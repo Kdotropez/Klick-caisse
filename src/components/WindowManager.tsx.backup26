@@ -25,7 +25,7 @@ import RecapModal from './RecapModal';
 interface Window {
   id: string;
   title: string;
-  type: 'products' | 'cart' | 'categories' | 'search' | 'settings' | 'import' | 'stats' | 'free';
+  type: 'products' | 'cart' | 'categories' | 'search' | 'settings' | 'import';
   x: number;
   y: number;
   width: number;
@@ -134,7 +134,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
              {
          id: 'window6',
          title: 'Fenêtre Libre 2',
-         type: 'free',
+         type: 'import',
          x: 431.3, // À côté de la première avec espacement (20 + 401.3 + 10)
          y: 820, // Sous la grille de produits avec espacement (210 + 600 + 20)
          width: 388.63, // Largeur ajustée par l'utilisateur
@@ -146,7 +146,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                {
           id: 'window7',
           title: 'Fonction Stat',
-          type: 'stats',
+          type: 'settings',
           x: 832.33, // Même x que la fenêtre Modes de Règlement
           y: 897.33, // Sous la fenêtre Modes de Règlement avec espacement (700 + 187.33 + 10)
           width: 406.66, // Largeur ajustée par l'utilisateur
@@ -1035,669 +1035,185 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
                            case 'settings':
           return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
-              {/* Grille 3x4 pour les 12 boutons */}
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff5722',
-                    '&:hover': { backgroundColor: '#e64a19' }
-                  }}
-                  onClick={() => console.log('Vide 1')}
-                >
-                  Vide 1
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#795548',
-                    '&:hover': { backgroundColor: '#5d4037' }
-                  }}
-                  onClick={() => console.log('Vide 2')}
-                >
-                  Vide 2
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#455a64' }
-                  }}
-                  onClick={() => console.log('Vide 3')}
-                >
-                  Vide 3
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff4081',
-                    '&:hover': { backgroundColor: '#e91e63' }
-                  }}
-                  onClick={() => console.log('Vide 4')}
-                >
-                  Vide 4
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#3f51b5',
-                    '&:hover': { backgroundColor: '#303f9f' }
-                  }}
-                  onClick={() => console.log('Vide 5')}
-                >
-                  Vide 5
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' }
-                  }}
-                  onClick={() => console.log('Vide 6')}
-                >
-                  Vide 6
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff9800',
-                    '&:hover': { backgroundColor: '#f57c00' }
-                  }}
-                  onClick={() => console.log('Vide 7')}
-                >
-                  Vide 7
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' }
-                  }}
-                  onClick={() => console.log('Vide 8')}
-                >
-                  Vide 8
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#00bcd4',
-                    '&:hover': { backgroundColor: '#0097a7' }
-                  }}
-                  onClick={() => console.log('Vide 9')}
-                >
-                  Vide 9
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#009688',
-                    '&:hover': { backgroundColor: '#00796b' }
-                  }}
-                  onClick={() => console.log('Vide 10')}
-                >
-                  Vide 10
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#8bc34a',
-                    '&:hover': { backgroundColor: '#689f38' }
-                  }}
-                  onClick={() => console.log('Vide 11')}
-                >
-                  Vide 11
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#cddc39',
-                    '&:hover': { backgroundColor: '#afb42b' }
-                  }}
-                  onClick={() => console.log('Vide 12')}
-                >
-                  Vide 12
-                </Button>
-              </Box>
-            </Box>
-          );
-
-                           case 'import':
-          return (
             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
-                Gestion Données
+              <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider', textAlign: 'center', fontWeight: 'bold' }}>
+                Statistiques
               </Typography>
-              <Box sx={{ p: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography variant="body2" align="center" sx={{ mb: 1 }}>
-                  {products.length} produits chargés
-                </Typography>
-                <Typography variant="body2" align="center" sx={{ mb: 2 }}>
-                  {categories.length} catégories
-                </Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<ImportExport />}
-                  onClick={() => {
-                    // TODO: Ouvrir l'import CSV
-                    alert('Fonctionnalité d\'import CSV à implémenter');
-                  }}
-                >
-                  Importer CSV
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => {
-                    // TODO: Exporter les données
-                    alert('Fonctionnalité d\'export à implémenter');
-                  }}
-                >
-                  Exporter Données
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                                    onClick={() => {
-                     // TODO: Réinitialiser aux données par défaut
-                     // eslint-disable-next-line no-restricted-globals
-                     if (confirm('Réinitialiser aux données par défaut ?')) {
-                       // Réinitialiser les données
-                     }
-                   }}
-                >
-                  Réinitialiser
-                </Button>
+              <Box sx={{ p: 0.5, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                {/* Statistiques du jour */}
+                <Paper elevation={1} sx={{ p: 0.5, mb: 0.5, backgroundColor: '#e3f2fd' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#1976d2', mb: 0.5 }}>
+                    Aujourd'hui
+                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
+                    <Typography variant="caption">Ventes:</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>0 €</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
+                    <Typography variant="caption">Transactions:</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>0</Typography>
+                  </Box>
+                </Paper>
+
+                {/* Boutons de statistiques */}
+                <Box sx={{ display: 'flex', gap: 0.25, mb: 0.25 }}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ 
+                      flex: 1,
+                      py: 0.5, 
+                      fontSize: '0.7rem', 
+                      fontWeight: 'bold', 
+                      minHeight: '28px',
+                      backgroundColor: '#2196f3',
+                      '&:hover': { backgroundColor: '#1976d2' }
+                    }}
+                    onClick={() => console.log('Statistiques du jour')}
+                  >
+                    📊 Jour
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ 
+                      flex: 1,
+                      py: 0.5, 
+                      fontSize: '0.7rem', 
+                      fontWeight: 'bold', 
+                      minHeight: '28px',
+                      backgroundColor: '#4caf50',
+                      '&:hover': { backgroundColor: '#388e3c' }
+                    }}
+                    onClick={() => console.log('Statistiques de la semaine')}
+                  >
+                    📈 Semaine
+                  </Button>
+                </Box>
+                
+                <Box sx={{ display: 'flex', gap: 0.25, mb: 0.25 }}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ 
+                      flex: 1,
+                      py: 0.5, 
+                      fontSize: '0.7rem', 
+                      fontWeight: 'bold', 
+                      minHeight: '28px',
+                      backgroundColor: '#ff9800',
+                      '&:hover': { backgroundColor: '#f57c00' }
+                    }}
+                    onClick={() => console.log('Statistiques du mois')}
+                  >
+                    📋 Mois
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ 
+                      flex: 1,
+                      py: 0.5, 
+                      fontSize: '0.7rem', 
+                      fontWeight: 'bold', 
+                      minHeight: '28px',
+                      backgroundColor: '#9c27b0',
+                      '&:hover': { backgroundColor: '#7b1fa2' }
+                    }}
+                    onClick={() => console.log('Produits populaires')}
+                  >
+                    🏆 Top
+                  </Button>
+                </Box>
+                
+                <Box sx={{ display: 'flex', gap: 0.25 }}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ 
+                      flex: 1,
+                      py: 0.5, 
+                      fontSize: '0.7rem', 
+                      fontWeight: 'bold', 
+                      minHeight: '28px',
+                      backgroundColor: '#607d8b',
+                      '&:hover': { backgroundColor: '#455a64' }
+                    }}
+                    onClick={() => console.log('Export statistiques')}
+                  >
+                    📤 Export
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ 
+                      flex: 1,
+                      py: 0.5, 
+                      fontSize: '0.7rem', 
+                      fontWeight: 'bold', 
+                      minHeight: '28px',
+                      backgroundColor: '#e91e63',
+                      '&:hover': { backgroundColor: '#c2185b' }
+                    }}
+                    onClick={() => console.log('Réinitialiser stats')}
+                  >
+                    🔄 Reset
+                  </Button>
+                </Box>
               </Box>
             </Box>
           );
 
-              case 'stats':
-          return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
-              {/* Grille 2x3 pour les 6 boutons de fonction */}
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#2196f3',
-                    '&:hover': { backgroundColor: '#1976d2' }
+             case 'import':
+         return (
+           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+             <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
+               Gestion Données
+             </Typography>
+             <Box sx={{ p: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+               <Typography variant="body2" align="center" sx={{ mb: 1 }}>
+                 {products.length} produits chargés
+               </Typography>
+               <Typography variant="body2" align="center" sx={{ mb: 2 }}>
+                 {categories.length} catégories
+               </Typography>
+               <Button
+                 variant="outlined"
+                 size="small"
+                 startIcon={<ImportExport />}
+                 onClick={() => {
+                   // TODO: Ouvrir l'import CSV
+                   alert('Fonctionnalité d\'import CSV à implémenter');
+                 }}
+               >
+                 Importer CSV
+               </Button>
+               <Button
+                 variant="outlined"
+                 size="small"
+                 onClick={() => {
+                   // TODO: Exporter les données
+                   alert('Fonctionnalité d\'export à implémenter');
+                 }}
+               >
+                 Exporter Données
+               </Button>
+               <Button
+                 variant="outlined"
+                 size="small"
+                                   onClick={() => {
+                    // TODO: Réinitialiser aux données par défaut
+                    // eslint-disable-next-line no-restricted-globals
+                    if (confirm('Réinitialiser aux données par défaut ?')) {
+                      // Réinitialiser les données
+                    }
                   }}
-                  onClick={() => console.log('Fonction 1')}
-                >
-                  Fonction 1
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' }
-                  }}
-                  onClick={() => console.log('Fonction 2')}
-                >
-                  Fonction 2
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff9800',
-                    '&:hover': { backgroundColor: '#f57c00' }
-                  }}
-                  onClick={() => console.log('Fonction 3')}
-                >
-                  Fonction 3
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' }
-                  }}
-                  onClick={() => console.log('Fonction 4')}
-                >
-                  Fonction 4
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#e91e63',
-                    '&:hover': { backgroundColor: '#c2185b' }
-                  }}
-                  onClick={() => console.log('Fonction 5')}
-                >
-                  Fonction 5
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#455a64' }
-                  }}
-                  onClick={() => console.log('Fonction 6')}
-                >
-                  Fonction 6
-                </Button>
-              </Box>
-            </Box>
-          );
-
-              case 'free':
-          return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
-              {/* Grille 3x4 pour les 12 boutons */}
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#f44336',
-                    '&:hover': { backgroundColor: '#d32f2f' }
-                  }}
-                  onClick={() => console.log('Libre 1')}
-                >
-                  Libre 1
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#e91e63',
-                    '&:hover': { backgroundColor: '#c2185b' }
-                  }}
-                  onClick={() => console.log('Libre 2')}
-                >
-                  Libre 2
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' }
-                  }}
-                  onClick={() => console.log('Libre 3')}
-                >
-                  Libre 3
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#673ab7',
-                    '&:hover': { backgroundColor: '#512da8' }
-                  }}
-                  onClick={() => console.log('Libre 4')}
-                >
-                  Libre 4
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#3f51b5',
-                    '&:hover': { backgroundColor: '#303f9f' }
-                  }}
-                  onClick={() => console.log('Libre 5')}
-                >
-                  Libre 5
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#2196f3',
-                    '&:hover': { backgroundColor: '#1976d2' }
-                  }}
-                  onClick={() => console.log('Libre 6')}
-                >
-                  Libre 6
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#03a9f4',
-                    '&:hover': { backgroundColor: '#0288d1' }
-                  }}
-                  onClick={() => console.log('Libre 7')}
-                >
-                  Libre 7
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#00bcd4',
-                    '&:hover': { backgroundColor: '#0097a7' }
-                  }}
-                  onClick={() => console.log('Libre 8')}
-                >
-                  Libre 8
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#009688',
-                    '&:hover': { backgroundColor: '#00796b' }
-                  }}
-                  onClick={() => console.log('Libre 9')}
-                >
-                  Libre 9
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' }
-                  }}
-                  onClick={() => console.log('Libre 10')}
-                >
-                  Libre 10
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#8bc34a',
-                    '&:hover': { backgroundColor: '#689f38' }
-                  }}
-                  onClick={() => console.log('Libre 11')}
-                >
-                  Libre 11
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#cddc39',
-                    '&:hover': { backgroundColor: '#afb42b' }
-                  }}
-                  onClick={() => console.log('Libre 12')}
-                >
-                  Libre 12
-                </Button>
-              </Box>
-            </Box>
-          );
-
-              case 'settings':
-          return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
-              {/* Grille 3x4 pour les 12 boutons */}
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff5722',
-                    '&:hover': { backgroundColor: '#e64a19' }
-                  }}
-                  onClick={() => console.log('Fonction 1')}
-                >
-                  Fonction 1
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#795548',
-                    '&:hover': { backgroundColor: '#5d4037' }
-                  }}
-                  onClick={() => console.log('Fonction 2')}
-                >
-                  Fonction 2
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#455a64' }
-                  }}
-                  onClick={() => console.log('Fonction 3')}
-                >
-                  Fonction 3
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff4081',
-                    '&:hover': { backgroundColor: '#e91e63' }
-                  }}
-                  onClick={() => console.log('Fonction 4')}
-                >
-                  Fonction 4
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#3f51b5',
-                    '&:hover': { backgroundColor: '#303f9f' }
-                  }}
-                  onClick={() => console.log('Fonction 5')}
-                >
-                  Fonction 5
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' }
-                  }}
-                  onClick={() => console.log('Fonction 6')}
-                >
-                  Fonction 6
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff9800',
-                    '&:hover': { backgroundColor: '#f57c00' }
-                  }}
-                  onClick={() => console.log('Fonction 7')}
-                >
-                  Fonction 7
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' }
-                  }}
-                  onClick={() => console.log('Fonction 8')}
-                >
-                  Fonction 8
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#00bcd4',
-                    '&:hover': { backgroundColor: '#0097a7' }
-                  }}
-                  onClick={() => console.log('Fonction 9')}
-                >
-                  Fonction 9
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#009688',
-                    '&:hover': { backgroundColor: '#00796b' }
-                  }}
-                  onClick={() => console.log('Fonction 10')}
-                >
-                  Fonction 10
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#8bc34a',
-                    '&:hover': { backgroundColor: '#689f38' }
-                  }}
-                  onClick={() => console.log('Fonction 11')}
-                >
-                  Fonction 11
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#cddc39',
-                    '&:hover': { backgroundColor: '#afb42b' }
-                  }}
-                  onClick={() => console.log('Fonction 12')}
-                >
-                  Fonction 12
-                </Button>
-              </Box>
-            </Box>
-          );
+               >
+                 Réinitialiser
+               </Button>
+             </Box>
+           </Box>
+         );
 
       default:
         return null;

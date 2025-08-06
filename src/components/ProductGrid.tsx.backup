@@ -14,20 +14,24 @@ import {
   Pagination,
 } from '@mui/material';
 import { Settings, ExpandMore, ExpandLess, NavigateBefore, NavigateNext } from '@mui/icons-material';
-import { Product } from '../types/Product';
+import { Product, ProductVariation } from '../types/Product';
+import VariationModal from './VariationModal';
 
 interface ProductGridProps {
   products: Product[];
   onProductClick: (product: Product) => void;
+  onProductWithVariationClick: (product: Product, variation: ProductVariation) => void;
 }
 
-const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick }) => {
+const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick, onProductWithVariationClick }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [cardHeight, setCardHeight] = useState(140);
   const [cardWidth, setCardWidth] = useState(240);
   const [gridGap, setGridGap] = useState(12);
   const [gridPadding, setGridPadding] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
+  const [variationModalOpen, setVariationModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Configuration fixe 5×6
   const CARDS_PER_PAGE = 30; // 5 colonnes × 6 rangées
@@ -51,6 +55,23 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick }) =
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
+  };
+
+  const handleProductClick = (product: Product) => {
+    if (product.variations.length > 0) {
+      // Ouvrir la modale de déclinaisons
+      setSelectedProduct(product);
+      setVariationModalOpen(true);
+    } else {
+      // Ajouter directement au panier
+      onProductClick(product);
+    }
+  };
+
+  const handleVariationSelect = (variation: ProductVariation) => {
+    if (selectedProduct) {
+      onProductWithVariationClick(selectedProduct, variation);
+    }
   };
 
   // Calculer les produits à afficher pour la page courante
@@ -235,7 +256,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick }) =
                 transform: 'translateY(0px) scale(0.98)',
               },
             }}
-            onClick={() => onProductClick(product)}
+            onClick={() => handleProductClick(product)}
           >
             <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Typography
@@ -283,6 +304,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick }) =
           </Card>
         ))}
       </Box>
+
+      {/* Modale de sélection des déclinaisons */}
+      <VariationModal
+        open={variationModalOpen}
+        product={selectedProduct}
+        onClose={() => setVariationModalOpen(false)}
+        onSelectVariation={handleVariationSelect}
+      />
     </Box>
   );
 };
