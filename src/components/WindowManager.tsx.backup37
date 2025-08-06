@@ -76,7 +76,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         title: 'Grille Produits',
         type: 'products',
         x: 20, // Même x que la fenêtre catégories
-        y: 150, // Remonté de 60px (210 - 60 = 150)
+        y: 210, // Juste en dessous de la fenêtre catégories (80 + 120 + 10)
         width: 800, // Largeur personnalisée
         height: 600, // Hauteur personnalisée
         isMinimized: false,
@@ -88,7 +88,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          title: 'Panier & Ticket',
          type: 'cart',
          x: 832.33, // Position avec espacement de 10px (20 + 802.33 + 10)
-         y: 20, // Remonté de 60px (80 - 60 = 20)
+         y: 80, // Même y que la fenêtre catégories
          width: 405, // Largeur exacte mesurée
          height: 600, // Hauteur exacte mesurée
          isMinimized: false,
@@ -100,7 +100,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
            title: 'Catégories',
            type: 'categories',
            x: 20, // Position personnalisée - coin haut gauche de l'espace fenêtre
-           y: 20, // Remonté de 60px (80 - 60 = 20)
+           y: 80, // Position personnalisée - coin haut gauche de l'espace fenêtre
            width: 802.33, // Largeur exacte mesurée
            height: 121.33, // Hauteur exacte mesurée
            isMinimized: false,
@@ -112,7 +112,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          title: 'Modes de Règlement',
          type: 'search',
          x: 832.33, // Même x que la fenêtre ticket
-         y: 640, // Remonté de 60px (700 - 60 = 640)
+         y: 700, // En dessous de la fenêtre ticket avec espacement (80 + 600 + 20)
          width: 405.33, // Largeur exacte mesurée
          height: 187.33, // Hauteur exacte mesurée
          isMinimized: false,
@@ -124,7 +124,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          title: 'Fonction',
          type: 'settings',
          x: 20, // À gauche
-         y: 760, // Remonté de 60px (820 - 60 = 760)
+         y: 820, // Sous la grille de produits avec espacement (210 + 600 + 20)
          width: 401.3, // Largeur exacte mesurée
          height: 189.33, // Hauteur exacte mesurée
          isMinimized: false,
@@ -136,7 +136,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          title: 'Fenêtre Libre 2',
          type: 'free',
          x: 431.3, // À côté de la première avec espacement (20 + 401.3 + 10)
-         y: 760, // Remonté de 60px (820 - 60 = 760)
+         y: 820, // Sous la grille de produits avec espacement (210 + 600 + 20)
          width: 388.63, // Largeur ajustée par l'utilisateur
          height: 190.66, // Hauteur ajustée par l'utilisateur
          isMinimized: false,
@@ -148,7 +148,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           title: 'Fonction Stat',
           type: 'stats',
           x: 832.33, // Même x que la fenêtre Modes de Règlement
-          y: 837.33, // Remonté de 60px (897.33 - 60 = 837.33)
+          y: 897.33, // Sous la fenêtre Modes de Règlement avec espacement (700 + 187.33 + 10)
           width: 406.66, // Largeur ajustée par l'utilisateur
           height: 113, // Hauteur ajustée par l'utilisateur
           isMinimized: false,
