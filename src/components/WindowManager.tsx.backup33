@@ -171,29 +171,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     height: window.innerHeight
   });
 
-  // Système de scaling automatique pour adaptation dynamique
-  const [scaleFactor, setScaleFactor] = useState(1);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  // Calcul du facteur d'échelle optimal
-  const calculateScaleFactor = () => {
-    // Résolution de référence (écran de développement)
-    const referenceWidth = 1920;
-    const referenceHeight = 1080;
-    
-    // Calculer le facteur d'échelle basé sur la plus petite dimension
-    const widthScale = window.innerWidth / referenceWidth;
-    const heightScale = window.innerHeight / referenceHeight;
-    const newScaleFactor = Math.min(widthScale, heightScale, 1.5); // Limiter à 1.5x max
-    
-    return Math.max(0.7, newScaleFactor); // Minimum 0.7x
-  };
-
-  // Détection d'appareil tactile
-  const detectTouchDevice = () => {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  };
-
   // Fonction pour obtenir une couleur vive basée sur la catégorie
   const getCategoryColor = (categoryId: string) => {
     // Palette de couleurs vives et contrastées
@@ -402,24 +379,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Mettre à jour les dimensions de l'écran quand la fenêtre change de taille
   useEffect(() => {
     const handleResize = () => {
-      const newDimensions = {
+      setScreenDimensions({
         width: window.innerWidth,
         height: window.innerHeight
-      };
-      setScreenDimensions(newDimensions);
-      
-      // Recalculer le facteur d'échelle
-      const newScaleFactor = calculateScaleFactor();
-      setScaleFactor(newScaleFactor);
-      
-      // Détecter l'appareil tactile
-      setIsTouchDevice(detectTouchDevice());
-      
-      console.log(`Écran: ${newDimensions.width}x${newDimensions.height}, Scale: ${newScaleFactor.toFixed(2)}, Touch: ${detectTouchDevice()}`);
+      });
     };
-
-    // Initialisation
-    handleResize();
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -587,41 +551,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         return (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {/* Navigation pagination */}
-            <Box sx={{ 
-              p: 1 * scaleFactor, 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              fontSize: `${0.875 * scaleFactor}rem`
-            }}>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: `${0.875 * scaleFactor}rem` }}>
+            <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
                 Page {currentPage} sur {totalPages} - {filteredProducts.length} produits
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1 * scaleFactor }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   size="small"
-                  sx={{ 
-                    fontSize: `${0.75 * scaleFactor}rem`,
-                    minHeight: `${32 * scaleFactor}px`,
-                    padding: `${4 * scaleFactor}px ${8 * scaleFactor}px`
-                  }}
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
                 >
                   Précédent
                 </Button>
-                <Chip 
-                  label={`${currentPage}/${totalPages}`} 
-                  size="small" 
-                  sx={{ fontSize: `${0.75 * scaleFactor}rem` }}
-                />
+                <Chip label={`${currentPage}/${totalPages}`} size="small" />
                 <Button
                   size="small"
-                  sx={{ 
-                    fontSize: `${0.75 * scaleFactor}rem`,
-                    minHeight: `${32 * scaleFactor}px`,
-                    padding: `${4 * scaleFactor}px ${8 * scaleFactor}px`
-                  }}
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
                 >
@@ -634,10 +578,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
              <Box sx={{ 
                flexGrow: 1, 
                display: 'grid', 
-               gridTemplateColumns: screenDimensions.width < 1200 ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)',
-               gridTemplateRows: screenDimensions.height < 800 ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)',
-               gap: 0.5 * scaleFactor,
-               p: 0.5 * scaleFactor,
+               gridTemplateColumns: 'repeat(5, 1fr)',
+               gridTemplateRows: 'repeat(5, 1fr)',
+               gap: 0.5,
+               p: 0.5,
                overflow: 'hidden',
                minHeight: 0
              }}>
@@ -647,7 +591,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     <Paper
                       key={product.id}
                       sx={{
-                        p: 0.5 * scaleFactor,
+                        p: 0.5,
                         cursor: 'pointer',
                         transition: 'all 0.2s',
                         display: 'flex',
@@ -655,74 +599,35 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                         justifyContent: 'space-between',
                         minHeight: 0,
                         background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}80 30%, ${categoryColor}40 70%, white 100%)`, // Dégradé professionnel vers blanc
-                        border: `${2 * scaleFactor}px solid ${categoryColor}`, // Bordure fine et élégante
-                        borderRadius: `${8 * scaleFactor}px`, // Coins légèrement arrondis
-                        boxShadow: `0 ${3 * scaleFactor}px ${10 * scaleFactor}px rgba(0,0,0,0.15), 0 ${1 * scaleFactor}px ${3 * scaleFactor}px ${categoryColor}30`, // Ombre subtile et professionnelle
+                        border: `2px solid ${categoryColor}`, // Bordure fine et élégante
+                        borderRadius: '8px', // Coins légèrement arrondis
+                        boxShadow: `0 3px 10px rgba(0,0,0,0.15), 0 1px 3px ${categoryColor}30`, // Ombre subtile et professionnelle
                         color: '#2c3e50', // Texte foncé professionnel
                         fontWeight: '600', // Texte semi-gras
                         '&:hover': { 
                           transform: 'translateY(-2px)', 
-                          boxShadow: `0 ${6 * scaleFactor}px ${20 * scaleFactor}px rgba(0,0,0,0.2), 0 ${2 * scaleFactor}px ${6 * scaleFactor}px ${categoryColor}40`,
+                          boxShadow: `0 6px 20px rgba(0,0,0,0.2), 0 2px 6px ${categoryColor}40`,
                           background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}90 25%, ${categoryColor}50 65%, white 100%)`,
-                          border: `${2 * scaleFactor}px solid ${categoryColor}`
+                          border: `2px solid ${categoryColor}`
                         },
                         '&:active': { 
                           transform: 'translateY(0px) scale(0.98)',
-                          boxShadow: `0 ${2 * scaleFactor}px ${6 * scaleFactor}px rgba(0,0,0,0.25), 0 ${1 * scaleFactor}px ${2 * scaleFactor}px ${categoryColor}30`,
+                          boxShadow: `0 2px 6px rgba(0,0,0,0.25), 0 1px 2px ${categoryColor}30`,
                           background: `linear-gradient(135deg, ${categoryColor}80 0%, ${categoryColor}60 40%, ${categoryColor}30 80%, white 100%)`
                         }
                       }}
                       onClick={() => handleProductClick(product)}
                     >
-                                                                                                       <Typography variant="body2" sx={{ 
-                                         fontWeight: '600', 
-                                         fontSize: `${0.75 * scaleFactor}rem`, 
-                                         lineHeight: 1.2, 
-                                         flexGrow: 1, 
-                                         color: '#2c3e50' 
-                                       }}>
+                                                                                                       <Typography variant="body2" sx={{ fontWeight: '600', fontSize: '0.75rem', lineHeight: 1.2, flexGrow: 1, color: '#2c3e50' }}>
                      {product.name}
                    </Typography>
-                                        <Typography variant="h6" sx={{ 
-                                          fontWeight: 'bold', 
-                                          fontSize: `${1 * scaleFactor}rem`, 
-                                          textAlign: 'center', 
-                                          color: categoryColor, 
-                                          letterSpacing: `${0.5 * scaleFactor}px` 
-                                        }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem', textAlign: 'center', color: categoryColor, letterSpacing: '0.5px' }}>
                          {product.finalPrice.toFixed(2)} €
                        </Typography>
-                                       <Box sx={{ 
-                                         display: 'flex', 
-                                         justifyContent: 'space-between', 
-                                         mt: 0.25 * scaleFactor, 
-                                         gap: 0.25 * scaleFactor 
-                                       }}>
-                      <Chip 
-                        label={`${product.salesCount || 0}`} 
-                        size="small" 
-                        sx={{ 
-                          fontSize: `${0.6 * scaleFactor}rem`, 
-                          height: `${20 * scaleFactor}px`, 
-                          backgroundColor: categoryColor, 
-                          color: 'white', 
-                          fontWeight: '600', 
-                          boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
-                        }} 
-                      />
+                                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.25, gap: 0.25 }}>
+                      <Chip label={`${product.salesCount || 0}`} size="small" sx={{ fontSize: '0.6rem', height: '20px', backgroundColor: categoryColor, color: 'white', fontWeight: '600', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                       {product.variations.length > 0 && (
-                        <Chip 
-                          label={`${product.variations.length} var.`} 
-                          size="small" 
-                          sx={{ 
-                            fontSize: `${0.6 * scaleFactor}rem`, 
-                            height: `${20 * scaleFactor}px`, 
-                            backgroundColor: '#95a5a6', 
-                            color: 'white', 
-                            fontWeight: '600', 
-                            boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
-                          }} 
-                        />
+                        <Chip label={`${product.variations.length} var.`} size="small" sx={{ fontSize: '0.6rem', height: '20px', backgroundColor: '#95a5a6', color: 'white', fontWeight: '600', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                       )}
                     </Box>
                   </Paper>
