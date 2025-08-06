@@ -46,7 +46,6 @@ interface WindowManagerProps {
   onRemoveItem: (productId: string, variationId: string | null) => void;
   onCheckout: () => void;
   onImportComplete: (products: Product[], categories: Category[]) => void;
-  onProductsReorder?: (newProducts: Product[]) => void;
 }
 
 const WindowManager: React.FC<WindowManagerProps> = ({
@@ -60,7 +59,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   onRemoveItem,
   onCheckout,
   onImportComplete,
-  onProductsReorder,
 }) => {
   // Dimensions pour l'émulation 1920×1080
   const APP_BAR_HEIGHT = 64;
@@ -177,11 +175,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [scaleFactor, setScaleFactor] = useState(1);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-  // Système de drag and drop pour réorganiser les produits
-  const [draggedProduct, setDraggedProduct] = useState<Product | null>(null);
-  const [dragOverProduct, setDragOverProduct] = useState<Product | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-
   // Calcul du facteur d'échelle optimal
   const calculateScaleFactor = () => {
     // Résolution de référence (écran de développement)
@@ -199,76 +192,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Détection d'appareil tactile
   const detectTouchDevice = () => {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  };
-
-  // Fonctions de drag and drop
-  const handleDragStart = (e: React.DragEvent, product: Product) => {
-    setDraggedProduct(product);
-    setIsDragging(true);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', product.id);
-    
-    // Effet visuel pendant le drag
-    if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = '0.5';
-      e.currentTarget.style.transform = 'rotate(5deg) scale(1.05)';
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent, product: Product) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setDragOverProduct(product);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOverProduct(null);
-  };
-
-  const handleDrop = (e: React.DragEvent, targetProduct: Product) => {
-    e.preventDefault();
-    
-    if (draggedProduct && draggedProduct.id !== targetProduct.id) {
-      // Réorganiser les produits
-      const draggedIndex = products.findIndex(p => p.id === draggedProduct.id);
-      const targetIndex = products.findIndex(p => p.id === targetProduct.id);
-      
-      if (draggedIndex !== -1 && targetIndex !== -1) {
-        const newProducts = [...products];
-        const [removed] = newProducts.splice(draggedIndex, 1);
-        newProducts.splice(targetIndex, 0, removed);
-        
-        // Mettre à jour l'état des produits
-        console.log('Réorganisation des produits:', {
-          dragged: draggedProduct.name,
-          target: targetProduct.name,
-          newOrder: newProducts.map(p => p.name)
-        });
-        
-        // Appeler la fonction pour sauvegarder le nouvel ordre
-        if (onProductsReorder) {
-          onProductsReorder(newProducts);
-        }
-      }
-    }
-    
-    // Réinitialiser l'état
-    setDraggedProduct(null);
-    setDragOverProduct(null);
-    setIsDragging(false);
-  };
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    // Restaurer l'apparence normale
-    if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = '1';
-      e.currentTarget.style.transform = 'none';
-    }
-    
-    setDraggedProduct(null);
-    setDragOverProduct(null);
-    setIsDragging(false);
   };
 
   // Fonction pour obtenir une couleur vive basée sur la catégorie
@@ -614,10 +537,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   return (
                     <Paper
                       key={product.id}
-                      draggable
                       sx={{
                         p: 0.5 * scaleFactor,
-                        cursor: 'grab',
+                        cursor: 'pointer',
                         transition: 'all 0.2s',
                         display: 'flex',
                         flexDirection: 'column',
@@ -629,32 +551,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                         boxShadow: `0 ${3 * scaleFactor}px ${10 * scaleFactor}px rgba(0,0,0,0.15), 0 ${1 * scaleFactor}px ${3 * scaleFactor}px ${categoryColor}30`, // Ombre subtile et professionnelle
                         color: '#2c3e50', // Texte foncé professionnel
                         fontWeight: '600', // Texte semi-gras
-                        // Effet de drag over
-                        ...(dragOverProduct?.id === product.id && {
-                          transform: 'scale(1.05)',
-                          boxShadow: `0 ${8 * scaleFactor}px ${25 * scaleFactor}px rgba(0,0,0,0.3), 0 ${3 * scaleFactor}px ${8 * scaleFactor}px ${categoryColor}50`,
-                          border: `${3 * scaleFactor}px solid ${categoryColor}`,
-                          background: `linear-gradient(135deg, ${categoryColor}20 0%, ${categoryColor}40 30%, ${categoryColor}20 70%, white 100%)`
-                        }),
                         '&:hover': { 
                           transform: 'translateY(-2px)', 
                           boxShadow: `0 ${6 * scaleFactor}px ${20 * scaleFactor}px rgba(0,0,0,0.2), 0 ${2 * scaleFactor}px ${6 * scaleFactor}px ${categoryColor}40`,
                           background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}90 25%, ${categoryColor}50 65%, white 100%)`,
-                          border: `${2 * scaleFactor}px solid ${categoryColor}`,
-                          cursor: 'grab'
+                          border: `${2 * scaleFactor}px solid ${categoryColor}`
                         },
                         '&:active': { 
                           transform: 'translateY(0px) scale(0.98)',
                           boxShadow: `0 ${2 * scaleFactor}px ${6 * scaleFactor}px rgba(0,0,0,0.25), 0 ${1 * scaleFactor}px ${2 * scaleFactor}px ${categoryColor}30`,
-                          background: `linear-gradient(135deg, ${categoryColor}80 0%, ${categoryColor}60 40%, ${categoryColor}30 80%, white 100%)`,
-                          cursor: 'grabbing'
+                          background: `linear-gradient(135deg, ${categoryColor}80 0%, ${categoryColor}60 40%, ${categoryColor}30 80%, white 100%)`
                         }
                       }}
-                      onDragStart={(e) => handleDragStart(e, product)}
-                      onDragOver={(e) => handleDragOver(e, product)}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, product)}
-                      onDragEnd={handleDragEnd}
                       onClick={() => handleProductClick(product)}
                     >
                                                                                                        <Typography variant="body2" sx={{ 
@@ -1790,26 +1698,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       overflow: 'hidden',
       backgroundColor: '#f5f5f5'
     }}>
-      {/* Indicateur de mode drag and drop */}
-      {isDragging && (
-        <Box sx={{
-          position: 'fixed',
-          top: 10,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 9999,
-          backgroundColor: 'rgba(25, 118, 210, 0.9)',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: '20px',
-          fontSize: '14px',
-          fontWeight: 'bold',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          pointerEvents: 'none'
-        }}>
-          🎯 Glissez-déposez pour réorganiser les produits
-        </Box>
-      )}
 
                            {windows
           .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window6', 'window7'].includes(window.id)) // Afficher les 7 fenêtres

@@ -96,6 +96,13 @@ const App: React.FC = () => {
     alert('Fonctionnalité de paiement à implémenter');
   };
 
+  const handleProductsReorder = (newProducts: Product[]) => {
+    setProducts(newProducts);
+    // Sauvegarder le nouvel ordre dans le localStorage
+    localStorage.setItem('reorderedProducts', JSON.stringify(newProducts));
+    console.log('Nouvel ordre des produits sauvegardé');
+  };
+
   if (showImport) {
     return (
       <Box sx={{ height: '100vh', width: '100vw', p: 3 }}>
@@ -118,6 +125,7 @@ const App: React.FC = () => {
         onRemoveItem={handleRemoveItem}
         onCheckout={handleCheckout}
         onImportComplete={handleImportComplete}
+        onProductsReorder={handleProductsReorder}
       />
     </Box>
   );
