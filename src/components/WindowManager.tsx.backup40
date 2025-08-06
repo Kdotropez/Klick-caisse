@@ -20,7 +20,7 @@ import {
 } from '@mui/icons-material';
 import { Product, Category, CartItem, ProductVariation } from '../types/Product';
 import VariationModal from './VariationModal';
-
+import RecapModal from './RecapModal';
 
 interface Window {
   id: string;
@@ -70,7 +70,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   // État pour la modale récapitulative
-
+  const [recapModalOpen, setRecapModalOpen] = useState(false);
 
   const [windows, setWindows] = useState<Window[]>([
                    {
@@ -182,10 +182,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [dragOverProduct, setDragOverProduct] = useState<Product | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Système de notification de règlement
-  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
-
   // Calcul du facteur d'échelle optimal
   const calculateScaleFactor = () => {
     // Résolution de référence (écran de développement)
@@ -273,37 +269,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setDraggedProduct(null);
     setDragOverProduct(null);
     setIsDragging(false);
-  };
-
-  // Fonction de règlement direct
-  const handleDirectPayment = (method: string) => {
-    if (cartItems.length === 0) {
-      alert('Le panier est vide !');
-      return;
-    }
-
-    // Calculer le total
-    const total = cartItems.reduce((sum, item) => {
-      const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      return sum + (price * item.quantity);
-    }, 0);
-
-    // Afficher la notification de succès
-    setPaymentMethod(method);
-    setShowPaymentSuccess(true);
-
-    // Masquer la notification après 3 secondes
-    setTimeout(() => {
-      setShowPaymentSuccess(false);
-      setPaymentMethod('');
-    }, 3000);
-
-    // Vider le panier
-    cartItems.forEach(item => {
-      onRemoveItem(item.product.id, item.selectedVariation?.id || null);
-    });
-
-    console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€`);
   };
 
   // Fonction pour obtenir une couleur vive basée sur la catégorie
@@ -816,7 +781,80 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 }, 0).toFixed(2)} €
               </Typography>
               
-
+              {/* Boutons d'action du ticket */}
+              <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                                 {/* Bouton Recap */}
+                 <Button
+                   variant="contained"
+                   size="small"
+                   onClick={() => setRecapModalOpen(true)}
+                   disabled={cartItems.length === 0}
+                   sx={{ 
+                     flex: 1,
+                     fontSize: '0.8rem',
+                     py: 0.5,
+                     backgroundColor: '#2196f3',
+                     '&:hover': {
+                       backgroundColor: '#1976d2'
+                     },
+                     '&:disabled': {
+                       backgroundColor: '#ccc'
+                     }
+                   }}
+                 >
+                   📋 Recap
+                 </Button>
+                
+                {/* Bouton Remise */}
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    // TODO: Implémenter la fonctionnalité Remise
+                    console.log('Remise clicked');
+                  }}
+                  disabled={cartItems.length === 0}
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.8rem',
+                    py: 0.5,
+                    backgroundColor: '#ff9800',
+                    '&:hover': {
+                      backgroundColor: '#f57c00'
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#ccc'
+                    }
+                  }}
+                >
+                  💰 Remise
+                </Button>
+                
+                {/* Bouton Attente */}
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    // TODO: Implémenter la fonctionnalité Attente
+                    console.log('Attente clicked');
+                  }}
+                  disabled={cartItems.length === 0}
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.8rem',
+                    py: 0.5,
+                    backgroundColor: '#9c27b0',
+                    '&:hover': {
+                      backgroundColor: '#7b1fa2'
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#ccc'
+                    }
+                  }}
+                >
+                  ⏳ Attente
+                </Button>
+              </Box>
             </Box>
           </Box>
         );
@@ -1001,7 +1039,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      '&:hover': { backgroundColor: '#1b5e20' },
                      '&:disabled': { backgroundColor: '#ccc' }
                    }}
-                   onClick={() => handleDirectPayment('Espèces')}
+                   onClick={() => onCheckout()}
                    disabled={cartItems.length === 0}
                  >
                                        💵 ESPÈCES : {totalAmount.toFixed(2)} €
@@ -1022,7 +1060,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        '&:hover': { backgroundColor: '#1565c0' },
                        '&:disabled': { backgroundColor: '#ccc' }
                      }}
-                     onClick={() => handleDirectPayment('SumUp')}
+                     onClick={() => onCheckout()}
                      disabled={cartItems.length === 0}
                    >
                                            📱 SumUp : {totalAmount.toFixed(2)} €
@@ -1041,7 +1079,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        '&:hover': { backgroundColor: '#f57c00' },
                        '&:disabled': { backgroundColor: '#ccc' }
                      }}
-                     onClick={() => handleDirectPayment('Carte')}
+                     onClick={() => onCheckout()}
                      disabled={cartItems.length === 0}
                    >
                                            💳 Carte : {totalAmount.toFixed(2)} €
@@ -1064,7 +1102,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                       },
                       '&:disabled': { backgroundColor: '#ccc', color: '#ccc' }
                     }}
-                    onClick={() => handleDirectPayment('Chèque')}
+                    onClick={() => onCheckout()}
                     disabled={cartItems.length === 0}
                   >
                     📝 Chèque : {totalAmount.toFixed(2)} €
@@ -1773,34 +1811,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         </Box>
       )}
 
-      {/* Notification de règlement réussi */}
-      {showPaymentSuccess && (
-        <Box sx={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 10000,
-          backgroundColor: 'rgba(76, 175, 80, 0.95)',
-          color: 'white',
-          padding: '20px 40px',
-          borderRadius: '15px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-          textAlign: 'center',
-          animation: 'fadeInOut 3s ease-in-out',
-          '@keyframes fadeInOut': {
-            '0%': { opacity: 0, transform: 'translate(-50%, -50%) scale(0.8)' },
-            '20%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1.1)' },
-            '80%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
-            '100%': { opacity: 0, transform: 'translate(-50%, -50%) scale(0.8)' }
-          }
-        }}>
-          ✅ Règlement {paymentMethod} réussi !
-        </Box>
-      )}
-
                            {windows
           .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window6', 'window7'].includes(window.id)) // Afficher les 7 fenêtres
           .map((window) => (
@@ -1873,7 +1883,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          onSelectVariation={handleVariationSelect}
        />
 
-
+       {/* Modale récapitulative */}
+       <RecapModal
+         open={recapModalOpen}
+         onClose={() => setRecapModalOpen(false)}
+         cartItems={cartItems}
+       />
      </Box>
    );
  };
