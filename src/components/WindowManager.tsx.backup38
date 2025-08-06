@@ -89,7 +89,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          type: 'cart',
          x: 832.33, // Position avec espacement de 10px (20 + 802.33 + 10)
          y: 20, // Remonté de 60px (80 - 60 = 20)
-         width: 540, // Élargi d'un tiers (405 * 1.33 = 540)
+         width: 405, // Largeur exacte mesurée
          height: 600, // Hauteur exacte mesurée
          isMinimized: false,
          isMaximized: false,
@@ -113,7 +113,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          type: 'search',
          x: 832.33, // Même x que la fenêtre ticket
          y: 640, // Remonté de 60px (700 - 60 = 640)
-         width: 540, // Même largeur que le ticket élargi
+         width: 405.33, // Largeur exacte mesurée
          height: 187.33, // Hauteur exacte mesurée
          isMinimized: false,
          isMaximized: false,
@@ -149,7 +149,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           type: 'stats',
           x: 832.33, // Même x que la fenêtre Modes de Règlement
           y: 837.33, // Remonté de 60px (897.33 - 60 = 837.33)
-          width: 540, // Même largeur que les fenêtres au-dessus
+          width: 406.66, // Largeur ajustée par l'utilisateur
           height: 113, // Hauteur ajustée par l'utilisateur
           isMinimized: false,
           isMaximized: false,
