@@ -5,288 +5,288 @@ export const defaultCategories: Category[] = [
   {
     id: 'verre',
     name: 'VERRE',
-    color: '#a574a5',
+    color: '#3f50d1',
     productOrder: []
   },
   {
     id: 'vasque-et-seau',
     name: 'VASQUE ET SEAU',
-    color: '#5fe850',
+    color: '#e0c24a',
     productOrder: []
   },
   {
     id: 'cool-bag',
     name: 'COOL BAG',
-    color: '#afac51',
+    color: '#640a6d',
     productOrder: []
   },
   {
     id: 'vetement',
     name: 'VETEMENT',
-    color: '#a0d52a',
+    color: '#739dc9',
     productOrder: []
   },
   {
     id: 'ice-tropez',
     name: 'ICE TROPEZ',
-    color: '#b63bf6',
+    color: '#dced72',
     productOrder: []
   },
   {
     id: 'vin',
     name: 'VIN',
-    color: '#00d592',
+    color: '#2bcf8e',
     productOrder: []
   },
   {
     id: 'coffret',
     name: 'COFFRET',
-    color: '#9fc489',
+    color: '#11d209',
     productOrder: []
   },
   {
     id: 'degustation',
     name: 'DEGUSTATION',
-    color: '#92f1c1',
+    color: '#9edc84',
     productOrder: []
   },
   {
     id: 'led',
     name: 'LED',
-    color: '#7e3daa',
+    color: '#f8c301',
     productOrder: []
   },
   {
     id: 'braderie',
     name: 'BRADERIE',
-    color: '#670f7a',
+    color: '#5b3c66',
     productOrder: []
   },
   {
     id: 'porte-clef--bracelet',
     name: 'PORTE CLEF & BRACELET',
-    color: '#f6bf6e',
+    color: '#7862fd',
     productOrder: []
   },
   {
     id: 'divers',
     name: 'DIVERS',
-    color: '#47b82d',
+    color: '#510810',
     productOrder: []
   },
   {
     id: 'papeterie',
     name: 'PAPETERIE',
-    color: '#a1fb23',
+    color: '#a2e054',
     productOrder: []
   },
   {
     id: 'consomable-interne-boutique',
     name: 'CONSOMABLE INTERNE BOUTIQUE',
-    color: '#c3e5ef',
+    color: '#68434a',
     productOrder: []
   },
   {
     id: 'art-de-la-table',
     name: 'ART DE LA TABLE',
-    color: '#6c19f9',
+    color: '#4f0192',
     productOrder: []
   },
   {
     id: 'parapluie',
     name: 'PARAPLUIE',
-    color: '#59539b',
+    color: '#ba0f84',
     productOrder: []
   },
   {
     id: 'eventail',
     name: 'EVENTAIL',
-    color: '#e69f00',
+    color: '#8d8d1c',
     productOrder: []
   },
   {
     id: 'decapsuleur',
     name: 'DECAPSULEUR',
-    color: '#94733b',
+    color: '#b52814',
     productOrder: []
   },
   {
     id: 'pastis',
     name: 'PASTIS',
-    color: '#0ce3c8',
+    color: '#7d9b92',
     productOrder: []
   },
   {
     id: 'assiette',
     name: 'ASSIETTE',
-    color: '#a903cb',
+    color: '#25ad33',
     productOrder: []
   },
   {
     id: 'biere-bt',
     name: 'BIERE BT',
-    color: '#855445',
+    color: '#003dec',
     productOrder: []
   },
   {
     id: 'casquette',
     name: 'CASQUETTE',
-    color: '#051e3a',
+    color: '#871568',
     productOrder: []
   },
   {
     id: 'coussins',
     name: 'COUSSINS',
-    color: '#f5d33f',
+    color: '#aec2bd',
     productOrder: []
   },
   {
     id: 'emballage',
     name: 'EMBALLAGE',
-    color: '#96bdc8',
+    color: '#8c613c',
     productOrder: []
   },
   {
     id: 'sac',
     name: 'SAC',
-    color: '#e83a9a',
+    color: '#c969a9',
     productOrder: []
   },
   {
     id: 'enfant',
     name: 'ENFANT',
-    color: '#a6af3f',
+    color: '#021c8c',
     productOrder: []
   },
   {
     id: 'petanque',
     name: 'PETANQUE',
-    color: '#3d14a4',
+    color: '#8da628',
     productOrder: []
   },
   {
     id: 'pochette',
     name: 'POCHETTE',
-    color: '#303d57',
+    color: '#2e074b',
     productOrder: []
   },
   {
     id: 'bouchons',
     name: 'BOUCHONS',
-    color: '#8b4572',
+    color: '#cdb71e',
     productOrder: []
   },
   {
     id: 'serviette',
     name: 'SERVIETTE',
-    color: '#357620',
+    color: '#8afa5e',
     productOrder: []
   },
   {
     id: 'toutou',
     name: 'TOUTOU',
-    color: '#d0a816',
+    color: '#0e6a9c',
     productOrder: []
   },
   {
     id: 'pack-verre',
     name: 'PACK VERRE',
-    color: '#c15b01',
+    color: '#f72393',
     productOrder: []
   },
   {
     id: 'divers-interne',
     name: 'DIVERS INTERNE',
-    color: '#e21b77',
+    color: '#b035d5',
     productOrder: []
   },
   {
     id: 'pack-ice-bag',
     name: 'PACK ICE BAG',
-    color: '#ff57ea',
+    color: '#da5458',
     productOrder: []
   },
   {
     id: 'trio-pack',
     name: 'TRIO PACK',
-    color: '#13af7a',
+    color: '#233f80',
     productOrder: []
   },
   {
     id: 'tripack',
     name: 'TRIPACK',
-    color: '#a77197',
+    color: '#b428d1',
     productOrder: []
   },
   {
     id: 'composition-vasque',
     name: 'COMPOSITION VASQUE',
-    color: '#19c3af',
+    color: '#67fb25',
     productOrder: []
   },
   {
     id: 'plateau',
     name: 'PLATEAU',
-    color: '#21af11',
+    color: '#45f912',
     productOrder: []
   },
   {
     id: 'echarpe',
     name: 'ECHARPE',
-    color: '#5cc878',
+    color: '#b60102',
     productOrder: []
   },
   {
     id: 'produits-blonde',
     name: 'PRODUITS BLONDE',
-    color: '#baca2e',
+    color: '#3e1a95',
     productOrder: []
   },
   {
     id: 'pack-balloon',
     name: 'PACK BALLOON',
-    color: '#3bb0d9',
+    color: '#e11a73',
     productOrder: []
   },
   {
     id: 'plage-jeux-divers',
     name: 'PLAGE JEUX DIVERS',
-    color: '#2f3409',
+    color: '#c4efa5',
     productOrder: []
   },
   {
     id: 'accueil',
     name: 'Accueil',
-    color: '#199af2',
+    color: '#c38c31',
     productOrder: []
   },
   {
     id: 'bijoux',
     name: 'BIJOUX',
-    color: '#5d9d2c',
+    color: '#f44894',
     productOrder: []
   },
   {
     id: 'porte-cle-10',
     name: 'PORTE CLE 10',
-    color: '#c7874a',
+    color: '#1101e0',
     productOrder: []
   },
   {
     id: 'transat',
     name: 'TRANSAT',
-    color: '#61e083',
+    color: '#15ee27',
     productOrder: []
   },
   {
     id: 'verres-10-',
     name: 'VERRES 10 €',
-    color: '#7e5463',
+    color: '#f77f08',
     productOrder: []
   }
 ];
 
-// Produits générés automatiquement depuis votre CSV
+// Produits générés automatiquement depuis votre CSV (avec déclinaisons)
 export const defaultProducts: Product[] = [
   {
     id: '5851',
@@ -296,10 +296,12 @@ export const defaultProducts: Product[] = [
     reference: '1',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1,
-    variations: []
+    position: 5851,
+    variations: [
+
+    ]
   },
   {
     id: '5852',
@@ -309,10 +311,12 @@ export const defaultProducts: Product[] = [
     reference: '2',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 2,
-    variations: []
+    position: 5852,
+    variations: [
+
+    ]
   },
   {
     id: '5853',
@@ -322,10 +326,12 @@ export const defaultProducts: Product[] = [
     reference: '3',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 3,
-    variations: []
+    position: 5853,
+    variations: [
+
+    ]
   },
   {
     id: '5854',
@@ -335,10 +341,12 @@ export const defaultProducts: Product[] = [
     reference: '4',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 4,
-    variations: []
+    position: 5854,
+    variations: [
+
+    ]
   },
   {
     id: '5855',
@@ -348,10 +356,12 @@ export const defaultProducts: Product[] = [
     reference: '5',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 5,
-    variations: []
+    position: 5855,
+    variations: [
+
+    ]
   },
   {
     id: '5856',
@@ -361,10 +371,12 @@ export const defaultProducts: Product[] = [
     reference: '6',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 6,
-    variations: []
+    position: 5856,
+    variations: [
+
+    ]
   },
   {
     id: '5857',
@@ -374,10 +386,12 @@ export const defaultProducts: Product[] = [
     reference: '7',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 7,
-    variations: []
+    position: 5857,
+    variations: [
+
+    ]
   },
   {
     id: '5858',
@@ -387,10 +401,12 @@ export const defaultProducts: Product[] = [
     reference: '8',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 8,
-    variations: []
+    position: 5858,
+    variations: [
+
+    ]
   },
   {
     id: '5859',
@@ -400,10 +416,12 @@ export const defaultProducts: Product[] = [
     reference: '9',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 9,
-    variations: []
+    position: 5859,
+    variations: [
+
+    ]
   },
   {
     id: '5860',
@@ -413,10 +431,12 @@ export const defaultProducts: Product[] = [
     reference: '10',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 10,
-    variations: []
+    position: 5860,
+    variations: [
+
+    ]
   },
   {
     id: '5861',
@@ -426,10 +446,12 @@ export const defaultProducts: Product[] = [
     reference: '16',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 11,
-    variations: []
+    position: 5861,
+    variations: [
+
+    ]
   },
   {
     id: '5862',
@@ -439,10 +461,12 @@ export const defaultProducts: Product[] = [
     reference: '13',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 12,
-    variations: []
+    position: 5862,
+    variations: [
+
+    ]
   },
   {
     id: '5863',
@@ -452,10 +476,12 @@ export const defaultProducts: Product[] = [
     reference: '16',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 13,
-    variations: []
+    position: 5863,
+    variations: [
+
+    ]
   },
   {
     id: '5864',
@@ -465,10 +491,12 @@ export const defaultProducts: Product[] = [
     reference: '15',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 14,
-    variations: []
+    position: 5864,
+    variations: [
+
+    ]
   },
   {
     id: '5865',
@@ -478,10 +506,12 @@ export const defaultProducts: Product[] = [
     reference: '17',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 15,
-    variations: []
+    position: 5865,
+    variations: [
+
+    ]
   },
   {
     id: '5866',
@@ -491,10 +521,12 @@ export const defaultProducts: Product[] = [
     reference: '18',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 16,
-    variations: []
+    position: 5866,
+    variations: [
+
+    ]
   },
   {
     id: '5867',
@@ -504,10 +536,12 @@ export const defaultProducts: Product[] = [
     reference: '19',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 17,
-    variations: []
+    position: 5867,
+    variations: [
+
+    ]
   },
   {
     id: '5868',
@@ -517,10 +551,12 @@ export const defaultProducts: Product[] = [
     reference: '20',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 18,
-    variations: []
+    position: 5868,
+    variations: [
+
+    ]
   },
   {
     id: '5869',
@@ -530,10 +566,12 @@ export const defaultProducts: Product[] = [
     reference: '21',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 19,
-    variations: []
+    position: 5869,
+    variations: [
+
+    ]
   },
   {
     id: '5870',
@@ -543,10 +581,12 @@ export const defaultProducts: Product[] = [
     reference: '22',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 20,
-    variations: []
+    position: 5870,
+    variations: [
+
+    ]
   },
   {
     id: '5871',
@@ -556,10 +596,12 @@ export const defaultProducts: Product[] = [
     reference: '24',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 21,
-    variations: []
+    position: 5871,
+    variations: [
+
+    ]
   },
   {
     id: '5872',
@@ -569,10 +611,12 @@ export const defaultProducts: Product[] = [
     reference: '14',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 22,
-    variations: []
+    position: 5872,
+    variations: [
+
+    ]
   },
   {
     id: '5873',
@@ -582,10 +626,12 @@ export const defaultProducts: Product[] = [
     reference: '40',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 23,
-    variations: []
+    position: 5873,
+    variations: [
+
+    ]
   },
   {
     id: '5874',
@@ -595,10 +641,12 @@ export const defaultProducts: Product[] = [
     reference: '41',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 24,
-    variations: []
+    position: 5874,
+    variations: [
+
+    ]
   },
   {
     id: '5875',
@@ -608,10 +656,12 @@ export const defaultProducts: Product[] = [
     reference: '42',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 25,
-    variations: []
+    position: 5875,
+    variations: [
+
+    ]
   },
   {
     id: '5876',
@@ -621,10 +671,12 @@ export const defaultProducts: Product[] = [
     reference: '43',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 26,
-    variations: []
+    position: 5876,
+    variations: [
+
+    ]
   },
   {
     id: '5877',
@@ -634,10 +686,12 @@ export const defaultProducts: Product[] = [
     reference: '64',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 27,
-    variations: []
+    position: 5877,
+    variations: [
+
+    ]
   },
   {
     id: '5878',
@@ -647,10 +701,12 @@ export const defaultProducts: Product[] = [
     reference: '65',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 28,
-    variations: []
+    position: 5878,
+    variations: [
+
+    ]
   },
   {
     id: '5879',
@@ -660,10 +716,12 @@ export const defaultProducts: Product[] = [
     reference: '67',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 29,
-    variations: []
+    position: 5879,
+    variations: [
+
+    ]
   },
   {
     id: '5880',
@@ -673,10 +731,12 @@ export const defaultProducts: Product[] = [
     reference: '47',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 30,
-    variations: []
+    position: 5880,
+    variations: [
+
+    ]
   },
   {
     id: '5881',
@@ -686,10 +746,12 @@ export const defaultProducts: Product[] = [
     reference: '60',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 31,
-    variations: []
+    position: 5881,
+    variations: [
+
+    ]
   },
   {
     id: '5882',
@@ -699,10 +761,12 @@ export const defaultProducts: Product[] = [
     reference: '61',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 32,
-    variations: []
+    position: 5882,
+    variations: [
+
+    ]
   },
   {
     id: '5883',
@@ -712,10 +776,12 @@ export const defaultProducts: Product[] = [
     reference: '70',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 33,
-    variations: []
+    position: 5883,
+    variations: [
+
+    ]
   },
   {
     id: '5884',
@@ -725,10 +791,12 @@ export const defaultProducts: Product[] = [
     reference: '71',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 34,
-    variations: []
+    position: 5884,
+    variations: [
+
+    ]
   },
   {
     id: '5885',
@@ -738,10 +806,12 @@ export const defaultProducts: Product[] = [
     reference: '72',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 35,
-    variations: []
+    position: 5885,
+    variations: [
+
+    ]
   },
   {
     id: '5886',
@@ -751,10 +821,12 @@ export const defaultProducts: Product[] = [
     reference: '73',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 36,
-    variations: []
+    position: 5886,
+    variations: [
+
+    ]
   },
   {
     id: '5887',
@@ -764,10 +836,12 @@ export const defaultProducts: Product[] = [
     reference: '74',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 37,
-    variations: []
+    position: 5887,
+    variations: [
+
+    ]
   },
   {
     id: '5888',
@@ -777,10 +851,12 @@ export const defaultProducts: Product[] = [
     reference: '75',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 38,
-    variations: []
+    position: 5888,
+    variations: [
+
+    ]
   },
   {
     id: '5889',
@@ -790,10 +866,12 @@ export const defaultProducts: Product[] = [
     reference: '77',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 39,
-    variations: []
+    position: 5889,
+    variations: [
+
+    ]
   },
   {
     id: '5890',
@@ -803,10 +881,12 @@ export const defaultProducts: Product[] = [
     reference: '78',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 40,
-    variations: []
+    position: 5890,
+    variations: [
+
+    ]
   },
   {
     id: '5891',
@@ -816,10 +896,12 @@ export const defaultProducts: Product[] = [
     reference: '79',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 41,
-    variations: []
+    position: 5891,
+    variations: [
+
+    ]
   },
   {
     id: '5892',
@@ -829,10 +911,12 @@ export const defaultProducts: Product[] = [
     reference: '79',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 42,
-    variations: []
+    position: 5892,
+    variations: [
+
+    ]
   },
   {
     id: '5893',
@@ -842,10 +926,12 @@ export const defaultProducts: Product[] = [
     reference: '90',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 43,
-    variations: []
+    position: 5893,
+    variations: [
+
+    ]
   },
   {
     id: '5894',
@@ -855,10 +941,12 @@ export const defaultProducts: Product[] = [
     reference: '91',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 44,
-    variations: []
+    position: 5894,
+    variations: [
+
+    ]
   },
   {
     id: '5895',
@@ -868,10 +956,12 @@ export const defaultProducts: Product[] = [
     reference: '92',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 45,
-    variations: []
+    position: 5895,
+    variations: [
+
+    ]
   },
   {
     id: '5896',
@@ -881,10 +971,12 @@ export const defaultProducts: Product[] = [
     reference: '93',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 46,
-    variations: []
+    position: 5896,
+    variations: [
+
+    ]
   },
   {
     id: '5897',
@@ -894,10 +986,12 @@ export const defaultProducts: Product[] = [
     reference: '94',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 47,
-    variations: []
+    position: 5897,
+    variations: [
+
+    ]
   },
   {
     id: '5898',
@@ -907,10 +1001,12 @@ export const defaultProducts: Product[] = [
     reference: '95',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 48,
-    variations: []
+    position: 5898,
+    variations: [
+
+    ]
   },
   {
     id: '5899',
@@ -920,10 +1016,12 @@ export const defaultProducts: Product[] = [
     reference: '97',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 49,
-    variations: []
+    position: 5899,
+    variations: [
+
+    ]
   },
   {
     id: '5900',
@@ -933,10 +1031,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU8',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 50,
-    variations: []
+    position: 5900,
+    variations: [
+
+    ]
   },
   {
     id: '5901',
@@ -946,10 +1046,12 @@ export const defaultProducts: Product[] = [
     reference: '98',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 51,
-    variations: []
+    position: 5901,
+    variations: [
+
+    ]
   },
   {
     id: '5902',
@@ -959,10 +1061,12 @@ export const defaultProducts: Product[] = [
     reference: '99',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 52,
-    variations: []
+    position: 5902,
+    variations: [
+
+    ]
   },
   {
     id: '5903',
@@ -972,10 +1076,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU1',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 53,
-    variations: []
+    position: 5903,
+    variations: [
+
+    ]
   },
   {
     id: '5904',
@@ -985,10 +1091,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU2',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 54,
-    variations: []
+    position: 5904,
+    variations: [
+
+    ]
   },
   {
     id: '5905',
@@ -998,10 +1106,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU3',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 55,
-    variations: []
+    position: 5905,
+    variations: [
+
+    ]
   },
   {
     id: '5906',
@@ -1011,10 +1121,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU4',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 56,
-    variations: []
+    position: 5906,
+    variations: [
+
+    ]
   },
   {
     id: '5907',
@@ -1024,10 +1136,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU5',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 57,
-    variations: []
+    position: 5907,
+    variations: [
+
+    ]
   },
   {
     id: '5908',
@@ -1037,10 +1151,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU6',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 58,
-    variations: []
+    position: 5908,
+    variations: [
+
+    ]
   },
   {
     id: '5909',
@@ -1050,10 +1166,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU7',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 59,
-    variations: []
+    position: 5909,
+    variations: [
+
+    ]
   },
   {
     id: '5910',
@@ -1063,10 +1181,12 @@ export const defaultProducts: Product[] = [
     reference: 'FLU9',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 60,
-    variations: []
+    position: 5910,
+    variations: [
+
+    ]
   },
   {
     id: '5911',
@@ -1076,10 +1196,12 @@ export const defaultProducts: Product[] = [
     reference: '120',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 61,
-    variations: []
+    position: 5911,
+    variations: [
+
+    ]
   },
   {
     id: '5912',
@@ -1089,10 +1211,12 @@ export const defaultProducts: Product[] = [
     reference: '121',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 62,
-    variations: []
+    position: 5912,
+    variations: [
+
+    ]
   },
   {
     id: '5913',
@@ -1102,10 +1226,12 @@ export const defaultProducts: Product[] = [
     reference: '122',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 63,
-    variations: []
+    position: 5913,
+    variations: [
+
+    ]
   },
   {
     id: '5914',
@@ -1115,10 +1241,12 @@ export const defaultProducts: Product[] = [
     reference: '123',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 64,
-    variations: []
+    position: 5914,
+    variations: [
+
+    ]
   },
   {
     id: '5915',
@@ -1128,10 +1256,12 @@ export const defaultProducts: Product[] = [
     reference: '124',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 65,
-    variations: []
+    position: 5915,
+    variations: [
+
+    ]
   },
   {
     id: '5916',
@@ -1141,10 +1271,12 @@ export const defaultProducts: Product[] = [
     reference: '125',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 66,
-    variations: []
+    position: 5916,
+    variations: [
+
+    ]
   },
   {
     id: '5917',
@@ -1154,10 +1286,12 @@ export const defaultProducts: Product[] = [
     reference: '126',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 67,
-    variations: []
+    position: 5917,
+    variations: [
+
+    ]
   },
   {
     id: '5918',
@@ -1167,10 +1301,12 @@ export const defaultProducts: Product[] = [
     reference: '130',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 68,
-    variations: []
+    position: 5918,
+    variations: [
+
+    ]
   },
   {
     id: '5919',
@@ -1180,10 +1316,12 @@ export const defaultProducts: Product[] = [
     reference: '131',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 69,
-    variations: []
+    position: 5919,
+    variations: [
+
+    ]
   },
   {
     id: '5920',
@@ -1193,10 +1331,12 @@ export const defaultProducts: Product[] = [
     reference: '132',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 70,
-    variations: []
+    position: 5920,
+    variations: [
+
+    ]
   },
   {
     id: '5921',
@@ -1206,10 +1346,12 @@ export const defaultProducts: Product[] = [
     reference: '133',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 71,
-    variations: []
+    position: 5921,
+    variations: [
+
+    ]
   },
   {
     id: '5922',
@@ -1219,10 +1361,12 @@ export const defaultProducts: Product[] = [
     reference: '134',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 72,
-    variations: []
+    position: 5922,
+    variations: [
+
+    ]
   },
   {
     id: '5923',
@@ -1232,10 +1376,12 @@ export const defaultProducts: Product[] = [
     reference: '135',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 73,
-    variations: []
+    position: 5923,
+    variations: [
+
+    ]
   },
   {
     id: '5924',
@@ -1245,10 +1391,12 @@ export const defaultProducts: Product[] = [
     reference: '136',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 74,
-    variations: []
+    position: 5924,
+    variations: [
+
+    ]
   },
   {
     id: '5925',
@@ -1258,10 +1406,12 @@ export const defaultProducts: Product[] = [
     reference: '150',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 75,
-    variations: []
+    position: 5925,
+    variations: [
+
+    ]
   },
   {
     id: '5926',
@@ -1271,10 +1421,12 @@ export const defaultProducts: Product[] = [
     reference: '151',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 76,
-    variations: []
+    position: 5926,
+    variations: [
+
+    ]
   },
   {
     id: '5927',
@@ -1284,10 +1436,12 @@ export const defaultProducts: Product[] = [
     reference: '152',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 77,
-    variations: []
+    position: 5927,
+    variations: [
+
+    ]
   },
   {
     id: '5928',
@@ -1297,10 +1451,12 @@ export const defaultProducts: Product[] = [
     reference: '153',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 78,
-    variations: []
+    position: 5928,
+    variations: [
+
+    ]
   },
   {
     id: '5929',
@@ -1310,10 +1466,12 @@ export const defaultProducts: Product[] = [
     reference: '154',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 79,
-    variations: []
+    position: 5929,
+    variations: [
+
+    ]
   },
   {
     id: '5930',
@@ -1323,10 +1481,12 @@ export const defaultProducts: Product[] = [
     reference: '155',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 80,
-    variations: []
+    position: 5930,
+    variations: [
+
+    ]
   },
   {
     id: '5931',
@@ -1336,10 +1496,12 @@ export const defaultProducts: Product[] = [
     reference: '156',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 81,
-    variations: []
+    position: 5931,
+    variations: [
+
+    ]
   },
   {
     id: '5932',
@@ -1349,10 +1511,12 @@ export const defaultProducts: Product[] = [
     reference: '170',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 82,
-    variations: []
+    position: 5932,
+    variations: [
+
+    ]
   },
   {
     id: '5933',
@@ -1362,10 +1526,12 @@ export const defaultProducts: Product[] = [
     reference: '180',
     wholesalePrice: 10,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 83,
-    variations: []
+    position: 5933,
+    variations: [
+
+    ]
   },
   {
     id: '5934',
@@ -1375,10 +1541,12 @@ export const defaultProducts: Product[] = [
     reference: '190',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 84,
-    variations: []
+    position: 5934,
+    variations: [
+
+    ]
   },
   {
     id: '5935',
@@ -1388,10 +1556,12 @@ export const defaultProducts: Product[] = [
     reference: '191',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 85,
-    variations: []
+    position: 5935,
+    variations: [
+
+    ]
   },
   {
     id: '5936',
@@ -1401,10 +1571,12 @@ export const defaultProducts: Product[] = [
     reference: '192',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 86,
-    variations: []
+    position: 5936,
+    variations: [
+
+    ]
   },
   {
     id: '5937',
@@ -1414,10 +1586,12 @@ export const defaultProducts: Product[] = [
     reference: '193',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 87,
-    variations: []
+    position: 5937,
+    variations: [
+
+    ]
   },
   {
     id: '5938',
@@ -1427,10 +1601,12 @@ export const defaultProducts: Product[] = [
     reference: '194',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 88,
-    variations: []
+    position: 5938,
+    variations: [
+
+    ]
   },
   {
     id: '5939',
@@ -1440,10 +1616,12 @@ export const defaultProducts: Product[] = [
     reference: '195',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 89,
-    variations: []
+    position: 5939,
+    variations: [
+
+    ]
   },
   {
     id: '5940',
@@ -1453,10 +1631,12 @@ export const defaultProducts: Product[] = [
     reference: '196',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 90,
-    variations: []
+    position: 5940,
+    variations: [
+
+    ]
   },
   {
     id: '5941',
@@ -1466,10 +1646,12 @@ export const defaultProducts: Product[] = [
     reference: '210',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 91,
-    variations: []
+    position: 5941,
+    variations: [
+
+    ]
   },
   {
     id: '5942',
@@ -1479,10 +1661,12 @@ export const defaultProducts: Product[] = [
     reference: '211',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 92,
-    variations: []
+    position: 5942,
+    variations: [
+
+    ]
   },
   {
     id: '5943',
@@ -1492,10 +1676,12 @@ export const defaultProducts: Product[] = [
     reference: '220',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 93,
-    variations: []
+    position: 5943,
+    variations: [
+
+    ]
   },
   {
     id: '5944',
@@ -1505,10 +1691,12 @@ export const defaultProducts: Product[] = [
     reference: '221',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 94,
-    variations: []
+    position: 5944,
+    variations: [
+
+    ]
   },
   {
     id: '5945',
@@ -1518,10 +1706,12 @@ export const defaultProducts: Product[] = [
     reference: '222',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 95,
-    variations: []
+    position: 5945,
+    variations: [
+
+    ]
   },
   {
     id: '5946',
@@ -1531,10 +1721,12 @@ export const defaultProducts: Product[] = [
     reference: '223',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 96,
-    variations: []
+    position: 5946,
+    variations: [
+
+    ]
   },
   {
     id: '5947',
@@ -1544,10 +1736,12 @@ export const defaultProducts: Product[] = [
     reference: '224',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 97,
-    variations: []
+    position: 5947,
+    variations: [
+
+    ]
   },
   {
     id: '5948',
@@ -1557,10 +1751,12 @@ export const defaultProducts: Product[] = [
     reference: '225',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 98,
-    variations: []
+    position: 5948,
+    variations: [
+
+    ]
   },
   {
     id: '5949',
@@ -1570,10 +1766,12 @@ export const defaultProducts: Product[] = [
     reference: '226',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 99,
-    variations: []
+    position: 5949,
+    variations: [
+
+    ]
   },
   {
     id: '5950',
@@ -1583,10 +1781,12 @@ export const defaultProducts: Product[] = [
     reference: '240',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 100,
-    variations: []
+    position: 5950,
+    variations: [
+
+    ]
   },
   {
     id: '5951',
@@ -1596,10 +1796,12 @@ export const defaultProducts: Product[] = [
     reference: '250',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 101,
-    variations: []
+    position: 5951,
+    variations: [
+
+    ]
   },
   {
     id: '5952',
@@ -1609,10 +1811,12 @@ export const defaultProducts: Product[] = [
     reference: '252',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 102,
-    variations: []
+    position: 5952,
+    variations: [
+
+    ]
   },
   {
     id: '5953',
@@ -1622,10 +1826,12 @@ export const defaultProducts: Product[] = [
     reference: '253',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 103,
-    variations: []
+    position: 5953,
+    variations: [
+
+    ]
   },
   {
     id: '5954',
@@ -1635,10 +1841,12 @@ export const defaultProducts: Product[] = [
     reference: '254',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 104,
-    variations: []
+    position: 5954,
+    variations: [
+
+    ]
   },
   {
     id: '5955',
@@ -1648,10 +1856,12 @@ export const defaultProducts: Product[] = [
     reference: '270',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 105,
-    variations: []
+    position: 5955,
+    variations: [
+
+    ]
   },
   {
     id: '5956',
@@ -1661,10 +1871,12 @@ export const defaultProducts: Product[] = [
     reference: '271',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 106,
-    variations: []
+    position: 5956,
+    variations: [
+
+    ]
   },
   {
     id: '5957',
@@ -1674,10 +1886,12 @@ export const defaultProducts: Product[] = [
     reference: '280',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 107,
-    variations: []
+    position: 5957,
+    variations: [
+
+    ]
   },
   {
     id: '5958',
@@ -1687,10 +1901,12 @@ export const defaultProducts: Product[] = [
     reference: '281',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 108,
-    variations: []
+    position: 5958,
+    variations: [
+
+    ]
   },
   {
     id: '5959',
@@ -1700,10 +1916,12 @@ export const defaultProducts: Product[] = [
     reference: '290',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 109,
-    variations: []
+    position: 5959,
+    variations: [
+
+    ]
   },
   {
     id: '5960',
@@ -1713,10 +1931,12 @@ export const defaultProducts: Product[] = [
     reference: '291',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 110,
-    variations: []
+    position: 5960,
+    variations: [
+
+    ]
   },
   {
     id: '5961',
@@ -1726,10 +1946,12 @@ export const defaultProducts: Product[] = [
     reference: '292',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 111,
-    variations: []
+    position: 5961,
+    variations: [
+
+    ]
   },
   {
     id: '5962',
@@ -1739,10 +1961,12 @@ export const defaultProducts: Product[] = [
     reference: '293',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 112,
-    variations: []
+    position: 5962,
+    variations: [
+
+    ]
   },
   {
     id: '5963',
@@ -1752,10 +1976,12 @@ export const defaultProducts: Product[] = [
     reference: '300',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 113,
-    variations: []
+    position: 5963,
+    variations: [
+
+    ]
   },
   {
     id: '5964',
@@ -1765,10 +1991,12 @@ export const defaultProducts: Product[] = [
     reference: '310',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 114,
-    variations: []
+    position: 5964,
+    variations: [
+
+    ]
   },
   {
     id: '5965',
@@ -1778,10 +2006,12 @@ export const defaultProducts: Product[] = [
     reference: '320',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 115,
-    variations: []
+    position: 5965,
+    variations: [
+
+    ]
   },
   {
     id: '5966',
@@ -1791,10 +2021,12 @@ export const defaultProducts: Product[] = [
     reference: '321',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 116,
-    variations: []
+    position: 5966,
+    variations: [
+
+    ]
   },
   {
     id: '5967',
@@ -1804,10 +2036,12 @@ export const defaultProducts: Product[] = [
     reference: '322',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 117,
-    variations: []
+    position: 5967,
+    variations: [
+
+    ]
   },
   {
     id: '5968',
@@ -1817,10 +2051,12 @@ export const defaultProducts: Product[] = [
     reference: '330',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 118,
-    variations: []
+    position: 5968,
+    variations: [
+
+    ]
   },
   {
     id: '5969',
@@ -1830,10 +2066,12 @@ export const defaultProducts: Product[] = [
     reference: '331',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 119,
-    variations: []
+    position: 5969,
+    variations: [
+
+    ]
   },
   {
     id: '5970',
@@ -1843,10 +2081,12 @@ export const defaultProducts: Product[] = [
     reference: '340',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 120,
-    variations: []
+    position: 5970,
+    variations: [
+
+    ]
   },
   {
     id: '5971',
@@ -1856,10 +2096,12 @@ export const defaultProducts: Product[] = [
     reference: '350',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 121,
-    variations: []
+    position: 5971,
+    variations: [
+
+    ]
   },
   {
     id: '5972',
@@ -1869,10 +2111,12 @@ export const defaultProducts: Product[] = [
     reference: '351',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 122,
-    variations: []
+    position: 5972,
+    variations: [
+
+    ]
   },
   {
     id: '5973',
@@ -1882,10 +2126,12 @@ export const defaultProducts: Product[] = [
     reference: '360',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 123,
-    variations: []
+    position: 5973,
+    variations: [
+
+    ]
   },
   {
     id: '5974',
@@ -1895,10 +2141,12 @@ export const defaultProducts: Product[] = [
     reference: '370',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 124,
-    variations: []
+    position: 5974,
+    variations: [
+
+    ]
   },
   {
     id: '5975',
@@ -1908,10 +2156,12 @@ export const defaultProducts: Product[] = [
     reference: '380',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 125,
-    variations: []
+    position: 5975,
+    variations: [
+
+    ]
   },
   {
     id: '5976',
@@ -1921,10 +2171,12 @@ export const defaultProducts: Product[] = [
     reference: '390',
     wholesalePrice: 5,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 126,
-    variations: []
+    position: 5976,
+    variations: [
+
+    ]
   },
   {
     id: '5977',
@@ -1934,10 +2186,12 @@ export const defaultProducts: Product[] = [
     reference: '400',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 127,
-    variations: []
+    position: 5977,
+    variations: [
+
+    ]
   },
   {
     id: '5978',
@@ -1947,10 +2201,12 @@ export const defaultProducts: Product[] = [
     reference: '410',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 128,
-    variations: []
+    position: 5978,
+    variations: [
+
+    ]
   },
   {
     id: '5979',
@@ -1960,10 +2216,12 @@ export const defaultProducts: Product[] = [
     reference: '420',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 129,
-    variations: []
+    position: 5979,
+    variations: [
+
+    ]
   },
   {
     id: '5980',
@@ -1973,10 +2231,12 @@ export const defaultProducts: Product[] = [
     reference: '421',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 130,
-    variations: []
+    position: 5980,
+    variations: [
+
+    ]
   },
   {
     id: '5981',
@@ -1986,10 +2246,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 131,
-    variations: []
+    position: 5981,
+    variations: [
+
+    ]
   },
   {
     id: '5982',
@@ -1999,10 +2261,12 @@ export const defaultProducts: Product[] = [
     reference: '440',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 132,
-    variations: []
+    position: 5982,
+    variations: [
+
+    ]
   },
   {
     id: '5983',
@@ -2012,10 +2276,12 @@ export const defaultProducts: Product[] = [
     reference: '450',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 133,
-    variations: []
+    position: 5983,
+    variations: [
+
+    ]
   },
   {
     id: '5984',
@@ -2025,10 +2291,12 @@ export const defaultProducts: Product[] = [
     reference: '460',
     wholesalePrice: 10,
     finalPrice: 22,
-    crossedPrice: 24.200000000000003,
+    crossedPrice: 22,
     salesCount: 0,
-    position: 134,
-    variations: []
+    position: 5984,
+    variations: [
+
+    ]
   },
   {
     id: '5985',
@@ -2038,10 +2306,12 @@ export const defaultProducts: Product[] = [
     reference: '470',
     wholesalePrice: 6,
     finalPrice: 16,
-    crossedPrice: 17.6,
+    crossedPrice: 16,
     salesCount: 0,
-    position: 135,
-    variations: []
+    position: 5985,
+    variations: [
+
+    ]
   },
   {
     id: '5987',
@@ -2051,10 +2321,12 @@ export const defaultProducts: Product[] = [
     reference: '500',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 136,
-    variations: []
+    position: 5987,
+    variations: [
+
+    ]
   },
   {
     id: '5988',
@@ -2064,10 +2336,12 @@ export const defaultProducts: Product[] = [
     reference: '501',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 137,
-    variations: []
+    position: 5988,
+    variations: [
+
+    ]
   },
   {
     id: '5989',
@@ -2077,10 +2351,12 @@ export const defaultProducts: Product[] = [
     reference: '502',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 138,
-    variations: []
+    position: 5989,
+    variations: [
+
+    ]
   },
   {
     id: '5990',
@@ -2090,10 +2366,12 @@ export const defaultProducts: Product[] = [
     reference: '503',
     wholesalePrice: 6,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 139,
-    variations: []
+    position: 5990,
+    variations: [
+
+    ]
   },
   {
     id: '5991',
@@ -2103,10 +2381,12 @@ export const defaultProducts: Product[] = [
     reference: '510',
     wholesalePrice: 7,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 140,
-    variations: []
+    position: 5991,
+    variations: [
+
+    ]
   },
   {
     id: '5992',
@@ -2116,10 +2396,12 @@ export const defaultProducts: Product[] = [
     reference: '511',
     wholesalePrice: 8,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 141,
-    variations: []
+    position: 5992,
+    variations: [
+
+    ]
   },
   {
     id: '5993',
@@ -2129,10 +2411,12 @@ export const defaultProducts: Product[] = [
     reference: '520',
     wholesalePrice: 9,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 142,
-    variations: []
+    position: 5993,
+    variations: [
+
+    ]
   },
   {
     id: '5994',
@@ -2142,10 +2426,12 @@ export const defaultProducts: Product[] = [
     reference: '521',
     wholesalePrice: 7,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 143,
-    variations: []
+    position: 5994,
+    variations: [
+
+    ]
   },
   {
     id: '5995',
@@ -2155,10 +2441,12 @@ export const defaultProducts: Product[] = [
     reference: '530',
     wholesalePrice: 6,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 144,
-    variations: []
+    position: 5995,
+    variations: [
+
+    ]
   },
   {
     id: '5996',
@@ -2168,10 +2456,12 @@ export const defaultProducts: Product[] = [
     reference: '531',
     wholesalePrice: 6,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 145,
-    variations: []
+    position: 5996,
+    variations: [
+
+    ]
   },
   {
     id: '5997',
@@ -2181,10 +2471,12 @@ export const defaultProducts: Product[] = [
     reference: '540',
     wholesalePrice: 10,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 146,
-    variations: []
+    position: 5997,
+    variations: [
+
+    ]
   },
   {
     id: '5998',
@@ -2194,10 +2486,12 @@ export const defaultProducts: Product[] = [
     reference: '541',
     wholesalePrice: 10,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 147,
-    variations: []
+    position: 5998,
+    variations: [
+
+    ]
   },
   {
     id: '5999',
@@ -2207,10 +2501,12 @@ export const defaultProducts: Product[] = [
     reference: '542',
     wholesalePrice: 10,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 148,
-    variations: []
+    position: 5999,
+    variations: [
+
+    ]
   },
   {
     id: '6000',
@@ -2220,10 +2516,12 @@ export const defaultProducts: Product[] = [
     reference: '550',
     wholesalePrice: 10,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 149,
-    variations: []
+    position: 6000,
+    variations: [
+
+    ]
   },
   {
     id: '6001',
@@ -2233,10 +2531,12 @@ export const defaultProducts: Product[] = [
     reference: '551',
     wholesalePrice: 10,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 150,
-    variations: []
+    position: 6001,
+    variations: [
+
+    ]
   },
   {
     id: '6002',
@@ -2246,10 +2546,12 @@ export const defaultProducts: Product[] = [
     reference: '552',
     wholesalePrice: 10,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 151,
-    variations: []
+    position: 6002,
+    variations: [
+
+    ]
   },
   {
     id: '6003',
@@ -2259,10 +2561,12 @@ export const defaultProducts: Product[] = [
     reference: '560',
     wholesalePrice: 10,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 152,
-    variations: []
+    position: 6003,
+    variations: [
+
+    ]
   },
   {
     id: '6004',
@@ -2272,10 +2576,12 @@ export const defaultProducts: Product[] = [
     reference: '570',
     wholesalePrice: 19,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 153,
-    variations: []
+    position: 6004,
+    variations: [
+
+    ]
   },
   {
     id: '6005',
@@ -2285,10 +2591,12 @@ export const defaultProducts: Product[] = [
     reference: '571',
     wholesalePrice: 18,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 55,
     salesCount: 0,
-    position: 154,
-    variations: []
+    position: 6005,
+    variations: [
+
+    ]
   },
   {
     id: '6006',
@@ -2298,10 +2606,12 @@ export const defaultProducts: Product[] = [
     reference: '580',
     wholesalePrice: 8,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 155,
-    variations: []
+    position: 6006,
+    variations: [
+
+    ]
   },
   {
     id: '6007',
@@ -2311,10 +2621,12 @@ export const defaultProducts: Product[] = [
     reference: '585',
     wholesalePrice: 9,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 156,
-    variations: []
+    position: 6007,
+    variations: [
+
+    ]
   },
   {
     id: '6008',
@@ -2324,10 +2636,12 @@ export const defaultProducts: Product[] = [
     reference: '590',
     wholesalePrice: 13,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 157,
-    variations: []
+    position: 6008,
+    variations: [
+
+    ]
   },
   {
     id: '6009',
@@ -2337,10 +2651,12 @@ export const defaultProducts: Product[] = [
     reference: '600',
     wholesalePrice: 8,
     finalPrice: 19,
-    crossedPrice: 20.900000000000002,
+    crossedPrice: 19,
     salesCount: 0,
-    position: 158,
-    variations: []
+    position: 6009,
+    variations: [
+
+    ]
   },
   {
     id: '6010',
@@ -2350,10 +2666,12 @@ export const defaultProducts: Product[] = [
     reference: '605',
     wholesalePrice: 8,
     finalPrice: 19,
-    crossedPrice: 20.900000000000002,
+    crossedPrice: 19,
     salesCount: 0,
-    position: 159,
-    variations: []
+    position: 6010,
+    variations: [
+
+    ]
   },
   {
     id: '6011',
@@ -2363,10 +2681,12 @@ export const defaultProducts: Product[] = [
     reference: '610',
     wholesalePrice: 16,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 160,
-    variations: []
+    position: 6011,
+    variations: [
+
+    ]
   },
   {
     id: '6012',
@@ -2376,10 +2696,12 @@ export const defaultProducts: Product[] = [
     reference: '611',
     wholesalePrice: 18,
     finalPrice: 60,
-    crossedPrice: 66,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 161,
-    variations: []
+    position: 6012,
+    variations: [
+
+    ]
   },
   {
     id: '6013',
@@ -2389,10 +2711,12 @@ export const defaultProducts: Product[] = [
     reference: '612',
     wholesalePrice: 14,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 162,
-    variations: []
+    position: 6013,
+    variations: [
+
+    ]
   },
   {
     id: '6014',
@@ -2402,10 +2726,12 @@ export const defaultProducts: Product[] = [
     reference: '613',
     wholesalePrice: 17,
     finalPrice: 60,
-    crossedPrice: 66,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 163,
-    variations: []
+    position: 6014,
+    variations: [
+
+    ]
   },
   {
     id: '6015',
@@ -2415,10 +2741,12 @@ export const defaultProducts: Product[] = [
     reference: '614',
     wholesalePrice: 17,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 164,
-    variations: []
+    position: 6015,
+    variations: [
+
+    ]
   },
   {
     id: '6016',
@@ -2428,10 +2756,12 @@ export const defaultProducts: Product[] = [
     reference: '615',
     wholesalePrice: 17,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 165,
-    variations: []
+    position: 6016,
+    variations: [
+
+    ]
   },
   {
     id: '6017',
@@ -2441,10 +2771,12 @@ export const defaultProducts: Product[] = [
     reference: '620',
     wholesalePrice: 15,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 55,
     salesCount: 0,
-    position: 166,
-    variations: []
+    position: 6017,
+    variations: [
+
+    ]
   },
   {
     id: '6018',
@@ -2454,10 +2786,12 @@ export const defaultProducts: Product[] = [
     reference: '621',
     wholesalePrice: 15,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 55,
     salesCount: 0,
-    position: 167,
-    variations: []
+    position: 6018,
+    variations: [
+
+    ]
   },
   {
     id: '6019',
@@ -2467,10 +2801,12 @@ export const defaultProducts: Product[] = [
     reference: '622',
     wholesalePrice: 13,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 55,
     salesCount: 0,
-    position: 168,
-    variations: []
+    position: 6019,
+    variations: [
+
+    ]
   },
   {
     id: '6020',
@@ -2480,10 +2816,12 @@ export const defaultProducts: Product[] = [
     reference: '630',
     wholesalePrice: 10,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 169,
-    variations: []
+    position: 6020,
+    variations: [
+
+    ]
   },
   {
     id: '6021',
@@ -2493,10 +2831,12 @@ export const defaultProducts: Product[] = [
     reference: '631',
     wholesalePrice: 10,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 170,
-    variations: []
+    position: 6021,
+    variations: [
+
+    ]
   },
   {
     id: '6022',
@@ -2506,10 +2846,12 @@ export const defaultProducts: Product[] = [
     reference: '632',
     wholesalePrice: 11,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 171,
-    variations: []
+    position: 6022,
+    variations: [
+
+    ]
   },
   {
     id: '6023',
@@ -2519,10 +2861,12 @@ export const defaultProducts: Product[] = [
     reference: '640',
     wholesalePrice: 55,
     finalPrice: 110,
-    crossedPrice: 121.00000000000001,
+    crossedPrice: 110,
     salesCount: 0,
-    position: 172,
-    variations: []
+    position: 6023,
+    variations: [
+
+    ]
   },
   {
     id: '6024',
@@ -2532,10 +2876,12 @@ export const defaultProducts: Product[] = [
     reference: '641',
     wholesalePrice: 49,
     finalPrice: 105,
-    crossedPrice: 115.50000000000001,
+    crossedPrice: 105,
     salesCount: 0,
-    position: 173,
-    variations: []
+    position: 6024,
+    variations: [
+
+    ]
   },
   {
     id: '6025',
@@ -2545,10 +2891,12 @@ export const defaultProducts: Product[] = [
     reference: '650',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 174,
-    variations: []
+    position: 6025,
+    variations: [
+
+    ]
   },
   {
     id: '6026',
@@ -2558,10 +2906,12 @@ export const defaultProducts: Product[] = [
     reference: '651',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 175,
-    variations: []
+    position: 6026,
+    variations: [
+
+    ]
   },
   {
     id: '6027',
@@ -2571,10 +2921,12 @@ export const defaultProducts: Product[] = [
     reference: '652',
     wholesalePrice: 2,
     finalPrice: 7,
-    crossedPrice: 7.700000000000001,
+    crossedPrice: 7,
     salesCount: 0,
-    position: 176,
-    variations: []
+    position: 6027,
+    variations: [
+
+    ]
   },
   {
     id: '6028',
@@ -2584,10 +2936,12 @@ export const defaultProducts: Product[] = [
     reference: '653',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 177,
-    variations: []
+    position: 6028,
+    variations: [
+
+    ]
   },
   {
     id: '6029',
@@ -2597,10 +2951,12 @@ export const defaultProducts: Product[] = [
     reference: '654',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 178,
-    variations: []
+    position: 6029,
+    variations: [
+
+    ]
   },
   {
     id: '6030',
@@ -2610,10 +2966,12 @@ export const defaultProducts: Product[] = [
     reference: '655',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 179,
-    variations: []
+    position: 6030,
+    variations: [
+
+    ]
   },
   {
     id: '6037',
@@ -2623,10 +2981,12 @@ export const defaultProducts: Product[] = [
     reference: '670',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 180,
-    variations: []
+    position: 6037,
+    variations: [
+
+    ]
   },
   {
     id: '6038',
@@ -2636,10 +2996,12 @@ export const defaultProducts: Product[] = [
     reference: '671',
     wholesalePrice: 6,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 181,
-    variations: []
+    position: 6038,
+    variations: [
+
+    ]
   },
   {
     id: '6039',
@@ -2649,10 +3011,12 @@ export const defaultProducts: Product[] = [
     reference: '672',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 182,
-    variations: []
+    position: 6039,
+    variations: [
+
+    ]
   },
   {
     id: '6040',
@@ -2662,10 +3026,12 @@ export const defaultProducts: Product[] = [
     reference: '675',
     wholesalePrice: 12,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 183,
-    variations: []
+    position: 6040,
+    variations: [
+
+    ]
   },
   {
     id: '6041',
@@ -2675,10 +3041,12 @@ export const defaultProducts: Product[] = [
     reference: '676',
     wholesalePrice: 12,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 184,
-    variations: []
+    position: 6041,
+    variations: [
+
+    ]
   },
   {
     id: '6042',
@@ -2688,10 +3056,12 @@ export const defaultProducts: Product[] = [
     reference: '680',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 185,
-    variations: []
+    position: 6042,
+    variations: [
+
+    ]
   },
   {
     id: '6043',
@@ -2701,10 +3071,12 @@ export const defaultProducts: Product[] = [
     reference: '690',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 186,
-    variations: []
+    position: 6043,
+    variations: [
+
+    ]
   },
   {
     id: '6044',
@@ -2714,10 +3086,12 @@ export const defaultProducts: Product[] = [
     reference: '695',
     wholesalePrice: 10,
     finalPrice: 24,
-    crossedPrice: 26.400000000000002,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 187,
-    variations: []
+    position: 6044,
+    variations: [
+
+    ]
   },
   {
     id: '6045',
@@ -2727,10 +3101,12 @@ export const defaultProducts: Product[] = [
     reference: '696',
     wholesalePrice: 10,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 188,
-    variations: []
+    position: 6045,
+    variations: [
+
+    ]
   },
   {
     id: '6046',
@@ -2740,10 +3116,12 @@ export const defaultProducts: Product[] = [
     reference: '697',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 189,
-    variations: []
+    position: 6046,
+    variations: [
+
+    ]
   },
   {
     id: '6047',
@@ -2753,10 +3131,12 @@ export const defaultProducts: Product[] = [
     reference: '700',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 190,
-    variations: []
+    position: 6047,
+    variations: [
+
+    ]
   },
   {
     id: '6048',
@@ -2766,10 +3146,12 @@ export const defaultProducts: Product[] = [
     reference: '701',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 191,
-    variations: []
+    position: 6048,
+    variations: [
+
+    ]
   },
   {
     id: '6049',
@@ -2779,10 +3161,12 @@ export const defaultProducts: Product[] = [
     reference: '702',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 192,
-    variations: []
+    position: 6049,
+    variations: [
+
+    ]
   },
   {
     id: '6050',
@@ -2792,10 +3176,12 @@ export const defaultProducts: Product[] = [
     reference: '703',
     wholesalePrice: 3,
     finalPrice: 7,
-    crossedPrice: 7.700000000000001,
+    crossedPrice: 7,
     salesCount: 0,
-    position: 193,
-    variations: []
+    position: 6050,
+    variations: [
+
+    ]
   },
   {
     id: '6051',
@@ -2805,10 +3191,12 @@ export const defaultProducts: Product[] = [
     reference: '704',
     wholesalePrice: 3,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 194,
-    variations: []
+    position: 6051,
+    variations: [
+
+    ]
   },
   {
     id: '6052',
@@ -2818,10 +3206,12 @@ export const defaultProducts: Product[] = [
     reference: '710',
     wholesalePrice: 7,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 195,
-    variations: []
+    position: 6052,
+    variations: [
+
+    ]
   },
   {
     id: '6053',
@@ -2831,10 +3221,12 @@ export const defaultProducts: Product[] = [
     reference: '711',
     wholesalePrice: 19,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 196,
-    variations: []
+    position: 6053,
+    variations: [
+
+    ]
   },
   {
     id: '6054',
@@ -2844,10 +3236,12 @@ export const defaultProducts: Product[] = [
     reference: '712',
     wholesalePrice: 50,
     finalPrice: 89,
-    crossedPrice: 97.9,
+    crossedPrice: 89,
     salesCount: 0,
-    position: 197,
-    variations: []
+    position: 6054,
+    variations: [
+
+    ]
   },
   {
     id: '6055',
@@ -2857,10 +3251,12 @@ export const defaultProducts: Product[] = [
     reference: '713',
     wholesalePrice: 125,
     finalPrice: 250,
-    crossedPrice: 275,
+    crossedPrice: 250,
     salesCount: 0,
-    position: 198,
-    variations: []
+    position: 6055,
+    variations: [
+
+    ]
   },
   {
     id: '6056',
@@ -2870,10 +3266,12 @@ export const defaultProducts: Product[] = [
     reference: '714',
     wholesalePrice: 7,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 199,
-    variations: []
+    position: 6056,
+    variations: [
+
+    ]
   },
   {
     id: '6057',
@@ -2883,10 +3281,12 @@ export const defaultProducts: Product[] = [
     reference: '715',
     wholesalePrice: 7,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 200,
-    variations: []
+    position: 6057,
+    variations: [
+
+    ]
   },
   {
     id: '6063',
@@ -2896,10 +3296,12 @@ export const defaultProducts: Product[] = [
     reference: '730',
     wholesalePrice: 4,
     finalPrice: 16,
-    crossedPrice: 17.6,
+    crossedPrice: 16,
     salesCount: 0,
-    position: 201,
-    variations: []
+    position: 6063,
+    variations: [
+
+    ]
   },
   {
     id: '6064',
@@ -2909,10 +3311,12 @@ export const defaultProducts: Product[] = [
     reference: '731',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 202,
-    variations: []
+    position: 6064,
+    variations: [
+
+    ]
   },
   {
     id: '6065',
@@ -2922,10 +3326,12 @@ export const defaultProducts: Product[] = [
     reference: '732',
     wholesalePrice: 47,
     finalPrice: 85,
-    crossedPrice: 93.50000000000001,
+    crossedPrice: 85,
     salesCount: 0,
-    position: 203,
-    variations: []
+    position: 6065,
+    variations: [
+
+    ]
   },
   {
     id: '6066',
@@ -2935,10 +3341,12 @@ export const defaultProducts: Product[] = [
     reference: '733',
     wholesalePrice: 235,
     finalPrice: 299,
-    crossedPrice: 328.90000000000003,
+    crossedPrice: 299,
     salesCount: 0,
-    position: 204,
-    variations: []
+    position: 6066,
+    variations: [
+
+    ]
   },
   {
     id: '6067',
@@ -2948,10 +3356,12 @@ export const defaultProducts: Product[] = [
     reference: '740',
     wholesalePrice: 27,
     finalPrice: 52,
-    crossedPrice: 57.2,
+    crossedPrice: 52,
     salesCount: 0,
-    position: 205,
-    variations: []
+    position: 6067,
+    variations: [
+
+    ]
   },
   {
     id: '6068',
@@ -2961,10 +3371,12 @@ export const defaultProducts: Product[] = [
     reference: '741',
     wholesalePrice: 24,
     finalPrice: 48,
-    crossedPrice: 52.800000000000004,
+    crossedPrice: 48,
     salesCount: 0,
-    position: 206,
-    variations: []
+    position: 6068,
+    variations: [
+
+    ]
   },
   {
     id: '6069',
@@ -2974,10 +3386,12 @@ export const defaultProducts: Product[] = [
     reference: '742',
     wholesalePrice: 22,
     finalPrice: 48,
-    crossedPrice: 52.800000000000004,
+    crossedPrice: 48,
     salesCount: 0,
-    position: 207,
-    variations: []
+    position: 6069,
+    variations: [
+
+    ]
   },
   {
     id: '6070',
@@ -2987,10 +3401,12 @@ export const defaultProducts: Product[] = [
     reference: '743',
     wholesalePrice: 32,
     finalPrice: 58,
-    crossedPrice: 63.800000000000004,
+    crossedPrice: 58,
     salesCount: 0,
-    position: 208,
-    variations: []
+    position: 6070,
+    variations: [
+
+    ]
   },
   {
     id: '6071',
@@ -3000,10 +3416,12 @@ export const defaultProducts: Product[] = [
     reference: '744',
     wholesalePrice: 22,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 209,
-    variations: []
+    position: 6071,
+    variations: [
+
+    ]
   },
   {
     id: '6072',
@@ -3013,10 +3431,12 @@ export const defaultProducts: Product[] = [
     reference: '745',
     wholesalePrice: 22,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 210,
-    variations: []
+    position: 6072,
+    variations: [
+
+    ]
   },
   {
     id: '6073',
@@ -3026,10 +3446,12 @@ export const defaultProducts: Product[] = [
     reference: '746',
     wholesalePrice: 22,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 211,
-    variations: []
+    position: 6073,
+    variations: [
+
+    ]
   },
   {
     id: '6074',
@@ -3039,10 +3461,12 @@ export const defaultProducts: Product[] = [
     reference: '747',
     wholesalePrice: 45,
     finalPrice: 95,
-    crossedPrice: 104.50000000000001,
+    crossedPrice: 95,
     salesCount: 0,
-    position: 212,
-    variations: []
+    position: 6074,
+    variations: [
+
+    ]
   },
   {
     id: '6075',
@@ -3052,10 +3476,12 @@ export const defaultProducts: Product[] = [
     reference: '748',
     wholesalePrice: 45,
     finalPrice: 95,
-    crossedPrice: 104.50000000000001,
+    crossedPrice: 95,
     salesCount: 0,
-    position: 213,
-    variations: []
+    position: 6075,
+    variations: [
+
+    ]
   },
   {
     id: '6076',
@@ -3065,10 +3491,12 @@ export const defaultProducts: Product[] = [
     reference: '749',
     wholesalePrice: 252,
     finalPrice: 399,
-    crossedPrice: 438.90000000000003,
+    crossedPrice: 399,
     salesCount: 0,
-    position: 214,
-    variations: []
+    position: 6076,
+    variations: [
+
+    ]
   },
   {
     id: '6078',
@@ -3078,10 +3506,12 @@ export const defaultProducts: Product[] = [
     reference: '761',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 215,
-    variations: []
+    position: 6078,
+    variations: [
+
+    ]
   },
   {
     id: '6079',
@@ -3091,10 +3521,12 @@ export const defaultProducts: Product[] = [
     reference: '770',
     wholesalePrice: 42,
     finalPrice: 89,
-    crossedPrice: 97.9,
+    crossedPrice: 89,
     salesCount: 0,
-    position: 216,
-    variations: []
+    position: 6079,
+    variations: [
+
+    ]
   },
   {
     id: '6080',
@@ -3104,10 +3536,12 @@ export const defaultProducts: Product[] = [
     reference: '771',
     wholesalePrice: 41,
     finalPrice: 85,
-    crossedPrice: 93.50000000000001,
+    crossedPrice: 85,
     salesCount: 0,
-    position: 217,
-    variations: []
+    position: 6080,
+    variations: [
+
+    ]
   },
   {
     id: '6081',
@@ -3117,10 +3551,12 @@ export const defaultProducts: Product[] = [
     reference: '772',
     wholesalePrice: 13,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 218,
-    variations: []
+    position: 6081,
+    variations: [
+
+    ]
   },
   {
     id: '6082',
@@ -3130,10 +3566,12 @@ export const defaultProducts: Product[] = [
     reference: '773',
     wholesalePrice: 20,
     finalPrice: 30,
-    crossedPrice: 33,
+    crossedPrice: 30,
     salesCount: 0,
-    position: 219,
-    variations: []
+    position: 6082,
+    variations: [
+
+    ]
   },
   {
     id: '6083',
@@ -3143,10 +3581,12 @@ export const defaultProducts: Product[] = [
     reference: '774',
     wholesalePrice: 27,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 220,
-    variations: []
+    position: 6083,
+    variations: [
+
+    ]
   },
   {
     id: '6084',
@@ -3156,10 +3596,12 @@ export const defaultProducts: Product[] = [
     reference: '775',
     wholesalePrice: 27,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 221,
-    variations: []
+    position: 6084,
+    variations: [
+
+    ]
   },
   {
     id: '6085',
@@ -3171,21 +3613,25 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 222,
-    variations: []
-  },
-  {
-    id: '6085',
-    name: 'DEGUSTATION VIN',
-    category: 'degustation',
-    ean13: '2010648191235',
-    reference: '800',
-    wholesalePrice: 0,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 223,
-    variations: []
+    position: 6085,
+    variations: [
+    {
+      id: '3286',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 0
+    },
+    {
+      id: '2030',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 0
+    }
+    ]
   },
   {
     id: '6086',
@@ -3197,8 +3643,17 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 224,
-    variations: []
+    position: 6086,
+    variations: [
+    {
+      id: '2032',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 0
+    }
+    ]
   },
   {
     id: '6087',
@@ -3208,10 +3663,12 @@ export const defaultProducts: Product[] = [
     reference: '802',
     wholesalePrice: 29,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 225,
-    variations: []
+    position: 6087,
+    variations: [
+
+    ]
   },
   {
     id: '6088',
@@ -3221,10 +3678,12 @@ export const defaultProducts: Product[] = [
     reference: '803',
     wholesalePrice: 15,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 226,
-    variations: []
+    position: 6088,
+    variations: [
+
+    ]
   },
   {
     id: '6089',
@@ -3234,10 +3693,12 @@ export const defaultProducts: Product[] = [
     reference: '804',
     wholesalePrice: 25,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 227,
-    variations: []
+    position: 6089,
+    variations: [
+
+    ]
   },
   {
     id: '6090',
@@ -3247,10 +3708,12 @@ export const defaultProducts: Product[] = [
     reference: '805',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 228,
-    variations: []
+    position: 6090,
+    variations: [
+
+    ]
   },
   {
     id: '6091',
@@ -3260,10 +3723,12 @@ export const defaultProducts: Product[] = [
     reference: '810',
     wholesalePrice: 5,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 229,
-    variations: []
+    position: 6091,
+    variations: [
+
+    ]
   },
   {
     id: '6092',
@@ -3273,10 +3738,12 @@ export const defaultProducts: Product[] = [
     reference: '811',
     wholesalePrice: 5,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 230,
-    variations: []
+    position: 6092,
+    variations: [
+
+    ]
   },
   {
     id: '6093',
@@ -3286,10 +3753,12 @@ export const defaultProducts: Product[] = [
     reference: '812',
     wholesalePrice: 5,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 231,
-    variations: []
+    position: 6093,
+    variations: [
+
+    ]
   },
   {
     id: '6094',
@@ -3299,10 +3768,12 @@ export const defaultProducts: Product[] = [
     reference: '820',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 232,
-    variations: []
+    position: 6094,
+    variations: [
+
+    ]
   },
   {
     id: '6095',
@@ -3312,10 +3783,12 @@ export const defaultProducts: Product[] = [
     reference: '821',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 233,
-    variations: []
+    position: 6095,
+    variations: [
+
+    ]
   },
   {
     id: '6096',
@@ -3325,10 +3798,12 @@ export const defaultProducts: Product[] = [
     reference: '822',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 234,
-    variations: []
+    position: 6096,
+    variations: [
+
+    ]
   },
   {
     id: '6097',
@@ -3338,10 +3813,12 @@ export const defaultProducts: Product[] = [
     reference: '823',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 235,
-    variations: []
+    position: 6097,
+    variations: [
+
+    ]
   },
   {
     id: '6098',
@@ -3351,10 +3828,12 @@ export const defaultProducts: Product[] = [
     reference: '824',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 236,
-    variations: []
+    position: 6098,
+    variations: [
+
+    ]
   },
   {
     id: '6099',
@@ -3364,10 +3843,12 @@ export const defaultProducts: Product[] = [
     reference: '830',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 237,
-    variations: []
+    position: 6099,
+    variations: [
+
+    ]
   },
   {
     id: '6101',
@@ -3377,10 +3858,12 @@ export const defaultProducts: Product[] = [
     reference: '840',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 238,
-    variations: []
+    position: 6101,
+    variations: [
+
+    ]
   },
   {
     id: '6102',
@@ -3390,10 +3873,12 @@ export const defaultProducts: Product[] = [
     reference: '845',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 239,
-    variations: []
+    position: 6102,
+    variations: [
+
+    ]
   },
   {
     id: '6103',
@@ -3403,10 +3888,12 @@ export const defaultProducts: Product[] = [
     reference: '850',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 240,
-    variations: []
+    position: 6103,
+    variations: [
+
+    ]
   },
   {
     id: '6104',
@@ -3416,10 +3903,12 @@ export const defaultProducts: Product[] = [
     reference: '851',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 241,
-    variations: []
+    position: 6104,
+    variations: [
+
+    ]
   },
   {
     id: '6105',
@@ -3431,8 +3920,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 242,
-    variations: []
+    position: 6105,
+    variations: [
+
+    ]
   },
   {
     id: '6107',
@@ -3442,10 +3933,12 @@ export const defaultProducts: Product[] = [
     reference: '862',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 243,
-    variations: []
+    position: 6107,
+    variations: [
+
+    ]
   },
   {
     id: '6110',
@@ -3455,10 +3948,12 @@ export const defaultProducts: Product[] = [
     reference: '870',
     wholesalePrice: 9,
     finalPrice: 19,
-    crossedPrice: 20.900000000000002,
+    crossedPrice: 19,
     salesCount: 0,
-    position: 244,
-    variations: []
+    position: 6110,
+    variations: [
+
+    ]
   },
   {
     id: '6111',
@@ -3468,10 +3963,12 @@ export const defaultProducts: Product[] = [
     reference: '871',
     wholesalePrice: 9,
     finalPrice: 24,
-    crossedPrice: 26.400000000000002,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 245,
-    variations: []
+    position: 6111,
+    variations: [
+
+    ]
   },
   {
     id: '6113',
@@ -3481,10 +3978,19 @@ export const defaultProducts: Product[] = [
     reference: '873',
     wholesalePrice: 4,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 246,
-    variations: []
+    position: 6113,
+    variations: [
+    {
+      id: '3065',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 5
+    }
+    ]
   },
   {
     id: '6114',
@@ -3494,10 +4000,12 @@ export const defaultProducts: Product[] = [
     reference: '880',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 247,
-    variations: []
+    position: 6114,
+    variations: [
+
+    ]
   },
   {
     id: '6115',
@@ -3507,10 +4015,12 @@ export const defaultProducts: Product[] = [
     reference: '881',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 248,
-    variations: []
+    position: 6115,
+    variations: [
+
+    ]
   },
   {
     id: '6116',
@@ -3520,10 +4030,12 @@ export const defaultProducts: Product[] = [
     reference: '882',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 249,
-    variations: []
+    position: 6116,
+    variations: [
+
+    ]
   },
   {
     id: '6118',
@@ -3533,10 +4045,12 @@ export const defaultProducts: Product[] = [
     reference: '890',
     wholesalePrice: 2,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 250,
-    variations: []
+    position: 6118,
+    variations: [
+
+    ]
   },
   {
     id: '6119',
@@ -3546,10 +4060,12 @@ export const defaultProducts: Product[] = [
     reference: '891',
     wholesalePrice: 2,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 251,
-    variations: []
+    position: 6119,
+    variations: [
+
+    ]
   },
   {
     id: '6120',
@@ -3559,10 +4075,12 @@ export const defaultProducts: Product[] = [
     reference: '895',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 252,
-    variations: []
+    position: 6120,
+    variations: [
+
+    ]
   },
   {
     id: '6121',
@@ -3572,10 +4090,12 @@ export const defaultProducts: Product[] = [
     reference: '900',
     wholesalePrice: 1,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 253,
-    variations: []
+    position: 6121,
+    variations: [
+
+    ]
   },
   {
     id: '6123',
@@ -3585,10 +4105,12 @@ export const defaultProducts: Product[] = [
     reference: '906',
     wholesalePrice: 6,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 254,
-    variations: []
+    position: 6123,
+    variations: [
+
+    ]
   },
   {
     id: '6130',
@@ -3598,10 +4120,12 @@ export const defaultProducts: Product[] = [
     reference: '920',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 255,
-    variations: []
+    position: 6130,
+    variations: [
+
+    ]
   },
   {
     id: '6131',
@@ -3611,10 +4135,12 @@ export const defaultProducts: Product[] = [
     reference: '921',
     wholesalePrice: 37,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 256,
-    variations: []
+    position: 6131,
+    variations: [
+
+    ]
   },
   {
     id: '6132',
@@ -3624,10 +4150,12 @@ export const defaultProducts: Product[] = [
     reference: '925',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 257,
-    variations: []
+    position: 6132,
+    variations: [
+
+    ]
   },
   {
     id: '6133',
@@ -3637,10 +4165,12 @@ export const defaultProducts: Product[] = [
     reference: '926',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 258,
-    variations: []
+    position: 6133,
+    variations: [
+
+    ]
   },
   {
     id: '6134',
@@ -3650,10 +4180,12 @@ export const defaultProducts: Product[] = [
     reference: '927',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 259,
-    variations: []
+    position: 6134,
+    variations: [
+
+    ]
   },
   {
     id: '6135',
@@ -3663,10 +4195,12 @@ export const defaultProducts: Product[] = [
     reference: '928',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 260,
-    variations: []
+    position: 6135,
+    variations: [
+
+    ]
   },
   {
     id: '6137',
@@ -3676,10 +4210,12 @@ export const defaultProducts: Product[] = [
     reference: '930',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 261,
-    variations: []
+    position: 6137,
+    variations: [
+
+    ]
   },
   {
     id: '6138',
@@ -3689,10 +4225,12 @@ export const defaultProducts: Product[] = [
     reference: '931',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 262,
-    variations: []
+    position: 6138,
+    variations: [
+
+    ]
   },
   {
     id: '6139',
@@ -3702,10 +4240,12 @@ export const defaultProducts: Product[] = [
     reference: '932',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 263,
-    variations: []
+    position: 6139,
+    variations: [
+
+    ]
   },
   {
     id: '6140',
@@ -3715,10 +4255,12 @@ export const defaultProducts: Product[] = [
     reference: '933',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 264,
-    variations: []
+    position: 6140,
+    variations: [
+
+    ]
   },
   {
     id: '6141',
@@ -3728,10 +4270,12 @@ export const defaultProducts: Product[] = [
     reference: '934',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 265,
-    variations: []
+    position: 6141,
+    variations: [
+
+    ]
   },
   {
     id: '6142',
@@ -3741,10 +4285,12 @@ export const defaultProducts: Product[] = [
     reference: '940',
     wholesalePrice: 63,
     finalPrice: 129,
-    crossedPrice: 141.9,
+    crossedPrice: 129,
     salesCount: 0,
-    position: 266,
-    variations: []
+    position: 6142,
+    variations: [
+
+    ]
   },
   {
     id: '6143',
@@ -3754,10 +4300,12 @@ export const defaultProducts: Product[] = [
     reference: '945',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 267,
-    variations: []
+    position: 6143,
+    variations: [
+
+    ]
   },
   {
     id: '6144',
@@ -3767,10 +4315,12 @@ export const defaultProducts: Product[] = [
     reference: '946',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 268,
-    variations: []
+    position: 6144,
+    variations: [
+
+    ]
   },
   {
     id: '6145',
@@ -3780,10 +4330,12 @@ export const defaultProducts: Product[] = [
     reference: '947',
     wholesalePrice: 7,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 269,
-    variations: []
+    position: 6145,
+    variations: [
+
+    ]
   },
   {
     id: '6146',
@@ -3793,10 +4345,12 @@ export const defaultProducts: Product[] = [
     reference: '948',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 270,
-    variations: []
+    position: 6146,
+    variations: [
+
+    ]
   },
   {
     id: '6148',
@@ -3806,10 +4360,12 @@ export const defaultProducts: Product[] = [
     reference: '951',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 271,
-    variations: []
+    position: 6148,
+    variations: [
+
+    ]
   },
   {
     id: '6149',
@@ -3819,10 +4375,12 @@ export const defaultProducts: Product[] = [
     reference: '955',
     wholesalePrice: 12,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 272,
-    variations: []
+    position: 6149,
+    variations: [
+
+    ]
   },
   {
     id: '6150',
@@ -3832,10 +4390,12 @@ export const defaultProducts: Product[] = [
     reference: '956',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 273,
-    variations: []
+    position: 6150,
+    variations: [
+
+    ]
   },
   {
     id: '6155',
@@ -3845,10 +4405,12 @@ export const defaultProducts: Product[] = [
     reference: '980',
     wholesalePrice: 3,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 274,
-    variations: []
+    position: 6155,
+    variations: [
+
+    ]
   },
   {
     id: '6156',
@@ -3858,10 +4420,12 @@ export const defaultProducts: Product[] = [
     reference: '981',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 275,
-    variations: []
+    position: 6156,
+    variations: [
+
+    ]
   },
   {
     id: '6157',
@@ -3871,10 +4435,12 @@ export const defaultProducts: Product[] = [
     reference: '982',
     wholesalePrice: 6,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 276,
-    variations: []
+    position: 6157,
+    variations: [
+
+    ]
   },
   {
     id: '6158',
@@ -3886,8 +4452,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 277,
-    variations: []
+    position: 6158,
+    variations: [
+
+    ]
   },
   {
     id: '6159',
@@ -3899,8 +4467,17 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 278,
-    variations: []
+    position: 6159,
+    variations: [
+    {
+      id: '3268',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 0
+    }
+    ]
   },
   {
     id: '6160',
@@ -3910,10 +4487,12 @@ export const defaultProducts: Product[] = [
     reference: '990',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 279,
-    variations: []
+    position: 6160,
+    variations: [
+
+    ]
   },
   {
     id: '6161',
@@ -3923,10 +4502,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 280,
-    variations: []
+    position: 6161,
+    variations: [
+
+    ]
   },
   {
     id: '6162',
@@ -3936,10 +4517,12 @@ export const defaultProducts: Product[] = [
     reference: '992',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 281,
-    variations: []
+    position: 6162,
+    variations: [
+
+    ]
   },
   {
     id: '6163',
@@ -3949,10 +4532,12 @@ export const defaultProducts: Product[] = [
     reference: '993',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 282,
-    variations: []
+    position: 6163,
+    variations: [
+
+    ]
   },
   {
     id: '6164',
@@ -3962,10 +4547,12 @@ export const defaultProducts: Product[] = [
     reference: '994',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 283,
-    variations: []
+    position: 6164,
+    variations: [
+
+    ]
   },
   {
     id: '6165',
@@ -3975,10 +4562,12 @@ export const defaultProducts: Product[] = [
     reference: '995',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 284,
-    variations: []
+    position: 6165,
+    variations: [
+
+    ]
   },
   {
     id: '6167',
@@ -3988,10 +4577,12 @@ export const defaultProducts: Product[] = [
     reference: '997',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 285,
-    variations: []
+    position: 6167,
+    variations: [
+
+    ]
   },
   {
     id: '6168',
@@ -4001,10 +4592,12 @@ export const defaultProducts: Product[] = [
     reference: '998',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 286,
-    variations: []
+    position: 6168,
+    variations: [
+
+    ]
   },
   {
     id: '6169',
@@ -4014,10 +4607,12 @@ export const defaultProducts: Product[] = [
     reference: '999',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 287,
-    variations: []
+    position: 6169,
+    variations: [
+
+    ]
   },
   {
     id: '6170',
@@ -4027,10 +4622,12 @@ export const defaultProducts: Product[] = [
     reference: '1000',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 288,
-    variations: []
+    position: 6170,
+    variations: [
+
+    ]
   },
   {
     id: '6171',
@@ -4040,10 +4637,12 @@ export const defaultProducts: Product[] = [
     reference: '1001',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 289,
-    variations: []
+    position: 6171,
+    variations: [
+
+    ]
   },
   {
     id: '6172',
@@ -4053,10 +4652,12 @@ export const defaultProducts: Product[] = [
     reference: '1002',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 290,
-    variations: []
+    position: 6172,
+    variations: [
+
+    ]
   },
   {
     id: '6173',
@@ -4066,10 +4667,12 @@ export const defaultProducts: Product[] = [
     reference: '1020',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 291,
-    variations: []
+    position: 6173,
+    variations: [
+
+    ]
   },
   {
     id: '6174',
@@ -4079,10 +4682,12 @@ export const defaultProducts: Product[] = [
     reference: '1021',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 292,
-    variations: []
+    position: 6174,
+    variations: [
+
+    ]
   },
   {
     id: '6175',
@@ -4092,10 +4697,12 @@ export const defaultProducts: Product[] = [
     reference: '1022',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 293,
-    variations: []
+    position: 6175,
+    variations: [
+
+    ]
   },
   {
     id: '6176',
@@ -4105,10 +4712,12 @@ export const defaultProducts: Product[] = [
     reference: '1023',
     wholesalePrice: 12,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 294,
-    variations: []
+    position: 6176,
+    variations: [
+
+    ]
   },
   {
     id: '6177',
@@ -4118,10 +4727,12 @@ export const defaultProducts: Product[] = [
     reference: '1030',
     wholesalePrice: 7,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 295,
-    variations: []
+    position: 6177,
+    variations: [
+
+    ]
   },
   {
     id: '6178',
@@ -4131,10 +4742,12 @@ export const defaultProducts: Product[] = [
     reference: '1031',
     wholesalePrice: 7,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 296,
-    variations: []
+    position: 6178,
+    variations: [
+
+    ]
   },
   {
     id: '6179',
@@ -4144,10 +4757,12 @@ export const defaultProducts: Product[] = [
     reference: '1032',
     wholesalePrice: 7,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 297,
-    variations: []
+    position: 6179,
+    variations: [
+
+    ]
   },
   {
     id: '6180',
@@ -4157,10 +4772,12 @@ export const defaultProducts: Product[] = [
     reference: '1033',
     wholesalePrice: 7,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 298,
-    variations: []
+    position: 6180,
+    variations: [
+
+    ]
   },
   {
     id: '6181',
@@ -4170,10 +4787,12 @@ export const defaultProducts: Product[] = [
     reference: '1040',
     wholesalePrice: 17,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 299,
-    variations: []
+    position: 6181,
+    variations: [
+
+    ]
   },
   {
     id: '6182',
@@ -4183,10 +4802,12 @@ export const defaultProducts: Product[] = [
     reference: '1041',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 300,
-    variations: []
+    position: 6182,
+    variations: [
+
+    ]
   },
   {
     id: '6183',
@@ -4196,10 +4817,12 @@ export const defaultProducts: Product[] = [
     reference: '1042',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 301,
-    variations: []
+    position: 6183,
+    variations: [
+
+    ]
   },
   {
     id: '6184',
@@ -4209,10 +4832,12 @@ export const defaultProducts: Product[] = [
     reference: '1043',
     wholesalePrice: 17,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 302,
-    variations: []
+    position: 6184,
+    variations: [
+
+    ]
   },
   {
     id: '6185',
@@ -4222,10 +4847,12 @@ export const defaultProducts: Product[] = [
     reference: '1050',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 303,
-    variations: []
+    position: 6185,
+    variations: [
+
+    ]
   },
   {
     id: '6186',
@@ -4235,10 +4862,12 @@ export const defaultProducts: Product[] = [
     reference: '1051',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 304,
-    variations: []
+    position: 6186,
+    variations: [
+
+    ]
   },
   {
     id: '6187',
@@ -4248,10 +4877,12 @@ export const defaultProducts: Product[] = [
     reference: '1052',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 305,
-    variations: []
+    position: 6187,
+    variations: [
+
+    ]
   },
   {
     id: '6188',
@@ -4261,10 +4892,12 @@ export const defaultProducts: Product[] = [
     reference: '1053',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 306,
-    variations: []
+    position: 6188,
+    variations: [
+
+    ]
   },
   {
     id: '6192',
@@ -4276,8 +4909,17 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 307,
-    variations: []
+    position: 6192,
+    variations: [
+    {
+      id: '2238',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 0
+    }
+    ]
   },
   {
     id: '6193',
@@ -4287,10 +4929,12 @@ export const defaultProducts: Product[] = [
     reference: '1071',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 308,
-    variations: []
+    position: 6193,
+    variations: [
+
+    ]
   },
   {
     id: '6194',
@@ -4300,10 +4944,12 @@ export const defaultProducts: Product[] = [
     reference: '1072',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 309,
-    variations: []
+    position: 6194,
+    variations: [
+
+    ]
   },
   {
     id: '6195',
@@ -4313,10 +4959,12 @@ export const defaultProducts: Product[] = [
     reference: '1073',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 310,
-    variations: []
+    position: 6195,
+    variations: [
+
+    ]
   },
   {
     id: '6196',
@@ -4326,10 +4974,12 @@ export const defaultProducts: Product[] = [
     reference: '1074',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 311,
-    variations: []
+    position: 6196,
+    variations: [
+
+    ]
   },
   {
     id: '6197',
@@ -4339,10 +4989,12 @@ export const defaultProducts: Product[] = [
     reference: '1075',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 312,
-    variations: []
+    position: 6197,
+    variations: [
+
+    ]
   },
   {
     id: '6198',
@@ -4352,10 +5004,12 @@ export const defaultProducts: Product[] = [
     reference: '1090',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 313,
-    variations: []
+    position: 6198,
+    variations: [
+
+    ]
   },
   {
     id: '6199',
@@ -4365,10 +5019,12 @@ export const defaultProducts: Product[] = [
     reference: '1091',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 314,
-    variations: []
+    position: 6199,
+    variations: [
+
+    ]
   },
   {
     id: '6203',
@@ -4378,10 +5034,12 @@ export const defaultProducts: Product[] = [
     reference: 'COF VI',
     wholesalePrice: 1,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 315,
-    variations: []
+    position: 6203,
+    variations: [
+
+    ]
   },
   {
     id: '6204',
@@ -4393,8 +5051,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 316,
-    variations: []
+    position: 6204,
+    variations: [
+
+    ]
   },
   {
     id: '6205',
@@ -4404,10 +5064,12 @@ export const defaultProducts: Product[] = [
     reference: '1115',
     wholesalePrice: 2,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 317,
-    variations: []
+    position: 6205,
+    variations: [
+
+    ]
   },
   {
     id: '6206',
@@ -4417,10 +5079,12 @@ export const defaultProducts: Product[] = [
     reference: '1120',
     wholesalePrice: 3,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 318,
-    variations: []
+    position: 6206,
+    variations: [
+
+    ]
   },
   {
     id: '6207',
@@ -4430,10 +5094,12 @@ export const defaultProducts: Product[] = [
     reference: '1121',
     wholesalePrice: 3,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 319,
-    variations: []
+    position: 6207,
+    variations: [
+
+    ]
   },
   {
     id: '6208',
@@ -4443,10 +5109,12 @@ export const defaultProducts: Product[] = [
     reference: '1125',
     wholesalePrice: 4,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 320,
-    variations: []
+    position: 6208,
+    variations: [
+
+    ]
   },
   {
     id: '6212',
@@ -4456,10 +5124,12 @@ export const defaultProducts: Product[] = [
     reference: '1130',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 321,
-    variations: []
+    position: 6212,
+    variations: [
+
+    ]
   },
   {
     id: '6213',
@@ -4469,10 +5139,12 @@ export const defaultProducts: Product[] = [
     reference: '1131',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 322,
-    variations: []
+    position: 6213,
+    variations: [
+
+    ]
   },
   {
     id: '6214',
@@ -4482,10 +5154,12 @@ export const defaultProducts: Product[] = [
     reference: '1132',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 323,
-    variations: []
+    position: 6214,
+    variations: [
+
+    ]
   },
   {
     id: '6215',
@@ -4495,10 +5169,12 @@ export const defaultProducts: Product[] = [
     reference: '1133',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 324,
-    variations: []
+    position: 6215,
+    variations: [
+
+    ]
   },
   {
     id: '6216',
@@ -4508,10 +5184,12 @@ export const defaultProducts: Product[] = [
     reference: '1134',
     wholesalePrice: 12,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 325,
-    variations: []
+    position: 6216,
+    variations: [
+
+    ]
   },
   {
     id: '6217',
@@ -4521,10 +5199,12 @@ export const defaultProducts: Product[] = [
     reference: '1135',
     wholesalePrice: 12,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 326,
-    variations: []
+    position: 6217,
+    variations: [
+
+    ]
   },
   {
     id: '6218',
@@ -4534,10 +5214,12 @@ export const defaultProducts: Product[] = [
     reference: '1140',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 327,
-    variations: []
+    position: 6218,
+    variations: [
+
+    ]
   },
   {
     id: '6219',
@@ -4547,10 +5229,12 @@ export const defaultProducts: Product[] = [
     reference: '1141',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 328,
-    variations: []
+    position: 6219,
+    variations: [
+
+    ]
   },
   {
     id: '6220',
@@ -4560,10 +5244,12 @@ export const defaultProducts: Product[] = [
     reference: '1142',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 329,
-    variations: []
+    position: 6220,
+    variations: [
+
+    ]
   },
   {
     id: '6221',
@@ -4573,10 +5259,12 @@ export const defaultProducts: Product[] = [
     reference: '1143',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 330,
-    variations: []
+    position: 6221,
+    variations: [
+
+    ]
   },
   {
     id: '6222',
@@ -4586,10 +5274,12 @@ export const defaultProducts: Product[] = [
     reference: '1144',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 331,
-    variations: []
+    position: 6222,
+    variations: [
+
+    ]
   },
   {
     id: '6223',
@@ -4599,10 +5289,12 @@ export const defaultProducts: Product[] = [
     reference: '1145',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 332,
-    variations: []
+    position: 6223,
+    variations: [
+
+    ]
   },
   {
     id: '6224',
@@ -4612,10 +5304,12 @@ export const defaultProducts: Product[] = [
     reference: '1150',
     wholesalePrice: 45,
     finalPrice: 99,
-    crossedPrice: 108.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 333,
-    variations: []
+    position: 6224,
+    variations: [
+
+    ]
   },
   {
     id: '6228',
@@ -4625,10 +5319,12 @@ export const defaultProducts: Product[] = [
     reference: '1154',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 334,
-    variations: []
+    position: 6228,
+    variations: [
+
+    ]
   },
   {
     id: '6229',
@@ -4638,10 +5334,12 @@ export const defaultProducts: Product[] = [
     reference: '1155',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 335,
-    variations: []
+    position: 6229,
+    variations: [
+
+    ]
   },
   {
     id: '6230',
@@ -4651,10 +5349,12 @@ export const defaultProducts: Product[] = [
     reference: '1160',
     wholesalePrice: 6,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 336,
-    variations: []
+    position: 6230,
+    variations: [
+
+    ]
   },
   {
     id: '6231',
@@ -4664,10 +5364,12 @@ export const defaultProducts: Product[] = [
     reference: '1161',
     wholesalePrice: 6,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 337,
-    variations: []
+    position: 6231,
+    variations: [
+
+    ]
   },
   {
     id: '6235',
@@ -4677,10 +5379,12 @@ export const defaultProducts: Product[] = [
     reference: '1170',
     wholesalePrice: 6,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 338,
-    variations: []
+    position: 6235,
+    variations: [
+
+    ]
   },
   {
     id: '6240',
@@ -4690,10 +5394,12 @@ export const defaultProducts: Product[] = [
     reference: '1180',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 339,
-    variations: []
+    position: 6240,
+    variations: [
+
+    ]
   },
   {
     id: '6241',
@@ -4703,10 +5409,12 @@ export const defaultProducts: Product[] = [
     reference: '1181',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 340,
-    variations: []
+    position: 6241,
+    variations: [
+
+    ]
   },
   {
     id: '6242',
@@ -4716,10 +5424,12 @@ export const defaultProducts: Product[] = [
     reference: '1182',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 341,
-    variations: []
+    position: 6242,
+    variations: [
+
+    ]
   },
   {
     id: '6243',
@@ -4729,10 +5439,12 @@ export const defaultProducts: Product[] = [
     reference: '1183',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 342,
-    variations: []
+    position: 6243,
+    variations: [
+
+    ]
   },
   {
     id: '6244',
@@ -4742,10 +5454,12 @@ export const defaultProducts: Product[] = [
     reference: '1184',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 343,
-    variations: []
+    position: 6244,
+    variations: [
+
+    ]
   },
   {
     id: '6245',
@@ -4755,10 +5469,12 @@ export const defaultProducts: Product[] = [
     reference: '1190',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 344,
-    variations: []
+    position: 6245,
+    variations: [
+
+    ]
   },
   {
     id: '6246',
@@ -4768,10 +5484,12 @@ export const defaultProducts: Product[] = [
     reference: '1191',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 345,
-    variations: []
+    position: 6246,
+    variations: [
+
+    ]
   },
   {
     id: '6250',
@@ -4781,10 +5499,12 @@ export const defaultProducts: Product[] = [
     reference: '1200',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 346,
-    variations: []
+    position: 6250,
+    variations: [
+
+    ]
   },
   {
     id: '6251',
@@ -4794,49 +5514,43 @@ export const defaultProducts: Product[] = [
     reference: '1201',
     wholesalePrice: 5,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 347,
-    variations: []
-  },
-  {
-    id: '6251',
-    name: 'PORTE CLEF ACCROCHE CLEF',
-    category: 'porte-clef--bracelet',
-    ean13: '2039310691316',
-    reference: '1201',
-    wholesalePrice: 5,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 348,
-    variations: []
-  },
-  {
-    id: '6251',
-    name: 'PORTE CLEF ACCROCHE CLEF',
-    category: 'porte-clef--bracelet',
-    ean13: '2039310691316',
-    reference: '1201',
-    wholesalePrice: 5,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 349,
-    variations: []
-  },
-  {
-    id: '6251',
-    name: 'PORTE CLEF ACCROCHE CLEF',
-    category: 'porte-clef--bracelet',
-    ean13: '2039310691316',
-    reference: '1201',
-    wholesalePrice: 5,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 350,
-    variations: []
+    position: 6251,
+    variations: [
+    {
+      id: '2074',
+      ean13: '2065627257280',
+      reference: '',
+      attributes: 'CAVALAIRE',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '2072',
+      ean13: '2058924854559',
+      reference: '',
+      attributes: 'SAINTE MAXIME',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '2071',
+      ean13: '2010767101290',
+      reference: '',
+      attributes: 'SAINT TROPEZ',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '2073',
+      ean13: '2006622080381',
+      reference: '',
+      attributes: 'PORT GRIMAUD',
+      priceImpact: 0,
+      finalPrice: 12
+    }
+    ]
   },
   {
     id: '6252',
@@ -4846,10 +5560,12 @@ export const defaultProducts: Product[] = [
     reference: '1202',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 351,
-    variations: []
+    position: 6252,
+    variations: [
+
+    ]
   },
   {
     id: '6253',
@@ -4859,10 +5575,12 @@ export const defaultProducts: Product[] = [
     reference: '1203',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 352,
-    variations: []
+    position: 6253,
+    variations: [
+
+    ]
   },
   {
     id: '6254',
@@ -4872,10 +5590,12 @@ export const defaultProducts: Product[] = [
     reference: '1204',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 353,
-    variations: []
+    position: 6254,
+    variations: [
+
+    ]
   },
   {
     id: '6255',
@@ -4885,10 +5605,12 @@ export const defaultProducts: Product[] = [
     reference: '1210',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 354,
-    variations: []
+    position: 6255,
+    variations: [
+
+    ]
   },
   {
     id: '6256',
@@ -4898,10 +5620,12 @@ export const defaultProducts: Product[] = [
     reference: '1211',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 355,
-    variations: []
+    position: 6256,
+    variations: [
+
+    ]
   },
   {
     id: '6257',
@@ -4911,10 +5635,12 @@ export const defaultProducts: Product[] = [
     reference: '1220',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 356,
-    variations: []
+    position: 6257,
+    variations: [
+
+    ]
   },
   {
     id: '6258',
@@ -4924,10 +5650,12 @@ export const defaultProducts: Product[] = [
     reference: '1221',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 357,
-    variations: []
+    position: 6258,
+    variations: [
+
+    ]
   },
   {
     id: '6259',
@@ -4937,10 +5665,12 @@ export const defaultProducts: Product[] = [
     reference: '1222',
     wholesalePrice: 0,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 358,
-    variations: []
+    position: 6259,
+    variations: [
+
+    ]
   },
   {
     id: '6260',
@@ -4950,10 +5680,12 @@ export const defaultProducts: Product[] = [
     reference: '1230',
     wholesalePrice: 8,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 359,
-    variations: []
+    position: 6260,
+    variations: [
+
+    ]
   },
   {
     id: '6262',
@@ -4963,10 +5695,12 @@ export const defaultProducts: Product[] = [
     reference: '1241',
     wholesalePrice: 6,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 360,
-    variations: []
+    position: 6262,
+    variations: [
+
+    ]
   },
   {
     id: '6264',
@@ -4976,10 +5710,12 @@ export const defaultProducts: Product[] = [
     reference: '1250',
     wholesalePrice: 6,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 361,
-    variations: []
+    position: 6264,
+    variations: [
+
+    ]
   },
   {
     id: '6265',
@@ -4989,10 +5725,12 @@ export const defaultProducts: Product[] = [
     reference: '1251',
     wholesalePrice: 6,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 362,
-    variations: []
+    position: 6265,
+    variations: [
+
+    ]
   },
   {
     id: '6266',
@@ -5002,10 +5740,12 @@ export const defaultProducts: Product[] = [
     reference: '1252',
     wholesalePrice: 6,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 363,
-    variations: []
+    position: 6266,
+    variations: [
+
+    ]
   },
   {
     id: '6267',
@@ -5015,10 +5755,12 @@ export const defaultProducts: Product[] = [
     reference: '1253',
     wholesalePrice: 6,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 364,
-    variations: []
+    position: 6267,
+    variations: [
+
+    ]
   },
   {
     id: '6268',
@@ -5028,10 +5770,12 @@ export const defaultProducts: Product[] = [
     reference: '1254',
     wholesalePrice: 6,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 365,
-    variations: []
+    position: 6268,
+    variations: [
+
+    ]
   },
   {
     id: '6269',
@@ -5041,10 +5785,12 @@ export const defaultProducts: Product[] = [
     reference: '1260',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 366,
-    variations: []
+    position: 6269,
+    variations: [
+
+    ]
   },
   {
     id: '6272',
@@ -5054,10 +5800,12 @@ export const defaultProducts: Product[] = [
     reference: '1263',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 367,
-    variations: []
+    position: 6272,
+    variations: [
+
+    ]
   },
   {
     id: '6273',
@@ -5067,10 +5815,12 @@ export const defaultProducts: Product[] = [
     reference: '1264',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 368,
-    variations: []
+    position: 6273,
+    variations: [
+
+    ]
   },
   {
     id: '6274',
@@ -5080,10 +5830,12 @@ export const defaultProducts: Product[] = [
     reference: '1265',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 369,
-    variations: []
+    position: 6274,
+    variations: [
+
+    ]
   },
   {
     id: '6276',
@@ -5093,10 +5845,12 @@ export const defaultProducts: Product[] = [
     reference: '1267',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 370,
-    variations: []
+    position: 6276,
+    variations: [
+
+    ]
   },
   {
     id: '6277',
@@ -5106,10 +5860,12 @@ export const defaultProducts: Product[] = [
     reference: '1268',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 371,
-    variations: []
+    position: 6277,
+    variations: [
+
+    ]
   },
   {
     id: '6278',
@@ -5119,10 +5875,12 @@ export const defaultProducts: Product[] = [
     reference: '1269',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 372,
-    variations: []
+    position: 6278,
+    variations: [
+
+    ]
   },
   {
     id: '6279',
@@ -5132,10 +5890,12 @@ export const defaultProducts: Product[] = [
     reference: '1270',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 373,
-    variations: []
+    position: 6279,
+    variations: [
+
+    ]
   },
   {
     id: '6285',
@@ -5145,10 +5905,12 @@ export const defaultProducts: Product[] = [
     reference: '1285',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 374,
-    variations: []
+    position: 6285,
+    variations: [
+
+    ]
   },
   {
     id: '6286',
@@ -5158,10 +5920,12 @@ export const defaultProducts: Product[] = [
     reference: '1286',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 375,
-    variations: []
+    position: 6286,
+    variations: [
+
+    ]
   },
   {
     id: '6287',
@@ -5171,10 +5935,12 @@ export const defaultProducts: Product[] = [
     reference: '1287',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 376,
-    variations: []
+    position: 6287,
+    variations: [
+
+    ]
   },
   {
     id: '6288',
@@ -5184,10 +5950,12 @@ export const defaultProducts: Product[] = [
     reference: '1288',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 377,
-    variations: []
+    position: 6288,
+    variations: [
+
+    ]
   },
   {
     id: '6289',
@@ -5197,10 +5965,12 @@ export const defaultProducts: Product[] = [
     reference: '1289',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 378,
-    variations: []
+    position: 6289,
+    variations: [
+
+    ]
   },
   {
     id: '6290',
@@ -5210,10 +5980,12 @@ export const defaultProducts: Product[] = [
     reference: '1290',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 379,
-    variations: []
+    position: 6290,
+    variations: [
+
+    ]
   },
   {
     id: '6291',
@@ -5223,10 +5995,12 @@ export const defaultProducts: Product[] = [
     reference: '1291',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 380,
-    variations: []
+    position: 6291,
+    variations: [
+
+    ]
   },
   {
     id: '6292',
@@ -5236,10 +6010,12 @@ export const defaultProducts: Product[] = [
     reference: '1292',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 381,
-    variations: []
+    position: 6292,
+    variations: [
+
+    ]
   },
   {
     id: '6293',
@@ -5249,10 +6025,12 @@ export const defaultProducts: Product[] = [
     reference: '1300',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 382,
-    variations: []
+    position: 6293,
+    variations: [
+
+    ]
   },
   {
     id: '6294',
@@ -5262,10 +6040,12 @@ export const defaultProducts: Product[] = [
     reference: '1301',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 383,
-    variations: []
+    position: 6294,
+    variations: [
+
+    ]
   },
   {
     id: '6295',
@@ -5275,10 +6055,12 @@ export const defaultProducts: Product[] = [
     reference: '1310',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 384,
-    variations: []
+    position: 6295,
+    variations: [
+
+    ]
   },
   {
     id: '6296',
@@ -5288,10 +6070,12 @@ export const defaultProducts: Product[] = [
     reference: '1311',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 385,
-    variations: []
+    position: 6296,
+    variations: [
+
+    ]
   },
   {
     id: '6297',
@@ -5301,10 +6085,12 @@ export const defaultProducts: Product[] = [
     reference: '1312',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 386,
-    variations: []
+    position: 6297,
+    variations: [
+
+    ]
   },
   {
     id: '6298',
@@ -5314,10 +6100,12 @@ export const defaultProducts: Product[] = [
     reference: '1313',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 387,
-    variations: []
+    position: 6298,
+    variations: [
+
+    ]
   },
   {
     id: '6299',
@@ -5327,10 +6115,12 @@ export const defaultProducts: Product[] = [
     reference: '1320',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 388,
-    variations: []
+    position: 6299,
+    variations: [
+
+    ]
   },
   {
     id: '6300',
@@ -5340,10 +6130,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 389,
-    variations: []
+    position: 6300,
+    variations: [
+
+    ]
   },
   {
     id: '6301',
@@ -5353,10 +6145,12 @@ export const defaultProducts: Product[] = [
     reference: '1330',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 390,
-    variations: []
+    position: 6301,
+    variations: [
+
+    ]
   },
   {
     id: '6302',
@@ -5366,10 +6160,12 @@ export const defaultProducts: Product[] = [
     reference: '1340',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 391,
-    variations: []
+    position: 6302,
+    variations: [
+
+    ]
   },
   {
     id: '6303',
@@ -5379,10 +6175,12 @@ export const defaultProducts: Product[] = [
     reference: '1341',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 392,
-    variations: []
+    position: 6303,
+    variations: [
+
+    ]
   },
   {
     id: '6304',
@@ -5392,10 +6190,12 @@ export const defaultProducts: Product[] = [
     reference: '1342',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 393,
-    variations: []
+    position: 6304,
+    variations: [
+
+    ]
   },
   {
     id: '6305',
@@ -5405,10 +6205,12 @@ export const defaultProducts: Product[] = [
     reference: '1343',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 394,
-    variations: []
+    position: 6305,
+    variations: [
+
+    ]
   },
   {
     id: '6306',
@@ -5418,10 +6220,12 @@ export const defaultProducts: Product[] = [
     reference: '1344',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 395,
-    variations: []
+    position: 6306,
+    variations: [
+
+    ]
   },
   {
     id: '6307',
@@ -5431,10 +6235,12 @@ export const defaultProducts: Product[] = [
     reference: '1350',
     wholesalePrice: 12,
     finalPrice: 44,
-    crossedPrice: 48.400000000000006,
+    crossedPrice: 44,
     salesCount: 0,
-    position: 396,
-    variations: []
+    position: 6307,
+    variations: [
+
+    ]
   },
   {
     id: '6308',
@@ -5444,10 +6250,12 @@ export const defaultProducts: Product[] = [
     reference: '1360',
     wholesalePrice: 15,
     finalPrice: 44,
-    crossedPrice: 48.400000000000006,
+    crossedPrice: 44,
     salesCount: 0,
-    position: 397,
-    variations: []
+    position: 6308,
+    variations: [
+
+    ]
   },
   {
     id: '6309',
@@ -5457,10 +6265,12 @@ export const defaultProducts: Product[] = [
     reference: '1370',
     wholesalePrice: 5,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 398,
-    variations: []
+    position: 6309,
+    variations: [
+
+    ]
   },
   {
     id: '6312',
@@ -5470,10 +6280,12 @@ export const defaultProducts: Product[] = [
     reference: '1391',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 399,
-    variations: []
+    position: 6312,
+    variations: [
+
+    ]
   },
   {
     id: '6313',
@@ -5483,10 +6295,12 @@ export const defaultProducts: Product[] = [
     reference: '1392',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 400,
-    variations: []
+    position: 6313,
+    variations: [
+
+    ]
   },
   {
     id: '6314',
@@ -5496,10 +6310,12 @@ export const defaultProducts: Product[] = [
     reference: '1393',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 401,
-    variations: []
+    position: 6314,
+    variations: [
+
+    ]
   },
   {
     id: '6315',
@@ -5509,10 +6325,12 @@ export const defaultProducts: Product[] = [
     reference: '1394',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 402,
-    variations: []
+    position: 6315,
+    variations: [
+
+    ]
   },
   {
     id: '6316',
@@ -5522,10 +6340,12 @@ export const defaultProducts: Product[] = [
     reference: '1400',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 403,
-    variations: []
+    position: 6316,
+    variations: [
+
+    ]
   },
   {
     id: '6317',
@@ -5535,10 +6355,12 @@ export const defaultProducts: Product[] = [
     reference: '1401',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 404,
-    variations: []
+    position: 6317,
+    variations: [
+
+    ]
   },
   {
     id: '6318',
@@ -5548,10 +6370,12 @@ export const defaultProducts: Product[] = [
     reference: '1402',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 405,
-    variations: []
+    position: 6318,
+    variations: [
+
+    ]
   },
   {
     id: '6319',
@@ -5561,10 +6385,12 @@ export const defaultProducts: Product[] = [
     reference: '1403',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 406,
-    variations: []
+    position: 6319,
+    variations: [
+
+    ]
   },
   {
     id: '6320',
@@ -5574,10 +6400,12 @@ export const defaultProducts: Product[] = [
     reference: '1404',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 407,
-    variations: []
+    position: 6320,
+    variations: [
+
+    ]
   },
   {
     id: '6321',
@@ -5587,10 +6415,12 @@ export const defaultProducts: Product[] = [
     reference: '1410',
     wholesalePrice: 12,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 408,
-    variations: []
+    position: 6321,
+    variations: [
+
+    ]
   },
   {
     id: '6324',
@@ -5600,10 +6430,12 @@ export const defaultProducts: Product[] = [
     reference: '1413',
     wholesalePrice: 13,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 409,
-    variations: []
+    position: 6324,
+    variations: [
+
+    ]
   },
   {
     id: '6325',
@@ -5613,10 +6445,12 @@ export const defaultProducts: Product[] = [
     reference: '1414',
     wholesalePrice: 12,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 410,
-    variations: []
+    position: 6325,
+    variations: [
+
+    ]
   },
   {
     id: '6335',
@@ -5626,10 +6460,12 @@ export const defaultProducts: Product[] = [
     reference: '1450',
     wholesalePrice: 10,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 411,
-    variations: []
+    position: 6335,
+    variations: [
+
+    ]
   },
   {
     id: '6336',
@@ -5639,10 +6475,12 @@ export const defaultProducts: Product[] = [
     reference: '1452',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 412,
-    variations: []
+    position: 6336,
+    variations: [
+
+    ]
   },
   {
     id: '6337',
@@ -5652,10 +6490,12 @@ export const defaultProducts: Product[] = [
     reference: '1460',
     wholesalePrice: 9,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 413,
-    variations: []
+    position: 6337,
+    variations: [
+
+    ]
   },
   {
     id: '6338',
@@ -5665,10 +6505,12 @@ export const defaultProducts: Product[] = [
     reference: '1461',
     wholesalePrice: 9,
     finalPrice: 44,
-    crossedPrice: 48.400000000000006,
+    crossedPrice: 44,
     salesCount: 0,
-    position: 414,
-    variations: []
+    position: 6338,
+    variations: [
+
+    ]
   },
   {
     id: '6345',
@@ -5678,10 +6520,12 @@ export const defaultProducts: Product[] = [
     reference: '1480',
     wholesalePrice: 8,
     finalPrice: 19,
-    crossedPrice: 20.900000000000002,
+    crossedPrice: 19,
     salesCount: 0,
-    position: 415,
-    variations: []
+    position: 6345,
+    variations: [
+
+    ]
   },
   {
     id: '6347',
@@ -5691,10 +6535,12 @@ export const defaultProducts: Product[] = [
     reference: '1490',
     wholesalePrice: 25,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 416,
-    variations: []
+    position: 6347,
+    variations: [
+
+    ]
   },
   {
     id: '6349',
@@ -5704,10 +6550,12 @@ export const defaultProducts: Product[] = [
     reference: '1501',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 417,
-    variations: []
+    position: 6349,
+    variations: [
+
+    ]
   },
   {
     id: '6350',
@@ -5717,10 +6565,12 @@ export const defaultProducts: Product[] = [
     reference: '1502',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 418,
-    variations: []
+    position: 6350,
+    variations: [
+
+    ]
   },
   {
     id: '6351',
@@ -5730,10 +6580,12 @@ export const defaultProducts: Product[] = [
     reference: '1510',
     wholesalePrice: 8,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 419,
-    variations: []
+    position: 6351,
+    variations: [
+
+    ]
   },
   {
     id: '6352',
@@ -5743,10 +6595,12 @@ export const defaultProducts: Product[] = [
     reference: '1511',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 420,
-    variations: []
+    position: 6352,
+    variations: [
+
+    ]
   },
   {
     id: '6353',
@@ -5756,10 +6610,12 @@ export const defaultProducts: Product[] = [
     reference: '1512',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 421,
-    variations: []
+    position: 6353,
+    variations: [
+
+    ]
   },
   {
     id: '6354',
@@ -5769,10 +6625,12 @@ export const defaultProducts: Product[] = [
     reference: '1513',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 422,
-    variations: []
+    position: 6354,
+    variations: [
+
+    ]
   },
   {
     id: '6355',
@@ -5782,49 +6640,43 @@ export const defaultProducts: Product[] = [
     reference: '1514',
     wholesalePrice: 11,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 423,
-    variations: []
-  },
-  {
-    id: '6355',
-    name: 'TOTE BAG NOIRE',
-    category: 'sac',
-    ean13: '2040883702484',
-    reference: '1514',
-    wholesalePrice: 11,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 424,
-    variations: []
-  },
-  {
-    id: '6355',
-    name: 'TOTE BAG NOIRE',
-    category: 'sac',
-    ean13: '2040883702484',
-    reference: '1514',
-    wholesalePrice: 11,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 425,
-    variations: []
-  },
-  {
-    id: '6355',
-    name: 'TOTE BAG NOIRE',
-    category: 'sac',
-    ean13: '2040883702484',
-    reference: '1514',
-    wholesalePrice: 11,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 426,
-    variations: []
+    position: 6355,
+    variations: [
+    {
+      id: '2075',
+      ean13: '2006388641635',
+      reference: '',
+      attributes: 'SAINT TROPEZ',
+      priceImpact: 4,
+      finalPrice: 15
+    },
+    {
+      id: '2078',
+      ean13: '2046258096325',
+      reference: '',
+      attributes: 'CAVALAIRE',
+      priceImpact: 4,
+      finalPrice: 15
+    },
+    {
+      id: '2076',
+      ean13: '2000562547478',
+      reference: '',
+      attributes: 'SAINTE MAXIME',
+      priceImpact: 4,
+      finalPrice: 15
+    },
+    {
+      id: '2077',
+      ean13: '2060907659396',
+      reference: '',
+      attributes: 'PORT GRIMAUD',
+      priceImpact: 4,
+      finalPrice: 15
+    }
+    ]
   },
   {
     id: '6356',
@@ -5834,10 +6686,12 @@ export const defaultProducts: Product[] = [
     reference: '1515',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 427,
-    variations: []
+    position: 6356,
+    variations: [
+
+    ]
   },
   {
     id: '6357',
@@ -5847,10 +6701,12 @@ export const defaultProducts: Product[] = [
     reference: '1520',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 428,
-    variations: []
+    position: 6357,
+    variations: [
+
+    ]
   },
   {
     id: '6358',
@@ -5860,10 +6716,12 @@ export const defaultProducts: Product[] = [
     reference: '1521',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 429,
-    variations: []
+    position: 6358,
+    variations: [
+
+    ]
   },
   {
     id: '6359',
@@ -5873,10 +6731,12 @@ export const defaultProducts: Product[] = [
     reference: '1526',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 430,
-    variations: []
+    position: 6359,
+    variations: [
+
+    ]
   },
   {
     id: '6367',
@@ -5886,10 +6746,12 @@ export const defaultProducts: Product[] = [
     reference: '1560',
     wholesalePrice: 17,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 431,
-    variations: []
+    position: 6367,
+    variations: [
+
+    ]
   },
   {
     id: '6368',
@@ -5899,10 +6761,12 @@ export const defaultProducts: Product[] = [
     reference: '1561',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 432,
-    variations: []
+    position: 6368,
+    variations: [
+
+    ]
   },
   {
     id: '6369',
@@ -5912,10 +6776,12 @@ export const defaultProducts: Product[] = [
     reference: '1569',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 433,
-    variations: []
+    position: 6369,
+    variations: [
+
+    ]
   },
   {
     id: '6370',
@@ -5925,10 +6791,12 @@ export const defaultProducts: Product[] = [
     reference: '1563',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 434,
-    variations: []
+    position: 6370,
+    variations: [
+
+    ]
   },
   {
     id: '6371',
@@ -5938,10 +6806,12 @@ export const defaultProducts: Product[] = [
     reference: '1564',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 435,
-    variations: []
+    position: 6371,
+    variations: [
+
+    ]
   },
   {
     id: '6372',
@@ -5951,10 +6821,12 @@ export const defaultProducts: Product[] = [
     reference: '1570',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 436,
-    variations: []
+    position: 6372,
+    variations: [
+
+    ]
   },
   {
     id: '6373',
@@ -5964,10 +6836,12 @@ export const defaultProducts: Product[] = [
     reference: '1572',
     wholesalePrice: 17,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 437,
-    variations: []
+    position: 6373,
+    variations: [
+
+    ]
   },
   {
     id: '6375',
@@ -5977,10 +6851,12 @@ export const defaultProducts: Product[] = [
     reference: '1580',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 438,
-    variations: []
+    position: 6375,
+    variations: [
+
+    ]
   },
   {
     id: '6376',
@@ -5990,10 +6866,12 @@ export const defaultProducts: Product[] = [
     reference: '1581',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 439,
-    variations: []
+    position: 6376,
+    variations: [
+
+    ]
   },
   {
     id: '6377',
@@ -6003,10 +6881,12 @@ export const defaultProducts: Product[] = [
     reference: '1582',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 440,
-    variations: []
+    position: 6377,
+    variations: [
+
+    ]
   },
   {
     id: '6378',
@@ -6016,10 +6896,12 @@ export const defaultProducts: Product[] = [
     reference: '1583',
     wholesalePrice: 17,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 441,
-    variations: []
+    position: 6378,
+    variations: [
+
+    ]
   },
   {
     id: '6379',
@@ -6029,10 +6911,12 @@ export const defaultProducts: Product[] = [
     reference: '1590',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 442,
-    variations: []
+    position: 6379,
+    variations: [
+
+    ]
   },
   {
     id: '6381',
@@ -6042,10 +6926,12 @@ export const defaultProducts: Product[] = [
     reference: '862',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 443,
-    variations: []
+    position: 6381,
+    variations: [
+
+    ]
   },
   {
     id: '6382',
@@ -6055,10 +6941,12 @@ export const defaultProducts: Product[] = [
     reference: '1601',
     wholesalePrice: 2,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 444,
-    variations: []
+    position: 6382,
+    variations: [
+
+    ]
   },
   {
     id: '6383',
@@ -6068,10 +6956,12 @@ export const defaultProducts: Product[] = [
     reference: '1610',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 445,
-    variations: []
+    position: 6383,
+    variations: [
+
+    ]
   },
   {
     id: '6384',
@@ -6081,10 +6971,12 @@ export const defaultProducts: Product[] = [
     reference: '1611',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 446,
-    variations: []
+    position: 6384,
+    variations: [
+
+    ]
   },
   {
     id: '6385',
@@ -6094,10 +6986,12 @@ export const defaultProducts: Product[] = [
     reference: '1612',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 447,
-    variations: []
+    position: 6385,
+    variations: [
+
+    ]
   },
   {
     id: '6386',
@@ -6107,10 +7001,12 @@ export const defaultProducts: Product[] = [
     reference: '1613',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 448,
-    variations: []
+    position: 6386,
+    variations: [
+
+    ]
   },
   {
     id: '6387',
@@ -6120,10 +7016,12 @@ export const defaultProducts: Product[] = [
     reference: '1614',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 449,
-    variations: []
+    position: 6387,
+    variations: [
+
+    ]
   },
   {
     id: '6390',
@@ -6133,10 +7031,12 @@ export const defaultProducts: Product[] = [
     reference: '1630',
     wholesalePrice: 13,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 450,
-    variations: []
+    position: 6390,
+    variations: [
+
+    ]
   },
   {
     id: '6392',
@@ -6146,10 +7046,12 @@ export const defaultProducts: Product[] = [
     reference: '1632',
     wholesalePrice: 13,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 451,
-    variations: []
+    position: 6392,
+    variations: [
+
+    ]
   },
   {
     id: '6394',
@@ -6159,10 +7061,12 @@ export const defaultProducts: Product[] = [
     reference: '1634',
     wholesalePrice: 13,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 452,
-    variations: []
+    position: 6394,
+    variations: [
+
+    ]
   },
   {
     id: '6396',
@@ -6172,101 +7076,75 @@ export const defaultProducts: Product[] = [
     reference: '5000',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 453,
-    variations: []
-  },
-  {
-    id: '6396',
-    name: 'TEE SHIRT FEMME  BLANC LOGO ORANGE NBO',
-    category: 'vetement',
-    ean13: '',
-    reference: '5000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 454,
-    variations: []
-  },
-  {
-    id: '6396',
-    name: 'TEE SHIRT FEMME  BLANC LOGO ORANGE NBO',
-    category: 'vetement',
-    ean13: '',
-    reference: '5000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 455,
-    variations: []
-  },
-  {
-    id: '6396',
-    name: 'TEE SHIRT FEMME  BLANC LOGO ORANGE NBO',
-    category: 'vetement',
-    ean13: '',
-    reference: '5000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 456,
-    variations: []
-  },
-  {
-    id: '6396',
-    name: 'TEE SHIRT FEMME  BLANC LOGO ORANGE NBO',
-    category: 'vetement',
-    ean13: '',
-    reference: '5000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 457,
-    variations: []
-  },
-  {
-    id: '6396',
-    name: 'TEE SHIRT FEMME  BLANC LOGO ORANGE NBO',
-    category: 'vetement',
-    ean13: '',
-    reference: '5000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 458,
-    variations: []
-  },
-  {
-    id: '6396',
-    name: 'TEE SHIRT FEMME  BLANC LOGO ORANGE NBO',
-    category: 'vetement',
-    ean13: '',
-    reference: '5000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 459,
-    variations: []
-  },
-  {
-    id: '6396',
-    name: 'TEE SHIRT FEMME  BLANC LOGO ORANGE NBO',
-    category: 'vetement',
-    ean13: '',
-    reference: '5000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 460,
-    variations: []
+    position: 6396,
+    variations: [
+    {
+      id: '2274',
+      ean13: '2090811413449',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2272',
+      ean13: '2042332287429',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2273',
+      ean13: '2038773675048',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2278',
+      ean13: '2091145619101',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2275',
+      ean13: '2053253721602',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2277',
+      ean13: '2038276012944',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2276',
+      ean13: '2065667922490',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2279',
+      ean13: '2061434582676',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6397',
@@ -6276,101 +7154,75 @@ export const defaultProducts: Product[] = [
     reference: '5010',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 461,
-    variations: []
-  },
-  {
-    id: '6397',
-    name: 'TEE SHIRT FEMME BLANC LOGO ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '5010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 462,
-    variations: []
-  },
-  {
-    id: '6397',
-    name: 'TEE SHIRT FEMME BLANC LOGO ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '5010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 463,
-    variations: []
-  },
-  {
-    id: '6397',
-    name: 'TEE SHIRT FEMME BLANC LOGO ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '5010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 464,
-    variations: []
-  },
-  {
-    id: '6397',
-    name: 'TEE SHIRT FEMME BLANC LOGO ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '5010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 465,
-    variations: []
-  },
-  {
-    id: '6397',
-    name: 'TEE SHIRT FEMME BLANC LOGO ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '5010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 466,
-    variations: []
-  },
-  {
-    id: '6397',
-    name: 'TEE SHIRT FEMME BLANC LOGO ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '5010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 467,
-    variations: []
-  },
-  {
-    id: '6397',
-    name: 'TEE SHIRT FEMME BLANC LOGO ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '5010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 468,
-    variations: []
+    position: 6397,
+    variations: [
+    {
+      id: '2282',
+      ean13: '2036048832462',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2280',
+      ean13: '2079664763437',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2281',
+      ean13: '2074948710961',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2285',
+      ean13: '2016487095062',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2284',
+      ean13: '2094188131265',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2283',
+      ean13: '2070722940272',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2287',
+      ean13: '2094133522575',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2286',
+      ean13: '2007922544375',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6398',
@@ -6380,101 +7232,75 @@ export const defaultProducts: Product[] = [
     reference: '5020',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 469,
-    variations: []
-  },
-  {
-    id: '6398',
-    name: 'TEE SHIRT FEMME BLANC LOGO BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '5020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 470,
-    variations: []
-  },
-  {
-    id: '6398',
-    name: 'TEE SHIRT FEMME BLANC LOGO BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '5020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 471,
-    variations: []
-  },
-  {
-    id: '6398',
-    name: 'TEE SHIRT FEMME BLANC LOGO BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '5020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 472,
-    variations: []
-  },
-  {
-    id: '6398',
-    name: 'TEE SHIRT FEMME BLANC LOGO BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '5020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 473,
-    variations: []
-  },
-  {
-    id: '6398',
-    name: 'TEE SHIRT FEMME BLANC LOGO BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '5020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 474,
-    variations: []
-  },
-  {
-    id: '6398',
-    name: 'TEE SHIRT FEMME BLANC LOGO BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '5020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 475,
-    variations: []
-  },
-  {
-    id: '6398',
-    name: 'TEE SHIRT FEMME BLANC LOGO BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '5020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 476,
-    variations: []
+    position: 6398,
+    variations: [
+    {
+      id: '2288',
+      ean13: '2059545381363',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2289',
+      ean13: '2046238678947',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2290',
+      ean13: '2039503550086',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2291',
+      ean13: '2006918696401',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2293',
+      ean13: '2028763869786',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2292',
+      ean13: '2066024310233',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2295',
+      ean13: '2042047926101',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2294',
+      ean13: '2055152521253',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6399',
@@ -6484,101 +7310,75 @@ export const defaultProducts: Product[] = [
     reference: '5030',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 477,
-    variations: []
-  },
-  {
-    id: '6399',
-    name: 'TEE SHIRT FEMME LOGO CLOCHER',
-    category: 'vetement',
-    ean13: '',
-    reference: '5030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 478,
-    variations: []
-  },
-  {
-    id: '6399',
-    name: 'TEE SHIRT FEMME LOGO CLOCHER',
-    category: 'vetement',
-    ean13: '',
-    reference: '5030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 479,
-    variations: []
-  },
-  {
-    id: '6399',
-    name: 'TEE SHIRT FEMME LOGO CLOCHER',
-    category: 'vetement',
-    ean13: '',
-    reference: '5030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 480,
-    variations: []
-  },
-  {
-    id: '6399',
-    name: 'TEE SHIRT FEMME LOGO CLOCHER',
-    category: 'vetement',
-    ean13: '',
-    reference: '5030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 481,
-    variations: []
-  },
-  {
-    id: '6399',
-    name: 'TEE SHIRT FEMME LOGO CLOCHER',
-    category: 'vetement',
-    ean13: '',
-    reference: '5030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 482,
-    variations: []
-  },
-  {
-    id: '6399',
-    name: 'TEE SHIRT FEMME LOGO CLOCHER',
-    category: 'vetement',
-    ean13: '',
-    reference: '5030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 483,
-    variations: []
-  },
-  {
-    id: '6399',
-    name: 'TEE SHIRT FEMME LOGO CLOCHER',
-    category: 'vetement',
-    ean13: '',
-    reference: '5030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 484,
-    variations: []
+    position: 6399,
+    variations: [
+    {
+      id: '2299',
+      ean13: '2063872830616',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2297',
+      ean13: '2074054528085',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2298',
+      ean13: '2060631932499',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2296',
+      ean13: '2011732777106',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2301',
+      ean13: '2051572767127',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2300',
+      ean13: '2067538840889',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2303',
+      ean13: '2034143476932',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2302',
+      ean13: '2032111054571',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6400',
@@ -6588,101 +7388,75 @@ export const defaultProducts: Product[] = [
     reference: '5040',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 485,
-    variations: []
-  },
-  {
-    id: '6400',
-    name: 'TEE SHIRT FEMMELOGO VICHY CŒUR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 486,
-    variations: []
-  },
-  {
-    id: '6400',
-    name: 'TEE SHIRT FEMMELOGO VICHY CŒUR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 487,
-    variations: []
-  },
-  {
-    id: '6400',
-    name: 'TEE SHIRT FEMMELOGO VICHY CŒUR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 488,
-    variations: []
-  },
-  {
-    id: '6400',
-    name: 'TEE SHIRT FEMMELOGO VICHY CŒUR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 489,
-    variations: []
-  },
-  {
-    id: '6400',
-    name: 'TEE SHIRT FEMMELOGO VICHY CŒUR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 490,
-    variations: []
-  },
-  {
-    id: '6400',
-    name: 'TEE SHIRT FEMMELOGO VICHY CŒUR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 491,
-    variations: []
-  },
-  {
-    id: '6400',
-    name: 'TEE SHIRT FEMMELOGO VICHY CŒUR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 492,
-    variations: []
+    position: 6400,
+    variations: [
+    {
+      id: '2308',
+      ean13: '2067518617296',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2305',
+      ean13: '2033808357821',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2306',
+      ean13: '2066728079948',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2304',
+      ean13: '2024348375437',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2307',
+      ean13: '2021818442927',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2311',
+      ean13: '2038257997987',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2310',
+      ean13: '2075098021754',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2309',
+      ean13: '2026157806621',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6401',
@@ -6692,101 +7466,75 @@ export const defaultProducts: Product[] = [
     reference: '5050',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 493,
-    variations: []
-  },
-  {
-    id: '6401',
-    name: 'TEE SHIRT FEMME NOIR BRODE DOS',
-    category: 'vetement',
-    ean13: '',
-    reference: '5050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 494,
-    variations: []
-  },
-  {
-    id: '6401',
-    name: 'TEE SHIRT FEMME NOIR BRODE DOS',
-    category: 'vetement',
-    ean13: '',
-    reference: '5050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 495,
-    variations: []
-  },
-  {
-    id: '6401',
-    name: 'TEE SHIRT FEMME NOIR BRODE DOS',
-    category: 'vetement',
-    ean13: '',
-    reference: '5050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 496,
-    variations: []
-  },
-  {
-    id: '6401',
-    name: 'TEE SHIRT FEMME NOIR BRODE DOS',
-    category: 'vetement',
-    ean13: '',
-    reference: '5050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 497,
-    variations: []
-  },
-  {
-    id: '6401',
-    name: 'TEE SHIRT FEMME NOIR BRODE DOS',
-    category: 'vetement',
-    ean13: '',
-    reference: '5050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 498,
-    variations: []
-  },
-  {
-    id: '6401',
-    name: 'TEE SHIRT FEMME NOIR BRODE DOS',
-    category: 'vetement',
-    ean13: '',
-    reference: '5050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 499,
-    variations: []
-  },
-  {
-    id: '6401',
-    name: 'TEE SHIRT FEMME NOIR BRODE DOS',
-    category: 'vetement',
-    ean13: '',
-    reference: '5050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 500,
-    variations: []
+    position: 6401,
+    variations: [
+    {
+      id: '2312',
+      ean13: '2096037618620',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2313',
+      ean13: '2066089212961',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2314',
+      ean13: '2025686100613',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2315',
+      ean13: '2040102783201',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2316',
+      ean13: '2063743717800',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2319',
+      ean13: '2017118318109',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2318',
+      ean13: '2039027714858',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2317',
+      ean13: '2005364385129',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6402',
@@ -6796,101 +7544,75 @@ export const defaultProducts: Product[] = [
     reference: '5060',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 501,
-    variations: []
-  },
-  {
-    id: '6402',
-    name: 'TEE SHIRT FEMME BLANC COL ROND LOGO BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '5060',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 502,
-    variations: []
-  },
-  {
-    id: '6402',
-    name: 'TEE SHIRT FEMME BLANC COL ROND LOGO BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '5060',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 503,
-    variations: []
-  },
-  {
-    id: '6402',
-    name: 'TEE SHIRT FEMME BLANC COL ROND LOGO BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '5060',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 504,
-    variations: []
-  },
-  {
-    id: '6402',
-    name: 'TEE SHIRT FEMME BLANC COL ROND LOGO BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '5060',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 505,
-    variations: []
-  },
-  {
-    id: '6402',
-    name: 'TEE SHIRT FEMME BLANC COL ROND LOGO BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '5060',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 506,
-    variations: []
-  },
-  {
-    id: '6402',
-    name: 'TEE SHIRT FEMME BLANC COL ROND LOGO BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '5060',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 507,
-    variations: []
-  },
-  {
-    id: '6402',
-    name: 'TEE SHIRT FEMME BLANC COL ROND LOGO BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '5060',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 508,
-    variations: []
+    position: 6402,
+    variations: [
+    {
+      id: '2320',
+      ean13: '2013448752316',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2321',
+      ean13: '2038535395542',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2322',
+      ean13: '2036342510028',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2325',
+      ean13: '2064348304389',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2323',
+      ean13: '2045094372730',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2327',
+      ean13: '2073914566885',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2326',
+      ean13: '2020930283463',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2324',
+      ean13: '2040478827905',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6403',
@@ -6900,101 +7622,75 @@ export const defaultProducts: Product[] = [
     reference: '5070',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 509,
-    variations: []
-  },
-  {
-    id: '6403',
-    name: 'TEE SHIRT FEMME BLANC PAILLETTE OR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5070',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 510,
-    variations: []
-  },
-  {
-    id: '6403',
-    name: 'TEE SHIRT FEMME BLANC PAILLETTE OR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5070',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 511,
-    variations: []
-  },
-  {
-    id: '6403',
-    name: 'TEE SHIRT FEMME BLANC PAILLETTE OR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5070',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 512,
-    variations: []
-  },
-  {
-    id: '6403',
-    name: 'TEE SHIRT FEMME BLANC PAILLETTE OR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5070',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 513,
-    variations: []
-  },
-  {
-    id: '6403',
-    name: 'TEE SHIRT FEMME BLANC PAILLETTE OR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5070',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 514,
-    variations: []
-  },
-  {
-    id: '6403',
-    name: 'TEE SHIRT FEMME BLANC PAILLETTE OR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5070',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 515,
-    variations: []
-  },
-  {
-    id: '6403',
-    name: 'TEE SHIRT FEMME BLANC PAILLETTE OR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5070',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 516,
-    variations: []
+    position: 6403,
+    variations: [
+    {
+      id: '2331',
+      ean13: '2089408120440',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2329',
+      ean13: '2095434464977',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2330',
+      ean13: '2075103842121',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2328',
+      ean13: '2055857215525',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2333',
+      ean13: '2051016750029',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2332',
+      ean13: '2023806402449',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2335',
+      ean13: '2045393121961',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2334',
+      ean13: '2047632865780',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6404',
@@ -7004,101 +7700,75 @@ export const defaultProducts: Product[] = [
     reference: '5080',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 517,
-    variations: []
-  },
-  {
-    id: '6404',
-    name: 'TEE SHIRT FEMME GRIS LOGO TROPEZ GFR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5080',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 518,
-    variations: []
-  },
-  {
-    id: '6404',
-    name: 'TEE SHIRT FEMME GRIS LOGO TROPEZ GFR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5080',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 519,
-    variations: []
-  },
-  {
-    id: '6404',
-    name: 'TEE SHIRT FEMME GRIS LOGO TROPEZ GFR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5080',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 520,
-    variations: []
-  },
-  {
-    id: '6404',
-    name: 'TEE SHIRT FEMME GRIS LOGO TROPEZ GFR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5080',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 521,
-    variations: []
-  },
-  {
-    id: '6404',
-    name: 'TEE SHIRT FEMME GRIS LOGO TROPEZ GFR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5080',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 522,
-    variations: []
-  },
-  {
-    id: '6404',
-    name: 'TEE SHIRT FEMME GRIS LOGO TROPEZ GFR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5080',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 523,
-    variations: []
-  },
-  {
-    id: '6404',
-    name: 'TEE SHIRT FEMME GRIS LOGO TROPEZ GFR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5080',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 524,
-    variations: []
+    position: 6404,
+    variations: [
+    {
+      id: '2248',
+      ean13: '2056639120242',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2249',
+      ean13: '2091247524204',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2250',
+      ean13: '2030935109637',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2254',
+      ean13: '2065447144784',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2251',
+      ean13: '2055712157946',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2253',
+      ean13: '2078080457098',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2252',
+      ean13: '2053022370932',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2255',
+      ean13: '2038865490443',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6405',
@@ -7108,101 +7778,75 @@ export const defaultProducts: Product[] = [
     reference: '5090',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 525,
-    variations: []
-  },
-  {
-    id: '6405',
-    name: 'TEE SHIRT FEMME FUSHIA LOGO TROPEZ FFG',
-    category: 'vetement',
-    ean13: '',
-    reference: '5090',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 526,
-    variations: []
-  },
-  {
-    id: '6405',
-    name: 'TEE SHIRT FEMME FUSHIA LOGO TROPEZ FFG',
-    category: 'vetement',
-    ean13: '',
-    reference: '5090',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 527,
-    variations: []
-  },
-  {
-    id: '6405',
-    name: 'TEE SHIRT FEMME FUSHIA LOGO TROPEZ FFG',
-    category: 'vetement',
-    ean13: '',
-    reference: '5090',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 528,
-    variations: []
-  },
-  {
-    id: '6405',
-    name: 'TEE SHIRT FEMME FUSHIA LOGO TROPEZ FFG',
-    category: 'vetement',
-    ean13: '',
-    reference: '5090',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 529,
-    variations: []
-  },
-  {
-    id: '6405',
-    name: 'TEE SHIRT FEMME FUSHIA LOGO TROPEZ FFG',
-    category: 'vetement',
-    ean13: '',
-    reference: '5090',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 530,
-    variations: []
-  },
-  {
-    id: '6405',
-    name: 'TEE SHIRT FEMME FUSHIA LOGO TROPEZ FFG',
-    category: 'vetement',
-    ean13: '',
-    reference: '5090',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 531,
-    variations: []
-  },
-  {
-    id: '6405',
-    name: 'TEE SHIRT FEMME FUSHIA LOGO TROPEZ FFG',
-    category: 'vetement',
-    ean13: '',
-    reference: '5090',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 532,
-    variations: []
+    position: 6405,
+    variations: [
+    {
+      id: '2240',
+      ean13: '2068652052950',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2243',
+      ean13: '2096338153059',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2241',
+      ean13: '2004076205039',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2246',
+      ean13: '2013219474058',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2247',
+      ean13: '2087787326293',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2245',
+      ean13: '2012456218401',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2242',
+      ean13: '2082716979090',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2244',
+      ean13: '2016491832875',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6406',
@@ -7212,101 +7856,75 @@ export const defaultProducts: Product[] = [
     reference: '5100',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 533,
-    variations: []
-  },
-  {
-    id: '6406',
-    name: 'TEE SHIRT FEMME ROSE LOGO TROPEZ ROSE RBR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5100',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 534,
-    variations: []
-  },
-  {
-    id: '6406',
-    name: 'TEE SHIRT FEMME ROSE LOGO TROPEZ ROSE RBR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5100',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 535,
-    variations: []
-  },
-  {
-    id: '6406',
-    name: 'TEE SHIRT FEMME ROSE LOGO TROPEZ ROSE RBR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5100',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 536,
-    variations: []
-  },
-  {
-    id: '6406',
-    name: 'TEE SHIRT FEMME ROSE LOGO TROPEZ ROSE RBR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5100',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 537,
-    variations: []
-  },
-  {
-    id: '6406',
-    name: 'TEE SHIRT FEMME ROSE LOGO TROPEZ ROSE RBR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5100',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 538,
-    variations: []
-  },
-  {
-    id: '6406',
-    name: 'TEE SHIRT FEMME ROSE LOGO TROPEZ ROSE RBR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5100',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 539,
-    variations: []
-  },
-  {
-    id: '6406',
-    name: 'TEE SHIRT FEMME ROSE LOGO TROPEZ ROSE RBR',
-    category: 'vetement',
-    ean13: '',
-    reference: '5100',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 540,
-    variations: []
+    position: 6406,
+    variations: [
+    {
+      id: '2257',
+      ean13: '2088183610993',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2261',
+      ean13: '2071932587370',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2256',
+      ean13: '2030466686911',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2258',
+      ean13: '2018479813791',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2260',
+      ean13: '2049268135688',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2259',
+      ean13: '2014065191847',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2263',
+      ean13: '2041498028808',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2262',
+      ean13: '2091421809608',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6407',
@@ -7316,101 +7934,75 @@ export const defaultProducts: Product[] = [
     reference: '5200',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 541,
-    variations: []
-  },
-  {
-    id: '6407',
-    name: 'TEE SHIRT FEMME 5',
-    category: 'vetement',
-    ean13: '',
-    reference: '5200',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 542,
-    variations: []
-  },
-  {
-    id: '6407',
-    name: 'TEE SHIRT FEMME 5',
-    category: 'vetement',
-    ean13: '',
-    reference: '5200',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 543,
-    variations: []
-  },
-  {
-    id: '6407',
-    name: 'TEE SHIRT FEMME 5',
-    category: 'vetement',
-    ean13: '',
-    reference: '5200',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 544,
-    variations: []
-  },
-  {
-    id: '6407',
-    name: 'TEE SHIRT FEMME 5',
-    category: 'vetement',
-    ean13: '',
-    reference: '5200',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 545,
-    variations: []
-  },
-  {
-    id: '6407',
-    name: 'TEE SHIRT FEMME 5',
-    category: 'vetement',
-    ean13: '',
-    reference: '5200',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 546,
-    variations: []
-  },
-  {
-    id: '6407',
-    name: 'TEE SHIRT FEMME 5',
-    category: 'vetement',
-    ean13: '',
-    reference: '5200',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 547,
-    variations: []
-  },
-  {
-    id: '6407',
-    name: 'TEE SHIRT FEMME 5',
-    category: 'vetement',
-    ean13: '',
-    reference: '5200',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 548,
-    variations: []
+    position: 6407,
+    variations: [
+    {
+      id: '2266',
+      ean13: '2017933050956',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2264',
+      ean13: '2057568073234',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2265',
+      ean13: '2042092655513',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2270',
+      ean13: '2017295573490',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2268',
+      ean13: '2099257295329',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2267',
+      ean13: '2013076784857',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2271',
+      ean13: '2077550098953',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2269',
+      ean13: '2067774642650',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6415',
@@ -7420,101 +8012,75 @@ export const defaultProducts: Product[] = [
     reference: '8010',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 549,
-    variations: []
-  },
-  {
-    id: '6415',
-    name: 'TEE SHIRT HOMME BLANC LOGO NIK',
-    category: 'vetement',
-    ean13: '',
-    reference: '8010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 550,
-    variations: []
-  },
-  {
-    id: '6415',
-    name: 'TEE SHIRT HOMME BLANC LOGO NIK',
-    category: 'vetement',
-    ean13: '',
-    reference: '8010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 551,
-    variations: []
-  },
-  {
-    id: '6415',
-    name: 'TEE SHIRT HOMME BLANC LOGO NIK',
-    category: 'vetement',
-    ean13: '',
-    reference: '8010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 552,
-    variations: []
-  },
-  {
-    id: '6415',
-    name: 'TEE SHIRT HOMME BLANC LOGO NIK',
-    category: 'vetement',
-    ean13: '',
-    reference: '8010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 553,
-    variations: []
-  },
-  {
-    id: '6415',
-    name: 'TEE SHIRT HOMME BLANC LOGO NIK',
-    category: 'vetement',
-    ean13: '',
-    reference: '8010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 554,
-    variations: []
-  },
-  {
-    id: '6415',
-    name: 'TEE SHIRT HOMME BLANC LOGO NIK',
-    category: 'vetement',
-    ean13: '',
-    reference: '8010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 555,
-    variations: []
-  },
-  {
-    id: '6415',
-    name: 'TEE SHIRT HOMME BLANC LOGO NIK',
-    category: 'vetement',
-    ean13: '',
-    reference: '8010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 556,
-    variations: []
+    position: 6415,
+    variations: [
+    {
+      id: '2336',
+      ean13: '2071766790793',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2337',
+      ean13: '2050668601864',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2340',
+      ean13: '2090419368387',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2338',
+      ean13: '2085924535973',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2343',
+      ean13: '2099365791348',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2342',
+      ean13: '2012650266451',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2341',
+      ean13: '2061852797058',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2339',
+      ean13: '2081782847807',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6416',
@@ -7524,101 +8090,75 @@ export const defaultProducts: Product[] = [
     reference: '8020',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 557,
-    variations: []
-  },
-  {
-    id: '6416',
-    name: 'TEE SHIRT HOMMENOIR PAILLETTE',
-    category: 'vetement',
-    ean13: '',
-    reference: '8020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 558,
-    variations: []
-  },
-  {
-    id: '6416',
-    name: 'TEE SHIRT HOMMENOIR PAILLETTE',
-    category: 'vetement',
-    ean13: '',
-    reference: '8020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 559,
-    variations: []
-  },
-  {
-    id: '6416',
-    name: 'TEE SHIRT HOMMENOIR PAILLETTE',
-    category: 'vetement',
-    ean13: '',
-    reference: '8020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 560,
-    variations: []
-  },
-  {
-    id: '6416',
-    name: 'TEE SHIRT HOMMENOIR PAILLETTE',
-    category: 'vetement',
-    ean13: '',
-    reference: '8020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 561,
-    variations: []
-  },
-  {
-    id: '6416',
-    name: 'TEE SHIRT HOMMENOIR PAILLETTE',
-    category: 'vetement',
-    ean13: '',
-    reference: '8020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 562,
-    variations: []
-  },
-  {
-    id: '6416',
-    name: 'TEE SHIRT HOMMENOIR PAILLETTE',
-    category: 'vetement',
-    ean13: '',
-    reference: '8020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 563,
-    variations: []
-  },
-  {
-    id: '6416',
-    name: 'TEE SHIRT HOMMENOIR PAILLETTE',
-    category: 'vetement',
-    ean13: '',
-    reference: '8020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 564,
-    variations: []
+    position: 6416,
+    variations: [
+    {
+      id: '2348',
+      ean13: '2077454458242',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2345',
+      ean13: '2070588313814',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2346',
+      ean13: '2022673466783',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2344',
+      ean13: '2025584041568',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2347',
+      ean13: '2073533734467',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2351',
+      ean13: '2083197318415',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2350',
+      ean13: '2065530309441',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2349',
+      ean13: '2055279338086',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6417',
@@ -7628,101 +8168,75 @@ export const defaultProducts: Product[] = [
     reference: '8030',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 565,
-    variations: []
-  },
-  {
-    id: '6417',
-    name: 'TEE SHIRT HOMME NOIR LOGO TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '8030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 566,
-    variations: []
-  },
-  {
-    id: '6417',
-    name: 'TEE SHIRT HOMME NOIR LOGO TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '8030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 567,
-    variations: []
-  },
-  {
-    id: '6417',
-    name: 'TEE SHIRT HOMME NOIR LOGO TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '8030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 568,
-    variations: []
-  },
-  {
-    id: '6417',
-    name: 'TEE SHIRT HOMME NOIR LOGO TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '8030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 569,
-    variations: []
-  },
-  {
-    id: '6417',
-    name: 'TEE SHIRT HOMME NOIR LOGO TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '8030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 570,
-    variations: []
-  },
-  {
-    id: '6417',
-    name: 'TEE SHIRT HOMME NOIR LOGO TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '8030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 571,
-    variations: []
-  },
-  {
-    id: '6417',
-    name: 'TEE SHIRT HOMME NOIR LOGO TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '8030',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 572,
-    variations: []
+    position: 6417,
+    variations: [
+    {
+      id: '2352',
+      ean13: '2042011309725',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2353',
+      ean13: '2070178896864',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2354',
+      ean13: '2004678135246',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2357',
+      ean13: '2081861878616',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2355',
+      ean13: '2054694160647',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2356',
+      ean13: '2033634856352',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2359',
+      ean13: '2072957028855',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2358',
+      ean13: '2044456613351',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6418',
@@ -7732,101 +8246,75 @@ export const defaultProducts: Product[] = [
     reference: '8040',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 573,
-    variations: []
-  },
-  {
-    id: '6418',
-    name: 'TEE SHIRT HOMME GRIS LOGO NIKE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '8040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 574,
-    variations: []
-  },
-  {
-    id: '6418',
-    name: 'TEE SHIRT HOMME GRIS LOGO NIKE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '8040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 575,
-    variations: []
-  },
-  {
-    id: '6418',
-    name: 'TEE SHIRT HOMME GRIS LOGO NIKE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '8040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 576,
-    variations: []
-  },
-  {
-    id: '6418',
-    name: 'TEE SHIRT HOMME GRIS LOGO NIKE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '8040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 577,
-    variations: []
-  },
-  {
-    id: '6418',
-    name: 'TEE SHIRT HOMME GRIS LOGO NIKE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '8040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 578,
-    variations: []
-  },
-  {
-    id: '6418',
-    name: 'TEE SHIRT HOMME GRIS LOGO NIKE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '8040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 579,
-    variations: []
-  },
-  {
-    id: '6418',
-    name: 'TEE SHIRT HOMME GRIS LOGO NIKE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '8040',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 580,
-    variations: []
+    position: 6418,
+    variations: [
+    {
+      id: '2360',
+      ean13: '2066403802663',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2361',
+      ean13: '2069057415692',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2362',
+      ean13: '2076324821469',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2365',
+      ean13: '2073990634973',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2363',
+      ean13: '2090878618443',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2366',
+      ean13: '2045927264454',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2364',
+      ean13: '2015078755262',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2367',
+      ean13: '2020825516409',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6419',
@@ -7836,101 +8324,75 @@ export const defaultProducts: Product[] = [
     reference: '8050',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 581,
-    variations: []
-  },
-  {
-    id: '6419',
-    name: 'TEE SHIRT HOMME BEIGE LOGO STEM',
-    category: 'vetement',
-    ean13: '',
-    reference: '8050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 582,
-    variations: []
-  },
-  {
-    id: '6419',
-    name: 'TEE SHIRT HOMME BEIGE LOGO STEM',
-    category: 'vetement',
-    ean13: '',
-    reference: '8050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 583,
-    variations: []
-  },
-  {
-    id: '6419',
-    name: 'TEE SHIRT HOMME BEIGE LOGO STEM',
-    category: 'vetement',
-    ean13: '',
-    reference: '8050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 584,
-    variations: []
-  },
-  {
-    id: '6419',
-    name: 'TEE SHIRT HOMME BEIGE LOGO STEM',
-    category: 'vetement',
-    ean13: '',
-    reference: '8050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 585,
-    variations: []
-  },
-  {
-    id: '6419',
-    name: 'TEE SHIRT HOMME BEIGE LOGO STEM',
-    category: 'vetement',
-    ean13: '',
-    reference: '8050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 586,
-    variations: []
-  },
-  {
-    id: '6419',
-    name: 'TEE SHIRT HOMME BEIGE LOGO STEM',
-    category: 'vetement',
-    ean13: '',
-    reference: '8050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 587,
-    variations: []
-  },
-  {
-    id: '6419',
-    name: 'TEE SHIRT HOMME BEIGE LOGO STEM',
-    category: 'vetement',
-    ean13: '',
-    reference: '8050',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 588,
-    variations: []
+    position: 6419,
+    variations: [
+    {
+      id: '2370',
+      ean13: '2145475766919',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2368',
+      ean13: '',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2369',
+      ean13: '',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2371',
+      ean13: '2153146808653',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2373',
+      ean13: '',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2372',
+      ean13: '',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2375',
+      ean13: '',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2374',
+      ean13: '',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6420',
@@ -7940,75 +8402,59 @@ export const defaultProducts: Product[] = [
     reference: '2677',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 589,
-    variations: []
-  },
-  {
-    id: '6420',
-    name: 'TEE SHIRT HOMME BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '2677',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 590,
-    variations: []
-  },
-  {
-    id: '6420',
-    name: 'TEE SHIRT HOMME BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '2677',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 591,
-    variations: []
-  },
-  {
-    id: '6420',
-    name: 'TEE SHIRT HOMME BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '2677',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 592,
-    variations: []
-  },
-  {
-    id: '6420',
-    name: 'TEE SHIRT HOMME BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '2677',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 593,
-    variations: []
-  },
-  {
-    id: '6420',
-    name: 'TEE SHIRT HOMME BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '2677',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 594,
-    variations: []
+    position: 6420,
+    variations: [
+    {
+      id: '2378',
+      ean13: '2190379822810',
+      reference: '2677S',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2377',
+      ean13: '',
+      reference: '2677XS',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2381',
+      ean13: '2273244948881',
+      reference: '2677XL',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2379',
+      ean13: '2195788811240',
+      reference: '2677M',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2380',
+      ean13: '2219862681199',
+      reference: '2677L',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2382',
+      ean13: '',
+      reference: '2677XXL',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6422',
@@ -8018,114 +8464,83 @@ export const defaultProducts: Product[] = [
     reference: '9000',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 595,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 596,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 597,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 598,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 599,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 600,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 601,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 602,
-    variations: []
-  },
-  {
-    id: '6422',
-    name: 'TEE SHIRT PANNEAU TROPEZ',
-    category: 'vetement',
-    ean13: '',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 603,
-    variations: []
+    position: 6422,
+    variations: [
+    {
+      id: '2219',
+      ean13: '1651669513180',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2220',
+      ean13: '1652273217631',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2221',
+      ean13: '1684285397919',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2222',
+      ean13: '1725967465240',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2810',
+      ean13: '1613608627976',
+      reference: '',
+      attributes: '16 ANS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2226',
+      ean13: '2058478937869',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2225',
+      ean13: '2083061187703',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2223',
+      ean13: '1754577622323',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2224',
+      ean13: '2083054749246',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6428',
@@ -8135,62 +8550,51 @@ export const defaultProducts: Product[] = [
     reference: '9500',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 604,
-    variations: []
-  },
-  {
-    id: '6428',
-    name: 'WIND PROOF FUSHIA',
-    category: 'vetement',
-    ean13: '',
-    reference: '9500',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 605,
-    variations: []
-  },
-  {
-    id: '6428',
-    name: 'WIND PROOF FUSHIA',
-    category: 'vetement',
-    ean13: '',
-    reference: '9500',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 606,
-    variations: []
-  },
-  {
-    id: '6428',
-    name: 'WIND PROOF FUSHIA',
-    category: 'vetement',
-    ean13: '',
-    reference: '9500',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 607,
-    variations: []
-  },
-  {
-    id: '6428',
-    name: 'WIND PROOF FUSHIA',
-    category: 'vetement',
-    ean13: '',
-    reference: '9500',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 608,
-    variations: []
+    position: 6428,
+    variations: [
+    {
+      id: '1800',
+      ean13: '2012272192206',
+      reference: '9501',
+      attributes: '1',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1801',
+      ean13: '2042419082831',
+      reference: '9502',
+      attributes: '2',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1802',
+      ean13: '2024620618559',
+      reference: '9503',
+      attributes: '3',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1803',
+      ean13: '2040834604270',
+      reference: '9504',
+      attributes: '4',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1804',
+      ean13: '2058504633109',
+      reference: '9505',
+      attributes: '5',
+      priceImpact: 0,
+      finalPrice: 39
+    }
+    ]
   },
   {
     id: '6429',
@@ -8200,62 +8604,51 @@ export const defaultProducts: Product[] = [
     reference: '9510',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 609,
-    variations: []
-  },
-  {
-    id: '6429',
-    name: 'WIND PROOF BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '9510',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 610,
-    variations: []
-  },
-  {
-    id: '6429',
-    name: 'WIND PROOF BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '9510',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 611,
-    variations: []
-  },
-  {
-    id: '6429',
-    name: 'WIND PROOF BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '9510',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 612,
-    variations: []
-  },
-  {
-    id: '6429',
-    name: 'WIND PROOF BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '9510',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 613,
-    variations: []
+    position: 6429,
+    variations: [
+    {
+      id: '1805',
+      ean13: '2079766058851',
+      reference: '9511',
+      attributes: '1',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1806',
+      ean13: '2001721308268',
+      reference: '9512',
+      attributes: '2',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1807',
+      ean13: '2001794612262',
+      reference: '9513',
+      attributes: '3',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1808',
+      ean13: '2064527758286',
+      reference: '9514',
+      attributes: '4',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1809',
+      ean13: '2022231002910',
+      reference: '9515',
+      attributes: '5',
+      priceImpact: 0,
+      finalPrice: 39
+    }
+    ]
   },
   {
     id: '6430',
@@ -8265,62 +8658,51 @@ export const defaultProducts: Product[] = [
     reference: '9520',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 614,
-    variations: []
-  },
-  {
-    id: '6430',
-    name: 'WIND PROOF BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9520',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 615,
-    variations: []
-  },
-  {
-    id: '6430',
-    name: 'WIND PROOF BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9520',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 616,
-    variations: []
-  },
-  {
-    id: '6430',
-    name: 'WIND PROOF BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9520',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 617,
-    variations: []
-  },
-  {
-    id: '6430',
-    name: 'WIND PROOF BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9520',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 618,
-    variations: []
+    position: 6430,
+    variations: [
+    {
+      id: '1814',
+      ean13: '2085617008678',
+      reference: '9525',
+      attributes: '5',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1813',
+      ean13: '2053398270805',
+      reference: '9524',
+      attributes: '4',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1811',
+      ean13: '2049658150758',
+      reference: '9522',
+      attributes: '2',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1810',
+      ean13: '2035664383488',
+      reference: '9521',
+      attributes: '1',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1812',
+      ean13: '2034869478234',
+      reference: '9523',
+      attributes: '3',
+      priceImpact: 0,
+      finalPrice: 39
+    }
+    ]
   },
   {
     id: '6431',
@@ -8330,62 +8712,51 @@ export const defaultProducts: Product[] = [
     reference: '9530',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 619,
-    variations: []
-  },
-  {
-    id: '6431',
-    name: 'WIND PROOF BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '9530',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 620,
-    variations: []
-  },
-  {
-    id: '6431',
-    name: 'WIND PROOF BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '9530',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 621,
-    variations: []
-  },
-  {
-    id: '6431',
-    name: 'WIND PROOF BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '9530',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 622,
-    variations: []
-  },
-  {
-    id: '6431',
-    name: 'WIND PROOF BLANC',
-    category: 'vetement',
-    ean13: '',
-    reference: '9530',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 623,
-    variations: []
+    position: 6431,
+    variations: [
+    {
+      id: '1816',
+      ean13: '2001968861106',
+      reference: '9532',
+      attributes: '2',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1815',
+      ean13: '2008006112794',
+      reference: '9531',
+      attributes: '1',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1818',
+      ean13: '2042763264693',
+      reference: '9534',
+      attributes: '4',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1819',
+      ean13: '2087128846527',
+      reference: '9535',
+      attributes: '5',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1817',
+      ean13: '2092390999727',
+      reference: '9533',
+      attributes: '3',
+      priceImpact: 0,
+      finalPrice: 39
+    }
+    ]
   },
   {
     id: '6432',
@@ -8395,62 +8766,51 @@ export const defaultProducts: Product[] = [
     reference: '9540',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 624,
-    variations: []
-  },
-  {
-    id: '6432',
-    name: 'WIND PROOF ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9540',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 625,
-    variations: []
-  },
-  {
-    id: '6432',
-    name: 'WIND PROOF ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9540',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 626,
-    variations: []
-  },
-  {
-    id: '6432',
-    name: 'WIND PROOF ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9540',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 627,
-    variations: []
-  },
-  {
-    id: '6432',
-    name: 'WIND PROOF ROSE',
-    category: 'vetement',
-    ean13: '',
-    reference: '9540',
-    wholesalePrice: 18,
-    finalPrice: 39,
-    crossedPrice: 42.900000000000006,
-    salesCount: 0,
-    position: 628,
-    variations: []
+    position: 6432,
+    variations: [
+    {
+      id: '1821',
+      ean13: '2079612148965',
+      reference: '9542',
+      attributes: '2',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1820',
+      ean13: '2074800782365',
+      reference: '9541',
+      attributes: '1',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1822',
+      ean13: '2058440924835',
+      reference: '9543',
+      attributes: '3',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1823',
+      ean13: '2039100274194',
+      reference: '9544',
+      attributes: '4',
+      priceImpact: 0,
+      finalPrice: 39
+    },
+    {
+      id: '1824',
+      ean13: '2007717732062',
+      reference: '9545',
+      attributes: '5',
+      priceImpact: 0,
+      finalPrice: 39
+    }
+    ]
   },
   {
     id: '6433',
@@ -8460,10 +8820,12 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 629,
-    variations: []
+    position: 6433,
+    variations: [
+
+    ]
   },
   {
     id: '6434',
@@ -8473,10 +8835,12 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 630,
-    variations: []
+    position: 6434,
+    variations: [
+
+    ]
   },
   {
     id: '6435',
@@ -8486,140 +8850,162 @@ export const defaultProducts: Product[] = [
     reference: 'PA 10',
     wholesalePrice: 15,
     finalPrice: 62,
-    crossedPrice: 68.2,
+    crossedPrice: 65,
     salesCount: 0,
-    position: 631,
-    variations: []
+    position: 6435,
+    variations: [
+
+    ]
   },
   {
     id: '6436',
     name: 'PACK 6 COCKTAILS VILLAGE 83',
     category: 'pack-verre',
     ean13: '2074576212417',
-    reference: 'REF6436',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 632,
-    variations: []
+    position: 6436,
+    variations: [
+
+    ]
   },
   {
     id: '6437',
     name: 'PACK 6 MOJITO VILLAGE 83',
     category: 'pack-verre',
     ean13: '2018926007001',
-    reference: 'REF6437',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 633,
-    variations: []
+    position: 6437,
+    variations: [
+
+    ]
   },
   {
     id: '6438',
     name: 'PACK 6 FLUTES VILLAGE 83',
     category: 'pack-verre',
     ean13: '2017410096972',
-    reference: 'REF6438',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 634,
-    variations: []
+    position: 6438,
+    variations: [
+
+    ]
   },
   {
     id: '6439',
     name: 'PACK 6 SHOOTER  VILLAGE 83',
     category: 'pack-verre',
     ean13: '2029307238488',
-    reference: 'REF6439',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 635,
-    variations: []
+    position: 6439,
+    variations: [
+
+    ]
   },
   {
     id: '6440',
     name: 'PACK 6 TASSES  VILLAGE 83',
     category: 'pack-verre',
     ean13: '2071640236409',
-    reference: 'REF6440',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 636,
-    variations: []
+    position: 6440,
+    variations: [
+
+    ]
   },
   {
     id: '6441',
     name: 'PACK 4 TUBES BLANC VILLAGE',
     category: 'pack-verre',
     ean13: '2065045270274',
-    reference: 'REF6441',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 637,
-    variations: []
+    position: 6441,
+    variations: [
+
+    ]
   },
   {
     id: '6442',
     name: 'PACK 6 MUGS  VILLAGE 83',
     category: 'pack-verre',
     ean13: '2061670477262',
-    reference: 'REF6442',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 638,
-    variations: []
+    position: 6442,
+    variations: [
+
+    ]
   },
   {
     id: '6443',
     name: 'PACK 6 BK TROPEZ',
     category: 'pack-verre',
     ean13: '2028731852352',
-    reference: 'REF6443',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 639,
-    variations: []
+    position: 6443,
+    variations: [
+
+    ]
   },
   {
     id: '6444',
     name: 'PACK 6 BK CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2009849581860',
-    reference: 'REF6444',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 640,
-    variations: []
+    position: 6444,
+    variations: [
+
+    ]
   },
   {
     id: '6445',
     name: 'PACK 6 BK NOIR TROPEZ',
     category: 'pack-verre',
     ean13: '2073360500853',
-    reference: 'REF6445',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 641,
-    variations: []
+    position: 6445,
+    variations: [
+
+    ]
   },
   {
     id: '6446',
@@ -8629,10 +9015,12 @@ export const defaultProducts: Product[] = [
     reference: '698',
     wholesalePrice: 10,
     finalPrice: 24,
-    crossedPrice: 26.400000000000002,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 642,
-    variations: []
+    position: 6446,
+    variations: [
+
+    ]
   },
   {
     id: '6449',
@@ -8642,10 +9030,12 @@ export const defaultProducts: Product[] = [
     reference: '1186',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 643,
-    variations: []
+    position: 6449,
+    variations: [
+
+    ]
   },
   {
     id: '6451',
@@ -8655,10 +9045,12 @@ export const defaultProducts: Product[] = [
     reference: '979',
     wholesalePrice: 14,
     finalPrice: 24,
-    crossedPrice: 26.400000000000002,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 644,
-    variations: []
+    position: 6451,
+    variations: [
+
+    ]
   },
   {
     id: '6452',
@@ -8668,10 +9060,12 @@ export const defaultProducts: Product[] = [
     reference: '1185',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 645,
-    variations: []
+    position: 6452,
+    variations: [
+
+    ]
   },
   {
     id: '6453',
@@ -8681,10 +9075,12 @@ export const defaultProducts: Product[] = [
     reference: '642',
     wholesalePrice: 23,
     finalPrice: 72,
-    crossedPrice: 79.2,
+    crossedPrice: 72,
     salesCount: 0,
-    position: 646,
-    variations: []
+    position: 6453,
+    variations: [
+
+    ]
   },
   {
     id: '6454',
@@ -8694,10 +9090,12 @@ export const defaultProducts: Product[] = [
     reference: '295',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 647,
-    variations: []
+    position: 6454,
+    variations: [
+
+    ]
   },
   {
     id: '6455',
@@ -8707,10 +9105,12 @@ export const defaultProducts: Product[] = [
     reference: '294',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 648,
-    variations: []
+    position: 6455,
+    variations: [
+
+    ]
   },
   {
     id: '6456',
@@ -8722,8 +9122,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 649,
-    variations: []
+    position: 6456,
+    variations: [
+
+    ]
   },
   {
     id: '6459',
@@ -8733,10 +9135,12 @@ export const defaultProducts: Product[] = [
     reference: '1451',
     wholesalePrice: 10,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 650,
-    variations: []
+    position: 6459,
+    variations: [
+
+    ]
   },
   {
     id: '6464',
@@ -8746,10 +9150,12 @@ export const defaultProducts: Product[] = [
     reference: '80',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 651,
-    variations: []
+    position: 6464,
+    variations: [
+
+    ]
   },
   {
     id: '6465',
@@ -8759,10 +9165,12 @@ export const defaultProducts: Product[] = [
     reference: '81',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 652,
-    variations: []
+    position: 6465,
+    variations: [
+
+    ]
   },
   {
     id: '6466',
@@ -8772,10 +9180,12 @@ export const defaultProducts: Product[] = [
     reference: '82',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 653,
-    variations: []
+    position: 6466,
+    variations: [
+
+    ]
   },
   {
     id: '6467',
@@ -8785,10 +9195,12 @@ export const defaultProducts: Product[] = [
     reference: '83',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 654,
-    variations: []
+    position: 6467,
+    variations: [
+
+    ]
   },
   {
     id: '6468',
@@ -8798,10 +9210,12 @@ export const defaultProducts: Product[] = [
     reference: '84',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 655,
-    variations: []
+    position: 6468,
+    variations: [
+
+    ]
   },
   {
     id: '6469',
@@ -8811,10 +9225,12 @@ export const defaultProducts: Product[] = [
     reference: '85',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 656,
-    variations: []
+    position: 6469,
+    variations: [
+
+    ]
   },
   {
     id: '6470',
@@ -8824,88 +9240,67 @@ export const defaultProducts: Product[] = [
     reference: '7000',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 657,
-    variations: []
-  },
-  {
-    id: '6470',
-    name: 'TEE SHIRT ENFANT BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 658,
-    variations: []
-  },
-  {
-    id: '6470',
-    name: 'TEE SHIRT ENFANT BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 659,
-    variations: []
-  },
-  {
-    id: '6470',
-    name: 'TEE SHIRT ENFANT BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 660,
-    variations: []
-  },
-  {
-    id: '6470',
-    name: 'TEE SHIRT ENFANT BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 661,
-    variations: []
-  },
-  {
-    id: '6470',
-    name: 'TEE SHIRT ENFANT BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 662,
-    variations: []
-  },
-  {
-    id: '6470',
-    name: 'TEE SHIRT ENFANT BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7000',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 663,
-    variations: []
+    position: 6470,
+    variations: [
+    {
+      id: '1835',
+      ean13: '2093526722639',
+      reference: '7003',
+      attributes: '2 à 3',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1833',
+      ean13: '2087692847746',
+      reference: '7001',
+      attributes: '0 à 1',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1834',
+      ean13: '2042268440547',
+      reference: '7002',
+      attributes: '1 à 2',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1837',
+      ean13: '2012072085036',
+      reference: '7005',
+      attributes: '6 à 7',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1836',
+      ean13: '2059802204329',
+      reference: '7004',
+      attributes: '3 à 4',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1838',
+      ean13: '2008605042119',
+      reference: '7006',
+      attributes: '9 à 10',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1839',
+      ean13: '2049748553476',
+      reference: '7007',
+      attributes: '12 à 14',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6471',
@@ -8915,88 +9310,67 @@ export const defaultProducts: Product[] = [
     reference: '7010',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 664,
-    variations: []
-  },
-  {
-    id: '6471',
-    name: 'TEE SHIRT ENFANT CORAIL',
-    category: 'vetement',
-    ean13: '',
-    reference: '7010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 665,
-    variations: []
-  },
-  {
-    id: '6471',
-    name: 'TEE SHIRT ENFANT CORAIL',
-    category: 'vetement',
-    ean13: '',
-    reference: '7010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 666,
-    variations: []
-  },
-  {
-    id: '6471',
-    name: 'TEE SHIRT ENFANT CORAIL',
-    category: 'vetement',
-    ean13: '',
-    reference: '7010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 667,
-    variations: []
-  },
-  {
-    id: '6471',
-    name: 'TEE SHIRT ENFANT CORAIL',
-    category: 'vetement',
-    ean13: '',
-    reference: '7010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 668,
-    variations: []
-  },
-  {
-    id: '6471',
-    name: 'TEE SHIRT ENFANT CORAIL',
-    category: 'vetement',
-    ean13: '',
-    reference: '7010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 669,
-    variations: []
-  },
-  {
-    id: '6471',
-    name: 'TEE SHIRT ENFANT CORAIL',
-    category: 'vetement',
-    ean13: '',
-    reference: '7010',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 670,
-    variations: []
+    position: 6471,
+    variations: [
+    {
+      id: '1840',
+      ean13: '2012884078806',
+      reference: '7011',
+      attributes: '0 à 1',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1841',
+      ean13: '2045129312960',
+      reference: '7012',
+      attributes: '1 à 2',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1842',
+      ean13: '2059942591310',
+      reference: '7013',
+      attributes: '2 à 3',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1844',
+      ean13: '2080345904759',
+      reference: '7015',
+      attributes: '6 à 7',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1843',
+      ean13: '2064268295514',
+      reference: '7014',
+      attributes: '3 à 4',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1846',
+      ean13: '2059853961493',
+      reference: '7017',
+      attributes: '12 à 14',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1845',
+      ean13: '2055180978098',
+      reference: '7016',
+      attributes: '9 à 10',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6472',
@@ -9006,88 +9380,67 @@ export const defaultProducts: Product[] = [
     reference: '7020',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 671,
-    variations: []
-  },
-  {
-    id: '6472',
-    name: 'TEE SHIRT ENFANT PANNEAU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 672,
-    variations: []
-  },
-  {
-    id: '6472',
-    name: 'TEE SHIRT ENFANT PANNEAU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 673,
-    variations: []
-  },
-  {
-    id: '6472',
-    name: 'TEE SHIRT ENFANT PANNEAU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 674,
-    variations: []
-  },
-  {
-    id: '6472',
-    name: 'TEE SHIRT ENFANT PANNEAU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 675,
-    variations: []
-  },
-  {
-    id: '6472',
-    name: 'TEE SHIRT ENFANT PANNEAU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 676,
-    variations: []
-  },
-  {
-    id: '6472',
-    name: 'TEE SHIRT ENFANT PANNEAU',
-    category: 'vetement',
-    ean13: '',
-    reference: '7020',
-    wholesalePrice: 8,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 677,
-    variations: []
+    position: 6472,
+    variations: [
+    {
+      id: '1849',
+      ean13: '2009858702676',
+      reference: '7023',
+      attributes: '2 à 3',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1847',
+      ean13: '2016352970098',
+      reference: '7021',
+      attributes: '0 à 1',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1848',
+      ean13: '2058006358746',
+      reference: '7022',
+      attributes: '1 à 2',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1850',
+      ean13: '2083379620350',
+      reference: '7024',
+      attributes: '3 à 4',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1851',
+      ean13: '2010825158143',
+      reference: '7025',
+      attributes: '6 à 7',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1852',
+      ean13: '2002091929664',
+      reference: '7026',
+      attributes: '9 à 10',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '1853',
+      ean13: '2092620515062',
+      reference: '7027',
+      attributes: '12 à 14',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6473',
@@ -9097,10 +9450,12 @@ export const defaultProducts: Product[] = [
     reference: '1212',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 678,
-    variations: []
+    position: 6473,
+    variations: [
+
+    ]
   },
   {
     id: '6474',
@@ -9110,10 +9465,12 @@ export const defaultProducts: Product[] = [
     reference: '1213',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 679,
-    variations: []
+    position: 6474,
+    variations: [
+
+    ]
   },
   {
     id: '6475',
@@ -9123,10 +9480,12 @@ export const defaultProducts: Product[] = [
     reference: '1214',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 680,
-    variations: []
+    position: 6475,
+    variations: [
+
+    ]
   },
   {
     id: '6476',
@@ -9136,10 +9495,12 @@ export const defaultProducts: Product[] = [
     reference: '1223',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 681,
-    variations: []
+    position: 6476,
+    variations: [
+
+    ]
   },
   {
     id: '6477',
@@ -9149,10 +9510,12 @@ export const defaultProducts: Product[] = [
     reference: '1224',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 682,
-    variations: []
+    position: 6477,
+    variations: [
+
+    ]
   },
   {
     id: '6478',
@@ -9162,10 +9525,12 @@ export const defaultProducts: Product[] = [
     reference: '1271',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 683,
-    variations: []
+    position: 6478,
+    variations: [
+
+    ]
   },
   {
     id: '6479',
@@ -9175,10 +9540,12 @@ export const defaultProducts: Product[] = [
     reference: '1272',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 684,
-    variations: []
+    position: 6479,
+    variations: [
+
+    ]
   },
   {
     id: '6480',
@@ -9188,10 +9555,12 @@ export const defaultProducts: Product[] = [
     reference: '1273',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 685,
-    variations: []
+    position: 6480,
+    variations: [
+
+    ]
   },
   {
     id: '6481',
@@ -9201,10 +9570,12 @@ export const defaultProducts: Product[] = [
     reference: '1293',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 686,
-    variations: []
+    position: 6481,
+    variations: [
+
+    ]
   },
   {
     id: '6485',
@@ -9214,10 +9585,12 @@ export const defaultProducts: Product[] = [
     reference: '1056',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 687,
-    variations: []
+    position: 6485,
+    variations: [
+
+    ]
   },
   {
     id: '6486',
@@ -9227,10 +9600,12 @@ export const defaultProducts: Product[] = [
     reference: '1057',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 688,
-    variations: []
+    position: 6486,
+    variations: [
+
+    ]
   },
   {
     id: '6488',
@@ -9240,10 +9615,12 @@ export const defaultProducts: Product[] = [
     reference: '1058',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 689,
-    variations: []
+    position: 6488,
+    variations: [
+
+    ]
   },
   {
     id: '6490',
@@ -9253,10 +9630,12 @@ export const defaultProducts: Product[] = [
     reference: '140',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 690,
-    variations: []
+    position: 6490,
+    variations: [
+
+    ]
   },
   {
     id: '6491',
@@ -9266,10 +9645,12 @@ export const defaultProducts: Product[] = [
     reference: '141',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 691,
-    variations: []
+    position: 6491,
+    variations: [
+
+    ]
   },
   {
     id: '6492',
@@ -9279,10 +9660,12 @@ export const defaultProducts: Product[] = [
     reference: '142',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 692,
-    variations: []
+    position: 6492,
+    variations: [
+
+    ]
   },
   {
     id: '6493',
@@ -9292,10 +9675,12 @@ export const defaultProducts: Product[] = [
     reference: '143',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 693,
-    variations: []
+    position: 6493,
+    variations: [
+
+    ]
   },
   {
     id: '6494',
@@ -9305,10 +9690,12 @@ export const defaultProducts: Product[] = [
     reference: '144',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 694,
-    variations: []
+    position: 6494,
+    variations: [
+
+    ]
   },
   {
     id: '6495',
@@ -9318,10 +9705,12 @@ export const defaultProducts: Product[] = [
     reference: '145',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 695,
-    variations: []
+    position: 6495,
+    variations: [
+
+    ]
   },
   {
     id: '6497',
@@ -9331,10 +9720,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 6,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 696,
-    variations: []
+    position: 6497,
+    variations: [
+
+    ]
   },
   {
     id: '6500',
@@ -9344,10 +9735,12 @@ export const defaultProducts: Product[] = [
     reference: '1176',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 697,
-    variations: []
+    position: 6500,
+    variations: [
+
+    ]
   },
   {
     id: '6502',
@@ -9357,10 +9750,12 @@ export const defaultProducts: Product[] = [
     reference: '1206',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 698,
-    variations: []
+    position: 6502,
+    variations: [
+
+    ]
   },
   {
     id: '6503',
@@ -9370,10 +9765,12 @@ export const defaultProducts: Product[] = [
     reference: '1207',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 699,
-    variations: []
+    position: 6503,
+    variations: [
+
+    ]
   },
   {
     id: '6504',
@@ -9383,10 +9780,12 @@ export const defaultProducts: Product[] = [
     reference: '1208',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 700,
-    variations: []
+    position: 6504,
+    variations: [
+
+    ]
   },
   {
     id: '6506',
@@ -9396,10 +9795,12 @@ export const defaultProducts: Product[] = [
     reference: '1314',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 701,
-    variations: []
+    position: 6506,
+    variations: [
+
+    ]
   },
   {
     id: '6507',
@@ -9409,10 +9810,12 @@ export const defaultProducts: Product[] = [
     reference: '1395',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 702,
-    variations: []
+    position: 6507,
+    variations: [
+
+    ]
   },
   {
     id: '6508',
@@ -9422,10 +9825,12 @@ export const defaultProducts: Product[] = [
     reference: '1396',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 703,
-    variations: []
+    position: 6508,
+    variations: [
+
+    ]
   },
   {
     id: '6509',
@@ -9435,10 +9840,12 @@ export const defaultProducts: Product[] = [
     reference: '1397',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 704,
-    variations: []
+    position: 6509,
+    variations: [
+
+    ]
   },
   {
     id: '6510',
@@ -9448,10 +9855,12 @@ export const defaultProducts: Product[] = [
     reference: '862',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 705,
-    variations: []
+    position: 6510,
+    variations: [
+
+    ]
   },
   {
     id: '6511',
@@ -9461,10 +9870,12 @@ export const defaultProducts: Product[] = [
     reference: '1616',
     wholesalePrice: 4,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 706,
-    variations: []
+    position: 6511,
+    variations: [
+
+    ]
   },
   {
     id: '6512',
@@ -9474,10 +9885,12 @@ export const defaultProducts: Product[] = [
     reference: '862',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 707,
-    variations: []
+    position: 6512,
+    variations: [
+
+    ]
   },
   {
     id: '6513',
@@ -9487,10 +9900,12 @@ export const defaultProducts: Product[] = [
     reference: '1604',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 708,
-    variations: []
+    position: 6513,
+    variations: [
+
+    ]
   },
   {
     id: '6514',
@@ -9500,10 +9915,12 @@ export const defaultProducts: Product[] = [
     reference: '1321',
     wholesalePrice: 0,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 709,
-    variations: []
+    position: 6514,
+    variations: [
+
+    ]
   },
   {
     id: '6515',
@@ -9513,10 +9930,12 @@ export const defaultProducts: Product[] = [
     reference: '1602',
     wholesalePrice: 2,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 710,
-    variations: []
+    position: 6515,
+    variations: [
+
+    ]
   },
   {
     id: '6516',
@@ -9526,10 +9945,12 @@ export const defaultProducts: Product[] = [
     reference: '1225',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 711,
-    variations: []
+    position: 6516,
+    variations: [
+
+    ]
   },
   {
     id: '6523',
@@ -9539,88 +9960,67 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 5,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 712,
-    variations: []
-  },
-  {
-    id: '6523',
-    name: 'Frais de port',
-    category: 'divers-interne',
-    ean13: '2082927260734',
-    reference: 'Z',
-    wholesalePrice: 16,
-    finalPrice: 4,
-    crossedPrice: 4.4,
-    salesCount: 0,
-    position: 713,
-    variations: []
-  },
-  {
-    id: '6523',
-    name: 'Frais de port',
-    category: 'divers-interne',
-    ean13: '2082927260734',
-    reference: 'Z',
-    wholesalePrice: 50,
-    finalPrice: 4,
-    crossedPrice: 4.4,
-    salesCount: 0,
-    position: 714,
-    variations: []
-  },
-  {
-    id: '6523',
-    name: 'Frais de port',
-    category: 'divers-interne',
-    ean13: '2082927260734',
-    reference: 'Z',
-    wholesalePrice: 10,
-    finalPrice: 4,
-    crossedPrice: 4.4,
-    salesCount: 0,
-    position: 715,
-    variations: []
-  },
-  {
-    id: '6523',
-    name: 'Frais de port',
-    category: 'divers-interne',
-    ean13: '2082927260734',
-    reference: 'Z',
-    wholesalePrice: 10,
-    finalPrice: 4,
-    crossedPrice: 4.4,
-    salesCount: 0,
-    position: 716,
-    variations: []
-  },
-  {
-    id: '6523',
-    name: 'Frais de port',
-    category: 'divers-interne',
-    ean13: '2082927260734',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 4,
-    crossedPrice: 4.4,
-    salesCount: 0,
-    position: 717,
-    variations: []
-  },
-  {
-    id: '6523',
-    name: 'Frais de port',
-    category: 'divers-interne',
-    ean13: '2082927260734',
-    reference: 'Z',
-    wholesalePrice: 4,
-    finalPrice: 4,
-    crossedPrice: 4.4,
-    salesCount: 0,
-    position: 718,
-    variations: []
+    position: 6523,
+    variations: [
+    {
+      id: '2463',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 1,
+      finalPrice: 4
+    },
+    {
+      id: '2466',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 15,
+      finalPrice: 4
+    },
+    {
+      id: '3026',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 55,
+      finalPrice: 4
+    },
+    {
+      id: '3158',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 7,
+      finalPrice: 4
+    },
+    {
+      id: '3250',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 7,
+      finalPrice: 4
+    },
+    {
+      id: '3159',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 3,
+      finalPrice: 4
+    },
+    {
+      id: '2033',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 4
+    }
+    ]
   },
   {
     id: '6524',
@@ -9630,10 +10030,19 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 719,
-    variations: []
+    position: 6524,
+    variations: [
+    {
+      id: '2065',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 2
+    }
+    ]
   },
   {
     id: '6529',
@@ -9643,88 +10052,102 @@ export const defaultProducts: Product[] = [
     reference: '1000',
     wholesalePrice: 12,
     finalPrice: 41,
-    crossedPrice: 45.1,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 720,
-    variations: []
+    position: 6529,
+    variations: [
+
+    ]
   },
   {
     id: '6530',
     name: 'PACK 6 TASSES CLEAR VILLAGE',
     category: 'pack-verre',
     ean13: '2049483927549',
-    reference: 'REF6530',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 721,
-    variations: []
+    position: 6530,
+    variations: [
+
+    ]
   },
   {
     id: '6539',
     name: 'COOL BAG GRAND + 6 BK TROPEZ',
     category: 'pack-ice-bag',
     ean13: '2020197280496',
-    reference: 'REF6539',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 53,
-    crossedPrice: 58.300000000000004,
+    crossedPrice: 58,
     salesCount: 0,
-    position: 722,
-    variations: []
+    position: 6539,
+    variations: [
+
+    ]
   },
   {
     id: '6542',
     name: 'COOL BAG GRAND + 6 BK CLEAR TROPEZ',
     category: 'pack-ice-bag',
     ean13: '2049573967042',
-    reference: 'REF6542',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 53,
-    crossedPrice: 58.300000000000004,
+    crossedPrice: 58,
     salesCount: 0,
-    position: 723,
-    variations: []
+    position: 6542,
+    variations: [
+
+    ]
   },
   {
     id: '6543',
     name: 'TRIO VN BLANC TROP+MAX+1PECHE+1GINGER',
     category: 'trio-pack',
     ean13: '2081801212012',
-    reference: 'REF6543',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 724,
-    variations: []
+    position: 6543,
+    variations: [
+
+    ]
   },
   {
     id: '6545',
     name: 'TRIO VN CLEAR TROP+MAX+1PECHE+1GINGER',
     category: 'trio-pack',
     ean13: '2040267783696',
-    reference: 'REF6545',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 725,
-    variations: []
+    position: 6545,
+    variations: [
+
+    ]
   },
   {
     id: '6548',
     name: 'TRIO 3 BLONDE',
     category: 'trio-pack',
     ean13: '2021973534963',
-    reference: 'REF6548',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 726,
-    variations: []
+    position: 6548,
+    variations: [
+
+    ]
   },
   {
     id: '6563',
@@ -9734,10 +10157,12 @@ export const defaultProducts: Product[] = [
     reference: 'CO 6',
     wholesalePrice: 12,
     finalPrice: 41,
-    crossedPrice: 45.1,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 727,
-    variations: []
+    position: 6563,
+    variations: [
+
+    ]
   },
   {
     id: '6565',
@@ -9747,10 +10172,12 @@ export const defaultProducts: Product[] = [
     reference: 'CO 6',
     wholesalePrice: 12,
     finalPrice: 41,
-    crossedPrice: 45.1,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 728,
-    variations: []
+    position: 6565,
+    variations: [
+
+    ]
   },
   {
     id: '6572',
@@ -9762,8 +10189,17 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 729,
-    variations: []
+    position: 6572,
+    variations: [
+    {
+      id: '2996',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 0
+    }
+    ]
   },
   {
     id: '6574',
@@ -9773,10 +10209,12 @@ export const defaultProducts: Product[] = [
     reference: '1001',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 730,
-    variations: []
+    position: 6574,
+    variations: [
+
+    ]
   },
   {
     id: '6575',
@@ -9786,231 +10224,267 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 731,
-    variations: []
+    position: 6575,
+    variations: [
+
+    ]
   },
   {
     id: '6576',
     name: 'PACK 6 MOJITO TROPEZ',
     category: 'pack-verre',
     ean13: '2092019649385',
-    reference: 'REF6576',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 732,
-    variations: []
+    position: 6576,
+    variations: [
+
+    ]
   },
   {
     id: '6577',
     name: 'PACK 6 MOJITO CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2083553349268',
-    reference: 'REF6577',
+    reference: '',
     wholesalePrice: 11,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 733,
-    variations: []
+    position: 6577,
+    variations: [
+
+    ]
   },
   {
     id: '6578',
     name: 'PACK 6 COCKTAILS TROPEZ',
     category: 'pack-verre',
     ean13: '2055846268112',
-    reference: 'REF6578',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 734,
-    variations: []
+    position: 6578,
+    variations: [
+
+    ]
   },
   {
     id: '6579',
     name: 'PACK 6 COCKTAILS CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2038209205221',
-    reference: 'REF6579',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 735,
-    variations: []
+    position: 6579,
+    variations: [
+
+    ]
   },
   {
     id: '6580',
     name: 'PACK 6 TUBES TROPEZ',
     category: 'pack-verre',
     ean13: '2049144361026',
-    reference: 'REF6580',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 736,
-    variations: []
+    position: 6580,
+    variations: [
+
+    ]
   },
   {
     id: '6581',
     name: 'PACK 6 TUBES LONG DRINK CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2028477930772',
-    reference: 'REF6581',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 737,
-    variations: []
+    position: 6581,
+    variations: [
+
+    ]
   },
   {
     id: '6582',
     name: 'PACK 6 BR CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2004922329384',
-    reference: 'REF6582',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 738,
-    variations: []
+    position: 6582,
+    variations: [
+
+    ]
   },
   {
     id: '6583',
     name: 'PACK 6 CROISIERES CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2086260164902',
-    reference: 'REF6583',
+    reference: '',
     wholesalePrice: 11,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 739,
-    variations: []
+    position: 6583,
+    variations: [
+
+    ]
   },
   {
     id: '6584',
     name: 'PACK 6 AIR BEACH CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2074459484047',
-    reference: 'REF6584',
+    reference: '',
     wholesalePrice: 16,
     finalPrice: 57,
-    crossedPrice: 62.7,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 740,
-    variations: []
+    position: 6584,
+    variations: [
+
+    ]
   },
   {
     id: '6587',
     name: 'PACK 6  BK CLEAR UNI',
     category: 'pack-verre',
     ean13: '2018619791774',
-    reference: 'REF6587',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 741,
-    variations: []
+    position: 6587,
+    variations: [
+
+    ]
   },
   {
     id: '6589',
     name: 'PACK 6 CROISIERES TROPEZ',
     category: 'pack-verre',
     ean13: '2081459490992',
-    reference: 'REF6589',
+    reference: '',
     wholesalePrice: 11,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 742,
-    variations: []
+    position: 6589,
+    variations: [
+
+    ]
   },
   {
     id: '6590',
     name: 'PACK 6 AIR BEACH TROPEZ',
     category: 'pack-verre',
     ean13: '2000015722889',
-    reference: 'REF6590',
+    reference: '',
     wholesalePrice: 16,
     finalPrice: 57,
-    crossedPrice: 62.7,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 743,
-    variations: []
+    position: 6590,
+    variations: [
+
+    ]
   },
   {
     id: '6592',
     name: 'PACK 6 FLUTES TROPEZ',
     category: 'pack-verre',
     ean13: '2087739919788',
-    reference: 'REF6592',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 744,
-    variations: []
+    position: 6592,
+    variations: [
+
+    ]
   },
   {
     id: '6593',
     name: 'PACK 8 BK  (2TRZ + 2MAX + 2PG + 2CA)',
     category: 'pack-verre',
     ean13: '2053143489995',
-    reference: 'REF6593',
+    reference: '',
     wholesalePrice: 23,
     finalPrice: 65,
-    crossedPrice: 71.5,
+    crossedPrice: 68,
     salesCount: 0,
-    position: 745,
-    variations: []
+    position: 6593,
+    variations: [
+
+    ]
   },
   {
     id: '6601',
     name: 'TRIPACK  VIDE ICE PECHE',
     category: 'tripack',
     ean13: '2091453813871',
-    reference: 'REF6601',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 746,
-    variations: []
+    position: 6601,
+    variations: [
+
+    ]
   },
   {
     id: '6602',
     name: 'TRIPACK VIDE  NO ALCOOL',
     category: 'tripack',
     ean13: '2081151168793',
-    reference: 'REF6602',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 747,
-    variations: []
+    position: 6602,
+    variations: [
+
+    ]
   },
   {
     id: '6603',
     name: 'TRIPACK  VIDE ICE EXOTIQUE',
     category: 'tripack',
     ean13: '2045426329715',
-    reference: 'REF6603',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 748,
-    variations: []
+    position: 6603,
+    variations: [
+
+    ]
   },
   {
     id: '6604',
@@ -10020,10 +10494,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 17,
-    crossedPrice: 18.700000000000003,
+    crossedPrice: 17,
     salesCount: 0,
-    position: 749,
-    variations: []
+    position: 6604,
+    variations: [
+
+    ]
   },
   {
     id: '6605',
@@ -10033,10 +10509,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 7,
     finalPrice: 17,
-    crossedPrice: 18.700000000000003,
+    crossedPrice: 17,
     salesCount: 0,
-    position: 750,
-    variations: []
+    position: 6605,
+    variations: [
+
+    ]
   },
   {
     id: '6606',
@@ -10046,10 +10524,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 17,
-    crossedPrice: 18.700000000000003,
+    crossedPrice: 17,
     salesCount: 0,
-    position: 751,
-    variations: []
+    position: 6606,
+    variations: [
+
+    ]
   },
   {
     id: '6611',
@@ -10059,10 +10539,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 5,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 752,
-    variations: []
+    position: 6611,
+    variations: [
+
+    ]
   },
   {
     id: '6613',
@@ -10074,8 +10556,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 753,
-    variations: []
+    position: 6613,
+    variations: [
+
+    ]
   },
   {
     id: '6634',
@@ -10085,10 +10569,12 @@ export const defaultProducts: Product[] = [
     reference: '1002',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 754,
-    variations: []
+    position: 6634,
+    variations: [
+
+    ]
   },
   {
     id: '6640',
@@ -10098,10 +10584,12 @@ export const defaultProducts: Product[] = [
     reference: '270',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 755,
-    variations: []
+    position: 6640,
+    variations: [
+
+    ]
   },
   {
     id: '6641',
@@ -10111,10 +10599,12 @@ export const defaultProducts: Product[] = [
     reference: '280',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 756,
-    variations: []
+    position: 6641,
+    variations: [
+
+    ]
   },
   {
     id: '6642',
@@ -10124,10 +10614,12 @@ export const defaultProducts: Product[] = [
     reference: '48',
     wholesalePrice: 7,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 757,
-    variations: []
+    position: 6642,
+    variations: [
+
+    ]
   },
   {
     id: '6643',
@@ -10137,10 +10629,12 @@ export const defaultProducts: Product[] = [
     reference: '60',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 758,
-    variations: []
+    position: 6643,
+    variations: [
+
+    ]
   },
   {
     id: '6644',
@@ -10150,10 +10644,12 @@ export const defaultProducts: Product[] = [
     reference: '61',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 759,
-    variations: []
+    position: 6644,
+    variations: [
+
+    ]
   },
   {
     id: '6645',
@@ -10163,10 +10659,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 55,
     finalPrice: 99,
-    crossedPrice: 108.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 760,
-    variations: []
+    position: 6645,
+    variations: [
+
+    ]
   },
   {
     id: '6646',
@@ -10176,10 +10674,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 55,
     finalPrice: 99,
-    crossedPrice: 108.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 761,
-    variations: []
+    position: 6646,
+    variations: [
+
+    ]
   },
   {
     id: '6647',
@@ -10189,10 +10689,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 55,
     finalPrice: 99,
-    crossedPrice: 108.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 762,
-    variations: []
+    position: 6647,
+    variations: [
+
+    ]
   },
   {
     id: '6649',
@@ -10202,10 +10704,12 @@ export const defaultProducts: Product[] = [
     reference: '610',
     wholesalePrice: 14,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 763,
-    variations: []
+    position: 6649,
+    variations: [
+
+    ]
   },
   {
     id: '6650',
@@ -10215,10 +10719,12 @@ export const defaultProducts: Product[] = [
     reference: '610',
     wholesalePrice: 15,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 764,
-    variations: []
+    position: 6650,
+    variations: [
+
+    ]
   },
   {
     id: '6651',
@@ -10228,10 +10734,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 765,
-    variations: []
+    position: 6651,
+    variations: [
+
+    ]
   },
   {
     id: '6652',
@@ -10241,10 +10749,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 22,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 65,
     salesCount: 0,
-    position: 766,
-    variations: []
+    position: 6652,
+    variations: [
+
+    ]
   },
   {
     id: '6653',
@@ -10254,10 +10764,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 767,
-    variations: []
+    position: 6653,
+    variations: [
+
+    ]
   },
   {
     id: '6654',
@@ -10267,10 +10779,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 768,
-    variations: []
+    position: 6654,
+    variations: [
+
+    ]
   },
   {
     id: '6655',
@@ -10280,10 +10794,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 769,
-    variations: []
+    position: 6655,
+    variations: [
+
+    ]
   },
   {
     id: '6656',
@@ -10293,10 +10809,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 770,
-    variations: []
+    position: 6656,
+    variations: [
+
+    ]
   },
   {
     id: '6657',
@@ -10306,10 +10824,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 39,
     finalPrice: 75,
-    crossedPrice: 82.5,
+    crossedPrice: 75,
     salesCount: 0,
-    position: 771,
-    variations: []
+    position: 6657,
+    variations: [
+
+    ]
   },
   {
     id: '6658',
@@ -10319,10 +10839,12 @@ export const defaultProducts: Product[] = [
     reference: '802',
     wholesalePrice: 25,
     finalPrice: 52,
-    crossedPrice: 57.2,
+    crossedPrice: 52,
     salesCount: 0,
-    position: 772,
-    variations: []
+    position: 6658,
+    variations: [
+
+    ]
   },
   {
     id: '6662',
@@ -10332,23 +10854,27 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 773,
-    variations: []
+    position: 6662,
+    variations: [
+
+    ]
   },
   {
     id: '6663',
     name: 'VASQUE VELA  + 12 BK TROPEZ',
     category: 'composition-vasque',
     ean13: '2034818377502',
-    reference: 'REF6663',
+    reference: '',
     wholesalePrice: 51,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 161,
     salesCount: 0,
-    position: 774,
-    variations: []
+    position: 6663,
+    variations: [
+
+    ]
   },
   {
     id: '6673',
@@ -10358,10 +10884,12 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 775,
-    variations: []
+    position: 6673,
+    variations: [
+
+    ]
   },
   {
     id: '6675',
@@ -10371,10 +10899,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 23,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 776,
-    variations: []
+    position: 6675,
+    variations: [
+
+    ]
   },
   {
     id: '6676',
@@ -10384,10 +10914,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 23,
     finalPrice: 21,
-    crossedPrice: 23.1,
+    crossedPrice: 21,
     salesCount: 0,
-    position: 777,
-    variations: []
+    position: 6676,
+    variations: [
+
+    ]
   },
   {
     id: '6677',
@@ -10399,86 +10931,65 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 778,
-    variations: []
-  },
-  {
-    id: '6677',
-    name: 'BOLDUC',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 5,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 779,
-    variations: []
-  },
-  {
-    id: '6677',
-    name: 'BOLDUC',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 5,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 780,
-    variations: []
-  },
-  {
-    id: '6677',
-    name: 'BOLDUC',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 5,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 781,
-    variations: []
-  },
-  {
-    id: '6677',
-    name: 'BOLDUC',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 5,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 782,
-    variations: []
-  },
-  {
-    id: '6677',
-    name: 'BOLDUC',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 5,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 783,
-    variations: []
-  },
-  {
-    id: '6677',
-    name: 'BOLDUC',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 5,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 784,
-    variations: []
+    position: 6677,
+    variations: [
+    {
+      id: '1959',
+      ean13: '2042947965750',
+      reference: '',
+      attributes: 'BLANC',
+      priceImpact: 4,
+      finalPrice: 0
+    },
+    {
+      id: '1960',
+      ean13: '2020929319104',
+      reference: '',
+      attributes: 'NOIR',
+      priceImpact: 2,
+      finalPrice: 0
+    },
+    {
+      id: '1961',
+      ean13: '2046005727151',
+      reference: '',
+      attributes: 'OR',
+      priceImpact: 6,
+      finalPrice: 0
+    },
+    {
+      id: '2934',
+      ean13: '',
+      reference: '',
+      attributes: 'ARGENT',
+      priceImpact: 0,
+      finalPrice: 0
+    },
+    {
+      id: '1962',
+      ean13: '2051232508596',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 2,
+      finalPrice: 0
+    },
+    {
+      id: '3040',
+      ean13: '',
+      reference: '',
+      attributes: 'ROSE',
+      priceImpact: 0,
+      finalPrice: 0
+    },
+    {
+      id: '2935',
+      ean13: '',
+      reference: '',
+      attributes: 'GRIS FONCE',
+      priceImpact: 0,
+      finalPrice: 0
+    }
+    ]
   },
   {
     id: '6679',
@@ -10490,8 +11001,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 785,
-    variations: []
+    position: 6679,
+    variations: [
+
+    ]
   },
   {
     id: '6680',
@@ -10501,10 +11014,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 7,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 786,
-    variations: []
+    position: 6680,
+    variations: [
+
+    ]
   },
   {
     id: '6681',
@@ -10514,10 +11029,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 7,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 787,
-    variations: []
+    position: 6681,
+    variations: [
+
+    ]
   },
   {
     id: '6691',
@@ -10529,8 +11046,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 788,
-    variations: []
+    position: 6691,
+    variations: [
+
+    ]
   },
   {
     id: '6692',
@@ -10542,8 +11061,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 789,
-    variations: []
+    position: 6692,
+    variations: [
+
+    ]
   },
   {
     id: '6694',
@@ -10553,36 +11074,42 @@ export const defaultProducts: Product[] = [
     reference: '710',
     wholesalePrice: 5,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 790,
-    variations: []
+    position: 6694,
+    variations: [
+
+    ]
   },
   {
     id: '6695',
     name: 'PACK 6 BALLOONS CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2033762058321',
-    reference: 'REF6695',
+    reference: '',
     wholesalePrice: 16,
     finalPrice: 57,
-    crossedPrice: 62.7,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 791,
-    variations: []
+    position: 6695,
+    variations: [
+
+    ]
   },
   {
     id: '6696',
     name: 'PACK 6 BALLOONS BLANC TROPEZ',
     category: 'pack-verre',
     ean13: '2042131958872',
-    reference: 'REF6696',
+    reference: '',
     wholesalePrice: 16,
     finalPrice: 57,
-    crossedPrice: 62.7,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 792,
-    variations: []
+    position: 6696,
+    variations: [
+
+    ]
   },
   {
     id: '6700',
@@ -10592,10 +11119,12 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 793,
-    variations: []
+    position: 6700,
+    variations: [
+
+    ]
   },
   {
     id: '6711',
@@ -10605,114 +11134,111 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 31,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 794,
-    variations: []
+    position: 6711,
+    variations: [
+
+    ]
   },
   {
     id: '6712',
     name: 'TRIO VN BLANC TRZ+MAX+1 UP 37.5',
     category: 'trio-pack',
     ean13: '2057699789608',
-    reference: 'REF6712',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 795,
-    variations: []
+    position: 6712,
+    variations: [
+
+    ]
   },
   {
     id: '6713',
     name: 'TRIO 2VN CLEAR TROP+MAX+1 UP 37.5',
     category: 'trio-pack',
     ean13: '2073563619369',
-    reference: 'REF6713',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 796,
-    variations: []
+    position: 6713,
+    variations: [
+
+    ]
   },
   {
     id: '6714',
     name: 'PACK 6 SOUS BOC MIXTE',
     category: 'art-de-la-table',
     ean13: '2050972189324',
-    reference: 'REF6714',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 797,
-    variations: []
+    position: 6714,
+    variations: [
+
+    ]
   },
   {
     id: '6715',
     name: 'PORTE CLEF COEUR PERLE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF6715',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 798,
-    variations: []
-  },
-  {
-    id: '6715',
-    name: 'PORTE CLEF COEUR PERLE',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF6715',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 799,
-    variations: []
-  },
-  {
-    id: '6715',
-    name: 'PORTE CLEF COEUR PERLE',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF6715',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 800,
-    variations: []
-  },
-  {
-    id: '6715',
-    name: 'PORTE CLEF COEUR PERLE',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF6715',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 801,
-    variations: []
-  },
-  {
-    id: '6715',
-    name: 'PORTE CLEF COEUR PERLE',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF6715',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 802,
-    variations: []
+    position: 6715,
+    variations: [
+    {
+      id: '2009',
+      ean13: '2063231428195',
+      reference: '',
+      attributes: 'MAUVE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2008',
+      ean13: '2037602074137',
+      reference: '',
+      attributes: 'JAUNE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2011',
+      ean13: '2039210676994',
+      reference: '',
+      attributes: 'MARRON',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2010',
+      ean13: '2002288691244',
+      reference: '',
+      attributes: 'ORANGE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2012',
+      ean13: '2002238126659',
+      reference: '',
+      attributes: 'ROSE',
+      priceImpact: 0,
+      finalPrice: 10
+    }
+    ]
   },
   {
     id: '6721',
@@ -10722,192 +11248,152 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 803,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 804,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 805,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 806,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 807,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 808,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 809,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 810,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 811,
-    variations: []
-  },
-  {
-    id: '6721',
-    name: 'BOB SAINT TROPEZ',
-    category: 'casquette',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 6,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 812,
-    variations: []
+    position: 6721,
+    variations: [
+    {
+      id: '1997',
+      ean13: '2011711531798',
+      reference: '',
+      attributes: 'BEIGE,54,BEIGE,54',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '1994',
+      ean13: '2023596448610',
+      reference: '',
+      attributes: 'BLANC,54,BLANC,54',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2003',
+      ean13: '2062734033837',
+      reference: '',
+      attributes: 'ROUGE,58,ROUGE,58',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '1998',
+      ean13: '2002607384062',
+      reference: '',
+      attributes: 'ROUGE,54,ROUGE,54',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '1995',
+      ean13: '2038556364572',
+      reference: '',
+      attributes: 'BLEU,54,BLEU,54',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '1999',
+      ean13: '2055956819143',
+      reference: '',
+      attributes: 'BLANC,58,BLANC,58',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2002',
+      ean13: '2099934522007',
+      reference: '',
+      attributes: 'BEIGE,58,BEIGE,58',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '1996',
+      ean13: '2031713736458',
+      reference: '',
+      attributes: 'ROSE,54,ROSE,54',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2000',
+      ean13: '2031173312032',
+      reference: '',
+      attributes: 'BLEU,58,BLEU,58',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2001',
+      ean13: '2074927458556',
+      reference: '',
+      attributes: 'ROSE,58,ROSE,58',
+      priceImpact: 0,
+      finalPrice: 20
+    }
+    ]
   },
   {
     id: '6722',
     name: 'PORTE CLEF BOIS PHOTO',
     category: 'porte-clef--bracelet',
     ean13: '2050159781044',
-    reference: 'REF6722',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 813,
-    variations: []
+    position: 6722,
+    variations: [
+
+    ]
   },
   {
     id: '6724',
     name: 'PORTE CLEF GOLF',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF6724',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 814,
-    variations: []
-  },
-  {
-    id: '6724',
-    name: 'PORTE CLEF GOLF',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF6724',
-    wholesalePrice: 2,
-    finalPrice: 8,
-    crossedPrice: 8.8,
-    salesCount: 0,
-    position: 815,
-    variations: []
-  },
-  {
-    id: '6724',
-    name: 'PORTE CLEF GOLF',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF6724',
-    wholesalePrice: 2,
-    finalPrice: 8,
-    crossedPrice: 8.8,
-    salesCount: 0,
-    position: 816,
-    variations: []
-  },
-  {
-    id: '6724',
-    name: 'PORTE CLEF GOLF',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF6724',
-    wholesalePrice: 2,
-    finalPrice: 8,
-    crossedPrice: 8.8,
-    salesCount: 0,
-    position: 817,
-    variations: []
+    position: 6724,
+    variations: [
+    {
+      id: '3124',
+      ean13: '',
+      reference: '',
+      attributes: 'ORANGE',
+      priceImpact: 0,
+      finalPrice: 8
+    },
+    {
+      id: '3092',
+      ean13: '',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 0,
+      finalPrice: 8
+    },
+    {
+      id: '3091',
+      ean13: '',
+      reference: '',
+      attributes: 'ROUGE',
+      priceImpact: 0,
+      finalPrice: 8
+    },
+    {
+      id: '3125',
+      ean13: '',
+      reference: '',
+      attributes: 'OR',
+      priceImpact: 0,
+      finalPrice: 8
+    }
+    ]
   },
   {
     id: '6726',
@@ -10917,10 +11403,12 @@ export const defaultProducts: Product[] = [
     reference: '993',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 818,
-    variations: []
+    position: 6726,
+    variations: [
+
+    ]
   },
   {
     id: '6728',
@@ -10930,88 +11418,67 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 819,
-    variations: []
-  },
-  {
-    id: '6728',
-    name: 'BRACELET LETTRE',
-    category: 'porte-clef--bracelet',
-    ean13: '2057551482630',
-    reference: 'Z',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 820,
-    variations: []
-  },
-  {
-    id: '6728',
-    name: 'BRACELET LETTRE',
-    category: 'porte-clef--bracelet',
-    ean13: '2057551482630',
-    reference: 'Z',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 821,
-    variations: []
-  },
-  {
-    id: '6728',
-    name: 'BRACELET LETTRE',
-    category: 'porte-clef--bracelet',
-    ean13: '2057551482630',
-    reference: 'Z',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 822,
-    variations: []
-  },
-  {
-    id: '6728',
-    name: 'BRACELET LETTRE',
-    category: 'porte-clef--bracelet',
-    ean13: '2057551482630',
-    reference: 'Z',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 823,
-    variations: []
-  },
-  {
-    id: '6728',
-    name: 'BRACELET LETTRE',
-    category: 'porte-clef--bracelet',
-    ean13: '2057551482630',
-    reference: 'Z',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 824,
-    variations: []
-  },
-  {
-    id: '6728',
-    name: 'BRACELET LETTRE',
-    category: 'porte-clef--bracelet',
-    ean13: '2057551482630',
-    reference: 'Z',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 825,
-    variations: []
+    position: 6728,
+    variations: [
+    {
+      id: '2018',
+      ean13: '2039740605877',
+      reference: '',
+      attributes: 'BLANC,STRASS PETITE LETTRE,BLANC,STRASS PETITE LETTRE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2013',
+      ean13: '2004602146904',
+      reference: '',
+      attributes: 'BLANC,STRASS GRANDE LETTRE,BLANC,STRASS GRANDE LETTRE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2014',
+      ean13: '2053669535152',
+      reference: '',
+      attributes: 'NOIR,STRASS GRANDE LETTRE,NOIR,STRASS GRANDE LETTRE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2025',
+      ean13: '2021220421695',
+      reference: '',
+      attributes: 'BLEU CIEL,LETTRE METAL,BLEU CIEL,LETTRE METAL',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2027',
+      ean13: '2012173497905',
+      reference: '',
+      attributes: 'ROSE,LETTRE METAL,ROSE,LETTRE METAL',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2026',
+      ean13: '2068922210240',
+      reference: '',
+      attributes: 'BLEU ROI,LETTRE METAL,BLEU ROI,LETTRE METAL',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2019',
+      ean13: '2012959845722',
+      reference: '',
+      attributes: 'NOIR,STRASS PETITE LETTRE,NOIR,STRASS PETITE LETTRE',
+      priceImpact: 0,
+      finalPrice: 10
+    }
+    ]
   },
   {
     id: '6732',
@@ -11021,36 +11488,42 @@ export const defaultProducts: Product[] = [
     reference: '1000',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 826,
-    variations: []
+    position: 6732,
+    variations: [
+
+    ]
   },
   {
     id: '6736',
     name: 'SOBAG TROPEZ + 6 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2042018070499',
-    reference: 'REF6736',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 827,
-    variations: []
+    position: 6736,
+    variations: [
+
+    ]
   },
   {
     id: '6737',
     name: 'SOBAG CLEAR TROPEZ + 6 VN TROPEZ CLEAR',
     category: 'composition-vasque',
     ean13: '2073045925483',
-    reference: 'REF6737',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 828,
-    variations: []
+    position: 6737,
+    variations: [
+
+    ]
   },
   {
     id: '6765',
@@ -11060,10 +11533,12 @@ export const defaultProducts: Product[] = [
     reference: '653',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 829,
-    variations: []
+    position: 6765,
+    variations: [
+
+    ]
   },
   {
     id: '6766',
@@ -11073,10 +11548,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 830,
-    variations: []
+    position: 6766,
+    variations: [
+
+    ]
   },
   {
     id: '6767',
@@ -11086,10 +11563,12 @@ export const defaultProducts: Product[] = [
     reference: '642',
     wholesalePrice: 1,
     finalPrice: 72,
-    crossedPrice: 79.2,
+    crossedPrice: 72,
     salesCount: 0,
-    position: 831,
-    variations: []
+    position: 6767,
+    variations: [
+
+    ]
   },
   {
     id: '6768',
@@ -11099,36 +11578,42 @@ export const defaultProducts: Product[] = [
     reference: '642',
     wholesalePrice: 32,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 832,
-    variations: []
+    position: 6768,
+    variations: [
+
+    ]
   },
   {
     id: '6769',
     name: 'DOUBLE TRIPACK 3 PÊCHE 3 GINGER',
     category: 'tripack',
     ean13: '2019032337594',
-    reference: 'REF6769',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 17,
-    crossedPrice: 18.700000000000003,
+    crossedPrice: 17,
     salesCount: 0,
-    position: 833,
-    variations: []
+    position: 6769,
+    variations: [
+
+    ]
   },
   {
     id: '6770',
     name: 'TRIO BLANC UP GRIMAUD',
     category: 'trio-pack',
     ean13: '2042141369439',
-    reference: 'REF6770',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 26,
-    crossedPrice: 28.6,
+    crossedPrice: 26,
     salesCount: 0,
-    position: 834,
-    variations: []
+    position: 6770,
+    variations: [
+
+    ]
   },
   {
     id: '6775',
@@ -11138,10 +11623,12 @@ export const defaultProducts: Product[] = [
     reference: '190',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 835,
-    variations: []
+    position: 6775,
+    variations: [
+
+    ]
   },
   {
     id: '6779',
@@ -11153,21 +11640,25 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 836,
-    variations: []
+    position: 6779,
+    variations: [
+
+    ]
   },
   {
     id: '6781',
     name: 'TRIO VN CLEAR TROP+MAX +1UP ROSE 75',
     category: 'trio-pack',
     ean13: '2094948211282',
-    reference: 'REF6781',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 31,
-    crossedPrice: 34.1,
+    crossedPrice: 31,
     salesCount: 0,
-    position: 837,
-    variations: []
+    position: 6781,
+    variations: [
+
+    ]
   },
   {
     id: '6784',
@@ -11177,10 +11668,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 838,
-    variations: []
+    position: 6784,
+    variations: [
+
+    ]
   },
   {
     id: '6785',
@@ -11190,10 +11683,12 @@ export const defaultProducts: Product[] = [
     reference: '821',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 839,
-    variations: []
+    position: 6785,
+    variations: [
+
+    ]
   },
   {
     id: '6786',
@@ -11203,10 +11698,12 @@ export const defaultProducts: Product[] = [
     reference: '821',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 840,
-    variations: []
+    position: 6786,
+    variations: [
+
+    ]
   },
   {
     id: '6789',
@@ -11216,10 +11713,12 @@ export const defaultProducts: Product[] = [
     reference: '1562',
     wholesalePrice: 16,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 841,
-    variations: []
+    position: 6789,
+    variations: [
+
+    ]
   },
   {
     id: '6790',
@@ -11229,10 +11728,12 @@ export const defaultProducts: Product[] = [
     reference: '1565',
     wholesalePrice: 16,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 842,
-    variations: []
+    position: 6790,
+    variations: [
+
+    ]
   },
   {
     id: '6791',
@@ -11242,10 +11743,12 @@ export const defaultProducts: Product[] = [
     reference: '1567',
     wholesalePrice: 16,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 843,
-    variations: []
+    position: 6791,
+    variations: [
+
+    ]
   },
   {
     id: '6792',
@@ -11255,10 +11758,12 @@ export const defaultProducts: Product[] = [
     reference: '1566',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 844,
-    variations: []
+    position: 6792,
+    variations: [
+
+    ]
   },
   {
     id: '6793',
@@ -11268,10 +11773,12 @@ export const defaultProducts: Product[] = [
     reference: '1568',
     wholesalePrice: 16,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 845,
-    variations: []
+    position: 6793,
+    variations: [
+
+    ]
   },
   {
     id: '6794',
@@ -11281,10 +11788,12 @@ export const defaultProducts: Product[] = [
     reference: '1524',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 846,
-    variations: []
+    position: 6794,
+    variations: [
+
+    ]
   },
   {
     id: '6796',
@@ -11294,10 +11803,12 @@ export const defaultProducts: Product[] = [
     reference: '1000',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 847,
-    variations: []
+    position: 6796,
+    variations: [
+
+    ]
   },
   {
     id: '6797',
@@ -11307,10 +11818,12 @@ export const defaultProducts: Product[] = [
     reference: '1002',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 848,
-    variations: []
+    position: 6797,
+    variations: [
+
+    ]
   },
   {
     id: '6798',
@@ -11320,10 +11833,12 @@ export const defaultProducts: Product[] = [
     reference: '997',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 849,
-    variations: []
+    position: 6798,
+    variations: [
+
+    ]
   },
   {
     id: '6799',
@@ -11333,10 +11848,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 850,
-    variations: []
+    position: 6799,
+    variations: [
+
+    ]
   },
   {
     id: '6800',
@@ -11346,10 +11863,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 851,
-    variations: []
+    position: 6800,
+    variations: [
+
+    ]
   },
   {
     id: '6801',
@@ -11359,10 +11878,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 852,
-    variations: []
+    position: 6801,
+    variations: [
+
+    ]
   },
   {
     id: '6802',
@@ -11372,10 +11893,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 853,
-    variations: []
+    position: 6802,
+    variations: [
+
+    ]
   },
   {
     id: '6803',
@@ -11385,10 +11908,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 854,
-    variations: []
+    position: 6803,
+    variations: [
+
+    ]
   },
   {
     id: '6804',
@@ -11398,10 +11923,12 @@ export const defaultProducts: Product[] = [
     reference: '990',
     wholesalePrice: 6,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 855,
-    variations: []
+    position: 6804,
+    variations: [
+
+    ]
   },
   {
     id: '6805',
@@ -11411,10 +11938,12 @@ export const defaultProducts: Product[] = [
     reference: '1021',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 856,
-    variations: []
+    position: 6805,
+    variations: [
+
+    ]
   },
   {
     id: '6806',
@@ -11424,10 +11953,12 @@ export const defaultProducts: Product[] = [
     reference: '1021',
     wholesalePrice: 12,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 857,
-    variations: []
+    position: 6806,
+    variations: [
+
+    ]
   },
   {
     id: '6807',
@@ -11437,10 +11968,12 @@ export const defaultProducts: Product[] = [
     reference: '1390',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 858,
-    variations: []
+    position: 6807,
+    variations: [
+
+    ]
   },
   {
     id: '6811',
@@ -11450,10 +11983,12 @@ export const defaultProducts: Product[] = [
     reference: '1186',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 859,
-    variations: []
+    position: 6811,
+    variations: [
+
+    ]
   },
   {
     id: '6812',
@@ -11463,10 +11998,12 @@ export const defaultProducts: Product[] = [
     reference: '1175',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 860,
-    variations: []
+    position: 6812,
+    variations: [
+
+    ]
   },
   {
     id: '6813',
@@ -11476,10 +12013,12 @@ export const defaultProducts: Product[] = [
     reference: '1370',
     wholesalePrice: 13,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 861,
-    variations: []
+    position: 6813,
+    variations: [
+
+    ]
   },
   {
     id: '6814',
@@ -11489,10 +12028,12 @@ export const defaultProducts: Product[] = [
     reference: '1360',
     wholesalePrice: 17,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 862,
-    variations: []
+    position: 6814,
+    variations: [
+
+    ]
   },
   {
     id: '6815',
@@ -11502,10 +12043,12 @@ export const defaultProducts: Product[] = [
     reference: '1380',
     wholesalePrice: 25,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 863,
-    variations: []
+    position: 6815,
+    variations: [
+
+    ]
   },
   {
     id: '6816',
@@ -11515,10 +12058,12 @@ export const defaultProducts: Product[] = [
     reference: '990',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 864,
-    variations: []
+    position: 6816,
+    variations: [
+
+    ]
   },
   {
     id: '6817',
@@ -11528,10 +12073,12 @@ export const defaultProducts: Product[] = [
     reference: '1571',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 865,
-    variations: []
+    position: 6817,
+    variations: [
+
+    ]
   },
   {
     id: '6818',
@@ -11541,10 +12088,12 @@ export const defaultProducts: Product[] = [
     reference: '997',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 866,
-    variations: []
+    position: 6818,
+    variations: [
+
+    ]
   },
   {
     id: '6820',
@@ -11554,10 +12103,12 @@ export const defaultProducts: Product[] = [
     reference: '1524',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 867,
-    variations: []
+    position: 6820,
+    variations: [
+
+    ]
   },
   {
     id: '6821',
@@ -11567,10 +12118,12 @@ export const defaultProducts: Product[] = [
     reference: '1293',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 868,
-    variations: []
+    position: 6821,
+    variations: [
+
+    ]
   },
   {
     id: '6822',
@@ -11580,101 +12133,75 @@ export const defaultProducts: Product[] = [
     reference: '9000',
     wholesalePrice: 9,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 869,
-    variations: []
-  },
-  {
-    id: '6822',
-    name: 'TEE SHIRT PANNEAU MAXIME',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 870,
-    variations: []
-  },
-  {
-    id: '6822',
-    name: 'TEE SHIRT PANNEAU MAXIME',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 871,
-    variations: []
-  },
-  {
-    id: '6822',
-    name: 'TEE SHIRT PANNEAU MAXIME',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 872,
-    variations: []
-  },
-  {
-    id: '6822',
-    name: 'TEE SHIRT PANNEAU MAXIME',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 873,
-    variations: []
-  },
-  {
-    id: '6822',
-    name: 'TEE SHIRT PANNEAU MAXIME',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 874,
-    variations: []
-  },
-  {
-    id: '6822',
-    name: 'TEE SHIRT PANNEAU MAXIME',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 875,
-    variations: []
-  },
-  {
-    id: '6822',
-    name: 'TEE SHIRT PANNEAU MAXIME',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 15,
-    crossedPrice: 16.5,
-    salesCount: 0,
-    position: 876,
-    variations: []
+    position: 6822,
+    variations: [
+    {
+      id: '2229',
+      ean13: '2046368734582',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 15
+    },
+    {
+      id: '2227',
+      ean13: '2092199923442',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 15
+    },
+    {
+      id: '2228',
+      ean13: '2028727984616',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 15
+    },
+    {
+      id: '2231',
+      ean13: '2075292203321',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 15
+    },
+    {
+      id: '2232',
+      ean13: '2044187786737',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 15
+    },
+    {
+      id: '2230',
+      ean13: '2081228026827',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 15
+    },
+    {
+      id: '2234',
+      ean13: '2052540456296',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 15
+    },
+    {
+      id: '2233',
+      ean13: '2033003134845',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 15
+    }
+    ]
   },
   {
     id: '6823',
@@ -11684,218 +12211,168 @@ export const defaultProducts: Product[] = [
     reference: '48',
     wholesalePrice: 7,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 877,
-    variations: []
+    position: 6823,
+    variations: [
+
+    ]
   },
   {
     id: '6827',
     name: 'DEBARDEUR BEIGE',
     category: 'vetement',
     ean13: '',
-    reference: 'REF6827',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 878,
-    variations: []
-  },
-  {
-    id: '6827',
-    name: 'DEBARDEUR BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6827',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 879,
-    variations: []
-  },
-  {
-    id: '6827',
-    name: 'DEBARDEUR BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6827',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 880,
-    variations: []
-  },
-  {
-    id: '6827',
-    name: 'DEBARDEUR BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6827',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 881,
-    variations: []
-  },
-  {
-    id: '6827',
-    name: 'DEBARDEUR BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6827',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 882,
-    variations: []
-  },
-  {
-    id: '6827',
-    name: 'DEBARDEUR BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6827',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 883,
-    variations: []
-  },
-  {
-    id: '6827',
-    name: 'DEBARDEUR BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6827',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 884,
-    variations: []
-  },
-  {
-    id: '6827',
-    name: 'DEBARDEUR BEIGE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6827',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 885,
-    variations: []
+    position: 6827,
+    variations: [
+    {
+      id: '2409',
+      ean13: '2015173422854',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2407',
+      ean13: '2085949043040',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2408',
+      ean13: '2005231933699',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2413',
+      ean13: '2035809217081',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2410',
+      ean13: '2017130663522',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2412',
+      ean13: '2042739981760',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2411',
+      ean13: '2075589420721',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2414',
+      ean13: '2037617071107',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6828',
     name: 'DEBARDEUR NOIR',
     category: 'vetement',
     ean13: '',
-    reference: 'REF6828',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 886,
-    variations: []
-  },
-  {
-    id: '6828',
-    name: 'DEBARDEUR NOIR',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6828',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 887,
-    variations: []
-  },
-  {
-    id: '6828',
-    name: 'DEBARDEUR NOIR',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6828',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 888,
-    variations: []
-  },
-  {
-    id: '6828',
-    name: 'DEBARDEUR NOIR',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6828',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 889,
-    variations: []
-  },
-  {
-    id: '6828',
-    name: 'DEBARDEUR NOIR',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6828',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 890,
-    variations: []
-  },
-  {
-    id: '6828',
-    name: 'DEBARDEUR NOIR',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6828',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 891,
-    variations: []
-  },
-  {
-    id: '6828',
-    name: 'DEBARDEUR NOIR',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6828',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 892,
-    variations: []
-  },
-  {
-    id: '6828',
-    name: 'DEBARDEUR NOIR',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF6828',
-    wholesalePrice: 7,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 893,
-    variations: []
+    position: 6828,
+    variations: [
+    {
+      id: '2415',
+      ean13: '2033589864532',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2416',
+      ean13: '2035105436360',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2417',
+      ean13: '2090949780031',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2420',
+      ean13: '2090079486582',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2418',
+      ean13: '2054736642926',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2421',
+      ean13: '2061832987219',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2419',
+      ean13: '2033117653416',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2422',
+      ean13: '2066723696447',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '6829',
@@ -11905,10 +12382,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 894,
-    variations: []
+    position: 6829,
+    variations: [
+
+    ]
   },
   {
     id: '6834',
@@ -11918,10 +12397,12 @@ export const defaultProducts: Product[] = [
     reference: '153',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 895,
-    variations: []
+    position: 6834,
+    variations: [
+
+    ]
   },
   {
     id: '6835',
@@ -11931,10 +12412,12 @@ export const defaultProducts: Product[] = [
     reference: '151',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 896,
-    variations: []
+    position: 6835,
+    variations: [
+
+    ]
   },
   {
     id: '6836',
@@ -11944,10 +12427,12 @@ export const defaultProducts: Product[] = [
     reference: '152',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 897,
-    variations: []
+    position: 6836,
+    variations: [
+
+    ]
   },
   {
     id: '6837',
@@ -11957,10 +12442,12 @@ export const defaultProducts: Product[] = [
     reference: '155',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 898,
-    variations: []
+    position: 6837,
+    variations: [
+
+    ]
   },
   {
     id: '6838',
@@ -11970,10 +12457,12 @@ export const defaultProducts: Product[] = [
     reference: '155',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 899,
-    variations: []
+    position: 6838,
+    variations: [
+
+    ]
   },
   {
     id: '6839',
@@ -11983,23 +12472,27 @@ export const defaultProducts: Product[] = [
     reference: '290',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 900,
-    variations: []
+    position: 6839,
+    variations: [
+
+    ]
   },
   {
     id: '6842',
     name: 'PINCE CLIP SAINT TROPEZ',
     category: 'porte-clef--bracelet',
     ean13: '2023014023917',
-    reference: 'REF6842',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 901,
-    variations: []
+    position: 6842,
+    variations: [
+
+    ]
   },
   {
     id: '6843',
@@ -12009,10 +12502,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 902,
-    variations: []
+    position: 6843,
+    variations: [
+
+    ]
   },
   {
     id: '6844',
@@ -12022,49 +12517,57 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 903,
-    variations: []
+    position: 6844,
+    variations: [
+
+    ]
   },
   {
     id: '6845',
     name: 'SAC CABAS ARC EN CIEL',
     category: 'sac',
     ean13: '2061478328544',
-    reference: 'REF6845',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 904,
-    variations: []
+    position: 6845,
+    variations: [
+
+    ]
   },
   {
     id: '6847',
     name: 'SAC CABAS EPONGE BEIGE',
     category: 'sac',
     ean13: '2026354653547',
-    reference: 'REF6847',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 905,
-    variations: []
+    position: 6847,
+    variations: [
+
+    ]
   },
   {
     id: '6849',
     name: 'FOUTAS ARTISANAL FRANCE',
     category: 'serviette',
     ean13: '2036724722575',
-    reference: 'REF6849',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 906,
-    variations: []
+    position: 6849,
+    variations: [
+
+    ]
   },
   {
     id: '6852',
@@ -12074,10 +12577,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 907,
-    variations: []
+    position: 6852,
+    variations: [
+
+    ]
   },
   {
     id: '6853',
@@ -12087,10 +12592,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 2,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 908,
-    variations: []
+    position: 6853,
+    variations: [
+
+    ]
   },
   {
     id: '6854',
@@ -12100,10 +12607,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 909,
-    variations: []
+    position: 6854,
+    variations: [
+
+    ]
   },
   {
     id: '6855',
@@ -12113,10 +12622,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 0,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 910,
-    variations: []
+    position: 6855,
+    variations: [
+
+    ]
   },
   {
     id: '6856',
@@ -12126,10 +12637,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 911,
-    variations: []
+    position: 6856,
+    variations: [
+
+    ]
   },
   {
     id: '6857',
@@ -12139,10 +12652,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 912,
-    variations: []
+    position: 6857,
+    variations: [
+
+    ]
   },
   {
     id: '6861',
@@ -12152,10 +12667,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 913,
-    variations: []
+    position: 6861,
+    variations: [
+
+    ]
   },
   {
     id: '6862',
@@ -12165,10 +12682,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 0,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 914,
-    variations: []
+    position: 6862,
+    variations: [
+
+    ]
   },
   {
     id: '6863',
@@ -12178,10 +12697,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 915,
-    variations: []
+    position: 6863,
+    variations: [
+
+    ]
   },
   {
     id: '6864',
@@ -12191,10 +12712,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 916,
-    variations: []
+    position: 6864,
+    variations: [
+
+    ]
   },
   {
     id: '6865',
@@ -12204,10 +12727,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 917,
-    variations: []
+    position: 6865,
+    variations: [
+
+    ]
   },
   {
     id: '6866',
@@ -12217,10 +12742,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 918,
-    variations: []
+    position: 6866,
+    variations: [
+
+    ]
   },
   {
     id: '6867',
@@ -12230,10 +12757,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 919,
-    variations: []
+    position: 6867,
+    variations: [
+
+    ]
   },
   {
     id: '6869',
@@ -12243,10 +12772,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 920,
-    variations: []
+    position: 6869,
+    variations: [
+
+    ]
   },
   {
     id: '6870',
@@ -12256,10 +12787,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 921,
-    variations: []
+    position: 6870,
+    variations: [
+
+    ]
   },
   {
     id: '6871',
@@ -12269,10 +12802,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 922,
-    variations: []
+    position: 6871,
+    variations: [
+
+    ]
   },
   {
     id: '6872',
@@ -12282,10 +12817,12 @@ export const defaultProducts: Product[] = [
     reference: '1273',
     wholesalePrice: 0,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 923,
-    variations: []
+    position: 6872,
+    variations: [
+
+    ]
   },
   {
     id: '6873',
@@ -12295,10 +12832,12 @@ export const defaultProducts: Product[] = [
     reference: '851',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 924,
-    variations: []
+    position: 6873,
+    variations: [
+
+    ]
   },
   {
     id: '6874',
@@ -12308,10 +12847,12 @@ export const defaultProducts: Product[] = [
     reference: '1262',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 925,
-    variations: []
+    position: 6874,
+    variations: [
+
+    ]
   },
   {
     id: '6875',
@@ -12321,10 +12862,12 @@ export const defaultProducts: Product[] = [
     reference: '1262',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 926,
-    variations: []
+    position: 6875,
+    variations: [
+
+    ]
   },
   {
     id: '6876',
@@ -12334,10 +12877,12 @@ export const defaultProducts: Product[] = [
     reference: '1266',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 927,
-    variations: []
+    position: 6876,
+    variations: [
+
+    ]
   },
   {
     id: '6877',
@@ -12347,23 +12892,27 @@ export const defaultProducts: Product[] = [
     reference: '1266',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 928,
-    variations: []
+    position: 6877,
+    variations: [
+
+    ]
   },
   {
     id: '6878',
     name: 'PORTE CLEF BOULE BALLON',
     category: 'porte-clef--bracelet',
     ean13: '2031526660018',
-    reference: 'REF6878',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 929,
-    variations: []
+    position: 6878,
+    variations: [
+
+    ]
   },
   {
     id: '6879',
@@ -12373,10 +12922,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 930,
-    variations: []
+    position: 6879,
+    variations: [
+
+    ]
   },
   {
     id: '6880',
@@ -12386,10 +12937,12 @@ export const defaultProducts: Product[] = [
     reference: '900',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 931,
-    variations: []
+    position: 6880,
+    variations: [
+
+    ]
   },
   {
     id: '6881',
@@ -12399,10 +12952,12 @@ export const defaultProducts: Product[] = [
     reference: '1223',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 932,
-    variations: []
+    position: 6881,
+    variations: [
+
+    ]
   },
   {
     id: '6886',
@@ -12412,10 +12967,12 @@ export const defaultProducts: Product[] = [
     reference: '992',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 933,
-    variations: []
+    position: 6886,
+    variations: [
+
+    ]
   },
   {
     id: '6887',
@@ -12425,49 +12982,57 @@ export const defaultProducts: Product[] = [
     reference: '970',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 934,
-    variations: []
+    position: 6887,
+    variations: [
+
+    ]
   },
   {
     id: '6888',
     name: 'PACK 6 TUBES VILLAGE 83',
     category: 'pack-verre',
     ean13: '2093962964730',
-    reference: 'REF6888',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 935,
-    variations: []
+    position: 6888,
+    variations: [
+
+    ]
   },
   {
     id: '6889',
     name: 'PACK 6 SHOOTER CLEAR VILLAGE',
     category: 'pack-verre',
     ean13: '2043650173371',
-    reference: 'REF6889',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 936,
-    variations: []
+    position: 6889,
+    variations: [
+
+    ]
   },
   {
     id: '6890',
     name: 'TRIO BLANC ICE GRIMAUD',
     category: 'trio-pack',
     ean13: '2067626871283',
-    reference: 'REF6890',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 19,
-    crossedPrice: 20.900000000000002,
+    crossedPrice: 19,
     salesCount: 0,
-    position: 937,
-    variations: []
+    position: 6890,
+    variations: [
+
+    ]
   },
   {
     id: '6891',
@@ -12477,10 +13042,12 @@ export const defaultProducts: Product[] = [
     reference: '930',
     wholesalePrice: 2,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 938,
-    variations: []
+    position: 6891,
+    variations: [
+
+    ]
   },
   {
     id: '6892',
@@ -12490,10 +13057,12 @@ export const defaultProducts: Product[] = [
     reference: '7000',
     wholesalePrice: 8,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 939,
-    variations: []
+    position: 6892,
+    variations: [
+
+    ]
   },
   {
     id: '6894',
@@ -12503,10 +13072,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 940,
-    variations: []
+    position: 6894,
+    variations: [
+
+    ]
   },
   {
     id: '6895',
@@ -12516,10 +13087,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 941,
-    variations: []
+    position: 6895,
+    variations: [
+
+    ]
   },
   {
     id: '6897',
@@ -12529,10 +13102,12 @@ export const defaultProducts: Product[] = [
     reference: '744',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 942,
-    variations: []
+    position: 6897,
+    variations: [
+
+    ]
   },
   {
     id: '6898',
@@ -12542,10 +13117,12 @@ export const defaultProducts: Product[] = [
     reference: '744',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 943,
-    variations: []
+    position: 6898,
+    variations: [
+
+    ]
   },
   {
     id: '6899',
@@ -12555,10 +13132,12 @@ export const defaultProducts: Product[] = [
     reference: '744',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 944,
-    variations: []
+    position: 6899,
+    variations: [
+
+    ]
   },
   {
     id: '6900',
@@ -12568,10 +13147,12 @@ export const defaultProducts: Product[] = [
     reference: '744',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 945,
-    variations: []
+    position: 6900,
+    variations: [
+
+    ]
   },
   {
     id: '6901',
@@ -12581,10 +13162,12 @@ export const defaultProducts: Product[] = [
     reference: '775',
     wholesalePrice: 27,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 946,
-    variations: []
+    position: 6901,
+    variations: [
+
+    ]
   },
   {
     id: '6902',
@@ -12594,10 +13177,12 @@ export const defaultProducts: Product[] = [
     reference: '743',
     wholesalePrice: 12,
     finalPrice: 26,
-    crossedPrice: 28.6,
+    crossedPrice: 26,
     salesCount: 0,
-    position: 947,
-    variations: []
+    position: 6902,
+    variations: [
+
+    ]
   },
   {
     id: '6905',
@@ -12607,10 +13192,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 948,
-    variations: []
+    position: 6905,
+    variations: [
+
+    ]
   },
   {
     id: '6906',
@@ -12620,10 +13207,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 12,
     finalPrice: 48,
-    crossedPrice: 52.800000000000004,
+    crossedPrice: 48,
     salesCount: 0,
-    position: 949,
-    variations: []
+    position: 6906,
+    variations: [
+
+    ]
   },
   {
     id: '6908',
@@ -12633,10 +13222,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 950,
-    variations: []
+    position: 6908,
+    variations: [
+
+    ]
   },
   {
     id: '6910',
@@ -12646,10 +13237,12 @@ export const defaultProducts: Product[] = [
     reference: '61',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 951,
-    variations: []
+    position: 6910,
+    variations: [
+
+    ]
   },
   {
     id: '6911',
@@ -12659,10 +13252,12 @@ export const defaultProducts: Product[] = [
     reference: '60',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 952,
-    variations: []
+    position: 6911,
+    variations: [
+
+    ]
   },
   {
     id: '6912',
@@ -12672,10 +13267,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 953,
-    variations: []
+    position: 6912,
+    variations: [
+
+    ]
   },
   {
     id: '6913',
@@ -12685,10 +13282,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 954,
-    variations: []
+    position: 6913,
+    variations: [
+
+    ]
   },
   {
     id: '6914',
@@ -12698,10 +13297,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 5,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 955,
-    variations: []
+    position: 6914,
+    variations: [
+
+    ]
   },
   {
     id: '6915',
@@ -12711,10 +13312,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 5,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 956,
-    variations: []
+    position: 6915,
+    variations: [
+
+    ]
   },
   {
     id: '6917',
@@ -12724,10 +13327,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 957,
-    variations: []
+    position: 6917,
+    variations: [
+
+    ]
   },
   {
     id: '6918',
@@ -12737,49 +13342,35 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 12,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 958,
-    variations: []
-  },
-  {
-    id: '6918',
-    name: 'SAC POLOCHON',
-    category: 'sac',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 12,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 959,
-    variations: []
-  },
-  {
-    id: '6918',
-    name: 'SAC POLOCHON',
-    category: 'sac',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 12,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 960,
-    variations: []
-  },
-  {
-    id: '6919',
-    name: 'BONNET LAINE B',
-    category: 'produits-blonde',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 8,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 961,
-    variations: []
+    position: 6918,
+    variations: [
+    {
+      id: '2623',
+      ean13: '2025130426542',
+      reference: '',
+      attributes: 'NOIR',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2622',
+      ean13: '2027682007798',
+      reference: '',
+      attributes: 'BEIGE',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2624',
+      ean13: '2093661470693',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 0,
+      finalPrice: 20
+    }
+    ]
   },
   {
     id: '6919',
@@ -12789,49 +13380,51 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 962,
-    variations: []
-  },
-  {
-    id: '6919',
-    name: 'BONNET LAINE B',
-    category: 'produits-blonde',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 8,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 963,
-    variations: []
-  },
-  {
-    id: '6919',
-    name: 'BONNET LAINE B',
-    category: 'produits-blonde',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 8,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 964,
-    variations: []
-  },
-  {
-    id: '6919',
-    name: 'BONNET LAINE B',
-    category: 'produits-blonde',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 8,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 965,
-    variations: []
+    position: 6919,
+    variations: [
+    {
+      id: '2629',
+      ean13: '2093803105377',
+      reference: '',
+      attributes: 'GRIS FONCE',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2628',
+      ean13: '2087270117629',
+      reference: '',
+      attributes: 'ARGENT',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2631',
+      ean13: '2083496419363',
+      reference: '',
+      attributes: 'BEIGE',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2630',
+      ean13: '2057583257763',
+      reference: '',
+      attributes: 'VERT',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2632',
+      ean13: '2027792148961',
+      reference: '',
+      attributes: 'NOIR',
+      priceImpact: 0,
+      finalPrice: 20
+    }
+    ]
   },
   {
     id: '6920',
@@ -12841,10 +13434,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 966,
-    variations: []
+    position: 6920,
+    variations: [
+
+    ]
   },
   {
     id: '6921',
@@ -12854,10 +13449,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 967,
-    variations: []
+    position: 6921,
+    variations: [
+
+    ]
   },
   {
     id: '6922',
@@ -12867,10 +13464,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 968,
-    variations: []
+    position: 6922,
+    variations: [
+
+    ]
   },
   {
     id: '6923',
@@ -12880,10 +13479,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 969,
-    variations: []
+    position: 6923,
+    variations: [
+
+    ]
   },
   {
     id: '6925',
@@ -12893,36 +13494,35 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 10,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 970,
-    variations: []
-  },
-  {
-    id: '6925',
-    name: 'SERVIETTE RONDE B',
-    category: 'serviette',
-    ean13: '2039036611230',
-    reference: 'Z',
-    wholesalePrice: 10,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 971,
-    variations: []
-  },
-  {
-    id: '6925',
-    name: 'SERVIETTE RONDE B',
-    category: 'serviette',
-    ean13: '2039036611230',
-    reference: 'Z',
-    wholesalePrice: 10,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 972,
-    variations: []
+    position: 6925,
+    variations: [
+    {
+      id: '2633',
+      ean13: '2094324535957',
+      reference: '',
+      attributes: 'MANDALA',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2635',
+      ean13: '2048875740261',
+      reference: '',
+      attributes: 'UNIE',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2634',
+      ean13: '2067349023235',
+      reference: '',
+      attributes: 'ETOILE',
+      priceImpact: 0,
+      finalPrice: 20
+    }
+    ]
   },
   {
     id: '6926',
@@ -12932,23 +13532,27 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 10,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 973,
-    variations: []
-  },
-  {
-    id: '6926',
-    name: 'SERVIETTE RECTANGLE B',
-    category: 'serviette',
-    ean13: '2005322644480',
-    reference: 'Z',
-    wholesalePrice: 10,
-    finalPrice: 20,
-    crossedPrice: 22,
-    salesCount: 0,
-    position: 974,
-    variations: []
+    position: 6926,
+    variations: [
+    {
+      id: '2638',
+      ean13: '2007988039518',
+      reference: '',
+      attributes: 'UNIE',
+      priceImpact: 0,
+      finalPrice: 20
+    },
+    {
+      id: '2637',
+      ean13: '2049537053545',
+      reference: '',
+      attributes: 'ETOILE',
+      priceImpact: 0,
+      finalPrice: 20
+    }
+    ]
   },
   {
     id: '6928',
@@ -12958,10 +13562,12 @@ export const defaultProducts: Product[] = [
     reference: '255',
     wholesalePrice: 0,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 975,
-    variations: []
+    position: 6928,
+    variations: [
+
+    ]
   },
   {
     id: '6929',
@@ -12971,10 +13577,12 @@ export const defaultProducts: Product[] = [
     reference: '256',
     wholesalePrice: 0,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 976,
-    variations: []
+    position: 6929,
+    variations: [
+
+    ]
   },
   {
     id: '6931',
@@ -12984,10 +13592,12 @@ export const defaultProducts: Product[] = [
     reference: '390',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 977,
-    variations: []
+    position: 6931,
+    variations: [
+
+    ]
   },
   {
     id: '6932',
@@ -12997,10 +13607,12 @@ export const defaultProducts: Product[] = [
     reference: '440',
     wholesalePrice: 10,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 978,
-    variations: []
+    position: 6932,
+    variations: [
+
+    ]
   },
   {
     id: '6933',
@@ -13010,10 +13622,12 @@ export const defaultProducts: Product[] = [
     reference: '49',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 979,
-    variations: []
+    position: 6933,
+    variations: [
+
+    ]
   },
   {
     id: '6934',
@@ -13023,10 +13637,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 55,
     finalPrice: 109,
-    crossedPrice: 119.9,
+    crossedPrice: 109,
     salesCount: 0,
-    position: 980,
-    variations: []
+    position: 6934,
+    variations: [
+
+    ]
   },
   {
     id: '6935',
@@ -13036,10 +13652,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 55,
     finalPrice: 109,
-    crossedPrice: 119.9,
+    crossedPrice: 109,
     salesCount: 0,
-    position: 981,
-    variations: []
+    position: 6935,
+    variations: [
+
+    ]
   },
   {
     id: '6936',
@@ -13049,36 +13667,42 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 55,
     finalPrice: 99,
-    crossedPrice: 108.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 982,
-    variations: []
+    position: 6936,
+    variations: [
+
+    ]
   },
   {
     id: '6937',
     name: 'PACK 6 SUNSET  38 UNI',
     category: 'pack-verre',
     ean13: '2018674584670',
-    reference: 'REF6937',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 983,
-    variations: []
+    position: 6937,
+    variations: [
+
+    ]
   },
   {
     id: '6938',
     name: 'PACK 6 SUNSET CLEAR 46 UNI',
     category: 'pack-verre',
     ean13: '2030783587915',
-    reference: 'REF6938',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 984,
-    variations: []
+    position: 6938,
+    variations: [
+
+    ]
   },
   {
     id: '6939',
@@ -13088,23 +13712,27 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 985,
-    variations: []
+    position: 6939,
+    variations: [
+
+    ]
   },
   {
     id: '6941',
     name: 'PACK 6 AIR BEACH CLEAR UNI',
     category: 'pack-verre',
     ean13: '2038602832734',
-    reference: 'REF6941',
+    reference: '',
     wholesalePrice: 16,
     finalPrice: 57,
-    crossedPrice: 62.7,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 986,
-    variations: []
+    position: 6941,
+    variations: [
+
+    ]
   },
   {
     id: '6942',
@@ -13114,49 +13742,57 @@ export const defaultProducts: Product[] = [
     reference: '16',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 987,
-    variations: []
+    position: 6942,
+    variations: [
+
+    ]
   },
   {
     id: '6943',
     name: 'PACK 6 SUNSET 46 TROPEZ',
     category: 'pack-verre',
     ean13: '2074194642832',
-    reference: 'REF6943',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 988,
-    variations: []
+    position: 6943,
+    variations: [
+
+    ]
   },
   {
     id: '6944',
     name: 'PACK 6 SUNSET 46 CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2017243356755',
-    reference: 'REF6944',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 989,
-    variations: []
+    position: 6944,
+    variations: [
+
+    ]
   },
   {
     id: '6945',
     name: 'PACK 6 SUNSET 38 TROPEZ',
     category: 'pack-verre',
     ean13: '2085794855348',
-    reference: 'REF6945',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 990,
-    variations: []
+    position: 6945,
+    variations: [
+
+    ]
   },
   {
     id: '6954',
@@ -13166,270 +13802,312 @@ export const defaultProducts: Product[] = [
     reference: '1270',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 991,
-    variations: []
+    position: 6954,
+    variations: [
+
+    ]
   },
   {
     id: '6955',
     name: 'PACK 6 CROISIERES  BLONDE',
     category: 'pack-verre',
     ean13: '2005719676506',
-    reference: 'REF6955',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 30,
-    crossedPrice: 33,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 992,
-    variations: []
+    position: 6955,
+    variations: [
+
+    ]
   },
   {
     id: '6956',
     name: 'PACK 6 CROISIERES CLEAR BLONDE',
     category: 'pack-verre',
     ean13: '2058561111749',
-    reference: 'REF6956',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 30,
-    crossedPrice: 33,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 993,
-    variations: []
+    position: 6956,
+    variations: [
+
+    ]
   },
   {
     id: '6963',
     name: 'PACK 6 BK BLONDE',
     category: 'pack-verre',
     ean13: '2028731862352',
-    reference: 'REF6963',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 994,
-    variations: []
+    position: 6963,
+    variations: [
+
+    ]
   },
   {
     id: '6965',
     name: 'SEAU 2BT VELA CLEAR TROPEZ+ 6 SUN 46 TROPEZ',
     category: 'composition-vasque',
     ean13: '2068838269950',
-    reference: 'REF6965',
+    reference: '',
     wholesalePrice: 26,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 995,
-    variations: []
+    position: 6965,
+    variations: [
+
+    ]
   },
   {
     id: '6966',
     name: 'SOBAG NOIR  + 2 BK OR + 4 BK TROPEZ NOIR',
     category: 'composition-vasque',
     ean13: '2016828039250',
-    reference: 'REF6966',
+    reference: '',
     wholesalePrice: 38,
     finalPrice: 85,
-    crossedPrice: 93.50000000000001,
+    crossedPrice: 103,
     salesCount: 0,
-    position: 996,
-    variations: []
+    position: 6966,
+    variations: [
+
+    ]
   },
   {
     id: '6967',
     name: 'SEAU 2BT VELA  TROPEZ + 6 SUNSET 38 TROPEZ',
     category: 'composition-vasque',
     ean13: '2035995103120',
-    reference: 'REF6967',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 997,
-    variations: []
+    position: 6967,
+    variations: [
+
+    ]
   },
   {
     id: '6968',
     name: 'SEAU 2BT VELA CLEAR TROPEZ + 6 SUNSET 38 TROPEZ CLEAR',
     category: 'composition-vasque',
     ean13: '2068613947325',
-    reference: 'REF6968',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 998,
-    variations: []
+    position: 6968,
+    variations: [
+
+    ]
   },
   {
     id: '6969',
     name: 'VICTORIA BLC TRZ + 6 SUN 38 BLC TRZ + 6 SUN 38 CLR TRZ',
     category: 'composition-vasque',
     ean13: '2041740934369',
-    reference: 'REF6969',
+    reference: '',
     wholesalePrice: 50,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 157,
     salesCount: 0,
-    position: 999,
-    variations: []
+    position: 6969,
+    variations: [
+
+    ]
   },
   {
     id: '6970',
     name: 'VICTORIA BLC TRZ + 6 BK BLC TRZ + 2 BK TROPEZ OR',
     category: 'composition-vasque',
     ean13: '2022682437958',
-    reference: 'REF6970',
+    reference: '',
     wholesalePrice: 48,
     finalPrice: 115,
-    crossedPrice: 126.50000000000001,
+    crossedPrice: 136,
     salesCount: 0,
-    position: 1000,
-    variations: []
+    position: 6970,
+    variations: [
+
+    ]
   },
   {
     id: '6971',
     name: 'VASQUE VELA  + 10 AIR BEACH TROPEZ',
     category: 'composition-vasque',
     ean13: '2010637740529',
-    reference: 'REF6971',
+    reference: '',
     wholesalePrice: 43,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 159,
     salesCount: 0,
-    position: 1001,
-    variations: []
+    position: 6971,
+    variations: [
+
+    ]
   },
   {
     id: '6972',
     name: 'VASQUE VELA  BLC + 8 BK BLC TRZ + 2 BK OR TRZ',
     category: 'composition-vasque',
     ean13: '2017288059147',
-    reference: 'REF6972',
+    reference: '',
     wholesalePrice: 55,
     finalPrice: 135,
-    crossedPrice: 148.5,
+    crossedPrice: 157,
     salesCount: 0,
-    position: 1002,
-    variations: []
+    position: 6972,
+    variations: [
+
+    ]
   },
   {
     id: '6973',
     name: 'VASQUE RONDE VELA + 24 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2040457970295',
-    reference: 'REF6973',
+    reference: '',
     wholesalePrice: 54,
     finalPrice: 185,
-    crossedPrice: 203.50000000000003,
+    crossedPrice: 205,
     salesCount: 0,
-    position: 1003,
-    variations: []
+    position: 6973,
+    variations: [
+
+    ]
   },
   {
     id: '6974',
     name: 'VASQUE BULLE TRZ + 6 MOJ 45 + 6 BAL CLR TRZ + 6 SUN 38 CLR TRZ',
     category: 'composition-vasque',
     ean13: '2033800628127',
-    reference: 'REF6974',
+    reference: '',
     wholesalePrice: 97,
     finalPrice: 239,
-    crossedPrice: 262.90000000000003,
+    crossedPrice: 260,
     salesCount: 0,
-    position: 1004,
-    variations: []
+    position: 6974,
+    variations: [
+
+    ]
   },
   {
     id: '6975',
     name: 'SEAU 2BT VELA CLEAR TROPEZ+ 6 VN TROPEZ CLEAR',
     category: 'composition-vasque',
     ean13: '2082629665707',
-    reference: 'REF6975',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1005,
-    variations: []
+    position: 6975,
+    variations: [
+
+    ]
   },
   {
     id: '6976',
     name: 'SEAU 1BT VELA TRZ + 6 FLUTES TROPEZ',
     category: 'composition-vasque',
     ean13: '2044425735077',
-    reference: 'REF6976',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1006,
-    variations: []
+    position: 6976,
+    variations: [
+
+    ]
   },
   {
     id: '6978',
     name: 'VASQUE ANSE TROPEZ + 12 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2058520773858',
-    reference: 'REF6978',
+    reference: '',
     wholesalePrice: 30,
     finalPrice: 105,
-    crossedPrice: 115.50000000000001,
+    crossedPrice: 123,
     salesCount: 0,
-    position: 1007,
-    variations: []
+    position: 6978,
+    variations: [
+
+    ]
   },
   {
     id: '6979',
     name: 'VASQUE BULLE TRZ + 12 SUN 46 CLEAR TRZ',
     category: 'composition-vasque',
     ean13: '2065557916707',
-    reference: 'REF6979',
+    reference: '',
     wholesalePrice: 88,
     finalPrice: 189,
-    crossedPrice: 207.9,
+    crossedPrice: 212,
     salesCount: 0,
-    position: 1008,
-    variations: []
+    position: 6979,
+    variations: [
+
+    ]
   },
   {
     id: '6980',
     name: 'VASQUE BONGO + 12 BK TROPEZ CLEAR',
     category: 'composition-vasque',
     ean13: '2030209853013',
-    reference: 'REF6980',
+    reference: '',
     wholesalePrice: 58,
     finalPrice: 141,
-    crossedPrice: 155.10000000000002,
+    crossedPrice: 159,
     salesCount: 0,
-    position: 1009,
-    variations: []
+    position: 6980,
+    variations: [
+
+    ]
   },
   {
     id: '6981',
     name: 'VICTORIA TROPEZ + 12 BK TROPEZ',
     category: 'composition-vasque',
     ean13: '2096779437374',
-    reference: 'REF6981',
+    reference: '',
     wholesalePrice: 48,
     finalPrice: 135,
-    crossedPrice: 148.5,
+    crossedPrice: 157,
     salesCount: 0,
-    position: 1010,
-    variations: []
+    position: 6981,
+    variations: [
+
+    ]
   },
   {
     id: '6982',
     name: 'PACK 6 CROISIERES  UNI',
     category: 'pack-verre',
     ean13: '2035730716028',
-    reference: 'REF6982',
+    reference: '',
     wholesalePrice: 11,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1011,
-    variations: []
+    position: 6982,
+    variations: [
+
+    ]
   },
   {
     id: '6991',
@@ -13439,36 +14117,42 @@ export const defaultProducts: Product[] = [
     reference: '61',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1012,
-    variations: []
+    position: 6991,
+    variations: [
+
+    ]
   },
   {
     id: '7005',
     name: 'PACK 6  AIR BEACH CLEAR UNI',
     category: 'pack-balloon',
     ean13: '',
-    reference: 'REF7005',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1013,
-    variations: []
+    position: 7005,
+    variations: [
+
+    ]
   },
   {
     id: '7011',
     name: 'SOBAG NOIR + 3 BK OR + 3 BK TROPEZ NOIR',
     category: 'composition-vasque',
     ean13: '2013352687377',
-    reference: 'REF7011',
+    reference: '',
     wholesalePrice: 43,
     finalPrice: 89,
-    crossedPrice: 97.9,
+    crossedPrice: 109,
     salesCount: 0,
-    position: 1014,
-    variations: []
+    position: 7011,
+    variations: [
+
+    ]
   },
   {
     id: '7022',
@@ -13478,75 +14162,87 @@ export const defaultProducts: Product[] = [
     reference: '702',
     wholesalePrice: 1,
     finalPrice: 60,
-    crossedPrice: 66,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 1015,
-    variations: []
+    position: 7022,
+    variations: [
+
+    ]
   },
   {
     id: '7023',
     name: 'SEAU 2BT VELA  TROPEZ + 6 VN VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2091100923793',
-    reference: 'REF7023',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1016,
-    variations: []
+    position: 7023,
+    variations: [
+
+    ]
   },
   {
     id: '7024',
     name: 'SEAU 2BT VELA  TROPEZ + 8 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2046949187257',
-    reference: 'REF7024',
+    reference: '',
     wholesalePrice: 21,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 91,
     salesCount: 0,
-    position: 1017,
-    variations: []
+    position: 7024,
+    variations: [
+
+    ]
   },
   {
     id: '7025',
     name: 'SEAU 2BT VELA CLEAR + 8 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2099956111722',
-    reference: 'REF7025',
+    reference: '',
     wholesalePrice: 21,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 91,
     salesCount: 0,
-    position: 1018,
-    variations: []
+    position: 7025,
+    variations: [
+
+    ]
   },
   {
     id: '7026',
     name: 'SEAU 2BT VELA  TROPEZ +6 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2034835324039',
-    reference: 'REF7026',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1019,
-    variations: []
+    position: 7026,
+    variations: [
+
+    ]
   },
   {
     id: '7027',
     name: 'SEAU 2BT VELA CLEAR + 6 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2037640103745',
-    reference: 'REF7027',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1020,
-    variations: []
+    position: 7027,
+    variations: [
+
+    ]
   },
   {
     id: '7029',
@@ -13556,10 +14252,12 @@ export const defaultProducts: Product[] = [
     reference: '1390',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1021,
-    variations: []
+    position: 7029,
+    variations: [
+
+    ]
   },
   {
     id: '7038',
@@ -13571,73 +14269,85 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1022,
-    variations: []
+    position: 7038,
+    variations: [
+
+    ]
   },
   {
     id: '7039',
     name: 'SAC PLAGE BLONDE BLEU',
     category: 'sac',
     ean13: '2069930353332',
-    reference: 'REF7039',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1023,
-    variations: []
+    position: 7039,
+    variations: [
+
+    ]
   },
   {
     id: '7040',
     name: 'TRIO 2 ICE PECHE + 2 VN TROPEZ',
     category: 'trio-pack',
     ean13: '2060455847833',
-    reference: 'REF7040',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1024,
-    variations: []
+    position: 7040,
+    variations: [
+
+    ]
   },
   {
     id: '7041',
     name: 'TRIO  ICE PECHE+GINGER+2 VN TROPEZ',
     category: 'trio-pack',
     ean13: '2146702292631',
-    reference: 'REF7041',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1025,
-    variations: []
+    position: 7041,
+    variations: [
+
+    ]
   },
   {
     id: '7042',
     name: 'TRIO 1 PECHE + 1 GINGER + 1 BLONDE',
     category: 'trio-pack',
     ean13: '3046702292630',
-    reference: 'REF7042',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 11,
-    crossedPrice: 12.100000000000001,
+    crossedPrice: 11,
     salesCount: 0,
-    position: 1026,
-    variations: []
+    position: 7042,
+    variations: [
+
+    ]
   },
   {
     id: '7043',
     name: 'TRIO  ICE + ICE NO + 2 VN TROPEZ',
     category: 'trio-pack',
     ean13: '2086324153538',
-    reference: 'REF7043',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1027,
-    variations: []
+    position: 7043,
+    variations: [
+
+    ]
   },
   {
     id: '7044',
@@ -13647,10 +14357,12 @@ export const defaultProducts: Product[] = [
     reference: '11',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1028,
-    variations: []
+    position: 7044,
+    variations: [
+
+    ]
   },
   {
     id: '7045',
@@ -13660,10 +14372,12 @@ export const defaultProducts: Product[] = [
     reference: '96',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1029,
-    variations: []
+    position: 7045,
+    variations: [
+
+    ]
   },
   {
     id: '7046',
@@ -13673,10 +14387,12 @@ export const defaultProducts: Product[] = [
     reference: '76',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1030,
-    variations: []
+    position: 7046,
+    variations: [
+
+    ]
   },
   {
     id: '7047',
@@ -13686,10 +14402,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1031,
-    variations: []
+    position: 7047,
+    variations: [
+
+    ]
   },
   {
     id: '7048',
@@ -13699,10 +14417,12 @@ export const defaultProducts: Product[] = [
     reference: '46',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1032,
-    variations: []
+    position: 7048,
+    variations: [
+
+    ]
   },
   {
     id: '7049',
@@ -13712,10 +14432,12 @@ export const defaultProducts: Product[] = [
     reference: '610',
     wholesalePrice: 16,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1033,
-    variations: []
+    position: 7049,
+    variations: [
+
+    ]
   },
   {
     id: '7050',
@@ -13725,10 +14447,12 @@ export const defaultProducts: Product[] = [
     reference: '510',
     wholesalePrice: 7,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1034,
-    variations: []
+    position: 7050,
+    variations: [
+
+    ]
   },
   {
     id: '7051',
@@ -13738,10 +14462,12 @@ export const defaultProducts: Product[] = [
     reference: '55',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1035,
-    variations: []
+    position: 7051,
+    variations: [
+
+    ]
   },
   {
     id: '7052',
@@ -13751,10 +14477,12 @@ export const defaultProducts: Product[] = [
     reference: '52',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1036,
-    variations: []
+    position: 7052,
+    variations: [
+
+    ]
   },
   {
     id: '7053',
@@ -13764,10 +14492,12 @@ export const defaultProducts: Product[] = [
     reference: '50',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1037,
-    variations: []
+    position: 7053,
+    variations: [
+
+    ]
   },
   {
     id: '7054',
@@ -13777,10 +14507,12 @@ export const defaultProducts: Product[] = [
     reference: '51',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1038,
-    variations: []
+    position: 7054,
+    variations: [
+
+    ]
   },
   {
     id: '7055',
@@ -13790,10 +14522,12 @@ export const defaultProducts: Product[] = [
     reference: '45',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1039,
-    variations: []
+    position: 7055,
+    variations: [
+
+    ]
   },
   {
     id: '7056',
@@ -13803,10 +14537,12 @@ export const defaultProducts: Product[] = [
     reference: '44',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1040,
-    variations: []
+    position: 7056,
+    variations: [
+
+    ]
   },
   {
     id: '7057',
@@ -13816,10 +14552,12 @@ export const defaultProducts: Product[] = [
     reference: '150',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1041,
-    variations: []
+    position: 7057,
+    variations: [
+
+    ]
   },
   {
     id: '7058',
@@ -13829,10 +14567,12 @@ export const defaultProducts: Product[] = [
     reference: '280',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1042,
-    variations: []
+    position: 7058,
+    variations: [
+
+    ]
   },
   {
     id: '7060',
@@ -13842,10 +14582,12 @@ export const defaultProducts: Product[] = [
     reference: '351',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1043,
-    variations: []
+    position: 7060,
+    variations: [
+
+    ]
   },
   {
     id: '7061',
@@ -13855,10 +14597,12 @@ export const defaultProducts: Product[] = [
     reference: '351',
     wholesalePrice: 9,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1044,
-    variations: []
+    position: 7061,
+    variations: [
+
+    ]
   },
   {
     id: '7062',
@@ -13868,10 +14612,12 @@ export const defaultProducts: Product[] = [
     reference: '120',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1045,
-    variations: []
+    position: 7062,
+    variations: [
+
+    ]
   },
   {
     id: '7063',
@@ -13881,10 +14627,12 @@ export const defaultProducts: Product[] = [
     reference: '120',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1046,
-    variations: []
+    position: 7063,
+    variations: [
+
+    ]
   },
   {
     id: '7064',
@@ -13894,10 +14642,12 @@ export const defaultProducts: Product[] = [
     reference: '120',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1047,
-    variations: []
+    position: 7064,
+    variations: [
+
+    ]
   },
   {
     id: '7065',
@@ -13907,10 +14657,12 @@ export const defaultProducts: Product[] = [
     reference: '120',
     wholesalePrice: 1,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1048,
-    variations: []
+    position: 7065,
+    variations: [
+
+    ]
   },
   {
     id: '7066',
@@ -13920,10 +14672,12 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1049,
-    variations: []
+    position: 7066,
+    variations: [
+
+    ]
   },
   {
     id: '7067',
@@ -13933,62 +14687,72 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1050,
-    variations: []
+    position: 7067,
+    variations: [
+
+    ]
   },
   {
     id: '7069',
     name: 'PACK 6 BK VILLAGE 83',
     category: 'pack-verre',
     ean13: '2085231398636',
-    reference: 'REF7069',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1051,
-    variations: []
+    position: 7069,
+    variations: [
+
+    ]
   },
   {
     id: '7070',
     name: 'PORTE CLEF BRELOQUE FLEUR',
     category: 'porte-clef--bracelet',
     ean13: '2080456365586',
-    reference: 'REF7070',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1052,
-    variations: []
+    position: 7070,
+    variations: [
+
+    ]
   },
   {
     id: '7071',
     name: 'PORTE CLEF BRELOQUE CITRON',
     category: 'porte-clef--bracelet',
     ean13: '2045723431494',
-    reference: 'REF7071',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1053,
-    variations: []
+    position: 7071,
+    variations: [
+
+    ]
   },
   {
     id: '7072',
     name: 'PORTE CLEF BRELOQUE BANANE',
     category: 'porte-clef--bracelet',
     ean13: '2038370762011',
-    reference: 'REF7072',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1054,
-    variations: []
+    position: 7072,
+    variations: [
+
+    ]
   },
   {
     id: '7075',
@@ -13998,75 +14762,73 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1055,
-    variations: []
+    position: 7075,
+    variations: [
+
+    ]
   },
   {
     id: '7076',
     name: 'PORTE CLEF BRELOQUES COULEUR',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7076',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1056,
-    variations: []
-  },
-  {
-    id: '7076',
-    name: 'PORTE CLEF BRELOQUES COULEUR',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF7076',
-    wholesalePrice: 3,
-    finalPrice: 8,
-    crossedPrice: 8.8,
-    salesCount: 0,
-    position: 1057,
-    variations: []
-  },
-  {
-    id: '7076',
-    name: 'PORTE CLEF BRELOQUES COULEUR',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF7076',
-    wholesalePrice: 3,
-    finalPrice: 8,
-    crossedPrice: 8.8,
-    salesCount: 0,
-    position: 1058,
-    variations: []
-  },
-  {
-    id: '7076',
-    name: 'PORTE CLEF BRELOQUES COULEUR',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF7076',
-    wholesalePrice: 3,
-    finalPrice: 8,
-    crossedPrice: 8.8,
-    salesCount: 0,
-    position: 1059,
-    variations: []
+    position: 7076,
+    variations: [
+    {
+      id: '2781',
+      ean13: '2098813570245',
+      reference: '',
+      attributes: 'VERT',
+      priceImpact: 0,
+      finalPrice: 8
+    },
+    {
+      id: '2780',
+      ean13: '2044770612047',
+      reference: '',
+      attributes: 'MAUVE',
+      priceImpact: 0,
+      finalPrice: 8
+    },
+    {
+      id: '2779',
+      ean13: '2016234856359',
+      reference: '',
+      attributes: 'ROUGE',
+      priceImpact: 0,
+      finalPrice: 8
+    },
+    {
+      id: '2778',
+      ean13: '2024389327471',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 0,
+      finalPrice: 8
+    }
+    ]
   },
   {
     id: '7077',
     name: 'PACK 6 BK COULEUR ANCIEN',
     category: 'pack-verre',
     ean13: '2008431515108',
-    reference: 'REF7077',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1060,
-    variations: []
+    position: 7077,
+    variations: [
+
+    ]
   },
   {
     id: '7080',
@@ -14076,10 +14838,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 64,
     finalPrice: 119,
-    crossedPrice: 130.9,
+    crossedPrice: 119,
     salesCount: 0,
-    position: 1061,
-    variations: []
+    position: 7080,
+    variations: [
+
+    ]
   },
   {
     id: '7081',
@@ -14089,140 +14853,162 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 10,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1062,
-    variations: []
+    position: 7081,
+    variations: [
+
+    ]
   },
   {
     id: '7082',
     name: 'PACK 6 TUBES GIVRES',
     category: 'pack-verre',
     ean13: '2054314232211',
-    reference: 'REF7082',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1063,
-    variations: []
+    position: 7082,
+    variations: [
+
+    ]
   },
   {
     id: '7083',
     name: 'PACK 6 BK UNI',
     category: 'pack-verre',
     ean13: '2096982084082',
-    reference: 'REF7083',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1064,
-    variations: []
+    position: 7083,
+    variations: [
+
+    ]
   },
   {
     id: '7086',
     name: 'VASQUE NICE +BK 2BLEU 2FUSHIA 2VERT 2 JAUNE 4 BLC',
     category: 'composition-vasque',
     ean13: '2034514103078',
-    reference: 'REF7086',
+    reference: '',
     wholesalePrice: 52,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 161,
     salesCount: 0,
-    position: 1065,
-    variations: []
+    position: 7086,
+    variations: [
+
+    ]
   },
   {
     id: '7087',
     name: 'SEAU 1BT VELA PORT GRIMAUD + 6 VN VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2043515014122',
-    reference: 'REF7087',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1066,
-    variations: []
+    position: 7087,
+    variations: [
+
+    ]
   },
   {
     id: '7088',
     name: 'SEAU 1BT VELA TROPEZ + 6 VN VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2090216616070',
-    reference: 'REF7088',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1067,
-    variations: []
+    position: 7088,
+    variations: [
+
+    ]
   },
   {
     id: '7089',
     name: 'SEAU 2BT VELA CLEAR TROPEZ+ 6 VN 83 CLEAR',
     category: 'composition-vasque',
     ean13: '2080522364345',
-    reference: 'REF7089',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1068,
-    variations: []
+    position: 7089,
+    variations: [
+
+    ]
   },
   {
     id: '7090',
     name: 'VICTORIA TROPEZ + 6 BK TROPEZ + 6 CROISIERE TROPEZ',
     category: 'composition-vasque',
     ean13: '2078648365261',
-    reference: 'REF7090',
+    reference: '',
     wholesalePrice: 45,
     finalPrice: 135,
-    crossedPrice: 148.5,
+    crossedPrice: 157,
     salesCount: 0,
-    position: 1069,
-    variations: []
+    position: 7090,
+    variations: [
+
+    ]
   },
   {
     id: '7091',
     name: 'VASQUE VELA + 6 BK + 6 CROISIERES TROPEZ',
     category: 'composition-vasque',
     ean13: '2001798168499',
-    reference: 'REF7091',
+    reference: '',
     wholesalePrice: 46,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 161,
     salesCount: 0,
-    position: 1070,
-    variations: []
+    position: 7091,
+    variations: [
+
+    ]
   },
   {
     id: '7093',
     name: 'PACK 6 NEW BIG TASSE CAFE ET 6 SOUS TASSE',
     category: 'pack-verre',
     ean13: '2018769096927',
-    reference: 'REF7093',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 43,
     salesCount: 0,
-    position: 1071,
-    variations: []
+    position: 7093,
+    variations: [
+
+    ]
   },
   {
     id: '7094',
     name: 'PACK 6 NEW PETITE TASSE CAFE ET 6 SOUS TASSES',
     category: 'pack-verre',
     ean13: '2052298297141',
-    reference: 'REF7094',
+    reference: '',
     wholesalePrice: 12,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 43,
     salesCount: 0,
-    position: 1072,
-    variations: []
+    position: 7094,
+    variations: [
+
+    ]
   },
   {
     id: '7095',
@@ -14232,88 +15018,102 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1073,
-    variations: []
+    position: 7095,
+    variations: [
+
+    ]
   },
   {
     id: '7097',
     name: 'PACK 6 BK VILLAGE 06',
     category: 'pack-verre',
     ean13: '2012387256503',
-    reference: 'REF7097',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1074,
-    variations: []
+    position: 7097,
+    variations: [
+
+    ]
   },
   {
     id: '7103',
     name: 'COOL BAG GRAND + 6 BK COULEUR NEW',
     category: 'pack-ice-bag',
     ean13: '2098190403648',
-    reference: 'REF7103',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 53,
-    crossedPrice: 58.300000000000004,
+    crossedPrice: 58,
     salesCount: 0,
-    position: 1075,
-    variations: []
+    position: 7103,
+    variations: [
+
+    ]
   },
   {
     id: '7104',
     name: 'TRIO VN CANNES & TROPEZ + 2 ICE PECHE',
     category: 'trio-pack',
     ean13: '2040134218054',
-    reference: 'REF7104',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1076,
-    variations: []
+    position: 7104,
+    variations: [
+
+    ]
   },
   {
     id: '7105',
     name: 'TRIO VN CANNES & TROPEZ + 1 ICE PECHE + 1 ICE EXO',
     category: 'trio-pack',
     ean13: '2054991055806',
-    reference: 'REF7105',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1077,
-    variations: []
+    position: 7105,
+    variations: [
+
+    ]
   },
   {
     id: '7106',
     name: 'TRIO VN CANNES & TROPEZ + 1 UP 37.5 CL',
     category: 'trio-pack',
     ean13: '2030181956269',
-    reference: 'REF7106',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1078,
-    variations: []
+    position: 7106,
+    variations: [
+
+    ]
   },
   {
     id: '7107',
     name: 'TRIO 2 VN CANNES + 2 ICE PECHE',
     category: 'trio-pack',
     ean13: '2038534799914',
-    reference: 'REF7107',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1079,
-    variations: []
+    position: 7107,
+    variations: [
+
+    ]
   },
   {
     id: '7110',
@@ -14323,10 +15123,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1080,
-    variations: []
+    position: 7110,
+    variations: [
+
+    ]
   },
   {
     id: '7111',
@@ -14336,49 +15138,43 @@ export const defaultProducts: Product[] = [
     reference: '2676',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1081,
-    variations: []
-  },
-  {
-    id: '7111',
-    name: 'TEE SHIRT HOMME TERRACOTA',
-    category: 'vetement',
-    ean13: '',
-    reference: '2676',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1082,
-    variations: []
-  },
-  {
-    id: '7111',
-    name: 'TEE SHIRT HOMME TERRACOTA',
-    category: 'vetement',
-    ean13: '',
-    reference: '2676',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1083,
-    variations: []
-  },
-  {
-    id: '7111',
-    name: 'TEE SHIRT HOMME TERRACOTA',
-    category: 'vetement',
-    ean13: '',
-    reference: '2676',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1084,
-    variations: []
+    position: 7111,
+    variations: [
+    {
+      id: '2805',
+      ean13: '2345678901234',
+      reference: '2676S',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2807',
+      ean13: '2447160423740',
+      reference: '2676L',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2806',
+      ean13: '2439173828261',
+      reference: '2676M',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2808',
+      ean13: '2652142893255',
+      reference: '2676XL',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '7112',
@@ -14388,10 +15184,12 @@ export const defaultProducts: Product[] = [
     reference: '890',
     wholesalePrice: 2,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 1085,
-    variations: []
+    position: 7112,
+    variations: [
+
+    ]
   },
   {
     id: '7113',
@@ -14401,10 +15199,12 @@ export const defaultProducts: Product[] = [
     reference: '1186',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1086,
-    variations: []
+    position: 7113,
+    variations: [
+
+    ]
   },
   {
     id: '7114',
@@ -14414,10 +15214,12 @@ export const defaultProducts: Product[] = [
     reference: '1314',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1087,
-    variations: []
+    position: 7114,
+    variations: [
+
+    ]
   },
   {
     id: '7115',
@@ -14427,23 +15229,27 @@ export const defaultProducts: Product[] = [
     reference: '1393',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1088,
-    variations: []
+    position: 7115,
+    variations: [
+
+    ]
   },
   {
     id: '7116',
     name: 'SAC PANIER GRASS',
     category: 'sac',
     ean13: '4470565315875',
-    reference: 'REF7116',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 1089,
-    variations: []
+    position: 7116,
+    variations: [
+
+    ]
   },
   {
     id: '7117',
@@ -14453,10 +15259,12 @@ export const defaultProducts: Product[] = [
     reference: '1413',
     wholesalePrice: 13,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1090,
-    variations: []
+    position: 7117,
+    variations: [
+
+    ]
   },
   {
     id: '7118',
@@ -14466,218 +15274,210 @@ export const defaultProducts: Product[] = [
     reference: '1397',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1091,
-    variations: []
+    position: 7118,
+    variations: [
+
+    ]
   },
   {
     id: '7125',
     name: 'PACK DUO PG TROPEZ',
     category: 'pack-verre',
     ean13: '2036984793629',
-    reference: 'REF7125',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 13,
-    crossedPrice: 14.3,
+    crossedPrice: 13,
     salesCount: 0,
-    position: 1092,
-    variations: []
+    position: 7125,
+    variations: [
+
+    ]
   },
   {
     id: '7127',
     name: 'PACK 6 FLUTES CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2004819023838',
-    reference: 'REF7127',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1093,
-    variations: []
+    position: 7127,
+    variations: [
+
+    ]
   },
   {
     id: '7128',
     name: 'TRIO 2 BK CANNES + 2 ICE TROPEZ PECHE',
     category: 'trio-pack',
     ean13: '2034515218962',
-    reference: 'REF7128',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 22,
-    crossedPrice: 24.200000000000003,
+    crossedPrice: 22,
     salesCount: 0,
-    position: 1094,
-    variations: []
+    position: 7128,
+    variations: [
+
+    ]
   },
   {
     id: '7129',
     name: 'TRIO 2 BK CANNES + 1 UP ROSE 37.5',
     category: 'trio-pack',
     ean13: '2005022553495',
-    reference: 'REF7129',
+    reference: '',
     wholesalePrice: 11,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 1095,
-    variations: []
+    position: 7129,
+    variations: [
+
+    ]
   },
   {
     id: '7130',
     name: 'SWEAT WHITE',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7130',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1096,
-    variations: []
-  },
-  {
-    id: '7130',
-    name: 'SWEAT WHITE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7130',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1097,
-    variations: []
-  },
-  {
-    id: '7130',
-    name: 'SWEAT WHITE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7130',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1098,
-    variations: []
-  },
-  {
-    id: '7130',
-    name: 'SWEAT WHITE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7130',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1099,
-    variations: []
+    position: 7130,
+    variations: [
+    {
+      id: '2819',
+      ean13: '2074772833591',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '2818',
+      ean13: '2044213345686',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '2817',
+      ean13: '1984802894632',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '2820',
+      ean13: '2127671193461',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 59
+    }
+    ]
   },
   {
     id: '7131',
     name: 'SWEAT BLUE',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7131',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1100,
-    variations: []
-  },
-  {
-    id: '7131',
-    name: 'SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7131',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1101,
-    variations: []
-  },
-  {
-    id: '7131',
-    name: 'SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7131',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1102,
-    variations: []
-  },
-  {
-    id: '7131',
-    name: 'SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7131',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1103,
-    variations: []
+    position: 7131,
+    variations: [
+    {
+      id: '2821',
+      ean13: '3180765472520',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '2824',
+      ean13: '3165102397674',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '2822',
+      ean13: '3202896893446',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '2823',
+      ean13: '3322819951555',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 59
+    }
+    ]
   },
   {
     id: '7132',
     name: 'TEE SHIRT HOMME DEGRADE BLEU',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7132',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1104,
-    variations: []
-  },
-  {
-    id: '7132',
-    name: 'TEE SHIRT HOMME DEGRADE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7132',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1105,
-    variations: []
-  },
-  {
-    id: '7132',
-    name: 'TEE SHIRT HOMME DEGRADE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7132',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1106,
-    variations: []
-  },
-  {
-    id: '7132',
-    name: 'TEE SHIRT HOMME DEGRADE BLEU',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7132',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1107,
-    variations: []
+    position: 7132,
+    variations: [
+    {
+      id: '2825',
+      ean13: '2658693756414',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2826',
+      ean13: '3084271575396',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2827',
+      ean13: '3105081104368',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '2828',
+      ean13: '3130540881702',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '7133',
@@ -14687,10 +15487,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 9,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1108,
-    variations: []
+    position: 7133,
+    variations: [
+
+    ]
   },
   {
     id: '7134',
@@ -14700,49 +15502,57 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 9,
     finalPrice: 19,
-    crossedPrice: 20.900000000000002,
+    crossedPrice: 19,
     salesCount: 0,
-    position: 1109,
-    variations: []
+    position: 7134,
+    variations: [
+
+    ]
   },
   {
     id: '7135',
     name: 'LIGHT TOWEL PANNEAU CANNES',
     category: 'serviette',
     ean13: '4017890123456',
-    reference: 'REF7135',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1110,
-    variations: []
+    position: 7135,
+    variations: [
+
+    ]
   },
   {
     id: '7136',
     name: 'BATHROOM TOWEL',
     category: 'serviette',
     ean13: '3336295650703',
-    reference: 'REF7136',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1111,
-    variations: []
+    position: 7136,
+    variations: [
+
+    ]
   },
   {
     id: '7138',
     name: 'COFFRET 6 VERRES ALPES MARITIMES',
     category: 'pack-verre',
     ean13: '3760333908769',
-    reference: 'REF7138',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 38,
-    crossedPrice: 41.800000000000004,
+    crossedPrice: 40,
     salesCount: 0,
-    position: 1112,
-    variations: []
+    position: 7138,
+    variations: [
+
+    ]
   },
   {
     id: '7140',
@@ -14752,10 +15562,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 15,
     finalPrice: 33,
-    crossedPrice: 36.300000000000004,
+    crossedPrice: 33,
     salesCount: 0,
-    position: 1113,
-    variations: []
+    position: 7140,
+    variations: [
+
+    ]
   },
   {
     id: '7141',
@@ -14765,10 +15577,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 15,
     finalPrice: 33,
-    crossedPrice: 36.300000000000004,
+    crossedPrice: 33,
     salesCount: 0,
-    position: 1114,
-    variations: []
+    position: 7141,
+    variations: [
+
+    ]
   },
   {
     id: '7143',
@@ -14778,10 +15592,12 @@ export const defaultProducts: Product[] = [
     reference: '53',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1115,
-    variations: []
+    position: 7143,
+    variations: [
+
+    ]
   },
   {
     id: '7144',
@@ -14791,10 +15607,12 @@ export const defaultProducts: Product[] = [
     reference: '1293',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1116,
-    variations: []
+    position: 7144,
+    variations: [
+
+    ]
   },
   {
     id: '7145',
@@ -14804,49 +15622,57 @@ export const defaultProducts: Product[] = [
     reference: '1370',
     wholesalePrice: 14,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1117,
-    variations: []
+    position: 7145,
+    variations: [
+
+    ]
   },
   {
     id: '7147',
     name: 'PACK 6 FLUTES CANNES',
     category: 'pack-verre',
     ean13: '2040438113123',
-    reference: 'REF7147',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1118,
-    variations: []
+    position: 7147,
+    variations: [
+
+    ]
   },
   {
     id: '7148',
     name: 'PACK 8 BK COULEUR 2025',
     category: 'pack-verre',
     ean13: '2095796211592',
-    reference: 'REF7148',
+    reference: '',
     wholesalePrice: 23,
     finalPrice: 65,
-    crossedPrice: 71.5,
+    crossedPrice: 68,
     salesCount: 0,
-    position: 1119,
-    variations: []
+    position: 7148,
+    variations: [
+
+    ]
   },
   {
     id: '7149',
     name: 'SAC CANVA 2024',
     category: 'sac',
     ean13: '4304296255905',
-    reference: 'REF7149',
+    reference: '',
     wholesalePrice: 21,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1120,
-    variations: []
+    position: 7149,
+    variations: [
+
+    ]
   },
   {
     id: '7150',
@@ -14856,88 +15682,102 @@ export const defaultProducts: Product[] = [
     reference: '2684 BIS',
     wholesalePrice: 17,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1121,
-    variations: []
+    position: 7150,
+    variations: [
+
+    ]
   },
   {
     id: '7152',
     name: 'VICTORIA + 10 VN 83',
     category: 'composition-vasque',
     ean13: '2086827886834',
-    reference: 'REF7152',
+    reference: '',
     wholesalePrice: 31,
     finalPrice: 99,
-    crossedPrice: 108.9,
+    crossedPrice: 120,
     salesCount: 0,
-    position: 1122,
-    variations: []
+    position: 7152,
+    variations: [
+
+    ]
   },
   {
     id: '7153',
     name: 'SEAU NICE TROPEZ +6 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2040025545139',
-    reference: 'REF7153',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1123,
-    variations: []
+    position: 7153,
+    variations: [
+
+    ]
   },
   {
     id: '7154',
     name: 'SEAU NICE CLEAR TROPEZ+ 6 VN TROPEZ CLEAR',
     category: 'composition-vasque',
     ean13: '2074932167993',
-    reference: 'REF7154',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1124,
-    variations: []
+    position: 7154,
+    variations: [
+
+    ]
   },
   {
     id: '7155',
     name: 'SOBAG  MAXIME + 6 VN VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2057085074691',
-    reference: 'REF7155',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1125,
-    variations: []
+    position: 7155,
+    variations: [
+
+    ]
   },
   {
     id: '7156',
     name: 'SOBAG CLEAR MAXIME + 6 VN 83 CLEAR',
     category: 'composition-vasque',
     ean13: '2035915687037',
-    reference: 'REF7156',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1126,
-    variations: []
+    position: 7156,
+    variations: [
+
+    ]
   },
   {
     id: '7157',
     name: 'COOL BAG SAUMON + ICE PEC + ICE EXO + FLUTE TRPZ + FLUTE MAX',
     category: 'pack-ice-bag',
     ean13: '2087988116747',
-    reference: 'REF7157',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1127,
-    variations: []
+    position: 7157,
+    variations: [
+
+    ]
   },
   {
     id: '7159',
@@ -14947,36 +15787,42 @@ export const defaultProducts: Product[] = [
     reference: 'CO 6',
     wholesalePrice: 12,
     finalPrice: 41,
-    crossedPrice: 45.1,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1128,
-    variations: []
+    position: 7159,
+    variations: [
+
+    ]
   },
   {
     id: '7160',
     name: 'COOL BAG GRAND + 6 BK VILLAGE 83',
     category: 'pack-ice-bag',
     ean13: '2008701370604',
-    reference: 'REF7160',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 53,
-    crossedPrice: 58.300000000000004,
+    crossedPrice: 58,
     salesCount: 0,
-    position: 1129,
-    variations: []
+    position: 7160,
+    variations: [
+
+    ]
   },
   {
     id: '7161',
     name: 'BIG FOLDING MAXIME AQUA',
     category: 'sac',
     ean13: '2050998513240',
-    reference: 'REF7161',
+    reference: '',
     wholesalePrice: 12,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1130,
-    variations: []
+    position: 7161,
+    variations: [
+
+    ]
   },
   {
     id: '7162',
@@ -14986,10 +15832,12 @@ export const defaultProducts: Product[] = [
     reference: '1563',
     wholesalePrice: 24,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1131,
-    variations: []
+    position: 7162,
+    variations: [
+
+    ]
   },
   {
     id: '7163',
@@ -14999,10 +15847,12 @@ export const defaultProducts: Product[] = [
     reference: '2684 BIS',
     wholesalePrice: 16,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1132,
-    variations: []
+    position: 7163,
+    variations: [
+
+    ]
   },
   {
     id: '7164',
@@ -15012,36 +15862,35 @@ export const defaultProducts: Product[] = [
     reference: '1287',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1133,
-    variations: []
-  },
-  {
-    id: '7164',
-    name: 'PORTE CLEF COEUR METAL MOVE CANNES',
-    category: 'porte-clef--bracelet',
-    ean13: '2003571699527',
-    reference: '1287',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 1134,
-    variations: []
-  },
-  {
-    id: '7164',
-    name: 'PORTE CLEF COEUR METAL MOVE CANNES',
-    category: 'porte-clef--bracelet',
-    ean13: '2003571699527',
-    reference: '1287',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 1135,
-    variations: []
+    position: 7164,
+    variations: [
+    {
+      id: '2853',
+      ean13: '1234568911280',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2852',
+      ean13: '173258714217',
+      reference: '',
+      attributes: 'ROSE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '2851',
+      ean13: '1295873465219',
+      reference: '',
+      attributes: 'MAUVE',
+      priceImpact: 0,
+      finalPrice: 10
+    }
+    ]
   },
   {
     id: '7165',
@@ -15051,10 +15900,12 @@ export const defaultProducts: Product[] = [
     reference: '2684 BIS',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1136,
-    variations: []
+    position: 7165,
+    variations: [
+
+    ]
   },
   {
     id: '7166',
@@ -15064,10 +15915,12 @@ export const defaultProducts: Product[] = [
     reference: '2684 BIS',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1137,
-    variations: []
+    position: 7166,
+    variations: [
+
+    ]
   },
   {
     id: '7167',
@@ -15077,10 +15930,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1138,
-    variations: []
+    position: 7167,
+    variations: [
+
+    ]
   },
   {
     id: '7168',
@@ -15090,10 +15945,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1139,
-    variations: []
+    position: 7168,
+    variations: [
+
+    ]
   },
   {
     id: '7169',
@@ -15103,10 +15960,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1140,
-    variations: []
+    position: 7169,
+    variations: [
+
+    ]
   },
   {
     id: '7170',
@@ -15116,10 +15975,12 @@ export const defaultProducts: Product[] = [
     reference: '1591',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1141,
-    variations: []
+    position: 7170,
+    variations: [
+
+    ]
   },
   {
     id: '7171',
@@ -15129,10 +15990,12 @@ export const defaultProducts: Product[] = [
     reference: '1591',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1142,
-    variations: []
+    position: 7171,
+    variations: [
+
+    ]
   },
   {
     id: '7172',
@@ -15142,10 +16005,12 @@ export const defaultProducts: Product[] = [
     reference: '1262',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1143,
-    variations: []
+    position: 7172,
+    variations: [
+
+    ]
   },
   {
     id: '7174',
@@ -15155,10 +16020,12 @@ export const defaultProducts: Product[] = [
     reference: '1591',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1144,
-    variations: []
+    position: 7174,
+    variations: [
+
+    ]
   },
   {
     id: '7175',
@@ -15168,10 +16035,12 @@ export const defaultProducts: Product[] = [
     reference: '1591',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1145,
-    variations: []
+    position: 7175,
+    variations: [
+
+    ]
   },
   {
     id: '7176',
@@ -15181,10 +16050,12 @@ export const defaultProducts: Product[] = [
     reference: '1591',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1146,
-    variations: []
+    position: 7176,
+    variations: [
+
+    ]
   },
   {
     id: '7177',
@@ -15194,10 +16065,12 @@ export const defaultProducts: Product[] = [
     reference: '2684 BIS',
     wholesalePrice: 16,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1147,
-    variations: []
+    position: 7177,
+    variations: [
+
+    ]
   },
   {
     id: '7178',
@@ -15207,10 +16080,12 @@ export const defaultProducts: Product[] = [
     reference: '9201',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1148,
-    variations: []
+    position: 7178,
+    variations: [
+
+    ]
   },
   {
     id: '7179',
@@ -15220,10 +16095,12 @@ export const defaultProducts: Product[] = [
     reference: '9202',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1149,
-    variations: []
+    position: 7179,
+    variations: [
+
+    ]
   },
   {
     id: '7181',
@@ -15233,10 +16110,12 @@ export const defaultProducts: Product[] = [
     reference: '9203',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1150,
-    variations: []
+    position: 7181,
+    variations: [
+
+    ]
   },
   {
     id: '7182',
@@ -15246,10 +16125,12 @@ export const defaultProducts: Product[] = [
     reference: '9203',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1151,
-    variations: []
+    position: 7182,
+    variations: [
+
+    ]
   },
   {
     id: '7187',
@@ -15259,10 +16140,12 @@ export const defaultProducts: Product[] = [
     reference: '9206',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1152,
-    variations: []
+    position: 7187,
+    variations: [
+
+    ]
   },
   {
     id: '7188',
@@ -15272,10 +16155,12 @@ export const defaultProducts: Product[] = [
     reference: '9207',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1153,
-    variations: []
+    position: 7188,
+    variations: [
+
+    ]
   },
   {
     id: '7189',
@@ -15285,10 +16170,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1154,
-    variations: []
+    position: 7189,
+    variations: [
+
+    ]
   },
   {
     id: '7190',
@@ -15298,10 +16185,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1155,
-    variations: []
+    position: 7190,
+    variations: [
+
+    ]
   },
   {
     id: '7191',
@@ -15311,10 +16200,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1156,
-    variations: []
+    position: 7191,
+    variations: [
+
+    ]
   },
   {
     id: '7192',
@@ -15324,10 +16215,12 @@ export const defaultProducts: Product[] = [
     reference: '1360',
     wholesalePrice: 19,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 1157,
-    variations: []
+    position: 7192,
+    variations: [
+
+    ]
   },
   {
     id: '7193',
@@ -15337,10 +16230,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1158,
-    variations: []
+    position: 7193,
+    variations: [
+
+    ]
   },
   {
     id: '7194',
@@ -15350,10 +16245,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1159,
-    variations: []
+    position: 7194,
+    variations: [
+
+    ]
   },
   {
     id: '7195',
@@ -15363,10 +16260,12 @@ export const defaultProducts: Product[] = [
     reference: '1002',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1160,
-    variations: []
+    position: 7195,
+    variations: [
+
+    ]
   },
   {
     id: '7196',
@@ -15376,10 +16275,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1161,
-    variations: []
+    position: 7196,
+    variations: [
+
+    ]
   },
   {
     id: '7197',
@@ -15389,10 +16290,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1162,
-    variations: []
+    position: 7197,
+    variations: [
+
+    ]
   },
   {
     id: '7198',
@@ -15402,10 +16305,12 @@ export const defaultProducts: Product[] = [
     reference: '1301',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1163,
-    variations: []
+    position: 7198,
+    variations: [
+
+    ]
   },
   {
     id: '7199',
@@ -15415,10 +16320,12 @@ export const defaultProducts: Product[] = [
     reference: '1213',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1164,
-    variations: []
+    position: 7199,
+    variations: [
+
+    ]
   },
   {
     id: '7200',
@@ -15428,10 +16335,12 @@ export const defaultProducts: Product[] = [
     reference: '1392',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1165,
-    variations: []
+    position: 7200,
+    variations: [
+
+    ]
   },
   {
     id: '7201',
@@ -15441,10 +16350,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1166,
-    variations: []
+    position: 7201,
+    variations: [
+
+    ]
   },
   {
     id: '7202',
@@ -15454,10 +16365,12 @@ export const defaultProducts: Product[] = [
     reference: '1000',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1167,
-    variations: []
+    position: 7202,
+    variations: [
+
+    ]
   },
   {
     id: '7203',
@@ -15467,10 +16380,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1168,
-    variations: []
+    position: 7203,
+    variations: [
+
+    ]
   },
   {
     id: '7204',
@@ -15480,10 +16395,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 26,
     finalPrice: 44,
-    crossedPrice: 48.400000000000006,
+    crossedPrice: 44,
     salesCount: 0,
-    position: 1169,
-    variations: []
+    position: 7204,
+    variations: [
+
+    ]
   },
   {
     id: '7205',
@@ -15493,10 +16410,12 @@ export const defaultProducts: Product[] = [
     reference: '1179',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1170,
-    variations: []
+    position: 7205,
+    variations: [
+
+    ]
   },
   {
     id: '7206',
@@ -15506,10 +16425,12 @@ export const defaultProducts: Product[] = [
     reference: '1524',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 1171,
-    variations: []
+    position: 7206,
+    variations: [
+
+    ]
   },
   {
     id: '7207',
@@ -15519,10 +16440,12 @@ export const defaultProducts: Product[] = [
     reference: '991',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1172,
-    variations: []
+    position: 7207,
+    variations: [
+
+    ]
   },
   {
     id: '7209',
@@ -15532,23 +16455,27 @@ export const defaultProducts: Product[] = [
     reference: '711',
     wholesalePrice: 22,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 1173,
-    variations: []
+    position: 7209,
+    variations: [
+
+    ]
   },
   {
     id: '7211',
     name: 'BEACH TW BLUE JEANS NEW',
     category: 'serviette',
     ean13: '2027035704848',
-    reference: 'REF7211',
+    reference: '',
     wholesalePrice: 23,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 1174,
-    variations: []
+    position: 7211,
+    variations: [
+
+    ]
   },
   {
     id: '7212',
@@ -15558,10 +16485,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 1175,
-    variations: []
+    position: 7212,
+    variations: [
+
+    ]
   },
   {
     id: '7213',
@@ -15571,10 +16500,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1176,
-    variations: []
+    position: 7213,
+    variations: [
+
+    ]
   },
   {
     id: '7214',
@@ -15584,10 +16515,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1177,
-    variations: []
+    position: 7214,
+    variations: [
+
+    ]
   },
   {
     id: '7215',
@@ -15597,23 +16530,27 @@ export const defaultProducts: Product[] = [
     reference: '921',
     wholesalePrice: 75,
     finalPrice: 112,
-    crossedPrice: 123.20000000000002,
+    crossedPrice: 112,
     salesCount: 0,
-    position: 1178,
-    variations: []
+    position: 7215,
+    variations: [
+
+    ]
   },
   {
     id: '7216',
     name: 'PORTE CLEF BARRE GOUVERNAIL',
     category: 'porte-clef--bracelet',
     ean13: '2041623371809',
-    reference: 'REF7216',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1179,
-    variations: []
+    position: 7216,
+    variations: [
+
+    ]
   },
   {
     id: '7217',
@@ -15623,23 +16560,27 @@ export const defaultProducts: Product[] = [
     reference: '1210',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1180,
-    variations: []
+    position: 7217,
+    variations: [
+
+    ]
   },
   {
     id: '7218',
     name: 'PORTE CLEF COINS CADDY',
     category: 'porte-clef--bracelet',
     ean13: '2043103364578',
-    reference: 'REF7218',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1181,
-    variations: []
+    position: 7218,
+    variations: [
+
+    ]
   },
   {
     id: '7219',
@@ -15649,10 +16590,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 12,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1182,
-    variations: []
+    position: 7219,
+    variations: [
+
+    ]
   },
   {
     id: '7220',
@@ -15662,166 +16605,192 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 12,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1183,
-    variations: []
+    position: 7220,
+    variations: [
+
+    ]
   },
   {
     id: '7221',
     name: 'SOBAG CLEAR PG + 6 VN 83 CLEAR',
     category: 'composition-vasque',
     ean13: '2005527568314',
-    reference: 'REF7221',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1184,
-    variations: []
+    position: 7221,
+    variations: [
+
+    ]
   },
   {
     id: '7222',
     name: 'SEAU 1BT VELA TROPEZ + 6 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2093819555883',
-    reference: 'REF7222',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1185,
-    variations: []
+    position: 7222,
+    variations: [
+
+    ]
   },
   {
     id: '7229',
     name: 'TRIO OURSON ROSE + CASQUETTE GLITTER ENFANT',
     category: 'trio-pack',
     ean13: '2038538879261',
-    reference: 'REF7229',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 33,
-    crossedPrice: 36.300000000000004,
+    crossedPrice: 33,
     salesCount: 0,
-    position: 1186,
-    variations: []
+    position: 7229,
+    variations: [
+
+    ]
   },
   {
     id: '7230',
     name: 'TRIO OURSON BLEU + CASQUETTE PANO ENFANT',
     category: 'trio-pack',
     ean13: '2030449740326',
-    reference: 'REF7230',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 33,
-    crossedPrice: 36.300000000000004,
+    crossedPrice: 33,
     salesCount: 0,
-    position: 1187,
-    variations: []
+    position: 7230,
+    variations: [
+
+    ]
   },
   {
     id: '7237',
     name: 'TRIO PASTIS CITADELLE GIVRE 1212',
     category: 'trio-pack',
     ean13: '2087404316270',
-    reference: 'REF7237',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 43,
-    crossedPrice: 47.300000000000004,
+    crossedPrice: 43,
     salesCount: 0,
-    position: 1188,
-    variations: []
+    position: 7237,
+    variations: [
+
+    ]
   },
   {
     id: '7238',
     name: 'PACK 6 VERTICAL TROPEZ',
     category: 'pack-verre',
     ean13: '2016487697457',
-    reference: 'REF7238',
+    reference: '',
     wholesalePrice: 26,
     finalPrice: 68,
-    crossedPrice: 74.80000000000001,
+    crossedPrice: 72,
     salesCount: 0,
-    position: 1189,
-    variations: []
+    position: 7238,
+    variations: [
+
+    ]
   },
   {
     id: '7239',
     name: 'PACK 6 VERTICAL CLEAR TROPEZ',
     category: 'pack-verre',
     ean13: '2065987493328',
-    reference: 'REF7239',
+    reference: '',
     wholesalePrice: 26,
     finalPrice: 68,
-    crossedPrice: 74.80000000000001,
+    crossedPrice: 72,
     salesCount: 0,
-    position: 1190,
-    variations: []
+    position: 7239,
+    variations: [
+
+    ]
   },
   {
     id: '7240',
     name: 'VASQUE VELA BLC + 2 PACK 6 BK COULEUR NEW',
     category: 'composition-vasque',
     ean13: '2011505810665',
-    reference: 'REF7240',
+    reference: '',
     wholesalePrice: 51,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 161,
     salesCount: 0,
-    position: 1191,
-    variations: []
+    position: 7240,
+    variations: [
+
+    ]
   },
   {
     id: '7241',
     name: 'SEAU 2BT VELA  TROPEZ + 6 BK COULEUR NEW',
     category: 'composition-vasque',
     ean13: '2080964690002',
-    reference: 'REF7241',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1192,
-    variations: []
+    position: 7241,
+    variations: [
+
+    ]
   },
   {
     id: '7242',
     name: 'VASQUE VELA  BLC + 6 AIR BEACH BLC + 6 CROISIERES BLC',
     category: 'composition-vasque',
     ean13: '2001453794759',
-    reference: 'REF7242',
+    reference: '',
     wholesalePrice: 44,
     finalPrice: 209,
-    crossedPrice: 229.9,
+    crossedPrice: 230,
     salesCount: 0,
-    position: 1193,
-    variations: []
+    position: 7242,
+    variations: [
+
+    ]
   },
   {
     id: '7243',
     name: 'SEAU 1BT VELA MAXIME + 6 VN MAXIME',
     category: 'composition-vasque',
     ean13: '2063651066311',
-    reference: 'REF7243',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1194,
-    variations: []
+    position: 7243,
+    variations: [
+
+    ]
   },
   {
     id: '7244',
     name: 'COOL BAG BIG + 12 ICE TROPEZ PECHE',
     category: 'pack-ice-bag',
     ean13: '2010427847230',
-    reference: 'REF7244',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1195,
-    variations: []
+    position: 7244,
+    variations: [
+
+    ]
   },
   {
     id: '7246',
@@ -15831,10 +16800,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1196,
-    variations: []
+    position: 7246,
+    variations: [
+
+    ]
   },
   {
     id: '7247',
@@ -15844,10 +16815,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1197,
-    variations: []
+    position: 7247,
+    variations: [
+
+    ]
   },
   {
     id: '7248',
@@ -15859,8 +16832,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1198,
-    variations: []
+    position: 7248,
+    variations: [
+
+    ]
   },
   {
     id: '7249',
@@ -15870,10 +16845,12 @@ export const defaultProducts: Product[] = [
     reference: '711',
     wholesalePrice: 55,
     finalPrice: 99,
-    crossedPrice: 108.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 1199,
-    variations: []
+    position: 7249,
+    variations: [
+
+    ]
   },
   {
     id: '7250',
@@ -15883,10 +16860,12 @@ export const defaultProducts: Product[] = [
     reference: '713',
     wholesalePrice: 144,
     finalPrice: 280,
-    crossedPrice: 308,
+    crossedPrice: 280,
     salesCount: 0,
-    position: 1200,
-    variations: []
+    position: 7250,
+    variations: [
+
+    ]
   },
   {
     id: '7252',
@@ -15896,10 +16875,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 10,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1201,
-    variations: []
+    position: 7252,
+    variations: [
+
+    ]
   },
   {
     id: '7253',
@@ -15909,10 +16890,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1202,
-    variations: []
+    position: 7253,
+    variations: [
+
+    ]
   },
   {
     id: '7254',
@@ -15922,10 +16905,12 @@ export const defaultProducts: Product[] = [
     reference: '1108',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1203,
-    variations: []
+    position: 7254,
+    variations: [
+
+    ]
   },
   {
     id: '7256',
@@ -15935,10 +16920,12 @@ export const defaultProducts: Product[] = [
     reference: '1108',
     wholesalePrice: 2,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1204,
-    variations: []
+    position: 7256,
+    variations: [
+
+    ]
   },
   {
     id: '7257',
@@ -15948,10 +16935,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1205,
-    variations: []
+    position: 7257,
+    variations: [
+
+    ]
   },
   {
     id: '7259',
@@ -15961,10 +16950,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1206,
-    variations: []
+    position: 7259,
+    variations: [
+
+    ]
   },
   {
     id: '7265',
@@ -15974,10 +16965,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1207,
-    variations: []
+    position: 7265,
+    variations: [
+
+    ]
   },
   {
     id: '7271',
@@ -15987,10 +16980,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1208,
-    variations: []
+    position: 7271,
+    variations: [
+
+    ]
   },
   {
     id: '7277',
@@ -16000,23 +16995,27 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1209,
-    variations: []
+    position: 7277,
+    variations: [
+
+    ]
   },
   {
     id: '7283',
     name: 'SAC FERRET BEIGE',
     category: 'sac',
     ean13: '2053642246938',
-    reference: 'REF7283',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1210,
-    variations: []
+    position: 7283,
+    variations: [
+
+    ]
   },
   {
     id: '7289',
@@ -16026,10 +17025,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1211,
-    variations: []
+    position: 7289,
+    variations: [
+
+    ]
   },
   {
     id: '7295',
@@ -16039,10 +17040,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1212,
-    variations: []
+    position: 7295,
+    variations: [
+
+    ]
   },
   {
     id: '7301',
@@ -16052,10 +17055,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1213,
-    variations: []
+    position: 7301,
+    variations: [
+
+    ]
   },
   {
     id: '7307',
@@ -16065,10 +17070,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 5,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1214,
-    variations: []
+    position: 7307,
+    variations: [
+
+    ]
   },
   {
     id: '7313',
@@ -16078,10 +17085,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 5,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1215,
-    variations: []
+    position: 7313,
+    variations: [
+
+    ]
   },
   {
     id: '7319',
@@ -16091,10 +17100,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 5,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1216,
-    variations: []
+    position: 7319,
+    variations: [
+
+    ]
   },
   {
     id: '7325',
@@ -16104,10 +17115,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1217,
-    variations: []
+    position: 7325,
+    variations: [
+
+    ]
   },
   {
     id: '7331',
@@ -16117,10 +17130,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1218,
-    variations: []
+    position: 7331,
+    variations: [
+
+    ]
   },
   {
     id: '7337',
@@ -16130,10 +17145,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1219,
-    variations: []
+    position: 7337,
+    variations: [
+
+    ]
   },
   {
     id: '7343',
@@ -16143,49 +17160,57 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 1220,
-    variations: []
+    position: 7343,
+    variations: [
+
+    ]
   },
   {
     id: '7361',
     name: 'SAC BIG NAVY BLEU',
     category: 'sac',
     ean13: '2066202668682',
-    reference: 'REF7361',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1221,
-    variations: []
+    position: 7361,
+    variations: [
+
+    ]
   },
   {
     id: '7379',
     name: 'CANVA ORIGIN',
     category: 'sac',
     ean13: '2042917784565',
-    reference: 'REF7379',
+    reference: '',
     wholesalePrice: 12,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 1222,
-    variations: []
+    position: 7379,
+    variations: [
+
+    ]
   },
   {
     id: '7385',
     name: 'SAC TOILE JUTE KISSARIA',
     category: 'sac',
     ean13: '2034070484420',
-    reference: 'REF7385',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 49,
     salesCount: 0,
-    position: 1223,
-    variations: []
+    position: 7385,
+    variations: [
+
+    ]
   },
   {
     id: '7397',
@@ -16195,10 +17220,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1224,
-    variations: []
+    position: 7397,
+    variations: [
+
+    ]
   },
   {
     id: '7403',
@@ -16208,36 +17235,35 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 1225,
-    variations: []
-  },
-  {
-    id: '7403',
-    name: 'MUG CERAMIQUE + CUILLERE',
-    category: 'verre',
-    ean13: '4580412896355',
-    reference: 'Z',
-    wholesalePrice: 4,
-    finalPrice: 14,
-    crossedPrice: 15.400000000000002,
-    salesCount: 0,
-    position: 1226,
-    variations: []
-  },
-  {
-    id: '7403',
-    name: 'MUG CERAMIQUE + CUILLERE',
-    category: 'verre',
-    ean13: '4580412896355',
-    reference: 'Z',
-    wholesalePrice: 4,
-    finalPrice: 14,
-    crossedPrice: 15.400000000000002,
-    salesCount: 0,
-    position: 1227,
-    variations: []
+    position: 7403,
+    variations: [
+    {
+      id: '3246',
+      ean13: '',
+      reference: '',
+      attributes: 'ROSE',
+      priceImpact: 0,
+      finalPrice: 14
+    },
+    {
+      id: '3247',
+      ean13: '',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 0,
+      finalPrice: 14
+    },
+    {
+      id: '3248',
+      ean13: '',
+      reference: '',
+      attributes: 'BEIGE',
+      priceImpact: 0,
+      finalPrice: 14
+    }
+    ]
   },
   {
     id: '7409',
@@ -16247,10 +17273,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1228,
-    variations: []
+    position: 7409,
+    variations: [
+
+    ]
   },
   {
     id: '7415',
@@ -16260,10 +17288,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1229,
-    variations: []
+    position: 7415,
+    variations: [
+
+    ]
   },
   {
     id: '7421',
@@ -16273,10 +17303,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1230,
-    variations: []
+    position: 7421,
+    variations: [
+
+    ]
   },
   {
     id: '7427',
@@ -16286,10 +17318,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1231,
-    variations: []
+    position: 7427,
+    variations: [
+
+    ]
   },
   {
     id: '7451',
@@ -16299,10 +17333,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1232,
-    variations: []
+    position: 7451,
+    variations: [
+
+    ]
   },
   {
     id: '7457',
@@ -16312,10 +17348,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 13,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1233,
-    variations: []
+    position: 7457,
+    variations: [
+
+    ]
   },
   {
     id: '7469',
@@ -16325,10 +17363,12 @@ export const defaultProducts: Product[] = [
     reference: '66',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1234,
-    variations: []
+    position: 7469,
+    variations: [
+
+    ]
   },
   {
     id: '7470',
@@ -16338,10 +17378,12 @@ export const defaultProducts: Product[] = [
     reference: '23',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1235,
-    variations: []
+    position: 7470,
+    variations: [
+
+    ]
   },
   {
     id: '7472',
@@ -16351,10 +17393,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1236,
-    variations: []
+    position: 7472,
+    variations: [
+
+    ]
   },
   {
     id: '7473',
@@ -16364,10 +17408,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1237,
-    variations: []
+    position: 7473,
+    variations: [
+
+    ]
   },
   {
     id: '7474',
@@ -16377,23 +17423,27 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1238,
-    variations: []
+    position: 7474,
+    variations: [
+
+    ]
   },
   {
     id: '7475',
     name: 'PACK 6 BK CLEAR CANNES',
     category: 'pack-verre',
     ean13: '2046927750961',
-    reference: 'REF7475',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1239,
-    variations: []
+    position: 7475,
+    variations: [
+
+    ]
   },
   {
     id: '7477',
@@ -16403,10 +17453,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1240,
-    variations: []
+    position: 7477,
+    variations: [
+
+    ]
   },
   {
     id: '7478',
@@ -16416,10 +17468,12 @@ export const defaultProducts: Product[] = [
     reference: '993',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1241,
-    variations: []
+    position: 7478,
+    variations: [
+
+    ]
   },
   {
     id: '7479',
@@ -16429,23 +17483,27 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1242,
-    variations: []
+    position: 7479,
+    variations: [
+
+    ]
   },
   {
     id: '7482',
     name: 'PORTE CLEF PLAQUE VILLAGE',
     category: 'porte-clef--bracelet',
     ean13: '2046460768393',
-    reference: 'REF7482',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1243,
-    variations: []
+    position: 7482,
+    variations: [
+
+    ]
   },
   {
     id: '7483',
@@ -16455,10 +17513,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1244,
-    variations: []
+    position: 7483,
+    variations: [
+
+    ]
   },
   {
     id: '7484',
@@ -16468,23 +17528,27 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1245,
-    variations: []
+    position: 7484,
+    variations: [
+
+    ]
   },
   {
     id: '7485',
     name: 'COOL BAG 1BT Kdo + ICE PEC + ICE EXO + FLUTE TRPZ + FLUTE MAX',
     category: 'pack-ice-bag',
     ean13: '2087988116747',
-    reference: 'REF7485',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1246,
-    variations: []
+    position: 7485,
+    variations: [
+
+    ]
   },
   {
     id: '7487',
@@ -16494,23 +17558,27 @@ export const defaultProducts: Product[] = [
     reference: 'PA 10',
     wholesalePrice: 15,
     finalPrice: 62,
-    crossedPrice: 68.2,
+    crossedPrice: 65,
     salesCount: 0,
-    position: 1247,
-    variations: []
+    position: 7487,
+    variations: [
+
+    ]
   },
   {
     id: '7498',
     name: 'PACK 6 BK VILLAGE 06 BIS SS CAV',
     category: 'pack-verre',
     ean13: '2014212608648',
-    reference: 'REF7498',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1248,
-    variations: []
+    position: 7498,
+    variations: [
+
+    ]
   },
   {
     id: '7505',
@@ -16520,10 +17588,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1249,
-    variations: []
+    position: 7505,
+    variations: [
+
+    ]
   },
   {
     id: '7506',
@@ -16533,10 +17603,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 20,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1250,
-    variations: []
+    position: 7506,
+    variations: [
+
+    ]
   },
   {
     id: '7507',
@@ -16546,10 +17618,12 @@ export const defaultProducts: Product[] = [
     reference: '2772',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1251,
-    variations: []
+    position: 7507,
+    variations: [
+
+    ]
   },
   {
     id: '7508',
@@ -16559,10 +17633,12 @@ export const defaultProducts: Product[] = [
     reference: '2770',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1252,
-    variations: []
+    position: 7508,
+    variations: [
+
+    ]
   },
   {
     id: '7509',
@@ -16572,10 +17648,12 @@ export const defaultProducts: Product[] = [
     reference: '2771',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1253,
-    variations: []
+    position: 7509,
+    variations: [
+
+    ]
   },
   {
     id: '7510',
@@ -16585,10 +17663,12 @@ export const defaultProducts: Product[] = [
     reference: '2762',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1254,
-    variations: []
+    position: 7510,
+    variations: [
+
+    ]
   },
   {
     id: '7511',
@@ -16598,10 +17678,12 @@ export const defaultProducts: Product[] = [
     reference: '2761',
     wholesalePrice: 2,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 1255,
-    variations: []
+    position: 7511,
+    variations: [
+
+    ]
   },
   {
     id: '7512',
@@ -16611,10 +17693,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1256,
-    variations: []
+    position: 7512,
+    variations: [
+
+    ]
   },
   {
     id: '7513',
@@ -16624,10 +17708,12 @@ export const defaultProducts: Product[] = [
     reference: '2762',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1257,
-    variations: []
+    position: 7513,
+    variations: [
+
+    ]
   },
   {
     id: '7514',
@@ -16639,8 +17725,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1258,
-    variations: []
+    position: 7514,
+    variations: [
+
+    ]
   },
   {
     id: '7515',
@@ -16652,8 +17740,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1259,
-    variations: []
+    position: 7515,
+    variations: [
+
+    ]
   },
   {
     id: '7516',
@@ -16665,151 +17755,175 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1260,
-    variations: []
+    position: 7516,
+    variations: [
+
+    ]
   },
   {
     id: '7517',
     name: 'TOWEL BAG',
     category: 'sac',
     ean13: '',
-    reference: 'REF7517',
+    reference: '',
     wholesalePrice: 13,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1261,
-    variations: []
+    position: 7517,
+    variations: [
+
+    ]
   },
   {
     id: '7518',
     name: 'TRIO 2 ICE PECHE  TROPEZ/TROPEZ',
     category: 'trio-pack',
     ean13: '2004668492786',
-    reference: 'REF7518',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1262,
-    variations: []
+    position: 7518,
+    variations: [
+
+    ]
   },
   {
     id: '7519',
     name: 'TRIO UP CAVALAIRE/TROPEZ',
     category: 'trio-pack',
     ean13: '2003305139695',
-    reference: 'REF7519',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 27,
-    crossedPrice: 29.700000000000003,
+    crossedPrice: 27,
     salesCount: 0,
-    position: 1263,
-    variations: []
+    position: 7519,
+    variations: [
+
+    ]
   },
   {
     id: '7520',
     name: 'TRIO 2 ICE PECHE  CAVALAIRE/TROPEZ',
     category: 'trio-pack',
     ean13: '2033526925234',
-    reference: 'REF7520',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1264,
-    variations: []
+    position: 7520,
+    variations: [
+
+    ]
   },
   {
     id: '7521',
     name: 'TRIO UP TROPEZ/TROPEZ',
     category: 'trio-pack',
     ean13: '2055605509388',
-    reference: 'REF7521',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 27,
-    crossedPrice: 29.700000000000003,
+    crossedPrice: 27,
     salesCount: 0,
-    position: 1265,
-    variations: []
+    position: 7521,
+    variations: [
+
+    ]
   },
   {
     id: '7522',
     name: 'TRIO 2 ICE PECHE  CANNES/TROPEZ',
     category: 'trio-pack',
     ean13: '2040134218054',
-    reference: 'REF7522',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1266,
-    variations: []
+    position: 7522,
+    variations: [
+
+    ]
   },
   {
     id: '7523',
     name: 'TRIO UP CANNES/TROPEZ',
     category: 'trio-pack',
     ean13: '2030181956269',
-    reference: 'REF7523',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 27,
-    crossedPrice: 29.700000000000003,
+    crossedPrice: 27,
     salesCount: 0,
-    position: 1267,
-    variations: []
+    position: 7523,
+    variations: [
+
+    ]
   },
   {
     id: '7524',
     name: 'TRIO UP MAXIME/TROPEZ',
     category: 'trio-pack',
     ean13: '2057699789608',
-    reference: 'REF7524',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 27,
-    crossedPrice: 29.700000000000003,
+    crossedPrice: 27,
     salesCount: 0,
-    position: 1268,
-    variations: []
+    position: 7524,
+    variations: [
+
+    ]
   },
   {
     id: '7526',
     name: 'TRIO 2 ICE PECHE  MAXIME/TROPEZ',
     category: 'trio-pack',
     ean13: '2032975348878',
-    reference: 'REF7526',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1269,
-    variations: []
+    position: 7526,
+    variations: [
+
+    ]
   },
   {
     id: '7527',
     name: 'TRIO UP GRIMAUD/TROPEZ',
     category: 'trio-pack',
     ean13: '2018306829162',
-    reference: 'REF7527',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 27,
-    crossedPrice: 29.700000000000003,
+    crossedPrice: 27,
     salesCount: 0,
-    position: 1270,
-    variations: []
+    position: 7527,
+    variations: [
+
+    ]
   },
   {
     id: '7528',
     name: 'TRIO 2 ICE PECHE  GRIMAUD/TROPEZ',
     category: 'trio-pack',
     ean13: '2045259833199',
-    reference: 'REF7528',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1271,
-    variations: []
+    position: 7528,
+    variations: [
+
+    ]
   },
   {
     id: '7529',
@@ -16819,10 +17933,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 2,
     finalPrice: 3,
-    crossedPrice: 3.3000000000000003,
+    crossedPrice: 3,
     salesCount: 0,
-    position: 1272,
-    variations: []
+    position: 7529,
+    variations: [
+
+    ]
   },
   {
     id: '7530',
@@ -16832,10 +17948,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 33,
     finalPrice: 40,
-    crossedPrice: 44,
+    crossedPrice: 40,
     salesCount: 0,
-    position: 1273,
-    variations: []
+    position: 7530,
+    variations: [
+
+    ]
   },
   {
     id: '7531',
@@ -16845,10 +17963,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1274,
-    variations: []
+    position: 7531,
+    variations: [
+
+    ]
   },
   {
     id: '7532',
@@ -16860,8 +17980,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1275,
-    variations: []
+    position: 7532,
+    variations: [
+
+    ]
   },
   {
     id: '7534',
@@ -16871,23 +17993,27 @@ export const defaultProducts: Product[] = [
     reference: '1262',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1276,
-    variations: []
+    position: 7534,
+    variations: [
+
+    ]
   },
   {
     id: '7535',
     name: 'PORTE CLEF SCOOTER',
     category: 'porte-clef--bracelet',
     ean13: '2041438598057',
-    reference: 'REF7535',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1277,
-    variations: []
+    position: 7535,
+    variations: [
+
+    ]
   },
   {
     id: '7536',
@@ -16897,23 +18023,27 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 6,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 1278,
-    variations: []
+    position: 7536,
+    variations: [
+
+    ]
   },
   {
     id: '7537',
     name: 'SAC  EPONGE TERACCOTA',
     category: 'sac',
     ean13: '',
-    reference: 'REF7537',
+    reference: '',
     wholesalePrice: 13,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1279,
-    variations: []
+    position: 7537,
+    variations: [
+
+    ]
   },
   {
     id: '7538',
@@ -16923,10 +18053,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1280,
-    variations: []
+    position: 7538,
+    variations: [
+
+    ]
   },
   {
     id: '7539',
@@ -16936,10 +18068,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 8,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1281,
-    variations: []
+    position: 7539,
+    variations: [
+
+    ]
   },
   {
     id: '7540',
@@ -16949,23 +18083,27 @@ export const defaultProducts: Product[] = [
     reference: 'PACK',
     wholesalePrice: 11,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 52,
     salesCount: 0,
-    position: 1282,
-    variations: []
+    position: 7540,
+    variations: [
+
+    ]
   },
   {
     id: '7541',
     name: 'PACK 4+4 VN/FLUTE 06',
     category: 'pack-verre',
     ean13: '2078449233387',
-    reference: 'REF7541',
+    reference: '',
     wholesalePrice: 11,
     finalPrice: 49,
-    crossedPrice: 53.900000000000006,
+    crossedPrice: 52,
     salesCount: 0,
-    position: 1283,
-    variations: []
+    position: 7541,
+    variations: [
+
+    ]
   },
   {
     id: '7543',
@@ -16977,8 +18115,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1284,
-    variations: []
+    position: 7543,
+    variations: [
+
+    ]
   },
   {
     id: '7544',
@@ -16988,10 +18128,12 @@ export const defaultProducts: Product[] = [
     reference: '480',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1285,
-    variations: []
+    position: 7544,
+    variations: [
+
+    ]
   },
   {
     id: '7545',
@@ -17001,10 +18143,12 @@ export const defaultProducts: Product[] = [
     reference: '1160',
     wholesalePrice: 6,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1286,
-    variations: []
+    position: 7545,
+    variations: [
+
+    ]
   },
   {
     id: '7546',
@@ -17014,62 +18158,79 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 100,
     finalPrice: 100,
-    crossedPrice: 110.00000000000001,
+    crossedPrice: 100,
     salesCount: 0,
-    position: 1287,
-    variations: []
+    position: 7546,
+    variations: [
+    {
+      id: '3041',
+      ean13: '',
+      reference: '',
+      attributes: '',
+      priceImpact: 0,
+      finalPrice: 100
+    }
+    ]
   },
   {
     id: '7548',
     name: 'TRIO 1 BLONDE + 2 FLUTES BLANC BLONDE',
     category: 'trio-pack',
     ean13: '2015730159100',
-    reference: 'REF7548',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1288,
-    variations: []
+    position: 7548,
+    variations: [
+
+    ]
   },
   {
     id: '7549',
     name: 'SOBAG  TROPEZ + 6 BK COULEUR NEW',
     category: 'composition-vasque',
     ean13: '2092946991205',
-    reference: 'REF7549',
+    reference: '',
     wholesalePrice: 28,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1289,
-    variations: []
+    position: 7549,
+    variations: [
+
+    ]
   },
   {
     id: '7550',
     name: 'VICTORIA TROPEZ + 8 BK TROPEZ',
     category: 'composition-vasque',
     ean13: '2016296476137',
-    reference: 'REF7550',
+    reference: '',
     wholesalePrice: 38,
     finalPrice: 105,
-    crossedPrice: 115.50000000000001,
+    crossedPrice: 123,
     salesCount: 0,
-    position: 1290,
-    variations: []
+    position: 7550,
+    variations: [
+
+    ]
   },
   {
     id: '7551',
     name: 'VASQUE VELA  + 8 AIR BEACH TROPEZ',
     category: 'composition-vasque',
     ean13: '2019312313492',
-    reference: 'REF7551',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 119,
-    crossedPrice: 130.9,
+    crossedPrice: 139,
     salesCount: 0,
-    position: 1291,
-    variations: []
+    position: 7551,
+    variations: [
+
+    ]
   },
   {
     id: '7554',
@@ -17079,10 +18240,12 @@ export const defaultProducts: Product[] = [
     reference: '155',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1292,
-    variations: []
+    position: 7554,
+    variations: [
+
+    ]
   },
   {
     id: '7555',
@@ -17092,10 +18255,12 @@ export const defaultProducts: Product[] = [
     reference: '154',
     wholesalePrice: 0,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1293,
-    variations: []
+    position: 7555,
+    variations: [
+
+    ]
   },
   {
     id: '7556',
@@ -17105,10 +18270,12 @@ export const defaultProducts: Product[] = [
     reference: '125',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1294,
-    variations: []
+    position: 7556,
+    variations: [
+
+    ]
   },
   {
     id: '7557',
@@ -17118,10 +18285,12 @@ export const defaultProducts: Product[] = [
     reference: '135',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1295,
-    variations: []
+    position: 7557,
+    variations: [
+
+    ]
   },
   {
     id: '7558',
@@ -17131,10 +18300,12 @@ export const defaultProducts: Product[] = [
     reference: '195',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1296,
-    variations: []
+    position: 7558,
+    variations: [
+
+    ]
   },
   {
     id: '7559',
@@ -17144,10 +18315,12 @@ export const defaultProducts: Product[] = [
     reference: '294',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1297,
-    variations: []
+    position: 7559,
+    variations: [
+
+    ]
   },
   {
     id: '7560',
@@ -17157,10 +18330,12 @@ export const defaultProducts: Product[] = [
     reference: '290',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1298,
-    variations: []
+    position: 7560,
+    variations: [
+
+    ]
   },
   {
     id: '7561',
@@ -17170,10 +18345,12 @@ export const defaultProducts: Product[] = [
     reference: '225',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1299,
-    variations: []
+    position: 7561,
+    variations: [
+
+    ]
   },
   {
     id: '7562',
@@ -17183,10 +18360,12 @@ export const defaultProducts: Product[] = [
     reference: '12',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1300,
-    variations: []
+    position: 7562,
+    variations: [
+
+    ]
   },
   {
     id: '7563',
@@ -17196,127 +18375,147 @@ export const defaultProducts: Product[] = [
     reference: '480',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1301,
-    variations: []
+    position: 7563,
+    variations: [
+
+    ]
   },
   {
     id: '7565',
     name: 'SEAU 1BT VELA CAVALAIRE + 6 VN CAVALAIRE',
     category: 'composition-vasque',
     ean13: '2085501819885',
-    reference: 'REF7565',
+    reference: '',
     wholesalePrice: 16,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1302,
-    variations: []
+    position: 7565,
+    variations: [
+
+    ]
   },
   {
     id: '7566',
     name: 'PORTE CLEF COULISSANT CANNES',
     category: 'porte-clef--bracelet',
     ean13: '8435124522503',
-    reference: 'REF7566',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1303,
-    variations: []
+    position: 7566,
+    variations: [
+
+    ]
   },
   {
     id: '7567',
     name: 'PORTE CLEF COULISSANT MONACO',
     category: 'porte-clef--bracelet',
     ean13: '8435124522510',
-    reference: 'REF7567',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1304,
-    variations: []
+    position: 7567,
+    variations: [
+
+    ]
   },
   {
     id: '7568',
     name: 'PORTE CLEF COULISSANT PARIS',
     category: 'porte-clef--bracelet',
     ean13: '8435124522527',
-    reference: 'REF7568',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1305,
-    variations: []
+    position: 7568,
+    variations: [
+
+    ]
   },
   {
     id: '7569',
     name: 'PORTE CLEF COULISSANT SAINT TROPEZ',
     category: 'porte-clef--bracelet',
     ean13: '8435124520288',
-    reference: 'REF7569',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1306,
-    variations: []
+    position: 7569,
+    variations: [
+
+    ]
   },
   {
     id: '7571',
     name: 'CASQUETTE BEIGE FEMME',
     category: 'casquette',
     ean13: '',
-    reference: 'REF7571',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1307,
-    variations: []
+    position: 7571,
+    variations: [
+
+    ]
   },
   {
     id: '7572',
     name: 'COFFRET CHAMPAGNE TITANE 2 VERRES',
     category: 'coffret',
     ean13: '',
-    reference: 'REF7572',
+    reference: '',
     wholesalePrice: 41,
     finalPrice: 85,
-    crossedPrice: 93.50000000000001,
+    crossedPrice: 85,
     salesCount: 0,
-    position: 1308,
-    variations: []
+    position: 7572,
+    variations: [
+
+    ]
   },
   {
     id: '7573',
     name: 'BOLDUC KDO',
     category: 'consomable-interne-boutique',
     ean13: '',
-    reference: 'REF7573',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1309,
-    variations: []
+    position: 7573,
+    variations: [
+
+    ]
   },
   {
     id: '7574',
     name: 'PLAISIR OFFRIR KDO',
     category: 'consomable-interne-boutique',
     ean13: '',
-    reference: 'REF7574',
+    reference: '',
     wholesalePrice: 41,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1310,
-    variations: []
+    position: 7574,
+    variations: [
+
+    ]
   },
   {
     id: '7575',
@@ -17328,1100 +18527,1242 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1311,
-    variations: []
+    position: 7575,
+    variations: [
+
+    ]
   },
   {
     id: '7576',
     name: 'SAC KRAFT 35X14X36',
     category: 'consomable-interne-boutique',
     ean13: '',
-    reference: 'REF7576',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1312,
-    variations: []
+    position: 7576,
+    variations: [
+
+    ]
   },
   {
     id: '7582',
     name: 'SOUS BOC LIEGE  MAXIME',
     category: 'art-de-la-table',
     ean13: '2037777283310',
-    reference: 'REF7582',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1313,
-    variations: []
+    position: 7582,
+    variations: [
+
+    ]
   },
   {
     id: '7583',
     name: 'PORTE SAC AUBERGE DES MAURES',
     category: 'art-de-la-table',
     ean13: '',
-    reference: 'REF7583',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1314,
-    variations: []
+    position: 7583,
+    variations: [
+
+    ]
   },
   {
     id: '7584',
     name: 'SOUS BOC LIEGE  RAMATUELLE',
     category: 'art-de-la-table',
     ean13: '2037777283310',
-    reference: 'REF7584',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1315,
-    variations: []
+    position: 7584,
+    variations: [
+
+    ]
   },
   {
     id: '7585',
     name: 'SOUS BOC LIEGE  PG',
     category: 'art-de-la-table',
     ean13: '2037777283310',
-    reference: 'REF7585',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1316,
-    variations: []
+    position: 7585,
+    variations: [
+
+    ]
   },
   {
     id: '7586',
     name: 'SOUS BOC LIEGE  LA CROIX',
     category: 'art-de-la-table',
     ean13: '2037777283310',
-    reference: 'REF7586',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1317,
-    variations: []
+    position: 7586,
+    variations: [
+
+    ]
   },
   {
     id: '7587',
     name: 'SOUS BOC LIEGE  CAVALAIRE',
     category: 'art-de-la-table',
     ean13: '2037777283310',
-    reference: 'REF7587',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1318,
-    variations: []
+    position: 7587,
+    variations: [
+
+    ]
   },
   {
     id: '7590',
     name: 'SAC TRIO OR',
     category: 'emballage',
     ean13: '',
-    reference: 'REF7590',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1319,
-    variations: []
+    position: 7590,
+    variations: [
+
+    ]
   },
   {
     id: '7594',
     name: 'BABY GOURDE MAUVE',
     category: 'enfant',
     ean13: '',
-    reference: 'REF7594',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1320,
-    variations: []
+    position: 7594,
+    variations: [
+
+    ]
   },
   {
     id: '7595',
     name: 'BABY GOURDE BLANCHE',
     category: 'enfant',
     ean13: '',
-    reference: 'REF7595',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1321,
-    variations: []
+    position: 7595,
+    variations: [
+
+    ]
   },
   {
     id: '7596',
     name: 'BIG POCHETTE EPONGE JAUNE',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7596',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1322,
-    variations: []
+    position: 7596,
+    variations: [
+
+    ]
   },
   {
     id: '7597',
     name: 'SMALL POCHETTE CANVA NAVY',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7597',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 1323,
-    variations: []
+    position: 7597,
+    variations: [
+
+    ]
   },
   {
     id: '7598',
     name: 'BIG POCHETTE EPONGE VERTE',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7598',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1324,
-    variations: []
+    position: 7598,
+    variations: [
+
+    ]
   },
   {
     id: '7600',
     name: 'BIG POCHETTE CANVA BLANCHE',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7600',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1325,
-    variations: []
+    position: 7600,
+    variations: [
+
+    ]
   },
   {
     id: '7603',
     name: 'SMALL POCHETTE BLEUE JEANS',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7603',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 1326,
-    variations: []
+    position: 7603,
+    variations: [
+
+    ]
   },
   {
     id: '7604',
     name: 'BIG POCHETTE CANVA NAVY',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7604',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1327,
-    variations: []
+    position: 7604,
+    variations: [
+
+    ]
   },
   {
     id: '7605',
     name: 'POCHETTE EPONGE BEIGE',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7605',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1328,
-    variations: []
+    position: 7605,
+    variations: [
+
+    ]
   },
   {
     id: '7606',
     name: 'MAGNET ROND METAL BLEU',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7606',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1329,
-    variations: []
+    position: 7606,
+    variations: [
+
+    ]
   },
   {
     id: '7607',
     name: 'MAGNET TROPEZ COEUR ROSE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7607',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1330,
-    variations: []
+    position: 7607,
+    variations: [
+
+    ]
   },
   {
     id: '7608',
     name: 'PORTE CLEF LOVE TROPEZ MISTRAL',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7608',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1331,
-    variations: []
+    position: 7608,
+    variations: [
+
+    ]
   },
   {
     id: '7609',
     name: 'PORTE CLEF BRELOQUE HIPPOCAMPE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7609',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1332,
-    variations: []
+    position: 7609,
+    variations: [
+
+    ]
   },
   {
     id: '7612',
     name: 'PORTE CLEF NEOPRENE GENDARME',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7612',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1333,
-    variations: []
+    position: 7612,
+    variations: [
+
+    ]
   },
   {
     id: '7613',
     name: 'PORTE CLEF COULISSANT PORT GRIMAUD',
     category: 'porte-clef--bracelet',
     ean13: '8435124522534',
-    reference: 'REF7613',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1334,
-    variations: []
+    position: 7613,
+    variations: [
+
+    ]
   },
   {
     id: '7614',
     name: 'DECAPSULEUR TONGUE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7614',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1335,
-    variations: []
+    position: 7614,
+    variations: [
+
+    ]
   },
   {
     id: '7615',
     name: 'PORTE CLE BOULE CORDE MANILLE ROUGE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7615',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1336,
-    variations: []
+    position: 7615,
+    variations: [
+
+    ]
   },
   {
     id: '7617',
     name: 'PORTE CLEF RUBAN ROUGE LATITUDE TROPEZ',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7617',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1337,
-    variations: []
+    position: 7617,
+    variations: [
+
+    ]
   },
   {
     id: '7618',
     name: 'PORTE CLEF OURSON METAL',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7618',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1338,
-    variations: []
+    position: 7618,
+    variations: [
+
+    ]
   },
   {
     id: '7619',
     name: 'PORTE CLEF BOUSSOLLE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7619',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1339,
-    variations: []
+    position: 7619,
+    variations: [
+
+    ]
   },
   {
     id: '7620',
     name: 'PORTE CLEF BRELOQUE NEW',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7620',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1340,
-    variations: []
+    position: 7620,
+    variations: [
+
+    ]
   },
   {
     id: '7622',
     name: 'MAGNET PROVENCE 83 ROSE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7622',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1341,
-    variations: []
+    position: 7622,
+    variations: [
+
+    ]
   },
   {
     id: '7623',
     name: 'MAGNET PROVENCE 83 BLEU',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7623',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1342,
-    variations: []
+    position: 7623,
+    variations: [
+
+    ]
   },
   {
     id: '7624',
     name: 'MAGNET OUVRE BT',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7624',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1343,
-    variations: []
+    position: 7624,
+    variations: [
+
+    ]
   },
   {
     id: '7625',
     name: 'MAGNET NIKE ROSE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7625',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1344,
-    variations: []
+    position: 7625,
+    variations: [
+
+    ]
   },
   {
     id: '7626',
     name: 'MAGNET NIKE JAUNE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7626',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1345,
-    variations: []
+    position: 7626,
+    variations: [
+
+    ]
   },
   {
     id: '7627',
     name: 'MAGNET NIKE BLEU',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7627',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1346,
-    variations: []
+    position: 7627,
+    variations: [
+
+    ]
   },
   {
     id: '7628',
     name: 'PORTE CLE BOULE CORDE MANILLE BLANCHE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7628',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1347,
-    variations: []
+    position: 7628,
+    variations: [
+
+    ]
   },
   {
     id: '7629',
     name: 'MAGNET BEIGE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7629',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1348,
-    variations: []
+    position: 7629,
+    variations: [
+
+    ]
   },
   {
     id: '7630',
     name: 'PORTE CLE BOULE CORDE MANILLE BLEU',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7630',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1349,
-    variations: []
+    position: 7630,
+    variations: [
+
+    ]
   },
   {
     id: '7631',
     name: 'MAGNET PROVENCE 83 ROUGE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7631',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1350,
-    variations: []
+    position: 7631,
+    variations: [
+
+    ]
   },
   {
     id: '7632',
     name: 'STYLO BLONDE',
     category: 'papeterie',
     ean13: '',
-    reference: 'REF7632',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1351,
-    variations: []
+    position: 7632,
+    variations: [
+
+    ]
   },
   {
     id: '7633',
     name: 'ECUSSON TISSU BLONDE',
     category: 'produits-blonde',
     ean13: '',
-    reference: 'REF7633',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1352,
-    variations: []
+    position: 7633,
+    variations: [
+
+    ]
   },
   {
     id: '7634',
     name: 'NECKLACE BLEU CAVALAIRE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7634',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1353,
-    variations: []
+    position: 7634,
+    variations: [
+
+    ]
   },
   {
     id: '7635',
     name: 'SAC A DOS BLONDE',
     category: 'sac',
     ean13: '',
-    reference: 'REF7635',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1354,
-    variations: []
+    position: 7635,
+    variations: [
+
+    ]
   },
   {
     id: '7636',
     name: 'MEDIUM JUST LOVE BAG ROSE',
     category: 'sac',
     ean13: '',
-    reference: 'REF7636',
+    reference: '',
     wholesalePrice: 14,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1355,
-    variations: []
+    position: 7636,
+    variations: [
+
+    ]
   },
   {
     id: '7637',
     name: 'SAC CABAS BLONDE',
     category: 'sac',
     ean13: '',
-    reference: 'REF7637',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1356,
-    variations: []
+    position: 7637,
+    variations: [
+
+    ]
   },
   {
     id: '7638',
     name: 'SAC MOYEN TROPEZ BEIGE BLONDE',
     category: 'sac',
     ean13: '',
-    reference: 'REF7638',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1357,
-    variations: []
+    position: 7638,
+    variations: [
+
+    ]
   },
   {
     id: '7639',
     name: 'SAC CABAS EPONGE BLEU KASSARIA',
     category: 'sac',
     ean13: '',
-    reference: 'REF7639',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1358,
-    variations: []
+    position: 7639,
+    variations: [
+
+    ]
   },
   {
     id: '7640',
     name: 'SAC GRAND TROPEZ BEIGE BLONDE',
     category: 'sac',
     ean13: '',
-    reference: 'REF7640',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1359,
-    variations: []
+    position: 7640,
+    variations: [
+
+    ]
   },
   {
     id: '7641',
     name: 'SAC CABAS EPONGE BLANC KASSARIA',
     category: 'sac',
     ean13: '',
-    reference: 'REF7641',
+    reference: '',
     wholesalePrice: 15,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1360,
-    variations: []
+    position: 7641,
+    variations: [
+
+    ]
   },
   {
     id: '7645',
     name: 'CUILLERE CERAMIQUE BLEUE',
     category: 'verre',
     ean13: '',
-    reference: 'REF7645',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1361,
-    variations: []
+    position: 7645,
+    variations: [
+
+    ]
   },
   {
     id: '7646',
     name: 'SUNSET ILY',
     category: 'verre',
     ean13: '',
-    reference: 'REF7646',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1362,
-    variations: []
+    position: 7646,
+    variations: [
+
+    ]
   },
   {
     id: '7647',
     name: 'TASSE *B*',
     category: 'verre',
     ean13: '',
-    reference: 'REF7647',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1363,
-    variations: []
+    position: 7647,
+    variations: [
+
+    ]
   },
   {
     id: '7648',
     name: 'VN UP FACETTE VERRE',
     category: 'verre',
     ean13: '',
-    reference: 'REF7648',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1364,
-    variations: []
+    position: 7648,
+    variations: [
+
+    ]
   },
   {
     id: '7649',
     name: 'CUILLERE CERAMIQUE BEIGE',
     category: 'verre',
     ean13: '',
-    reference: 'REF7649',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1365,
-    variations: []
+    position: 7649,
+    variations: [
+
+    ]
   },
   {
     id: '7650',
     name: 'CUILLERE CERAMIQUE ROSE',
     category: 'verre',
     ean13: '',
-    reference: 'REF7650',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1366,
-    variations: []
+    position: 7650,
+    variations: [
+
+    ]
   },
   {
     id: '7651',
     name: 'DEBARDEUR NOIR BLONDE L',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7651',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1367,
-    variations: []
+    position: 7651,
+    variations: [
+
+    ]
   },
   {
     id: '7652',
     name: 'TEE SHIRT HOMME BLEU BLONDE L',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7652',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1368,
-    variations: []
+    position: 7652,
+    variations: [
+
+    ]
   },
   {
     id: '7653',
     name: 'CEINTURE BLONDE',
     category: 'vetement',
     ean13: '2042319354779',
-    reference: 'REF7653',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1369,
-    variations: []
+    position: 7653,
+    variations: [
+
+    ]
   },
   {
     id: '7654',
     name: 'DEBARDEUR BLANC BLONDE L',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7654',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1370,
-    variations: []
+    position: 7654,
+    variations: [
+
+    ]
   },
   {
     id: '7655',
     name: 'POLO FEMME BLONDE XL',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7655',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1371,
-    variations: []
+    position: 7655,
+    variations: [
+
+    ]
   },
   {
     id: '7656',
     name: 'DOUDOUNE BLANCHE S',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7656',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1372,
-    variations: []
+    position: 7656,
+    variations: [
+
+    ]
   },
   {
     id: '7657',
     name: 'POLO FEMME BLONDE M',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7657',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1373,
-    variations: []
+    position: 7657,
+    variations: [
+
+    ]
   },
   {
     id: '7658',
     name: 'DEBARDEUR BLANC BLONDE S',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7658',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1374,
-    variations: []
+    position: 7658,
+    variations: [
+
+    ]
   },
   {
     id: '7659',
     name: 'DEBARDEUR NOIR BLONDE S',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7659',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1375,
-    variations: []
+    position: 7659,
+    variations: [
+
+    ]
   },
   {
     id: '7660',
     name: 'TEE SHIRT HOMME BLANC BLONDE L',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7660',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1376,
-    variations: []
+    position: 7660,
+    variations: [
+
+    ]
   },
   {
     id: '7661',
     name: 'POLO HOMME BLONDE XXL',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7661',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1377,
-    variations: []
+    position: 7661,
+    variations: [
+
+    ]
   },
   {
     id: '7662',
     name: 'POLO FEMME BLONDE S',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7662',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1378,
-    variations: []
+    position: 7662,
+    variations: [
+
+    ]
   },
   {
     id: '7663',
     name: 'POLO FEMME BLONDE XS',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7663',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1379,
-    variations: []
+    position: 7663,
+    variations: [
+
+    ]
   },
   {
     id: '7664',
     name: 'POLO FEMME BLONDE L',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7664',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1380,
-    variations: []
+    position: 7664,
+    variations: [
+
+    ]
   },
   {
     id: '7666',
     name: 'COOL BAG 1 PETITE BT LAMBORGHINI',
     category: 'cool-bag',
     ean13: '',
-    reference: 'REF7666',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1381,
-    variations: []
+    position: 7666,
+    variations: [
+
+    ]
   },
   {
     id: '7667',
     name: 'ASSIETTE 27 CM CLEAR UNI',
     category: 'assiette',
     ean13: '2021635912405',
-    reference: 'REF7667',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1382,
-    variations: []
+    position: 7667,
+    variations: [
+
+    ]
   },
   {
     id: '7668',
     name: 'ASSIETTE 27 CM CLEAR BLEUE',
     category: 'assiette',
     ean13: '2066917316700',
-    reference: 'REF7668',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1383,
-    variations: []
+    position: 7668,
+    variations: [
+
+    ]
   },
   {
     id: '7669',
     name: 'VICTORIA + 8 AIR BEACH',
     category: 'composition-vasque',
     ean13: '2073437594693',
-    reference: 'REF7669',
+    reference: '',
     wholesalePrice: 36,
     finalPrice: 115,
-    crossedPrice: 126.50000000000001,
+    crossedPrice: 135,
     salesCount: 0,
-    position: 1384,
-    variations: []
+    position: 7669,
+    variations: [
+
+    ]
   },
   {
     id: '7671',
     name: 'SEAU 2BT VELA  + 6 BK TROPEZ',
     category: 'composition-vasque',
     ean13: '2072918313976',
-    reference: 'REF7671',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1385,
-    variations: []
+    position: 7671,
+    variations: [
+
+    ]
   },
   {
     id: '7675',
     name: 'SCOTCH',
     category: 'consomable-interne-boutique',
     ean13: '',
-    reference: 'REF7675',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1386,
-    variations: []
+    position: 7675,
+    variations: [
+
+    ]
   },
   {
     id: '7678',
     name: 'CALICE METALISE',
     category: 'verre',
     ean13: '2066523448949',
-    reference: 'REF7678',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1387,
-    variations: []
-  },
-  {
-    id: '7678',
-    name: 'CALICE METALISE',
-    category: 'verre',
-    ean13: '2066523448949',
-    reference: 'REF7678',
-    wholesalePrice: 3,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 1388,
-    variations: []
-  },
-  {
-    id: '7678',
-    name: 'CALICE METALISE',
-    category: 'verre',
-    ean13: '2066523448949',
-    reference: 'REF7678',
-    wholesalePrice: 3,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 1389,
-    variations: []
-  },
-  {
-    id: '7678',
-    name: 'CALICE METALISE',
-    category: 'verre',
-    ean13: '2066523448949',
-    reference: 'REF7678',
-    wholesalePrice: 3,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 1390,
-    variations: []
-  },
-  {
-    id: '7678',
-    name: 'CALICE METALISE',
-    category: 'verre',
-    ean13: '2066523448949',
-    reference: 'REF7678',
-    wholesalePrice: 3,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 1391,
-    variations: []
-  },
-  {
-    id: '7678',
-    name: 'CALICE METALISE',
-    category: 'verre',
-    ean13: '2066523448949',
-    reference: 'REF7678',
-    wholesalePrice: 3,
-    finalPrice: 12,
-    crossedPrice: 13.200000000000001,
-    salesCount: 0,
-    position: 1392,
-    variations: []
+    position: 7678,
+    variations: [
+    {
+      id: '3052',
+      ean13: '2061199600233',
+      reference: '',
+      attributes: 'OR ROSE',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '3047',
+      ean13: '2002951062142',
+      reference: '',
+      attributes: 'OR',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '3334',
+      ean13: '2073828385992',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '3053',
+      ean13: '2064378345215',
+      reference: '',
+      attributes: 'SILVER',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '3054',
+      ean13: '2007771244020',
+      reference: '',
+      attributes: 'PINK',
+      priceImpact: 0,
+      finalPrice: 12
+    },
+    {
+      id: '3055',
+      ean13: '2084746282720',
+      reference: '',
+      attributes: 'VIOLET',
+      priceImpact: 0,
+      finalPrice: 12
+    }
+    ]
   },
   {
     id: '7679',
     name: 'BRACELET MANCHETTE BLANC',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7679',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1393,
-    variations: []
+    position: 7679,
+    variations: [
+
+    ]
   },
   {
     id: '7680',
     name: 'BRACELET MANCHETTE BLEU',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7680',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1394,
-    variations: []
+    position: 7680,
+    variations: [
+
+    ]
   },
   {
     id: '7681',
     name: 'COFFRET BOITE VIDE CARTON 6 VN',
     category: 'emballage',
     ean13: '2056443963905',
-    reference: 'REF7681',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1395,
-    variations: []
+    position: 7681,
+    variations: [
+
+    ]
   },
   {
     id: '7682',
@@ -18431,62 +19772,72 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1396,
-    variations: []
+    position: 7682,
+    variations: [
+
+    ]
   },
   {
     id: '7684',
     name: 'BOB ENFANT RAYE',
     category: 'braderie',
     ean13: '2011501428895',
-    reference: 'REF7684',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 5,
-    crossedPrice: 5.5,
+    crossedPrice: 5,
     salesCount: 0,
-    position: 1397,
-    variations: []
+    position: 7684,
+    variations: [
+
+    ]
   },
   {
     id: '7687',
     name: 'PAMPY ORANGE COMPLET',
     category: 'vin',
     ean13: '2007806046131',
-    reference: 'REF7687',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 1398,
-    variations: []
+    position: 7687,
+    variations: [
+
+    ]
   },
   {
     id: '7689',
     name: 'COFFRET 6 VN VILLAGE 83',
     category: 'pack-verre',
     ean13: '2088111811591',
-    reference: 'REF7689',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 38,
-    crossedPrice: 41.800000000000004,
+    crossedPrice: 40,
     salesCount: 0,
-    position: 1399,
-    variations: []
+    position: 7689,
+    variations: [
+
+    ]
   },
   {
     id: '7691',
     name: 'COFFRET 6 VN CLEAR VILLAGE',
     category: 'pack-verre',
     ean13: '2022060508942',
-    reference: 'REF7691',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 38,
-    crossedPrice: 41.800000000000004,
+    crossedPrice: 40,
     salesCount: 0,
-    position: 1400,
-    variations: []
+    position: 7691,
+    variations: [
+
+    ]
   },
   {
     id: '7692',
@@ -18498,21 +19849,25 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1401,
-    variations: []
+    position: 7692,
+    variations: [
+
+    ]
   },
   {
     id: '7693',
     name: 'TRIO PASTIS CITADELLE GIVRE TROPEZ',
     category: 'trio-pack',
     ean13: '2087404316270',
-    reference: 'REF7693',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 43,
-    crossedPrice: 47.300000000000004,
+    crossedPrice: 43,
     salesCount: 0,
-    position: 1402,
-    variations: []
+    position: 7693,
+    variations: [
+
+    ]
   },
   {
     id: '7694',
@@ -18524,8 +19879,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1403,
-    variations: []
+    position: 7694,
+    variations: [
+
+    ]
   },
   {
     id: '7695',
@@ -18537,8 +19894,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1404,
-    variations: []
+    position: 7695,
+    variations: [
+
+    ]
   },
   {
     id: '7696',
@@ -18550,8 +19909,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1405,
-    variations: []
+    position: 7696,
+    variations: [
+
+    ]
   },
   {
     id: '7697',
@@ -18563,8 +19924,10 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1406,
-    variations: []
+    position: 7697,
+    variations: [
+
+    ]
   },
   {
     id: '7698',
@@ -18576,255 +19939,274 @@ export const defaultProducts: Product[] = [
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1407,
-    variations: []
-  },
-  {
-    id: '7698',
-    name: 'POCHETTE  CADEAU RETIF GRISE',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 0,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 1408,
-    variations: []
-  },
-  {
-    id: '7698',
-    name: 'POCHETTE  CADEAU RETIF GRISE',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 0,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 1409,
-    variations: []
-  },
-  {
-    id: '7698',
-    name: 'POCHETTE  CADEAU RETIF GRISE',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 0,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 1410,
-    variations: []
-  },
-  {
-    id: '7698',
-    name: 'POCHETTE  CADEAU RETIF GRISE',
-    category: 'consomable-interne-boutique',
-    ean13: '',
-    reference: 'Z',
-    wholesalePrice: 0,
-    finalPrice: 0,
-    crossedPrice: 0,
-    salesCount: 0,
-    position: 1411,
-    variations: []
+    position: 7698,
+    variations: [
+    {
+      id: '3071',
+      ean13: '2086635136138',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 0
+    },
+    {
+      id: '3072',
+      ean13: '2088895026174',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 0
+    },
+    {
+      id: '3073',
+      ean13: '2015495702047',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 0
+    },
+    {
+      id: '3074',
+      ean13: '2093456537693',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 0
+    },
+    {
+      id: '3075',
+      ean13: '2017805446139',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 0
+    }
+    ]
   },
   {
     id: '7699',
     name: 'TRIO 2 ICE MIXTE MAXIME/TROPEZ',
     category: 'trio-pack',
     ean13: '2081801212012',
-    reference: 'REF7699',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1412,
-    variations: []
+    position: 7699,
+    variations: [
+
+    ]
   },
   {
     id: '7700',
     name: 'VASQUE VELA + 12 VN TROPEZ',
     category: 'composition-vasque',
     ean13: '2073514889407',
-    reference: 'REF7700',
+    reference: '',
     wholesalePrice: 36,
     finalPrice: 115,
-    crossedPrice: 126.50000000000001,
+    crossedPrice: 137,
     salesCount: 0,
-    position: 1413,
-    variations: []
+    position: 7700,
+    variations: [
+
+    ]
   },
   {
     id: '7701',
     name: 'VASQUE VELA  + 12 VN VILLAGE 06',
     category: 'composition-vasque',
     ean13: '2077098288106',
-    reference: 'REF7701',
+    reference: '',
     wholesalePrice: 36,
     finalPrice: 115,
-    crossedPrice: 126.50000000000001,
+    crossedPrice: 137,
     salesCount: 0,
-    position: 1414,
-    variations: []
+    position: 7701,
+    variations: [
+
+    ]
   },
   {
     id: '7702',
     name: 'SEAU 1BT VELA TROPEZ + 6 VN VILLAGE 06',
     category: 'composition-vasque',
     ean13: '2093921912109',
-    reference: 'REF7702',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1415,
-    variations: []
+    position: 7702,
+    variations: [
+
+    ]
   },
   {
     id: '7703',
     name: 'VASQUE VELA CANNES + 12 BK CANNES',
     category: 'composition-vasque',
     ean13: '2030282135914',
-    reference: 'REF7703',
+    reference: '',
     wholesalePrice: 51,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 161,
     salesCount: 0,
-    position: 1416,
-    variations: []
+    position: 7703,
+    variations: [
+
+    ]
   },
   {
     id: '7704',
     name: 'SEAU DIAMANT CANNES + 6 VN CLEAR CANNES',
     category: 'composition-vasque',
     ean13: '2087840600308',
-    reference: 'REF7704',
+    reference: '',
     wholesalePrice: 22,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 88,
     salesCount: 0,
-    position: 1417,
-    variations: []
+    position: 7704,
+    variations: [
+
+    ]
   },
   {
     id: '7705',
     name: 'SEAU DIAMANT CANNES + 6 VN CLEAR 06',
     category: 'composition-vasque',
     ean13: '2074729192542',
-    reference: 'REF7705',
+    reference: '',
     wholesalePrice: 22,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 88,
     salesCount: 0,
-    position: 1418,
-    variations: []
+    position: 7705,
+    variations: [
+
+    ]
   },
   {
     id: '7706',
     name: 'SEAU 2BT VELA CLEAR TROPEZ+ 6 VN CLEAR 06',
     category: 'composition-vasque',
     ean13: '2015589010522',
-    reference: 'REF7706',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1419,
-    variations: []
+    position: 7706,
+    variations: [
+
+    ]
   },
   {
     id: '7707',
     name: 'SEAU 2BT VELA  CANNES + 6 VN VILLAGE 06',
     category: 'composition-vasque',
     ean13: '2060725405908',
-    reference: 'REF7707',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1420,
-    variations: []
+    position: 7707,
+    variations: [
+
+    ]
   },
   {
     id: '7708',
     name: 'SOBAG  TROPEZ + 6 VN VILLAGE 06',
     category: 'composition-vasque',
     ean13: '2022458520914',
-    reference: 'REF7708',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1421,
-    variations: []
+    position: 7708,
+    variations: [
+
+    ]
   },
   {
     id: '7709',
     name: 'SOBAG CLEAR TROPEZ+ 6 VN MIXTE CLEAR 06',
     category: 'composition-vasque',
     ean13: '2098599730666',
-    reference: 'REF7709',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1422,
-    variations: []
+    position: 7709,
+    variations: [
+
+    ]
   },
   {
     id: '7710',
     name: 'SEAU 2BT VELA  TROPEZ + 6 BK  CLEAR CANNES',
     category: 'composition-vasque',
     ean13: '2036663763653',
-    reference: 'REF7710',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1423,
-    variations: []
+    position: 7710,
+    variations: [
+
+    ]
   },
   {
     id: '7711',
     name: 'SEAU 2BT VELA  CANNES  + 6 BK CANNES',
     category: 'composition-vasque',
     ean13: '2004940663378',
-    reference: 'REF7711',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1424,
-    variations: []
+    position: 7711,
+    variations: [
+
+    ]
   },
   {
     id: '7712',
     name: 'SEAU 2BT VELA  TROPEZ + 6 BK VILLAGE 06',
     category: 'composition-vasque',
     ean13: '2027428657355',
-    reference: 'REF7712',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1425,
-    variations: []
+    position: 7712,
+    variations: [
+
+    ]
   },
   {
     id: '7714',
     name: 'SEAU 2BT VELA  CANNES + 6 BK VILLAGE 06',
     category: 'composition-vasque',
     ean13: '2077468794725',
-    reference: 'REF7714',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1426,
-    variations: []
+    position: 7714,
+    variations: [
+
+    ]
   },
   {
     id: '7715',
@@ -18834,140 +20216,162 @@ export const defaultProducts: Product[] = [
     reference: 'PACK 6',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1427,
-    variations: []
+    position: 7715,
+    variations: [
+
+    ]
   },
   {
     id: '7716',
     name: 'PACK 6 SHOOTER VILLLAGE 06',
     category: 'pack-verre',
     ean13: '2084949703244',
-    reference: 'REF7716',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 1428,
-    variations: []
+    position: 7716,
+    variations: [
+
+    ]
   },
   {
     id: '7717',
     name: 'PACK 6 SHOOTER CLEAR 06',
     category: 'pack-verre',
     ean13: '2068527540551',
-    reference: 'REF7717',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 1429,
-    variations: []
+    position: 7717,
+    variations: [
+
+    ]
   },
   {
     id: '7718',
     name: 'PACK 6 COCKTAILS VILLAGE 06',
     category: 'pack-verre',
     ean13: '2054421481205',
-    reference: 'REF7718',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1430,
-    variations: []
+    position: 7718,
+    variations: [
+
+    ]
   },
   {
     id: '7720',
     name: 'PACK 6 TASSES VILLLAGE 06',
     category: 'pack-verre',
     ean13: '2097938327987',
-    reference: 'REF7720',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1431,
-    variations: []
+    position: 7720,
+    variations: [
+
+    ]
   },
   {
     id: '7721',
     name: 'PACK 6 TUBES VILLLAGE 06',
     category: 'pack-verre',
     ean13: '2087447158530',
-    reference: 'REF7721',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1432,
-    variations: []
+    position: 7721,
+    variations: [
+
+    ]
   },
   {
     id: '7722',
     name: 'PACK 6 MUGS VILLLAGE 06',
     category: 'pack-verre',
     ean13: '2074652075479',
-    reference: 'REF7722',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1433,
-    variations: []
+    position: 7722,
+    variations: [
+
+    ]
   },
   {
     id: '7723',
     name: 'PACK 6 TASSES CLEAR 06',
     category: 'pack-verre',
     ean13: '2049483927549',
-    reference: 'REF7723',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1434,
-    variations: []
+    position: 7723,
+    variations: [
+
+    ]
   },
   {
     id: '7724',
     name: 'VASQUE VELA CANNES + 12 BK 06',
     category: 'composition-vasque',
     ean13: '2012689413178',
-    reference: 'REF7724',
+    reference: '',
     wholesalePrice: 51,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 161,
     salesCount: 0,
-    position: 1435,
-    variations: []
+    position: 7724,
+    variations: [
+
+    ]
   },
   {
     id: '7725',
     name: 'EVENTAIL VICHY PINK',
     category: 'eventail',
     ean13: '2086232813579',
-    reference: 'REF7725',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 1436,
-    variations: []
+    position: 7725,
+    variations: [
+
+    ]
   },
   {
     id: '7726',
     name: 'EVENTAIL BLEU',
     category: 'eventail',
     ean13: '2094122747132',
-    reference: 'REF7726',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 9,
-    crossedPrice: 9.9,
+    crossedPrice: 9,
     salesCount: 0,
-    position: 1437,
-    variations: []
+    position: 7726,
+    variations: [
+
+    ]
   },
   {
     id: '7727',
@@ -18977,10 +20381,12 @@ export const defaultProducts: Product[] = [
     reference: '1591',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1438,
-    variations: []
+    position: 7727,
+    variations: [
+
+    ]
   },
   {
     id: '7728',
@@ -18990,23 +20396,27 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1439,
-    variations: []
+    position: 7728,
+    variations: [
+
+    ]
   },
   {
     id: '7729',
     name: 'PINS TROPEZ COEUR ROSE',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7729',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1440,
-    variations: []
+    position: 7729,
+    variations: [
+
+    ]
   },
   {
     id: '7730',
@@ -19016,10 +20426,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1441,
-    variations: []
+    position: 7730,
+    variations: [
+
+    ]
   },
   {
     id: '7731',
@@ -19029,10 +20441,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1442,
-    variations: []
+    position: 7731,
+    variations: [
+
+    ]
   },
   {
     id: '7732',
@@ -19042,10 +20456,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1443,
-    variations: []
+    position: 7732,
+    variations: [
+
+    ]
   },
   {
     id: '7733',
@@ -19055,10 +20471,12 @@ export const defaultProducts: Product[] = [
     reference: '1171',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1444,
-    variations: []
+    position: 7733,
+    variations: [
+
+    ]
   },
   {
     id: '7734',
@@ -19068,10 +20486,12 @@ export const defaultProducts: Product[] = [
     reference: '1171',
     wholesalePrice: 6,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1445,
-    variations: []
+    position: 7734,
+    variations: [
+
+    ]
   },
   {
     id: '7735',
@@ -19081,10 +20501,12 @@ export const defaultProducts: Product[] = [
     reference: '9520',
     wholesalePrice: 7,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1446,
-    variations: []
+    position: 7735,
+    variations: [
+
+    ]
   },
   {
     id: '7736',
@@ -19094,10 +20516,12 @@ export const defaultProducts: Product[] = [
     reference: '9520',
     wholesalePrice: 7,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1447,
-    variations: []
+    position: 7736,
+    variations: [
+
+    ]
   },
   {
     id: '7737',
@@ -19107,10 +20531,12 @@ export const defaultProducts: Product[] = [
     reference: '1265',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1448,
-    variations: []
+    position: 7737,
+    variations: [
+
+    ]
   },
   {
     id: '7738',
@@ -19120,10 +20546,12 @@ export const defaultProducts: Product[] = [
     reference: '1314',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1449,
-    variations: []
+    position: 7738,
+    variations: [
+
+    ]
   },
   {
     id: '7739',
@@ -19133,10 +20561,12 @@ export const defaultProducts: Product[] = [
     reference: '1312',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1450,
-    variations: []
+    position: 7739,
+    variations: [
+
+    ]
   },
   {
     id: '7740',
@@ -19146,166 +20576,136 @@ export const defaultProducts: Product[] = [
     reference: '1270',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1451,
-    variations: []
+    position: 7740,
+    variations: [
+
+    ]
   },
   {
     id: '7742',
     name: 'SWEAT BLUE NEW 2025 ZIP',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7742',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 62,
-    crossedPrice: 68.2,
+    crossedPrice: 62,
     salesCount: 0,
-    position: 1452,
-    variations: []
-  },
-  {
-    id: '7742',
-    name: 'SWEAT BLUE NEW 2025 ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7742',
-    wholesalePrice: 19,
-    finalPrice: 62,
-    crossedPrice: 68.2,
-    salesCount: 0,
-    position: 1453,
-    variations: []
-  },
-  {
-    id: '7742',
-    name: 'SWEAT BLUE NEW 2025 ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7742',
-    wholesalePrice: 19,
-    finalPrice: 62,
-    crossedPrice: 68.2,
-    salesCount: 0,
-    position: 1454,
-    variations: []
-  },
-  {
-    id: '7742',
-    name: 'SWEAT BLUE NEW 2025 ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7742',
-    wholesalePrice: 19,
-    finalPrice: 62,
-    crossedPrice: 68.2,
-    salesCount: 0,
-    position: 1455,
-    variations: []
-  },
-  {
-    id: '7742',
-    name: 'SWEAT BLUE NEW 2025 ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7742',
-    wholesalePrice: 19,
-    finalPrice: 62,
-    crossedPrice: 68.2,
-    salesCount: 0,
-    position: 1456,
-    variations: []
-  },
-  {
-    id: '7742',
-    name: 'SWEAT BLUE NEW 2025 ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7742',
-    wholesalePrice: 19,
-    finalPrice: 62,
-    crossedPrice: 68.2,
-    salesCount: 0,
-    position: 1457,
-    variations: []
+    position: 7742,
+    variations: [
+    {
+      id: '3098',
+      ean13: '2050556808887',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 62
+    },
+    {
+      id: '3099',
+      ean13: '2075852663374',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 62
+    },
+    {
+      id: '3100',
+      ean13: '2061838298593',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 62
+    },
+    {
+      id: '3101',
+      ean13: '2031750878012',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 62
+    },
+    {
+      id: '3103',
+      ean13: '2065242096936',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 62
+    },
+    {
+      id: '3102',
+      ean13: '2058076750952',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 62
+    }
+    ]
   },
   {
     id: '7743',
     name: 'SWEAT TAUPE NEW 2025 NO ZIP',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7743',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1458,
-    variations: []
-  },
-  {
-    id: '7743',
-    name: 'SWEAT TAUPE NEW 2025 NO ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7743',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1459,
-    variations: []
-  },
-  {
-    id: '7743',
-    name: 'SWEAT TAUPE NEW 2025 NO ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7743',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1460,
-    variations: []
-  },
-  {
-    id: '7743',
-    name: 'SWEAT TAUPE NEW 2025 NO ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7743',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1461,
-    variations: []
-  },
-  {
-    id: '7743',
-    name: 'SWEAT TAUPE NEW 2025 NO ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7743',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1462,
-    variations: []
-  },
-  {
-    id: '7743',
-    name: 'SWEAT TAUPE NEW 2025 NO ZIP',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7743',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1463,
-    variations: []
+    position: 7743,
+    variations: [
+    {
+      id: '3134',
+      ean13: '2042412122671',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3135',
+      ean13: '2036518912083',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3137',
+      ean13: '2072910624810',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3136',
+      ean13: '2077038245589',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3139',
+      ean13: '2082462347549',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3138',
+      ean13: '2065540458863',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 59
+    }
+    ]
   },
   {
     id: '7744',
@@ -19315,49 +20715,43 @@ export const defaultProducts: Product[] = [
     reference: '9000',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1464,
-    variations: []
-  },
-  {
-    id: '7744',
-    name: 'TEE SHIRT MIXTE TAUPE ST',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1465,
-    variations: []
-  },
-  {
-    id: '7744',
-    name: 'TEE SHIRT MIXTE TAUPE ST',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1466,
-    variations: []
-  },
-  {
-    id: '7744',
-    name: 'TEE SHIRT MIXTE TAUPE ST',
-    category: 'braderie',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1467,
-    variations: []
+    position: 7744,
+    variations: [
+    {
+      id: '3116',
+      ean13: '2067491663693',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '3118',
+      ean13: '2015982340202',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '3117',
+      ean13: '2061027663713',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '3119',
+      ean13: '2012544387965',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '7745',
@@ -19367,49 +20761,43 @@ export const defaultProducts: Product[] = [
     reference: '9000',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1468,
-    variations: []
-  },
-  {
-    id: '7745',
-    name: 'TEE SHIRT MIXTE BLEU',
-    category: 'vetement',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1469,
-    variations: []
-  },
-  {
-    id: '7745',
-    name: 'TEE SHIRT MIXTE BLEU',
-    category: 'vetement',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1470,
-    variations: []
-  },
-  {
-    id: '7745',
-    name: 'TEE SHIRT MIXTE BLEU',
-    category: 'vetement',
-    ean13: '2004120283501',
-    reference: '9000',
-    wholesalePrice: 9,
-    finalPrice: 25,
-    crossedPrice: 27.500000000000004,
-    salesCount: 0,
-    position: 1471,
-    variations: []
+    position: 7745,
+    variations: [
+    {
+      id: '3123',
+      ean13: '',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '3122',
+      ean13: '',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '3121',
+      ean13: '',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 25
+    },
+    {
+      id: '3120',
+      ean13: '',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 25
+    }
+    ]
   },
   {
     id: '7746',
@@ -19419,10 +20807,12 @@ export const defaultProducts: Product[] = [
     reference: '824',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1472,
-    variations: []
+    position: 7746,
+    variations: [
+
+    ]
   },
   {
     id: '7747',
@@ -19432,10 +20822,12 @@ export const defaultProducts: Product[] = [
     reference: '823',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1473,
-    variations: []
+    position: 7747,
+    variations: [
+
+    ]
   },
   {
     id: '7748',
@@ -19445,10 +20837,12 @@ export const defaultProducts: Product[] = [
     reference: '821',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1474,
-    variations: []
+    position: 7748,
+    variations: [
+
+    ]
   },
   {
     id: '7749',
@@ -19458,10 +20852,12 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1475,
-    variations: []
+    position: 7749,
+    variations: [
+
+    ]
   },
   {
     id: '7750',
@@ -19471,10 +20867,12 @@ export const defaultProducts: Product[] = [
     reference: '824',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1476,
-    variations: []
+    position: 7750,
+    variations: [
+
+    ]
   },
   {
     id: '7751',
@@ -19484,10 +20882,12 @@ export const defaultProducts: Product[] = [
     reference: '1053',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1477,
-    variations: []
+    position: 7751,
+    variations: [
+
+    ]
   },
   {
     id: '7752',
@@ -19497,10 +20897,12 @@ export const defaultProducts: Product[] = [
     reference: '1053',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1478,
-    variations: []
+    position: 7752,
+    variations: [
+
+    ]
   },
   {
     id: '7753',
@@ -19510,10 +20912,12 @@ export const defaultProducts: Product[] = [
     reference: '1058',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1479,
-    variations: []
+    position: 7753,
+    variations: [
+
+    ]
   },
   {
     id: '7754',
@@ -19523,10 +20927,12 @@ export const defaultProducts: Product[] = [
     reference: '1058',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1480,
-    variations: []
+    position: 7754,
+    variations: [
+
+    ]
   },
   {
     id: '7755',
@@ -19536,62 +20942,72 @@ export const defaultProducts: Product[] = [
     reference: '1053',
     wholesalePrice: 3,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1481,
-    variations: []
+    position: 7755,
+    variations: [
+
+    ]
   },
   {
     id: '7756',
     name: 'SEAU DIAMANT + 6 VN CLEAR VILLAGE',
     category: 'composition-vasque',
     ean13: '2050311083733',
-    reference: 'REF7756',
+    reference: '',
     wholesalePrice: 22,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 88,
     salesCount: 0,
-    position: 1482,
-    variations: []
+    position: 7756,
+    variations: [
+
+    ]
   },
   {
     id: '7757',
     name: 'SEAU DIAMANT + 6 VN CLEAR TROPEZ',
     category: 'composition-vasque',
     ean13: '2043133797902',
-    reference: 'REF7757',
+    reference: '',
     wholesalePrice: 22,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 88,
     salesCount: 0,
-    position: 1483,
-    variations: []
+    position: 7757,
+    variations: [
+
+    ]
   },
   {
     id: '7758',
     name: 'SEAU 1BT VELA MAXIME + 6 VN VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2035404579027',
-    reference: 'REF7758',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1484,
-    variations: []
+    position: 7758,
+    variations: [
+
+    ]
   },
   {
     id: '7759',
     name: 'SEAU NICE CLEAR TROPEZ + 6 VN 83 CLEAR',
     category: 'composition-vasque',
     ean13: '2080522364345',
-    reference: 'REF7759',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1485,
-    variations: []
+    position: 7759,
+    variations: [
+
+    ]
   },
   {
     id: '7760',
@@ -19601,10 +21017,12 @@ export const defaultProducts: Product[] = [
     reference: '1000-87',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1486,
-    variations: []
+    position: 7760,
+    variations: [
+
+    ]
   },
   {
     id: '7761',
@@ -19614,10 +21032,12 @@ export const defaultProducts: Product[] = [
     reference: '2000-87',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1487,
-    variations: []
+    position: 7761,
+    variations: [
+
+    ]
   },
   {
     id: '7762',
@@ -19627,10 +21047,12 @@ export const defaultProducts: Product[] = [
     reference: '4000-87',
     wholesalePrice: 10,
     finalPrice: 30,
-    crossedPrice: 33,
+    crossedPrice: 30,
     salesCount: 0,
-    position: 1488,
-    variations: []
+    position: 7762,
+    variations: [
+
+    ]
   },
   {
     id: '7763',
@@ -19640,10 +21062,12 @@ export const defaultProducts: Product[] = [
     reference: '6000-78',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1489,
-    variations: []
+    position: 7763,
+    variations: [
+
+    ]
   },
   {
     id: '7764',
@@ -19653,10 +21077,12 @@ export const defaultProducts: Product[] = [
     reference: '2000-36',
     wholesalePrice: 4,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1490,
-    variations: []
+    position: 7764,
+    variations: [
+
+    ]
   },
   {
     id: '7765',
@@ -19666,10 +21092,12 @@ export const defaultProducts: Product[] = [
     reference: '1000-94',
     wholesalePrice: 4,
     finalPrice: 7,
-    crossedPrice: 7.700000000000001,
+    crossedPrice: 7,
     salesCount: 0,
-    position: 1491,
-    variations: []
+    position: 7765,
+    variations: [
+
+    ]
   },
   {
     id: '7766',
@@ -19679,10 +21107,12 @@ export const defaultProducts: Product[] = [
     reference: '5000-94',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1492,
-    variations: []
+    position: 7766,
+    variations: [
+
+    ]
   },
   {
     id: '7767',
@@ -19692,10 +21122,12 @@ export const defaultProducts: Product[] = [
     reference: '1000-80',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1493,
-    variations: []
+    position: 7767,
+    variations: [
+
+    ]
   },
   {
     id: '7768',
@@ -19705,10 +21137,12 @@ export const defaultProducts: Product[] = [
     reference: '1500-80',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1494,
-    variations: []
+    position: 7768,
+    variations: [
+
+    ]
   },
   {
     id: '7769',
@@ -19718,23 +21152,27 @@ export const defaultProducts: Product[] = [
     reference: '2000-80',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1495,
-    variations: []
+    position: 7769,
+    variations: [
+
+    ]
   },
   {
     id: '7770',
     name: 'SEAU 1BT VELA CAVALAIRE + 6 BK CAVALAIRE',
     category: 'composition-vasque',
     ean13: '2053123296155',
-    reference: 'REF7770',
+    reference: '',
     wholesalePrice: 24,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 86,
     salesCount: 0,
-    position: 1496,
-    variations: []
+    position: 7770,
+    variations: [
+
+    ]
   },
   {
     id: '7771',
@@ -19744,10 +21182,12 @@ export const defaultProducts: Product[] = [
     reference: '54',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1497,
-    variations: []
+    position: 7771,
+    variations: [
+
+    ]
   },
   {
     id: '7773',
@@ -19757,10 +21197,12 @@ export const defaultProducts: Product[] = [
     reference: '56',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1498,
-    variations: []
+    position: 7773,
+    variations: [
+
+    ]
   },
   {
     id: '7774',
@@ -19770,10 +21212,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1499,
-    variations: []
+    position: 7774,
+    variations: [
+
+    ]
   },
   {
     id: '7775',
@@ -19783,10 +21227,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1500,
-    variations: []
+    position: 7775,
+    variations: [
+
+    ]
   },
   {
     id: '7776',
@@ -19796,10 +21242,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1501,
-    variations: []
+    position: 7776,
+    variations: [
+
+    ]
   },
   {
     id: '7777',
@@ -19809,10 +21257,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1502,
-    variations: []
+    position: 7777,
+    variations: [
+
+    ]
   },
   {
     id: '7778',
@@ -19822,10 +21272,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1503,
-    variations: []
+    position: 7778,
+    variations: [
+
+    ]
   },
   {
     id: '7779',
@@ -19835,10 +21287,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1504,
-    variations: []
+    position: 7779,
+    variations: [
+
+    ]
   },
   {
     id: '7780',
@@ -19848,10 +21302,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1505,
-    variations: []
+    position: 7780,
+    variations: [
+
+    ]
   },
   {
     id: '7781',
@@ -19861,10 +21317,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1506,
-    variations: []
+    position: 7781,
+    variations: [
+
+    ]
   },
   {
     id: '7782',
@@ -19874,10 +21332,12 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 21,
     finalPrice: 65,
-    crossedPrice: 71.5,
+    crossedPrice: 65,
     salesCount: 0,
-    position: 1507,
-    variations: []
+    position: 7782,
+    variations: [
+
+    ]
   },
   {
     id: '7783',
@@ -19887,205 +21347,237 @@ export const defaultProducts: Product[] = [
     reference: '730',
     wholesalePrice: 5,
     finalPrice: 16,
-    crossedPrice: 17.6,
+    crossedPrice: 16,
     salesCount: 0,
-    position: 1508,
-    variations: []
+    position: 7783,
+    variations: [
+
+    ]
   },
   {
     id: '7784',
     name: 'TRIO WHITE MAXIME/TROPEZ',
     category: 'trio-pack',
     ean13: '2042599656655',
-    reference: 'REF7784',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1509,
-    variations: []
+    position: 7784,
+    variations: [
+
+    ]
   },
   {
     id: '7785',
     name: 'SOBAG  PORT GRIMAUD + 6 VN VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2035246854498',
-    reference: 'REF7785',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1510,
-    variations: []
+    position: 7785,
+    variations: [
+
+    ]
   },
   {
     id: '7786',
     name: 'VASQUE BULLE TRZ + 6 BALLONS PIEDS COULEUR',
     category: 'composition-vasque',
     ean13: '2044006799191',
-    reference: 'REF7786',
+    reference: '',
     wholesalePrice: 70,
     finalPrice: 150,
-    crossedPrice: 165,
+    crossedPrice: 170,
     salesCount: 0,
-    position: 1511,
-    variations: []
+    position: 7786,
+    variations: [
+
+    ]
   },
   {
     id: '7787',
     name: 'TRIO WHITE CANNES/TROPEZ',
     category: 'trio-pack',
     ean13: '2085769760226',
-    reference: 'REF7787',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1512,
-    variations: []
+    position: 7787,
+    variations: [
+
+    ]
   },
   {
     id: '7788',
     name: 'TRIO WHITE PORT GRIMAUD/TROPEZ',
     category: 'trio-pack',
     ean13: '2097945621207',
-    reference: 'REF7788',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1513,
-    variations: []
+    position: 7788,
+    variations: [
+
+    ]
   },
   {
     id: '7791',
     name: 'TRIO WHITE CAVALAIRE/TROPEZ',
     category: 'trio-pack',
     ean13: '2027672774402',
-    reference: 'REF7791',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1514,
-    variations: []
+    position: 7791,
+    variations: [
+
+    ]
   },
   {
     id: '7792',
     name: 'VASQUE VELA CLEAR + 12 CALICES MIXTES',
     category: 'composition-vasque',
     ean13: '2021039727919',
-    reference: 'REF7792',
+    reference: '',
     wholesalePrice: 36,
     finalPrice: 184,
-    crossedPrice: 202.4,
+    crossedPrice: 204,
     salesCount: 0,
-    position: 1515,
-    variations: []
+    position: 7792,
+    variations: [
+
+    ]
   },
   {
     id: '7794',
     name: 'PACK 6 BALLOONS PIED COULEUR',
     category: 'pack-verre',
     ean13: '2016215592528',
-    reference: 'REF7794',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 57,
-    crossedPrice: 62.7,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 1516,
-    variations: []
+    position: 7794,
+    variations: [
+
+    ]
   },
   {
     id: '7795',
     name: 'SEAU 2BT VELA  + 6 BK VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2058867085546',
-    reference: 'REF7795',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1517,
-    variations: []
+    position: 7795,
+    variations: [
+
+    ]
   },
   {
     id: '7796',
     name: 'SOBAG CLEAR PORT GRIMAUD + 6 BK VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2037163567529',
-    reference: 'REF7796',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1518,
-    variations: []
+    position: 7796,
+    variations: [
+
+    ]
   },
   {
     id: '7797',
     name: 'VASQUE DIAMANT + 8 BK COULEURS 2025',
     category: 'composition-vasque',
     ean13: '2026560179800',
-    reference: 'REF7797',
+    reference: '',
     wholesalePrice: 44,
     finalPrice: 115,
-    crossedPrice: 126.50000000000001,
+    crossedPrice: 133,
     salesCount: 0,
-    position: 1519,
-    variations: []
+    position: 7797,
+    variations: [
+
+    ]
   },
   {
     id: '7798',
     name: 'SEAU 2BT VELA CLEAR TROPEZ+ 5 CALICES METAL',
     category: 'composition-vasque',
     ean13: '2040667421532',
-    reference: 'REF7798',
+    reference: '',
     wholesalePrice: 24,
     finalPrice: 84,
-    crossedPrice: 92.4,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 1520,
-    variations: []
+    position: 7798,
+    variations: [
+
+    ]
   },
   {
     id: '7799',
     name: 'SOBAG CLEAR TROPEZ+ 6 VN MIXTE CLEAR 83',
     category: 'composition-vasque',
     ean13: '2098599730666',
-    reference: 'REF7799',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1521,
-    variations: []
+    position: 7799,
+    variations: [
+
+    ]
   },
   {
     id: '7801',
     name: 'SOBAG CLEAR PG + 6 VN GRIMAUD BLANC',
     category: 'composition-vasque',
     ean13: '2012174803095',
-    reference: 'REF7801',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1522,
-    variations: []
+    position: 7801,
+    variations: [
+
+    ]
   },
   {
     id: '7802',
     name: 'SOBAG CLEAR MAXIME + 6 FLUTES BLNC MAXIME',
     category: 'composition-vasque',
     ean13: '2035915687037',
-    reference: 'REF7802',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1523,
-    variations: []
+    position: 7802,
+    variations: [
+
+    ]
   },
   {
     id: '7803',
@@ -20095,140 +21587,162 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 25,
     finalPrice: 44,
-    crossedPrice: 48.400000000000006,
+    crossedPrice: 44,
     salesCount: 0,
-    position: 1524,
-    variations: []
+    position: 7803,
+    variations: [
+
+    ]
   },
   {
     id: '7804',
     name: 'SEAU 1BT VELA CAVALAIRE + 6 FLUTES CAVALAIRE',
     category: 'composition-vasque',
     ean13: '2085501819885',
-    reference: 'REF7804',
+    reference: '',
     wholesalePrice: 16,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1525,
-    variations: []
+    position: 7804,
+    variations: [
+
+    ]
   },
   {
     id: '7806',
     name: 'CHAMPAGNE 50 cl  CARTE BLANCHE',
     category: 'vin',
     ean13: '',
-    reference: 'REF7806',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1526,
-    variations: []
+    position: 7806,
+    variations: [
+
+    ]
   },
   {
     id: '7807',
     name: 'CHAMPAGNE EVENEMENTIEL 75 CL',
     category: 'vin',
     ean13: '',
-    reference: 'REF7807',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 1527,
-    variations: []
+    position: 7807,
+    variations: [
+
+    ]
   },
   {
     id: '7810',
     name: 'PACK 6 CALICES METAL',
     category: 'pack-verre',
     ean13: '2003693311819',
-    reference: 'REF7810',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 68,
-    crossedPrice: 74.80000000000001,
+    crossedPrice: 72,
     salesCount: 0,
-    position: 1528,
-    variations: []
+    position: 7810,
+    variations: [
+
+    ]
   },
   {
     id: '7811',
     name: 'SEAU 2BT VELA BLANC + 6 BALLONS PIEDS COULEUR',
     category: 'composition-vasque',
     ean13: '2044006799191',
-    reference: 'REF7811',
+    reference: '',
     wholesalePrice: 27,
     finalPrice: 79,
-    crossedPrice: 86.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 1529,
-    variations: []
+    position: 7811,
+    variations: [
+
+    ]
   },
   {
     id: '7812',
     name: 'SEAU 2 BT VELA CLEAR + 6 BALLONS PIEDS COULEUR',
     category: 'composition-vasque',
     ean13: '2044006799191',
-    reference: 'REF7812',
+    reference: '',
     wholesalePrice: 27,
     finalPrice: 79,
-    crossedPrice: 86.9,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 1530,
-    variations: []
+    position: 7812,
+    variations: [
+
+    ]
   },
   {
     id: '7813',
     name: 'SEAU 2BT VELA BLANC TROPEZ+ 5 CALICES METAL',
     category: 'composition-vasque',
     ean13: '2040667421532',
-    reference: 'REF7813',
+    reference: '',
     wholesalePrice: 24,
     finalPrice: 84,
-    crossedPrice: 92.4,
+    crossedPrice: 99,
     salesCount: 0,
-    position: 1531,
-    variations: []
+    position: 7813,
+    variations: [
+
+    ]
   },
   {
     id: '7815',
     name: 'TRIO WHITE  TROPEZ/TROPEZ',
     category: 'trio-pack',
     ean13: '2098737081773',
-    reference: 'REF7815',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1532,
-    variations: []
+    position: 7815,
+    variations: [
+
+    ]
   },
   {
     id: '7816',
     name: 'TRIO DOMAINE TRZ /  VN TROPEZ/TROPEZ',
     category: 'trio-pack',
     ean13: '2016889314228',
-    reference: 'REF7816',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1533,
-    variations: []
+    position: 7816,
+    variations: [
+
+    ]
   },
   {
     id: '7817',
     name: 'SEAU NICE  + 6 BK TROPEZ',
     category: 'composition-vasque',
     ean13: '2031132425278',
-    reference: 'REF7817',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1534,
-    variations: []
+    position: 7817,
+    variations: [
+
+    ]
   },
   {
     id: '7818',
@@ -20238,23 +21752,27 @@ export const defaultProducts: Product[] = [
     reference: '1325',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1535,
-    variations: []
-  },
-  {
-    id: '7818',
-    name: 'PORTE CLEF HARIBO',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: '1325',
-    wholesalePrice: 2,
-    finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
-    salesCount: 0,
-    position: 1536,
-    variations: []
+    position: 7818,
+    variations: [
+    {
+      id: '3153',
+      ean13: '2032833485318',
+      reference: '',
+      attributes: 'ROUGE',
+      priceImpact: 0,
+      finalPrice: 6
+    },
+    {
+      id: '3152',
+      ean13: '2032426160271',
+      reference: '',
+      attributes: 'ROSE',
+      priceImpact: 0,
+      finalPrice: 6
+    }
+    ]
   },
   {
     id: '7819',
@@ -20264,218 +21782,210 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 3,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1537,
-    variations: []
+    position: 7819,
+    variations: [
+
+    ]
   },
   {
     id: '7820',
     name: 'TRIO PASTIS CITADELLE TUBE BLANC TROPEZ',
     category: 'trio-pack',
     ean13: '2087404316270',
-    reference: 'REF7820',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 43,
-    crossedPrice: 47.300000000000004,
+    crossedPrice: 43,
     salesCount: 0,
-    position: 1538,
-    variations: []
+    position: 7820,
+    variations: [
+
+    ]
   },
   {
     id: '7821',
     name: 'PACK 10 BK COULEUR 2025',
     category: 'pack-verre',
     ean13: '2027932514281',
-    reference: 'REF7821',
+    reference: '',
     wholesalePrice: 28,
     finalPrice: 80,
-    crossedPrice: 88,
+    crossedPrice: 85,
     salesCount: 0,
-    position: 1539,
-    variations: []
+    position: 7821,
+    variations: [
+
+    ]
   },
   {
     id: '7823',
     name: 'PAPIER DE SOIE',
     category: 'consomable-interne-boutique',
     ean13: '',
-    reference: 'REF7823',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 0,
     crossedPrice: 0,
     salesCount: 0,
-    position: 1540,
-    variations: []
+    position: 7823,
+    variations: [
+
+    ]
   },
   {
     id: '7824',
     name: 'copy of SWEAT BLUE',
     category: 'vetement',
     ean13: '',
-    reference: 'REF7824',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1541,
-    variations: []
-  },
-  {
-    id: '7824',
-    name: 'copy of SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7824',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1542,
-    variations: []
-  },
-  {
-    id: '7824',
-    name: 'copy of SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7824',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1543,
-    variations: []
-  },
-  {
-    id: '7824',
-    name: 'copy of SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7824',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1544,
-    variations: []
-  },
-  {
-    id: '7824',
-    name: 'copy of SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7824',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1545,
-    variations: []
-  },
-  {
-    id: '7824',
-    name: 'copy of SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7824',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1546,
-    variations: []
-  },
-  {
-    id: '7824',
-    name: 'copy of SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7824',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1547,
-    variations: []
-  },
-  {
-    id: '7824',
-    name: 'copy of SWEAT BLUE',
-    category: 'vetement',
-    ean13: '',
-    reference: 'REF7824',
-    wholesalePrice: 19,
-    finalPrice: 59,
-    crossedPrice: 64.9,
-    salesCount: 0,
-    position: 1548,
-    variations: []
+    position: 7824,
+    variations: [
+    {
+      id: '3165',
+      ean13: '',
+      reference: '',
+      attributes: 'XXS',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3166',
+      ean13: '',
+      reference: '',
+      attributes: 'XS',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3167',
+      ean13: '',
+      reference: '',
+      attributes: 'S',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3170',
+      ean13: '',
+      reference: '',
+      attributes: 'XL',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3168',
+      ean13: '',
+      reference: '',
+      attributes: 'M',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3171',
+      ean13: '',
+      reference: '',
+      attributes: 'XXL',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3169',
+      ean13: '',
+      reference: '',
+      attributes: 'L',
+      priceImpact: 0,
+      finalPrice: 59
+    },
+    {
+      id: '3172',
+      ean13: '',
+      reference: '',
+      attributes: 'XXXL',
+      priceImpact: 0,
+      finalPrice: 59
+    }
+    ]
   },
   {
     id: '7826',
     name: 'SEAU 1BT VELA MAXIME + 6 BK 06 SANS CAVALAIRE',
     category: 'composition-vasque',
     ean13: '2095249027756',
-    reference: 'REF7826',
+    reference: '',
     wholesalePrice: 24,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 86,
     salesCount: 0,
-    position: 1549,
-    variations: []
+    position: 7826,
+    variations: [
+
+    ]
   },
   {
     id: '7827',
     name: 'SOBAG  PORT GRIMAUD + 6 VN PG BLANC',
     category: 'composition-vasque',
     ean13: '2031201979572',
-    reference: 'REF7827',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1550,
-    variations: []
+    position: 7827,
+    variations: [
+
+    ]
   },
   {
     id: '7828',
     name: 'SEAU NICE TROPEZ + 6 VN VILLAGE BLANC 83',
     category: 'composition-vasque',
     ean13: '2003932309799',
-    reference: 'REF7828',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1551,
-    variations: []
+    position: 7828,
+    variations: [
+
+    ]
   },
   {
     id: '7829',
     name: 'VICTORIA + 6 SUNSET + 6 EASY CLIP',
     category: 'composition-vasque',
     ean13: '2047818618391',
-    reference: 'REF7829',
+    reference: '',
     wholesalePrice: 35,
     finalPrice: 119,
-    crossedPrice: 130.9,
+    crossedPrice: 136,
     salesCount: 0,
-    position: 1552,
-    variations: []
+    position: 7829,
+    variations: [
+
+    ]
   },
   {
     id: '7830',
     name: 'SEAU DIAMANT + 6 FLUTES TROPEZ CLEAR',
     category: 'composition-vasque',
     ean13: '2040640214199',
-    reference: 'REF7830',
+    reference: '',
     wholesalePrice: 22,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 88,
     salesCount: 0,
-    position: 1553,
-    variations: []
+    position: 7830,
+    variations: [
+
+    ]
   },
   {
     id: '7831',
@@ -20485,88 +21995,88 @@ export const defaultProducts: Product[] = [
     reference: '3123',
     wholesalePrice: 12,
     finalPrice: 29,
-    crossedPrice: 31.900000000000002,
+    crossedPrice: 29,
     salesCount: 0,
-    position: 1554,
-    variations: []
+    position: 7831,
+    variations: [
+
+    ]
   },
   {
     id: '7832',
     name: 'CASQUETTE LETTRE',
     category: 'casquette',
     ean13: '2009749756924',
-    reference: 'REF7832',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 24,
-    crossedPrice: 26.400000000000002,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 1555,
-    variations: []
+    position: 7832,
+    variations: [
+
+    ]
   },
   {
     id: '7833',
     name: 'PORTE CLEF  COEUR METAL MOVE TROPEZ',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7833',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1556,
-    variations: []
-  },
-  {
-    id: '7833',
-    name: 'PORTE CLEF  COEUR METAL MOVE TROPEZ',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF7833',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 1557,
-    variations: []
-  },
-  {
-    id: '7833',
-    name: 'PORTE CLEF  COEUR METAL MOVE TROPEZ',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF7833',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 1558,
-    variations: []
-  },
-  {
-    id: '7833',
-    name: 'PORTE CLEF  COEUR METAL MOVE TROPEZ',
-    category: 'porte-clef--bracelet',
-    ean13: '',
-    reference: 'REF7833',
-    wholesalePrice: 3,
-    finalPrice: 10,
-    crossedPrice: 11,
-    salesCount: 0,
-    position: 1559,
-    variations: []
+    position: 7833,
+    variations: [
+    {
+      id: '3201',
+      ean13: '',
+      reference: '',
+      attributes: 'MAUVE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '3200',
+      ean13: '',
+      reference: '',
+      attributes: 'BLEU',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '3199',
+      ean13: '',
+      reference: '',
+      attributes: 'ROSE',
+      priceImpact: 0,
+      finalPrice: 10
+    },
+    {
+      id: '3198',
+      ean13: '',
+      reference: '',
+      attributes: 'ORANGE',
+      priceImpact: 0,
+      finalPrice: 10
+    }
+    ]
   },
   {
     id: '7834',
     name: 'SEAU 2BT VELA CLEAR + 6 BK CLEAR TROPEZ',
     category: 'composition-vasque',
     ean13: '2081247467953',
-    reference: 'REF7834',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1560,
-    variations: []
+    position: 7834,
+    variations: [
+
+    ]
   },
   {
     id: '7835',
@@ -20576,504 +22086,582 @@ export const defaultProducts: Product[] = [
     reference: 'CO 6',
     wholesalePrice: 12,
     finalPrice: 41,
-    crossedPrice: 45.1,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1561,
-    variations: []
+    position: 7835,
+    variations: [
+
+    ]
   },
   {
     id: '7836',
     name: 'COOL BAG GRAND + 6 BK VILLAGE 06',
     category: 'pack-ice-bag',
     ean13: '2030437593804',
-    reference: 'REF7836',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 53,
-    crossedPrice: 58.300000000000004,
+    crossedPrice: 58,
     salesCount: 0,
-    position: 1562,
-    variations: []
+    position: 7836,
+    variations: [
+
+    ]
   },
   {
     id: '7837',
     name: 'COOL BAG GRAND + 6 BK CLEAR CANNES',
     category: 'pack-ice-bag',
     ean13: '2017848574790',
-    reference: 'REF7837',
+    reference: '',
     wholesalePrice: 19,
     finalPrice: 53,
-    crossedPrice: 58.300000000000004,
+    crossedPrice: 58,
     salesCount: 0,
-    position: 1563,
-    variations: []
+    position: 7837,
+    variations: [
+
+    ]
   },
   {
     id: '7838',
     name: 'SEAU 2BT VELA CANNES BLANC + 6 VN CANNES',
     category: 'composition-vasque',
     ean13: '2033710968016',
-    reference: 'REF7838',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 78,
     salesCount: 0,
-    position: 1564,
-    variations: []
+    position: 7838,
+    variations: [
+
+    ]
   },
   {
     id: '7839',
     name: 'SEAU 2BT VELA TROPEZ + 6 BK COULEUR 2025',
     category: 'composition-vasque',
     ean13: '2081498858043',
-    reference: 'REF7839',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1565,
-    variations: []
+    position: 7839,
+    variations: [
+
+    ]
   },
   {
     id: '7840',
     name: 'PACK HARLEY',
     category: 'pack-verre',
     ean13: '2034086108372',
-    reference: 'REF7840',
+    reference: '',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 17,
     salesCount: 0,
-    position: 1566,
-    variations: []
+    position: 7840,
+    variations: [
+
+    ]
   },
   {
     id: '7841',
     name: 'PACK 6 BK HARLEY',
     category: 'pack-verre',
     ean13: '2034086108372',
-    reference: 'REF7841',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 51,
     salesCount: 0,
-    position: 1567,
-    variations: []
+    position: 7841,
+    variations: [
+
+    ]
   },
   {
     id: '7842',
     name: 'COOL BAG UP + 1VN PG+ 1VN TROPEZ',
     category: 'pack-ice-bag',
     ean13: '2061268600362',
-    reference: 'REF7842',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 30,
-    crossedPrice: 33,
+    crossedPrice: 30,
     salesCount: 0,
-    position: 1568,
-    variations: []
+    position: 7842,
+    variations: [
+
+    ]
   },
   {
     id: '7843',
     name: 'VASQUE VELA CLEAR + 12 BK CLEAR TROPEZ',
     category: 'composition-vasque',
     ean13: '2082356798396',
-    reference: 'REF7843',
+    reference: '',
     wholesalePrice: 54,
     finalPrice: 139,
-    crossedPrice: 152.9,
+    crossedPrice: 162,
     salesCount: 0,
-    position: 1569,
-    variations: []
+    position: 7843,
+    variations: [
+
+    ]
   },
   {
     id: '7844',
     name: 'MAGNET PLAQUE PORT GRIMAUD',
     category: 'porte-clef--bracelet',
     ean13: '2010820671593',
-    reference: 'REF7844',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1570,
-    variations: []
+    position: 7844,
+    variations: [
+
+    ]
   },
   {
     id: '7845',
     name: 'TRIO BK HARLEY ICE',
     category: 'trio-pack',
     ean13: '',
-    reference: 'REF7845',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 24,
-    crossedPrice: 26.400000000000002,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 1571,
-    variations: []
+    position: 7845,
+    variations: [
+
+    ]
   },
   {
     id: '7846',
     name: 'MIGNONETTE PAMPY BOITE',
     category: 'vin',
     ean13: '2019001009064',
-    reference: 'REF7846',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 14,
-    crossedPrice: 15.400000000000002,
+    crossedPrice: 14,
     salesCount: 0,
-    position: 1572,
-    variations: []
+    position: 7846,
+    variations: [
+
+    ]
   },
   {
     id: '7847',
     name: 'MIGNONETTE PAMPY SANS BOITE',
     category: 'vin',
     ean13: '2007806046131',
-    reference: 'REF7847',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1573,
-    variations: []
+    position: 7847,
+    variations: [
+
+    ]
   },
   {
     id: '7848',
     name: 'CASQUETTE ST LIN BLEU',
     category: 'casquette',
     ean13: '2017948518199',
-    reference: 'REF7848',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1574,
-    variations: []
+    position: 7848,
+    variations: [
+
+    ]
   },
   {
     id: '7849',
     name: 'CASQUETTE ST LIN BEIGE',
     category: 'casquette',
     ean13: '2094334429895',
-    reference: 'REF7849',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1575,
-    variations: []
+    position: 7849,
+    variations: [
+
+    ]
   },
   {
     id: '7850',
     name: 'CASQUETTE ST COTON ORANGE LOGO BLANC',
     category: 'casquette',
     ean13: '2089013931844',
-    reference: 'REF7850',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1576,
-    variations: []
+    position: 7850,
+    variations: [
+
+    ]
   },
   {
     id: '7851',
     name: 'CASQUETTE ST COTON BEIGE CLAIR LOGO BLEU',
     category: 'casquette',
     ean13: '2003120046604',
-    reference: 'REF7851',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1577,
-    variations: []
+    position: 7851,
+    variations: [
+
+    ]
   },
   {
     id: '7852',
     name: 'CASQUETTE SATIN NIKE ROSE FUSHIA',
     category: 'casquette',
     ean13: '2027806298378',
-    reference: 'REF7852',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1578,
-    variations: []
+    position: 7852,
+    variations: [
+
+    ]
   },
   {
     id: '7853',
     name: 'CASQUETTE SATIN ST BEIGE',
     category: 'casquette',
     ean13: '2050130442162',
-    reference: 'REF7853',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1579,
-    variations: []
+    position: 7853,
+    variations: [
+
+    ]
   },
   {
     id: '7854',
     name: 'BOB FROUFROU TAUPE ST',
     category: 'casquette',
     ean13: '2086849004131',
-    reference: 'REF7854',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 22,
-    crossedPrice: 24.200000000000003,
+    crossedPrice: 22,
     salesCount: 0,
-    position: 1580,
-    variations: []
+    position: 7854,
+    variations: [
+
+    ]
   },
   {
     id: '7855',
     name: 'BOB FROUFROU ORANGE ST',
     category: 'casquette',
     ean13: '2028500729564',
-    reference: 'REF7855',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 22,
-    crossedPrice: 24.200000000000003,
+    crossedPrice: 22,
     salesCount: 0,
-    position: 1581,
-    variations: []
+    position: 7855,
+    variations: [
+
+    ]
   },
   {
     id: '7856',
     name: 'BOB FROUFROU BLEU ST',
     category: 'casquette',
     ean13: '2098665680017',
-    reference: 'REF7856',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 22,
-    crossedPrice: 24.200000000000003,
+    crossedPrice: 22,
     salesCount: 0,
-    position: 1582,
-    variations: []
+    position: 7856,
+    variations: [
+
+    ]
   },
   {
     id: '7857',
     name: 'BANDOULIERE BEIGE OR',
     category: 'vetement',
     ean13: '2059728499762',
-    reference: 'REF7857',
+    reference: '',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1583,
-    variations: []
+    position: 7857,
+    variations: [
+
+    ]
   },
   {
     id: '7858',
     name: 'BANDOULIERE  ORANGE',
     category: 'vetement',
     ean13: '2046582991785',
-    reference: 'REF7858',
+    reference: '',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1584,
-    variations: []
+    position: 7858,
+    variations: [
+
+    ]
   },
   {
     id: '7859',
     name: 'BANDOULIERE BLEUE',
     category: 'vetement',
     ean13: '2050833319440',
-    reference: 'REF7859',
+    reference: '',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1585,
-    variations: []
+    position: 7859,
+    variations: [
+
+    ]
   },
   {
     id: '7860',
     name: 'BIG POCHETTE TROPEZ VICHY 2025',
     category: 'pochette',
     ean13: '2019244139306',
-    reference: 'REF7860',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1586,
-    variations: []
+    position: 7860,
+    variations: [
+
+    ]
   },
   {
     id: '7861',
     name: 'BIG POCHETTE TROPEZ ORANGE 2025',
     category: 'pochette',
     ean13: '2032740494687',
-    reference: 'REF7861',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1587,
-    variations: []
+    position: 7861,
+    variations: [
+
+    ]
   },
   {
     id: '7862',
     name: 'POCHETTE TOWEL BLEU RAYE',
     category: 'pochette',
     ean13: '2003966862970',
-    reference: 'REF7862',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1588,
-    variations: []
+    position: 7862,
+    variations: [
+
+    ]
   },
   {
     id: '7863',
     name: 'POCHETTE TOWEL TAUPE RAYE',
     category: 'pochette',
     ean13: '2051657748478',
-    reference: 'REF7863',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1589,
-    variations: []
+    position: 7863,
+    variations: [
+
+    ]
   },
   {
     id: '7864',
     name: 'SAC TOWEL TAUPE RAYE',
     category: 'sac',
     ean13: '2001104572125',
-    reference: 'REF7864',
+    reference: '',
     wholesalePrice: 13,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1590,
-    variations: []
+    position: 7864,
+    variations: [
+
+    ]
   },
   {
     id: '7865',
     name: 'SAC TOWEL BLEU RAYE',
     category: 'sac',
     ean13: '2094688006568',
-    reference: 'REF7865',
+    reference: '',
     wholesalePrice: 13,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1591,
-    variations: []
+    position: 7865,
+    variations: [
+
+    ]
   },
   {
     id: '7866',
     name: 'LIGHT TOWEL ORANGE TROPEZ 2024',
     category: 'serviette',
     ean13: '2058455936243',
-    reference: 'REF7866',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1592,
-    variations: []
+    position: 7866,
+    variations: [
+
+    ]
   },
   {
     id: '7867',
     name: 'LIGHT TOWEL TAUPE TROPEZ',
     category: 'serviette',
     ean13: '2024287677852',
-    reference: 'REF7867',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 39,
-    crossedPrice: 42.900000000000006,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1593,
-    variations: []
+    position: 7867,
+    variations: [
+
+    ]
   },
   {
     id: '7868',
     name: 'BIG POCHETTE TROPEZ MARINE 2025',
     category: 'pochette',
     ean13: '2032313697903',
-    reference: 'REF7868',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1594,
-    variations: []
+    position: 7868,
+    variations: [
+
+    ]
   },
   {
     id: '7869',
     name: 'ECHARPE CHAPEAU',
     category: 'serviette',
     ean13: '2093518130268',
-    reference: 'REF7869',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1595,
-    variations: []
+    position: 7869,
+    variations: [
+
+    ]
   },
   {
     id: '7870',
     name: 'STYLO KDO BLEU',
     category: 'papeterie',
     ean13: '2054578965467',
-    reference: 'REF7870',
+    reference: '',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1596,
-    variations: []
+    position: 7870,
+    variations: [
+
+    ]
   },
   {
     id: '7871',
     name: 'LIGHT TOWEL RAYE BEIGE TROPEZ',
     category: 'serviette',
     ean13: '2065744327774',
-    reference: 'REF7871',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1597,
-    variations: []
+    position: 7871,
+    variations: [
+
+    ]
   },
   {
     id: '7872',
     name: 'LIGHT TOWEL RAYE BLEUE TROPEZ',
     category: 'serviette',
     ean13: '2035083146435',
-    reference: 'REF7872',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1598,
-    variations: []
+    position: 7872,
+    variations: [
+
+    ]
   },
   {
     id: '7873',
     name: 'LIGHT TOWEL RAYE BLEU CAVALAIRE',
     category: 'serviette',
     ean13: '2009121588051',
-    reference: 'REF7873',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1599,
-    variations: []
+    position: 7873,
+    variations: [
+
+    ]
   },
   {
     id: '7875',
@@ -21083,10 +22671,12 @@ export const defaultProducts: Product[] = [
     reference: '2684 BIS',
     wholesalePrice: 18,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1600,
-    variations: []
+    position: 7875,
+    variations: [
+
+    ]
   },
   {
     id: '7876',
@@ -21096,283 +22686,327 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1601,
-    variations: []
+    position: 7876,
+    variations: [
+
+    ]
   },
   {
     id: '7878',
     name: 'TRIO  ICE PECHE BRAVADETROPEZ',
     category: 'trio-pack',
     ean13: '',
-    reference: 'REF7878',
+    reference: '',
     wholesalePrice: 9,
     finalPrice: 24,
-    crossedPrice: 26.400000000000002,
+    crossedPrice: 24,
     salesCount: 0,
-    position: 1602,
-    variations: []
+    position: 7878,
+    variations: [
+
+    ]
   },
   {
     id: '7879',
     name: 'SAC LETTRE ST',
     category: 'sac',
     ean13: '2090015156371',
-    reference: 'REF7879',
+    reference: '',
     wholesalePrice: 25,
     finalPrice: 65,
-    crossedPrice: 71.5,
+    crossedPrice: 65,
     salesCount: 0,
-    position: 1603,
-    variations: []
+    position: 7879,
+    variations: [
+
+    ]
   },
   {
     id: '7880',
     name: 'PORTE CLEF BRACELET NEOPRENE 2025',
     category: 'porte-cle-10',
     ean13: '2088743497507',
-    reference: 'REF7880',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1604,
-    variations: []
+    position: 7880,
+    variations: [
+
+    ]
   },
   {
     id: '7881',
     name: 'BIG FOLDING TROPEZ NAVY 2025',
     category: 'sac',
     ean13: '2093684197737',
-    reference: 'REF7881',
+    reference: '',
     wholesalePrice: 13,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1605,
-    variations: []
+    position: 7881,
+    variations: [
+
+    ]
   },
   {
     id: '7882',
     name: 'BIG FOLDING TROPEZ BEIGE 2025',
     category: 'sac',
     ean13: '2069551744205',
-    reference: 'REF7882',
+    reference: '',
     wholesalePrice: 13,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1606,
-    variations: []
+    position: 7882,
+    variations: [
+
+    ]
   },
   {
     id: '7883',
     name: 'BIG FOLDING CANNES',
     category: 'sac',
     ean13: '2077482907781',
-    reference: 'REF7883',
+    reference: '',
     wholesalePrice: 13,
     finalPrice: 42,
-    crossedPrice: 46.2,
+    crossedPrice: 42,
     salesCount: 0,
-    position: 1607,
-    variations: []
+    position: 7883,
+    variations: [
+
+    ]
   },
   {
     id: '7884',
     name: 'MINI FOLDING TROPEZ BEIGE 2025',
     category: 'sac',
     ean13: '',
-    reference: 'REF7884',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1608,
-    variations: []
+    position: 7884,
+    variations: [
+
+    ]
   },
   {
     id: '7885',
     name: 'MINI FOLDING CANNES 2025',
     category: 'sac',
     ean13: '',
-    reference: 'REF7885',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1609,
-    variations: []
+    position: 7885,
+    variations: [
+
+    ]
   },
   {
     id: '7886',
     name: 'MINI FOLDING TROPEZ VICHY ROSE 2025',
     category: 'sac',
     ean13: '',
-    reference: 'REF7886',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1610,
-    variations: []
+    position: 7886,
+    variations: [
+
+    ]
   },
   {
     id: '7887',
     name: 'BIG POCHETTE BEIGE 2025',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7887',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1611,
-    variations: []
+    position: 7887,
+    variations: [
+
+    ]
   },
   {
     id: '7888',
     name: 'BIG POCHETTE CANNES 2025',
     category: 'pochette',
     ean13: '2059672260685',
-    reference: 'REF7888',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1612,
-    variations: []
+    position: 7888,
+    variations: [
+
+    ]
   },
   {
     id: '7889',
     name: 'BIG POCHETTE ORANGE VICHY 2025',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7889',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1613,
-    variations: []
+    position: 7889,
+    variations: [
+
+    ]
   },
   {
     id: '7890',
     name: 'LIGHT TOWEL VICHY ROSE TROPEZ 2025',
     category: 'serviette',
     ean13: '',
-    reference: 'REF7890',
+    reference: '',
     wholesalePrice: 18,
     finalPrice: 45,
-    crossedPrice: 49.50000000000001,
+    crossedPrice: 45,
     salesCount: 0,
-    position: 1614,
-    variations: []
+    position: 7890,
+    variations: [
+
+    ]
   },
   {
     id: '7891',
     name: 'NECKLACE ROSE TROPEZ 2025',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7891',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1615,
-    variations: []
+    position: 7891,
+    variations: [
+
+    ]
   },
   {
     id: '7892',
     name: 'NECKLACE ROUGE TROPEZ 2025',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7892',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1616,
-    variations: []
+    position: 7892,
+    variations: [
+
+    ]
   },
   {
     id: '7893',
     name: 'NECKLACE NAVY TROPEZ 2025',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7893',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1617,
-    variations: []
+    position: 7893,
+    variations: [
+
+    ]
   },
   {
     id: '7894',
     name: 'NECKLACE BEIGE TROPEZ 2025',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7894',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1618,
-    variations: []
+    position: 7894,
+    variations: [
+
+    ]
   },
   {
     id: '7895',
     name: 'NECKLACE BLEU CLAIR TROPEZ 2025',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7895',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1619,
-    variations: []
+    position: 7895,
+    variations: [
+
+    ]
   },
   {
     id: '7896',
     name: 'NECKLACE ORANGE TROPEZ 2025',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7896',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1620,
-    variations: []
+    position: 7896,
+    variations: [
+
+    ]
   },
   {
     id: '7897',
     name: 'NECKLACE BLEU CANNES 2025',
     category: 'porte-clef--bracelet',
     ean13: '',
-    reference: 'REF7897',
+    reference: '',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1621,
-    variations: []
+    position: 7897,
+    variations: [
+
+    ]
   },
   {
     id: '7898',
     name: 'CASQUETTE FROUFROU ST',
     category: 'casquette',
     ean13: '2014058120304',
-    reference: 'REF7898',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1622,
-    variations: []
+    position: 7898,
+    variations: [
+
+    ]
   },
   {
     id: '7900',
@@ -21382,62 +23016,72 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 0,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1623,
-    variations: []
+    position: 7900,
+    variations: [
+
+    ]
   },
   {
     id: '7901',
     name: 'SEAU 1BT VELA PORT GRIMAUD + 6 VN PORT GRIMAUD BLANC',
     category: 'composition-vasque',
     ean13: '2046937711402',
-    reference: 'REF7901',
+    reference: '',
     wholesalePrice: 17,
     finalPrice: 55,
-    crossedPrice: 60.50000000000001,
+    crossedPrice: 74,
     salesCount: 0,
-    position: 1624,
-    variations: []
+    position: 7901,
+    variations: [
+
+    ]
   },
   {
     id: '7902',
     name: 'TRANSAT 1212 CLOCHER',
     category: 'transat',
     ean13: '2052488122505',
-    reference: 'REF7902',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1625,
-    variations: []
+    position: 7902,
+    variations: [
+
+    ]
   },
   {
     id: '7903',
     name: 'TRANSAT 1212 TERRASSE',
     category: 'transat',
     ean13: '2050421936516',
-    reference: 'REF7903',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1626,
-    variations: []
+    position: 7903,
+    variations: [
+
+    ]
   },
   {
     id: '7904',
     name: 'TRANSAT 1212 PETANQUE',
     category: 'transat',
     ean13: '2060843265347',
-    reference: 'REF7904',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 18,
-    crossedPrice: 19.8,
+    crossedPrice: 18,
     salesCount: 0,
-    position: 1627,
-    variations: []
+    position: 7904,
+    variations: [
+
+    ]
   },
   {
     id: '7906',
@@ -21447,23 +23091,27 @@ export const defaultProducts: Product[] = [
     reference: 'Z',
     wholesalePrice: 1,
     finalPrice: 2,
-    crossedPrice: 2.2,
+    crossedPrice: 2,
     salesCount: 0,
-    position: 1628,
-    variations: []
+    position: 7906,
+    variations: [
+
+    ]
   },
   {
     id: '7907',
     name: 'SAC ST CL',
     category: 'sac',
     ean13: '2092632790761',
-    reference: 'REF7907',
+    reference: '',
     wholesalePrice: 22,
     finalPrice: 59,
-    crossedPrice: 64.9,
+    crossedPrice: 59,
     salesCount: 0,
-    position: 1629,
-    variations: []
+    position: 7907,
+    variations: [
+
+    ]
   },
   {
     id: '7908',
@@ -21473,10 +23121,12 @@ export const defaultProducts: Product[] = [
     reference: '3123',
     wholesalePrice: 15,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1630,
-    variations: []
+    position: 7908,
+    variations: [
+
+    ]
   },
   {
     id: '7909',
@@ -21486,36 +23136,42 @@ export const defaultProducts: Product[] = [
     reference: '1056',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1631,
-    variations: []
+    position: 7909,
+    variations: [
+
+    ]
   },
   {
     id: '7910',
     name: 'POCHETTE RAYE TOURIA',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7910',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1632,
-    variations: []
+    position: 7910,
+    variations: [
+
+    ]
   },
   {
     id: '7911',
     name: 'PACK 6 BALLOONS CLEAR OPTIQUE',
     category: 'pack-verre',
     ean13: '2033762058321',
-    reference: 'REF7911',
+    reference: '',
     wholesalePrice: 20,
     finalPrice: 57,
-    crossedPrice: 62.7,
+    crossedPrice: 60,
     salesCount: 0,
-    position: 1633,
-    variations: []
+    position: 7911,
+    variations: [
+
+    ]
   },
   {
     id: '7912',
@@ -21525,10 +23181,12 @@ export const defaultProducts: Product[] = [
     reference: '1600-80',
     wholesalePrice: 5,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1634,
-    variations: []
+    position: 7912,
+    variations: [
+
+    ]
   },
   {
     id: '7913',
@@ -21538,36 +23196,42 @@ export const defaultProducts: Product[] = [
     reference: '2600-80',
     wholesalePrice: 7,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1635,
-    variations: []
+    position: 7913,
+    variations: [
+
+    ]
   },
   {
     id: '7914',
     name: 'BIG BK OR TROPEZ',
     category: 'verre',
     ean13: '2009936718063',
-    reference: 'REF7914',
+    reference: '',
     wholesalePrice: 5,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1636,
-    variations: []
+    position: 7914,
+    variations: [
+
+    ]
   },
   {
     id: '7915',
     name: 'MOJITO OR TROPEZ',
     category: 'verre',
     ean13: '2078084443899',
-    reference: 'REF7915',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 12,
-    crossedPrice: 13.200000000000001,
+    crossedPrice: 12,
     salesCount: 0,
-    position: 1637,
-    variations: []
+    position: 7915,
+    variations: [
+
+    ]
   },
   {
     id: '7916',
@@ -21577,10 +23241,12 @@ export const defaultProducts: Product[] = [
     reference: '79',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1638,
-    variations: []
+    position: 7916,
+    variations: [
+
+    ]
   },
   {
     id: '7917',
@@ -21590,62 +23256,72 @@ export const defaultProducts: Product[] = [
     reference: '79',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1639,
-    variations: []
+    position: 7917,
+    variations: [
+
+    ]
   },
   {
     id: '7918',
     name: 'SEAU 1BT VELA TROPEZ + 6 BK TROPEZ',
     category: 'composition-vasque',
     ean13: '2090827626239',
-    reference: 'REF7918',
+    reference: '',
     wholesalePrice: 24,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 86,
     salesCount: 0,
-    position: 1640,
-    variations: []
+    position: 7918,
+    variations: [
+
+    ]
   },
   {
     id: '7919',
     name: 'CASQUETTE BLEU CLOCHER TON/TON',
     category: 'casquette',
     ean13: '2097242603470',
-    reference: 'REF7919',
+    reference: '',
     wholesalePrice: 6,
     finalPrice: 20,
-    crossedPrice: 22,
+    crossedPrice: 20,
     salesCount: 0,
-    position: 1641,
-    variations: []
+    position: 7919,
+    variations: [
+
+    ]
   },
   {
     id: '7920',
     name: 'WALLET BLEU JEAN',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7920',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1642,
-    variations: []
+    position: 7920,
+    variations: [
+
+    ]
   },
   {
     id: '7921',
     name: 'WALLET PHOTO TROPEZ',
     category: 'pochette',
     ean13: '',
-    reference: 'REF7921',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1643,
-    variations: []
+    position: 7921,
+    variations: [
+
+    ]
   },
   {
     id: '7922',
@@ -21655,179 +23331,207 @@ export const defaultProducts: Product[] = [
     reference: '5',
     wholesalePrice: 1,
     finalPrice: 6,
-    crossedPrice: 6.6000000000000005,
+    crossedPrice: 6,
     salesCount: 0,
-    position: 1644,
-    variations: []
+    position: 7922,
+    variations: [
+
+    ]
   },
   {
     id: '7923',
     name: 'A ENLEVER',
     category: 'tripack',
     ean13: '',
-    reference: 'REF7923',
+    reference: '',
     wholesalePrice: 14,
     finalPrice: 25,
-    crossedPrice: 27.500000000000004,
+    crossedPrice: 25,
     salesCount: 0,
-    position: 1645,
-    variations: []
+    position: 7923,
+    variations: [
+
+    ]
   },
   {
     id: '7924',
     name: 'MEDIUM JUST LOVE BAG BLEU',
     category: 'tripack',
     ean13: '4396899591733',
-    reference: 'REF7924',
+    reference: '',
     wholesalePrice: 14,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1646,
-    variations: []
+    position: 7924,
+    variations: [
+
+    ]
   },
   {
     id: '7925',
     name: 'BOUGIE ORANGE',
     category: 'art-de-la-table',
     ean13: '',
-    reference: 'REF7925',
+    reference: '',
     wholesalePrice: 4,
     finalPrice: 15,
-    crossedPrice: 16.5,
+    crossedPrice: 15,
     salesCount: 0,
-    position: 1647,
-    variations: []
+    position: 7925,
+    variations: [
+
+    ]
   },
   {
     id: '7926',
     name: 'ICE BAG TROPEZ BLANC +2ICE+FLUTE TROPEZ/MAXIME',
     category: 'pack-ice-bag',
     ean13: '2039569989431',
-    reference: 'REF7926',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1648,
-    variations: []
+    position: 7926,
+    variations: [
+
+    ]
   },
   {
     id: '7927',
     name: 'ICE BAG TROPEZ BLANC +2ICE+FLUTE TROPEZ/CANNES',
     category: 'pack-ice-bag',
     ean13: '2018221922306',
-    reference: 'REF7927',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1649,
-    variations: []
+    position: 7927,
+    variations: [
+
+    ]
   },
   {
     id: '7928',
     name: 'ICE BAG TROPEZ BLANC +2ICE+FLUTE TROPEZ/PG',
     category: 'pack-ice-bag',
     ean13: '2063186544308',
-    reference: 'REF7928',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1650,
-    variations: []
+    position: 7928,
+    variations: [
+
+    ]
   },
   {
     id: '7929',
     name: 'ICE BAG TROPEZ BLANC +2ICE+FLUTE TROPEZ/CAVALAIRE',
     category: 'pack-ice-bag',
     ean13: '2021023848934',
-    reference: 'REF7929',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1651,
-    variations: []
+    position: 7929,
+    variations: [
+
+    ]
   },
   {
     id: '7930',
     name: 'ICE BAG TROPEZ BLANC +2ICE+FLUTE TROPEZ/TROPEZ',
     category: 'pack-ice-bag',
     ean13: '2097957661253',
-    reference: 'REF7930',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1652,
-    variations: []
+    position: 7930,
+    variations: [
+
+    ]
   },
   {
     id: '7931',
     name: 'ICE BAG TROPEZ BLANC +2ICE MIXTE+FLUTE TROPEZ/MAXIME',
     category: 'pack-ice-bag',
     ean13: '2002406519290',
-    reference: 'REF7931',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1653,
-    variations: []
+    position: 7931,
+    variations: [
+
+    ]
   },
   {
     id: '7932',
     name: 'TRIO DOMAINE TRZ / VN TROPEZ/MAXIME',
     category: 'trio-pack',
     ean13: '2041736976717',
-    reference: 'REF7932',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1654,
-    variations: []
+    position: 7932,
+    variations: [
+
+    ]
   },
   {
     id: '7934',
     name: 'TRIO DOMAINE TRZ / VN TROPEZ/PG',
     category: 'trio-pack',
     ean13: '2011999966244',
-    reference: 'REF7934',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1655,
-    variations: []
+    position: 7934,
+    variations: [
+
+    ]
   },
   {
     id: '7935',
     name: 'TRIO DOMAINE TRZ / VN TROPEZ/CAVALAIRE',
     category: 'trio-pack',
     ean13: '2084823513150',
-    reference: 'REF7935',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1656,
-    variations: []
+    position: 7935,
+    variations: [
+
+    ]
   },
   {
     id: '7936',
     name: 'TRIO DOMAINE TRZ / VN TROPEZ/CANNES',
     category: 'trio-pack',
     ean13: '2035361781570',
-    reference: 'REF7936',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1657,
-    variations: []
+    position: 7936,
+    variations: [
+
+    ]
   },
   {
     id: '7937',
@@ -21837,10 +23541,12 @@ export const defaultProducts: Product[] = [
     reference: '9207',
     wholesalePrice: 15,
     finalPrice: 28,
-    crossedPrice: 30.800000000000004,
+    crossedPrice: 28,
     salesCount: 0,
-    position: 1658,
-    variations: []
+    position: 7937,
+    variations: [
+
+    ]
   },
   {
     id: '7938',
@@ -21850,10 +23556,12 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 2,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1659,
-    variations: []
+    position: 7938,
+    variations: [
+
+    ]
   },
   {
     id: '7939',
@@ -21863,49 +23571,57 @@ export const defaultProducts: Product[] = [
     reference: '430',
     wholesalePrice: 2,
     finalPrice: 8,
-    crossedPrice: 8.8,
+    crossedPrice: 8,
     salesCount: 0,
-    position: 1660,
-    variations: []
+    position: 7939,
+    variations: [
+
+    ]
   },
   {
     id: '7940',
     name: 'BALLON OPTIQUE UNI 58 CL',
     category: 'verres-10-',
     ean13: '2052586462923',
-    reference: 'REF7940',
+    reference: '',
     wholesalePrice: 3,
     finalPrice: 10,
-    crossedPrice: 11,
+    crossedPrice: 10,
     salesCount: 0,
-    position: 1661,
-    variations: []
+    position: 7940,
+    variations: [
+
+    ]
   },
   {
     id: '7941',
     name: 'ICE BAG  2 ICE + FLUTE TRZ /P GRIMAUD',
     category: 'pack-ice-bag',
     ean13: '2087988116747',
-    reference: 'REF7941',
+    reference: '',
     wholesalePrice: 7,
     finalPrice: 23,
-    crossedPrice: 25.3,
+    crossedPrice: 23,
     salesCount: 0,
-    position: 1662,
-    variations: []
+    position: 7941,
+    variations: [
+
+    ]
   },
   {
     id: '7942',
     name: 'VASQUE DIAMANT + 6 CLUBHOUSE',
     category: 'composition-vasque',
     ean13: '2001798168499',
-    reference: 'REF7942',
+    reference: '',
     wholesalePrice: 46,
     finalPrice: 115,
-    crossedPrice: 126.50000000000001,
+    crossedPrice: 125,
     salesCount: 0,
-    position: 1663,
-    variations: []
+    position: 7942,
+    variations: [
+
+    ]
   },
   {
     id: '7944',
@@ -21915,10 +23631,12 @@ export const defaultProducts: Product[] = [
     reference: '503',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1664,
-    variations: []
+    position: 7944,
+    variations: [
+
+    ]
   },
   {
     id: '7945',
@@ -21928,10 +23646,12 @@ export const defaultProducts: Product[] = [
     reference: '503',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1665,
-    variations: []
+    position: 7945,
+    variations: [
+
+    ]
   },
   {
     id: '7947',
@@ -21941,10 +23661,12 @@ export const defaultProducts: Product[] = [
     reference: '503',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1666,
-    variations: []
+    position: 7947,
+    variations: [
+
+    ]
   },
   {
     id: '7948',
@@ -21954,127 +23676,147 @@ export const defaultProducts: Product[] = [
     reference: '503',
     wholesalePrice: 7,
     finalPrice: 35,
-    crossedPrice: 38.5,
+    crossedPrice: 35,
     salesCount: 0,
-    position: 1667,
-    variations: []
+    position: 7948,
+    variations: [
+
+    ]
   },
   {
     id: '7951',
     name: 'Serigraphie 1 couleur Vasque',
     category: 'accueil',
     ean13: '',
-    reference: 'REF7951',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 1,
-    crossedPrice: 1.1,
+    crossedPrice: 1,
     salesCount: 0,
-    position: 1668,
-    variations: []
+    position: 7951,
+    variations: [
+
+    ]
   },
   {
     id: '7952',
     name: 'Frais technique de Matrice',
     category: 'accueil',
     ean13: '',
-    reference: 'REF7952',
+    reference: '',
     wholesalePrice: 40,
     finalPrice: 54,
-    crossedPrice: 59.400000000000006,
+    crossedPrice: 54,
     salesCount: 0,
-    position: 1669,
-    variations: []
+    position: 7952,
+    variations: [
+
+    ]
   },
   {
     id: '7953',
     name: 'Frais de livrasion 1 point',
     category: 'accueil',
     ean13: '',
-    reference: 'REF7953',
+    reference: '',
     wholesalePrice: 81,
     finalPrice: 102,
-    crossedPrice: 112.2,
+    crossedPrice: 102,
     salesCount: 0,
-    position: 1670,
-    variations: []
+    position: 7953,
+    variations: [
+
+    ]
   },
   {
     id: '7954',
     name: 'VN 29.5 cl Gradué à 25 cl',
     category: 'accueil',
     ean13: '',
-    reference: 'REF7954',
+    reference: '',
     wholesalePrice: 1,
     finalPrice: 4,
-    crossedPrice: 4.4,
+    crossedPrice: 4,
     salesCount: 0,
-    position: 1671,
-    variations: []
+    position: 7954,
+    variations: [
+
+    ]
   },
   {
     id: '7955',
     name: 'Vasque à champagne  blanche 7 l',
     category: 'accueil',
     ean13: '',
-    reference: 'REF7955',
+    reference: '',
     wholesalePrice: 10,
     finalPrice: 30,
-    crossedPrice: 33,
+    crossedPrice: 30,
     salesCount: 0,
-    position: 1672,
-    variations: []
+    position: 7955,
+    variations: [
+
+    ]
   },
   {
     id: '7956',
     name: 'PACK 6 MOJITO no Tropez, avec Cannes',
     category: 'pack-verre',
     ean13: '2079244716440',
-    reference: 'REF7956',
+    reference: '',
     wholesalePrice: 8,
     finalPrice: 37,
-    crossedPrice: 40.7,
+    crossedPrice: 39,
     salesCount: 0,
-    position: 1673,
-    variations: []
+    position: 7956,
+    variations: [
+
+    ]
   },
   {
     id: '7957',
     name: 'SEAU NICE  + 6 BK VILLAGE 83',
     category: 'composition-vasque',
     ean13: '2058867085546',
-    reference: 'REF7957',
+    reference: '',
     wholesalePrice: 26,
     finalPrice: 69,
-    crossedPrice: 75.9,
+    crossedPrice: 90,
     salesCount: 0,
-    position: 1674,
-    variations: []
+    position: 7957,
+    variations: [
+
+    ]
   },
   {
     id: '7959',
     name: 'VASQUE VELA BLANCHE + 12 CALICES MIXTES',
     category: 'composition-vasque',
     ean13: '2028588235087',
-    reference: 'REF7959',
+    reference: '',
     wholesalePrice: 36,
     finalPrice: 183,
-    crossedPrice: 201.3,
+    crossedPrice: 203,
     salesCount: 0,
-    position: 1675,
-    variations: []
+    position: 7959,
+    variations: [
+
+    ]
   },
   {
     id: '7960',
     name: 'SEAU 2BT VELA CLEAR TROPEZ+ 6 CALICES METAL',
     category: 'composition-vasque',
     ean13: '2055133703845',
-    reference: 'REF7960',
+    reference: '',
     wholesalePrice: 29,
     finalPrice: 91,
-    crossedPrice: 100.10000000000001,
+    crossedPrice: 111,
     salesCount: 0,
-    position: 1676,
-    variations: []
+    position: 7960,
+    variations: [
+
+    ]
   }
 ];
 
