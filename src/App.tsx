@@ -1,21 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Store, Lock, LockOpen } from '@mui/icons-material';
 import CSVImport from './components/CSVImport';
 import WindowManager from './components/WindowManager';
 import { Product, Category, CartItem } from './types/Product';
+import { loadProductionData, saveProductionData } from './data/productionData';
 
 const App: React.FC = () => {
-  const [showImport, setShowImport] = useState(true);
+  const [showImport, setShowImport] = useState(false); // Changé à false pour démarrer directement
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLayoutLocked, setIsLayoutLocked] = useState<boolean>(false);
 
+  // Charger les données de production au démarrage
+  useEffect(() => {
+    const { products: loadedProducts, categories: loadedCategories } = loadProductionData();
+    setProducts(loadedProducts);
+    setCategories(loadedCategories);
+  }, []);
+
   const handleImportComplete = (importedProducts: Product[], importedCategories: Category[]) => {
     setProducts(importedProducts);
     setCategories(importedCategories);
     setShowImport(false);
+    // Sauvegarder les nouvelles données
+    saveProductionData(importedProducts, importedCategories);
   };
 
   const handleProductClick = (product: Product) => {

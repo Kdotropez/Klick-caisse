@@ -794,29 +794,56 @@ const WindowManager: React.FC<WindowManagerProps> = ({
            </Box>
          );
 
-      case 'import':
-        return (
-          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
-              Import CSV
-            </Typography>
-            <Box sx={{ p: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <Typography variant="body2" align="center" sx={{ mb: 2 }}>
-                {products.length} produits importés
-              </Typography>
-              <Button
-                variant="outlined"
-                fullWidth
-                startIcon={<ImportExport />}
-                onClick={() => {
-                  // TODO: Ouvrir l'import CSV
-                }}
-              >
-                Réimporter CSV
-              </Button>
-            </Box>
-          </Box>
-        );
+             case 'import':
+         return (
+           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+             <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
+               Gestion Données
+             </Typography>
+             <Box sx={{ p: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+               <Typography variant="body2" align="center" sx={{ mb: 1 }}>
+                 {products.length} produits chargés
+               </Typography>
+               <Typography variant="body2" align="center" sx={{ mb: 2 }}>
+                 {categories.length} catégories
+               </Typography>
+               <Button
+                 variant="outlined"
+                 size="small"
+                 startIcon={<ImportExport />}
+                 onClick={() => {
+                   // TODO: Ouvrir l'import CSV
+                   alert('Fonctionnalité d\'import CSV à implémenter');
+                 }}
+               >
+                 Importer CSV
+               </Button>
+               <Button
+                 variant="outlined"
+                 size="small"
+                 onClick={() => {
+                   // TODO: Exporter les données
+                   alert('Fonctionnalité d\'export à implémenter');
+                 }}
+               >
+                 Exporter Données
+               </Button>
+               <Button
+                 variant="outlined"
+                 size="small"
+                                   onClick={() => {
+                    // TODO: Réinitialiser aux données par défaut
+                    // eslint-disable-next-line no-restricted-globals
+                    if (confirm('Réinitialiser aux données par défaut ?')) {
+                      // Réinitialiser les données
+                    }
+                  }}
+               >
+                 Réinitialiser
+               </Button>
+             </Box>
+           </Box>
+         );
 
       default:
         return null;
