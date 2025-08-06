@@ -460,8 +460,117 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
 
   const renderResizeHandles = (window: Window) => {
-    // Poignées de redimensionnement temporairement désactivées pour libérer de l'espace
-    return null;
+    if (window.isMinimized || isLayoutLocked) return null;
+
+    const handleSize = 12;
+    const handleStyle = {
+      position: 'absolute' as const,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      border: '2px solid #1976d2',
+      borderRadius: '2px',
+      zIndex: 1000,
+      transition: 'all 0.2s',
+      '&:hover': {
+        backgroundColor: 'rgba(25, 118, 210, 0.2)',
+        transform: 'scale(1.1)',
+      }
+    };
+
+    return (
+      <>
+        {/* Poignées de coin */}
+        <Box
+          sx={{
+            ...handleStyle,
+            width: handleSize,
+            height: handleSize,
+            top: -handleSize/2,
+            left: -handleSize/2,
+            cursor: 'nw-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 'nw')}
+        />
+        <Box
+          sx={{
+            ...handleStyle,
+            width: handleSize,
+            height: handleSize,
+            top: -handleSize/2,
+            right: -handleSize/2,
+            cursor: 'ne-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 'ne')}
+        />
+        <Box
+          sx={{
+            ...handleStyle,
+            width: handleSize,
+            height: handleSize,
+            bottom: -handleSize/2,
+            left: -handleSize/2,
+            cursor: 'sw-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 'sw')}
+        />
+        <Box
+          sx={{
+            ...handleStyle,
+            width: handleSize,
+            height: handleSize,
+            bottom: -handleSize/2,
+            right: -handleSize/2,
+            cursor: 'se-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 'se')}
+        />
+
+        {/* Poignées de bord */}
+        <Box
+          sx={{
+            ...handleStyle,
+            width: '100%',
+            height: handleSize,
+            top: -handleSize/2,
+            left: 0,
+            cursor: 'n-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 'n')}
+        />
+        <Box
+          sx={{
+            ...handleStyle,
+            width: '100%',
+            height: handleSize,
+            bottom: -handleSize/2,
+            left: 0,
+            cursor: 's-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 's')}
+        />
+        <Box
+          sx={{
+            ...handleStyle,
+            width: handleSize,
+            height: '100%',
+            top: 0,
+            left: -handleSize/2,
+            cursor: 'w-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 'w')}
+        />
+        <Box
+          sx={{
+            ...handleStyle,
+            width: handleSize,
+            height: '100%',
+            top: 0,
+            right: -handleSize/2,
+            cursor: 'e-resize',
+          }}
+          onMouseDown={(e) => handleResizeStart(e, window.id, 'e')}
+        />
+      </>
+    );
   };
 
   const renderWindowContent = (window: Window) => {
@@ -1698,7 +1807,48 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       overflow: 'hidden',
       backgroundColor: '#f5f5f5'
     }}>
-
+                          {/* Cadre rouge englobant les fenêtres actuelles */}
+       <Box sx={{
+         position: 'absolute',
+         top: 80, // y minimum des fenêtres
+         left: 20, // x minimum des fenêtres
+         width: 1220, // x max (840 + 400) - x min (20) = 1220
+         height: 926, // y max (810 + 196) - y min (80) = 926
+         border: '3px solid red',
+         borderStyle: 'dashed',
+         zIndex: 0,
+         pointerEvents: 'none',
+         backgroundColor: 'rgba(255, 0, 0, 0.05)'
+       }}>
+         <Typography 
+           variant="caption" 
+           sx={{ 
+             position: 'absolute', 
+             top: -20, 
+             left: 10, 
+             color: 'red', 
+             fontWeight: 'bold',
+             backgroundColor: 'white',
+             px: 1
+           }}
+         >
+           ESPACE FENÊTRES: 1220×926
+         </Typography>
+         <Typography 
+           variant="caption" 
+           sx={{ 
+             position: 'absolute', 
+             bottom: -20, 
+             right: 10, 
+             color: 'blue', 
+             fontWeight: 'bold',
+             backgroundColor: 'white',
+             px: 1
+           }}
+         >
+           POSITION: (20,80) à (1240,1006)
+         </Typography>
+       </Box>
                            {windows
           .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window6', 'window7'].includes(window.id)) // Afficher les 7 fenêtres
           .map((window) => (

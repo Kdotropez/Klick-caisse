@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, AppBar, Toolbar, Typography, Button } from '@mui/material';
-import { Store, Lock, LockOpen } from '@mui/icons-material';
+import { Box } from '@mui/material';
 import CSVImport from './components/CSVImport';
 import WindowManager from './components/WindowManager';
 import { Product, Category, CartItem, ProductVariation } from './types/Product';
@@ -99,68 +98,27 @@ const App: React.FC = () => {
 
   if (showImport) {
     return (
-      <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Store sx={{ mr: 2 }} />
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Klick Caisse - Import CSV
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Box sx={{ flexGrow: 1, p: 3 }}>
-          <CSVImport onImportComplete={handleImportComplete} />
-        </Box>
+      <Box sx={{ height: '100vh', width: '100vw', p: 3 }}>
+        <CSVImport onImportComplete={handleImportComplete} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* AppBar */}
-      <AppBar position="static">
-        <Toolbar>
-          <Store sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Klick Caisse - Système de Fenêtres
-          </Typography>
-          <Button
-            color="inherit"
-            startIcon={isLayoutLocked ? <Lock /> : <LockOpen />}
-            onClick={() => setIsLayoutLocked(!isLayoutLocked)}
-            sx={{ mr: 2 }}
-          >
-            {isLayoutLocked ? 'Déverrouiller' : 'Verrouiller'} Layout
-          </Button>
-          <Button
-            color="inherit"
-            onClick={() => {
-              setShowImport(true);
-              setProducts([]);
-              setCategories([]);
-              setCartItems([]);
-            }}
-          >
-            Réimporter CSV
-          </Button>
-        </Toolbar>
-      </AppBar>
-
-      {/* Zone des fenêtres */}
-      <Box sx={{ flexGrow: 1, position: 'relative' }}>
-        <WindowManager
-          products={products}
-          categories={categories}
-          cartItems={cartItems}
-          isLayoutLocked={isLayoutLocked}
-          onProductClick={handleProductClick}
-          onProductWithVariationClick={handleProductWithVariationClick}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-          onImportComplete={handleImportComplete}
-        />
-      </Box>
+    <Box sx={{ height: '100vh', width: '100vw', position: 'relative' }}>
+      {/* Zone des fenêtres - plein écran */}
+      <WindowManager
+        products={products}
+        categories={categories}
+        cartItems={cartItems}
+        isLayoutLocked={isLayoutLocked}
+        onProductClick={handleProductClick}
+        onProductWithVariationClick={handleProductWithVariationClick}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+        onCheckout={handleCheckout}
+        onImportComplete={handleImportComplete}
+      />
     </Box>
   );
 };
