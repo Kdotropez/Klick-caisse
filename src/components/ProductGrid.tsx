@@ -1,0 +1,290 @@
+import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  Slider,
+  Paper,
+  IconButton,
+  Collapse,
+  Divider,
+  Button,
+  Pagination,
+} from '@mui/material';
+import { Settings, ExpandMore, ExpandLess, NavigateBefore, NavigateNext } from '@mui/icons-material';
+import { Product } from '../types/Product';
+
+interface ProductGridProps {
+  products: Product[];
+  onProductClick: (product: Product) => void;
+}
+
+const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick }) => {
+  const [showSettings, setShowSettings] = useState(false);
+  const [cardHeight, setCardHeight] = useState(140);
+  const [cardWidth, setCardWidth] = useState(240);
+  const [gridGap, setGridGap] = useState(12);
+  const [gridPadding, setGridPadding] = useState(20);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Configuration fixe 5×6
+  const CARDS_PER_PAGE = 30; // 5 colonnes × 6 rangées
+  const COLUMNS_COUNT = 5;
+
+  const handleHeightChange = (event: Event, newValue: number | number[]) => {
+    setCardHeight(newValue as number);
+  };
+
+  const handleWidthChange = (event: Event, newValue: number | number[]) => {
+    setCardWidth(newValue as number);
+  };
+
+  const handleGapChange = (event: Event, newValue: number | number[]) => {
+    setGridGap(newValue as number);
+  };
+
+  const handlePaddingChange = (event: Event, newValue: number | number[]) => {
+    setGridPadding(newValue as number);
+  };
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value);
+  };
+
+  // Calculer les produits à afficher pour la page courante
+  const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
+  const endIndex = startIndex + CARDS_PER_PAGE;
+  const currentProducts = products.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(products.length / CARDS_PER_PAGE);
+
+  return (
+    <Box sx={{ flexGrow: 1, p: gridPadding }}>
+      {/* Contrôles de dimensions */}
+      <Paper sx={{ p: 2, mb: 2, backgroundColor: 'grey.50' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <Settings sx={{ mr: 1 }} />
+          <Typography variant="h6">Contrôles des dimensions</Typography>
+          <IconButton 
+            onClick={() => setShowSettings(!showSettings)}
+            sx={{ ml: 'auto' }}
+          >
+            {showSettings ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Box>
+        
+        <Collapse in={showSettings}>
+          <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+            {/* Hauteur des cartes */}
+            <Box sx={{ minWidth: 200, flex: 1 }}>
+              <Typography gutterBottom>
+                Hauteur des cartes: {cardHeight}px
+              </Typography>
+              <Slider
+                value={cardHeight}
+                onChange={handleHeightChange}
+                min={100}
+                max={200}
+                step={10}
+                marks={[
+                  { value: 100, label: '100px' },
+                  { value: 120, label: '120px' },
+                  { value: 140, label: '140px' },
+                  { value: 160, label: '160px' },
+                  { value: 180, label: '180px' },
+                  { value: 200, label: '200px' },
+                ]}
+              />
+            </Box>
+
+            {/* Largeur des cartes */}
+            <Box sx={{ minWidth: 200, flex: 1 }}>
+              <Typography gutterBottom>
+                Largeur des cartes: {cardWidth}px
+              </Typography>
+              <Slider
+                value={cardWidth}
+                onChange={handleWidthChange}
+                min={180}
+                max={350}
+                step={10}
+                marks={[
+                  { value: 180, label: '180px' },
+                  { value: 220, label: '220px' },
+                  { value: 260, label: '260px' },
+                  { value: 300, label: '300px' },
+                  { value: 350, label: '350px' },
+                ]}
+              />
+            </Box>
+          </Box>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+            {/* Espacement entre cartes */}
+            <Box sx={{ minWidth: 200, flex: 1 }}>
+              <Typography gutterBottom>
+                Espacement entre cartes: {gridGap}px
+              </Typography>
+              <Slider
+                value={gridGap}
+                onChange={handleGapChange}
+                min={4}
+                max={40}
+                step={2}
+                marks={[
+                  { value: 4, label: '4px' },
+                  { value: 12, label: '12px' },
+                  { value: 20, label: '20px' },
+                  { value: 32, label: '32px' },
+                  { value: 40, label: '40px' },
+                ]}
+              />
+            </Box>
+
+            {/* Marge externe de la grille */}
+            <Box sx={{ minWidth: 200, flex: 1 }}>
+              <Typography gutterBottom>
+                Marge externe: {gridPadding}px
+              </Typography>
+              <Slider
+                value={gridPadding}
+                onChange={handlePaddingChange}
+                min={0}
+                max={60}
+                step={4}
+                marks={[
+                  { value: 0, label: '0px' },
+                  { value: 16, label: '16px' },
+                  { value: 32, label: '32px' },
+                  { value: 48, label: '48px' },
+                  { value: 60, label: '60px' },
+                ]}
+              />
+            </Box>
+          </Box>
+          
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            Grille fixe: 5×6 = 30 cartes - Dimensions: {cardWidth}px × {cardHeight}px - Espacement: {gridGap}px - Marge: {gridPadding}px
+          </Typography>
+        </Collapse>
+      </Paper>
+
+      {/* Navigation des pages */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          Page {currentPage} sur {totalPages} - Produits {startIndex + 1} à {Math.min(endIndex, products.length)} sur {products.length}
+        </Typography>
+        
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<NavigateBefore />}
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            size="small"
+          >
+            Précédent
+          </Button>
+          
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            size="small"
+            showFirstButton
+            showLastButton
+          />
+          
+          <Button
+            variant="outlined"
+            endIcon={<NavigateNext />}
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            size="small"
+          >
+            Suivant
+          </Button>
+        </Box>
+      </Box>
+
+      {/* Grille de produits fixe 5×6 */}
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: `repeat(${COLUMNS_COUNT}, 1fr)`,
+        gap: gridGap,
+        height: `${(cardHeight * 6) + (gridGap * 5)}px`, // Hauteur fixe pour 6 rangées
+        overflow: 'hidden',
+      }}>
+        {currentProducts.map((product) => (
+          <Card
+            key={product.id}
+            sx={{
+              height: cardHeight,
+              width: cardWidth,
+              maxWidth: '100%',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 4,
+              },
+              '&:active': {
+                transform: 'translateY(0px) scale(0.98)',
+              },
+            }}
+            onClick={() => onProductClick(product)}
+          >
+            <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{
+                  fontWeight: 'bold',
+                  mb: 1,
+                  lineHeight: 1.2,
+                  minHeight: '2.4em',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {product.name}
+              </Typography>
+              
+              <Typography
+                variant="h6"
+                color="primary"
+                sx={{ fontWeight: 'bold', mb: 1 }}
+              >
+                {product.finalPrice.toFixed(2)} €
+              </Typography>
+              
+              <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Chip
+                  label={`Vendus: ${product.salesCount || 0}`}
+                  size="small"
+                  color="secondary"
+                  variant="outlined"
+                />
+                {product.variations.length > 0 && (
+                  <Chip
+                    label={`${product.variations.length} var.`}
+                    size="small"
+                    color="info"
+                    variant="outlined"
+                  />
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+    </Box>
+  );
+};
+
+export default ProductGrid; 
