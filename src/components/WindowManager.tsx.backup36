@@ -184,9 +184,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Calculer le facteur d'échelle basé sur la plus petite dimension
     const widthScale = window.innerWidth / referenceWidth;
     const heightScale = window.innerHeight / referenceHeight;
-    const newScaleFactor = Math.min(widthScale, heightScale, 2.0); // Limiter à 2.0x max
+    const newScaleFactor = Math.min(widthScale, heightScale, 1.5); // Limiter à 1.5x max
     
-    return Math.max(1.0, newScaleFactor); // Minimum 1.0x pour garder la taille normale
+    return Math.max(0.7, newScaleFactor); // Minimum 0.7x
   };
 
   // Détection d'appareil tactile
@@ -567,7 +567,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     >
                                                                                                        <Typography variant="body2" sx={{ 
                                          fontWeight: '600', 
-                                         fontSize: `${Math.max(0.75, 0.85 * scaleFactor)}rem`, 
+                                         fontSize: `${0.75 * scaleFactor}rem`, 
                                          lineHeight: 1.2, 
                                          flexGrow: 1, 
                                          color: '#2c3e50' 
@@ -576,7 +576,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    </Typography>
                                         <Typography variant="h6" sx={{ 
                                           fontWeight: 'bold', 
-                                          fontSize: `${Math.max(1, 1.1 * scaleFactor)}rem`, 
+                                          fontSize: `${1 * scaleFactor}rem`, 
                                           textAlign: 'center', 
                                           color: categoryColor, 
                                           letterSpacing: `${0.5 * scaleFactor}px` 
@@ -589,32 +589,32 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                                          mt: 0.25 * scaleFactor, 
                                          gap: 0.25 * scaleFactor 
                                        }}>
-                                             <Chip 
-                         label={`${product.salesCount || 0}`} 
-                         size="small" 
-                         sx={{ 
-                           fontSize: `${Math.max(0.6, 0.7 * scaleFactor)}rem`, 
-                           height: `${Math.max(20, 22 * scaleFactor)}px`, 
-                           backgroundColor: categoryColor, 
-                           color: 'white', 
-                           fontWeight: '600', 
-                           boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
-                         }} 
-                       />
-                                              {product.variations.length > 0 && (
-                          <Chip 
-                            label={`${product.variations.length} var.`} 
-                            size="small" 
-                            sx={{ 
-                              fontSize: `${Math.max(0.6, 0.7 * scaleFactor)}rem`, 
-                              height: `${Math.max(20, 22 * scaleFactor)}px`, 
-                              backgroundColor: '#95a5a6', 
-                              color: 'white', 
-                              fontWeight: '600', 
-                              boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
-                            }} 
-                          />
-                        )}
+                      <Chip 
+                        label={`${product.salesCount || 0}`} 
+                        size="small" 
+                        sx={{ 
+                          fontSize: `${0.6 * scaleFactor}rem`, 
+                          height: `${20 * scaleFactor}px`, 
+                          backgroundColor: categoryColor, 
+                          color: 'white', 
+                          fontWeight: '600', 
+                          boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
+                        }} 
+                      />
+                      {product.variations.length > 0 && (
+                        <Chip 
+                          label={`${product.variations.length} var.`} 
+                          size="small" 
+                          sx={{ 
+                            fontSize: `${0.6 * scaleFactor}rem`, 
+                            height: `${20 * scaleFactor}px`, 
+                            backgroundColor: '#95a5a6', 
+                            color: 'white', 
+                            fontWeight: '600', 
+                            boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
+                          }} 
+                        />
+                      )}
                     </Box>
                   </Paper>
                 );
