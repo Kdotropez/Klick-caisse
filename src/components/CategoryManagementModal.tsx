@@ -13,7 +13,6 @@ import {
   IconButton,
   Box,
   Typography,
-  Chip,
   Divider,
   Alert
 } from '@mui/material';

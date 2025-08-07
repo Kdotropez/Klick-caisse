@@ -16839,12 +16839,10 @@ export const categories = [
   }
 ];
 
-const productionData = {
+export default {
   products,
   categories
 };
-
-export default productionData;
 
 // Fonctions pour charger et sauvegarder les données
 export const loadProductionData = (): { products: Product[]; categories: Category[] } => {

@@ -9,7 +9,7 @@ import {
   List,
   ListItem,
   ListItemText,
-
+  ListItemSecondaryAction,
   TextField,
 } from '@mui/material';
 import {
@@ -206,7 +206,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Système de scaling automatique pour adaptation dynamique
   const [scaleFactor, setScaleFactor] = useState(1);
-
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   // Système de drag and drop pour réorganiser les produits
   const [draggedProduct, setDraggedProduct] = useState<Product | null>(null);
@@ -582,7 +582,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       setScaleFactor(newScaleFactor);
       
       // Détecter l'appareil tactile
-  
+      setIsTouchDevice(detectTouchDevice());
       
       console.log(`Écran: ${newDimensions.width}x${newDimensions.height}, Scale: ${newScaleFactor.toFixed(2)}, Touch: ${detectTouchDevice()}`);
     };
@@ -594,7 +594,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const toggleMinimize = (windowId: string) => {
+    if (isLayoutLocked) return; // Désactive la minimisation si verrouillé
+    setWindows(prev => prev.map(w => 
+      w.id === windowId ? { ...w, isMinimized: !w.isMinimized } : w
+    ));
+  };
 
+  const toggleMaximize = (windowId: string) => {
+    if (isLayoutLocked) return; // Désactive la maximisation si verrouillé
+    setWindows(prev => prev.map(w => 
+      w.id === windowId ? { ...w, isMaximized: !w.isMaximized } : w
+    ));
+  };
 
   // Fonctions de gestion des déclinaisons
   const handleProductClick = (product: Product) => {
