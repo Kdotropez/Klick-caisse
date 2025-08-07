@@ -115,6 +115,21 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
       return;
     }
 
+    // Trouver la catégorie à supprimer pour afficher son nom
+    const categoryToDelete = categories.find(cat => cat.id === categoryId);
+    
+    if (!categoryToDelete) {
+      setError('Catégorie introuvable');
+      return;
+    }
+
+    // Demander confirmation avant la suppression
+    const confirmMessage = `Êtes-vous sûr de vouloir supprimer la catégorie "${categoryToDelete.name}" ?\n\nCette action est irréversible.`;
+    
+    if (!window.confirm(confirmMessage)) {
+      return; // L'utilisateur a annulé
+    }
+
     const updatedCategories = categories.filter(cat => cat.id !== categoryId);
     onUpdateCategories(updatedCategories);
     setError('');
