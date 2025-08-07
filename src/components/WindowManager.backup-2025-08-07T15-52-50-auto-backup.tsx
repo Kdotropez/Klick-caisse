@@ -83,13 +83,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [itemDiscounts, setItemDiscounts] = useState<{[key: string]: {type: 'euro' | 'percent' | 'price', value: number}}>({});
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [showCategoryManagementModal, setShowCategoryManagementModal] = useState(false);
-  
-  // Force le re-rendu quand les catégories changent
-  const [categoriesVersion, setCategoriesVersion] = useState(0);
-  useEffect(() => {
-    setCategoriesVersion(prev => prev + 1);
-    console.log('🔄 Version des catégories mise à jour:', categoriesVersion + 1);
-  }, [categories]);
 
   const [windows, setWindows] = useState<Window[]>([
                    {
@@ -331,23 +324,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€`);
   };
 
-  // Fonction pour obtenir une couleur basée sur la catégorie
+  // Fonction pour obtenir une couleur vive basée sur la catégorie
   const getCategoryColor = (categoryId: string) => {
-    // D'abord, essayer de trouver la catégorie par ID et utiliser sa couleur personnalisée
-    const category = categories.find(cat => cat.id === categoryId);
-    if (category && category.color) {
-      console.log('🎨 Couleur personnalisée trouvée pour', categoryId, ':', category.color);
-      return category.color;
-    }
-    
-    // Si pas de couleur personnalisée, essayer de trouver par nom
-    const categoryByName = categories.find(cat => cat.name === categoryId);
-    if (categoryByName && categoryByName.color) {
-      console.log('🎨 Couleur personnalisée trouvée par nom pour', categoryId, ':', categoryByName.color);
-      return categoryByName.color;
-    }
-    
-    // Palette de couleurs vives et contrastées (fallback)
+    // Palette de couleurs vives et contrastées
     const colors = [
       '#FF1744', // Rouge vif
       '#2196F3', // Bleu vif
@@ -645,7 +624,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const handleUpdateCategories = (newCategories: Category[]) => {
     // Mettre à jour les catégories dans le composant parent
-    console.log('🔄 Mise à jour des catégories:', newCategories.length, 'catégories');
     if (onUpdateCategories) {
       onUpdateCategories(newCategories);
     } else {

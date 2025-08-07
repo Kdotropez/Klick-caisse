@@ -103,13 +103,6 @@ const App: React.FC = () => {
     console.log('Nouvel ordre des produits sauvegardé');
   };
 
-  const handleUpdateCategories = (newCategories: Category[]) => {
-    setCategories(newCategories);
-    // Sauvegarder les nouvelles catégories
-    saveProductionData(products, newCategories);
-    console.log('Nouvelles catégories sauvegardées:', newCategories.length);
-  };
-
   if (showImport) {
     return (
       <Box sx={{ height: '100vh', width: '100vw', p: 3 }}>
@@ -133,7 +126,6 @@ const App: React.FC = () => {
         onCheckout={handleCheckout}
         onImportComplete={handleImportComplete}
         onProductsReorder={handleProductsReorder}
-        onUpdateCategories={handleUpdateCategories}
       />
     </Box>
   );
