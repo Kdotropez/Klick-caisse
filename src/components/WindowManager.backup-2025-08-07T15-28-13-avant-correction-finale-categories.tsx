@@ -170,13 +170,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   // Réinitialiser la pagination quand la catégorie ou la recherche change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, searchTerm, categorySearchTerm]);
+  }, [selectedCategory, searchTerm]);
   const [draggedWindow, setDraggedWindow] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizingWindow, setResizingWindow] = useState<string | null>(null);
@@ -1102,12 +1101,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    >
                      Toutes
                    </Button>
-                   {categories
-                     .filter(category => 
-                       !categorySearchTerm || 
-                       category.name.toLowerCase().includes(categorySearchTerm.toLowerCase())
-                     )
-                     .map((category) => {
+                   {categories.map((category) => {
                      const categoryColor = getCategoryColor(category.id);
                      return (
                        <Button
@@ -1186,8 +1180,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    size="small"
                    placeholder="Rechercher catégorie..."
                    variant="outlined"
-                   value={categorySearchTerm}
-                   onChange={(e) => setCategorySearchTerm(e.target.value)}
                    sx={{ 
                      flex: 1,
                      '& .MuiOutlinedInput-root': {
