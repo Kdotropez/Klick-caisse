@@ -20,9 +20,6 @@ import {
 } from '@mui/icons-material';
 import { Product, Category, CartItem, ProductVariation } from '../types/Product';
 import VariationModal from './VariationModal';
-import RecapModal from './RecapModal';
-import GlobalDiscountModal from './GlobalDiscountModal';
-import ItemDiscountModal from './ItemDiscountModal';
 
 
 interface Window {
@@ -73,12 +70,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   // État pour la modale récapitulative
-  const [showRecapModal, setShowRecapModal] = useState(false);
-  const [showDiscountModal, setShowDiscountModal] = useState(false);
-  const [showGlobalDiscountModal, setShowGlobalDiscountModal] = useState(false);
-  const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null);
-  const [itemDiscounts, setItemDiscounts] = useState<{[key: string]: {type: 'euro' | 'percent' | 'price', value: number}}>({});
-  const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
+
 
   const [windows, setWindows] = useState<Window[]>([
                    {
@@ -577,94 +569,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     }
   };
 
-  const openDiscountModal = (item: CartItem) => {
-    setSelectedItemForDiscount(item);
-    setShowDiscountModal(true);
-  };
-
-  const openGlobalDiscountModal = () => {
-    setShowGlobalDiscountModal(true);
-  };
-
-  const applyGlobalDiscount = (discountType: 'euro' | 'percent', value: number) => {
-    setGlobalDiscount({ type: discountType, value });
-  };
-
-  const applyItemDiscount = (itemId: string, variationId: string | null, discountType: 'euro' | 'percent' | 'price', value: number) => {
-    const discountKey = `${itemId}-${variationId || 'main'}`;
-    setItemDiscounts(prev => ({
-      ...prev,
-      [discountKey]: { type: discountType, value }
-    }));
-  };
-
-  const getItemFinalPrice = (item: CartItem) => {
-    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-    const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-    const discount = itemDiscounts[discountKey];
-
-    if (!discount) return originalPrice;
-
-    switch (discount.type) {
-      case 'euro':
-        return Math.max(0, originalPrice - discount.value);
-      case 'percent':
-        return originalPrice * (1 - discount.value / 100);
-      case 'price':
-        return discount.value;
-      default:
-        return originalPrice;
-    }
-  };
-
-  const getTotalWithGlobalDiscount = () => {
-    // Calculer le total des produits remisables et non remisés
-    const discountableTotal = cartItems.reduce((sum, item) => {
-      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-      const hasIndividualDiscount = itemDiscounts[discountKey];
-      
-      // Si le produit a une remise individuelle ou n'est pas remisable, ne pas l'inclure
-      if (hasIndividualDiscount || !item.product.remisable) {
-        const finalPrice = getItemFinalPrice(item);
-        return sum + (finalPrice * item.quantity);
-      } else {
-        const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-        return sum + (originalPrice * item.quantity);
-      }
-    }, 0);
-
-    // Calculer le total des produits non remisables (avec remises individuelles)
-    const nonDiscountableTotal = cartItems.reduce((sum, item) => {
-      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-      const hasIndividualDiscount = itemDiscounts[discountKey];
-      
-      if (hasIndividualDiscount || !item.product.remisable) {
-        const finalPrice = getItemFinalPrice(item);
-        return sum + (finalPrice * item.quantity);
-      }
-      return sum;
-    }, 0);
-
-    if (!globalDiscount) {
-      return discountableTotal + nonDiscountableTotal;
-    }
-
-    // Appliquer la remise globale seulement sur les produits remisables et non remisés
-    let discountedAmount = 0;
-    switch (globalDiscount.type) {
-      case 'euro':
-        discountedAmount = Math.max(0, discountableTotal - globalDiscount.value);
-        break;
-      case 'percent':
-        discountedAmount = discountableTotal * (1 - globalDiscount.value / 100);
-        break;
-      default:
-        discountedAmount = discountableTotal;
-    }
-
-    return discountedAmount + nonDiscountableTotal;
-  };
-
 
 
   const renderResizeHandles = (window: Window) => {
@@ -860,31 +764,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             
             <List dense sx={{ flexGrow: 1, overflow: 'auto' }}>
               {cartItems.map((item, index) => {
+                const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
                 const variationId = item.selectedVariation?.id || null;
                 
                 return (
-                  <ListItem 
-                    key={`${item.product.id}-${variationId || 'main'}`} 
-                    sx={{ py: 0.5, cursor: 'pointer' }}
-                    onClick={() => openDiscountModal(item)}
-                    onMouseDown={(e) => e.stopPropagation()}
-                  >
+                  <ListItem key={`${item.product.id}-${variationId || 'main'}`} sx={{ py: 0.5 }}>
                     <ListItemText
                       primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                             {item.product.name}
                           </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRemoveItem(item.product.id, variationId);
-                            }}
-                            sx={{ color: '#f44336', p: 0.5 }}
-                          >
-                            ✕
-                          </IconButton>
                           {item.selectedVariation && (
                             <Chip 
                               label={item.selectedVariation.attributes} 
@@ -910,7 +800,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     />
                     <ListItemSecondaryAction>
                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                        {(getItemFinalPrice(item) * item.quantity).toFixed(2)} €
+                        {(price * item.quantity).toFixed(2)} €
                       </Typography>
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -919,88 +809,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             </List>
             
             <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
-              {/* Sous-total */}
-              <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5 }}>
-                Sous-total: {cartItems.reduce((sum, item) => {
-                  const finalPrice = getItemFinalPrice(item);
-                  return sum + (finalPrice * item.quantity);
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                TOTAL: {cartItems.reduce((sum, item) => {
+                  const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                  return sum + (price * item.quantity);
                 }, 0).toFixed(2)} €
               </Typography>
-
-              {/* Montant de la remise globale */}
-              {globalDiscount && (
-                <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5, color: '#f44336', fontWeight: 'bold' }}>
-                  Remise globale: -{(cartItems.reduce((sum, item) => {
-                    const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-                    const hasIndividualDiscount = itemDiscounts[discountKey];
-                    
-                    if (hasIndividualDiscount || !item.product.remisable) {
-                      return sum; // Ne pas inclure les produits déjà remisés ou non remisables
-                    } else {
-                      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                      const discountedPrice = globalDiscount.type === 'euro' 
-                        ? Math.max(0, originalPrice - globalDiscount.value)
-                        : originalPrice * (1 - globalDiscount.value / 100);
-                      return sum + ((originalPrice - discountedPrice) * item.quantity);
-                    }
-                  }, 0)).toFixed(2)} €
-                </Typography>
-              )}
-
-              {/* Total final */}
-              <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'right' }}>
-                TOTAL: {getTotalWithGlobalDiscount().toFixed(2)} €
-              </Typography>
               
-              {/* Boutons du pied de page */}
-              <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => setShowRecapModal(true)}
-                  sx={{ 
-                    backgroundColor: '#1976d2',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  📋 Recap
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={openGlobalDiscountModal}
-                  sx={{ 
-                    backgroundColor: '#ff9800',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  💰 Remise
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => {
-                    // Effacer tous les articles du panier
-                    cartItems.forEach(item => {
-                      const variationId = item.selectedVariation?.id || null;
-                      onRemoveItem(item.product.id, variationId);
-                    });
-                    // Effacer toutes les remises individuelles
-                    setItemDiscounts({});
-                    // Effacer la remise globale
-                    setGlobalDiscount(null);
-                  }}
-                  sx={{ 
-                    backgroundColor: '#f44336',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  🔄 Reset
-                </Button>
-              </Box>
+
             </Box>
           </Box>
         );
@@ -2039,7 +1855,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 '& .MuiTypography-h6': { color: '#388e3c' }
               })
             }}
-            // onMouseDown={(e) => handleMouseDown(e, window.id)}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
           >
            {/* Contenu de la fenêtre */}
            <Box sx={{ flexGrow: 1, overflow: 'hidden', position: 'relative' }}>
@@ -2057,30 +1873,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          onSelectVariation={handleVariationSelect}
        />
 
-               {/* Modale de remise individuelle */}
-        {showDiscountModal && selectedItemForDiscount && (
-          <ItemDiscountModal
-            open={showDiscountModal}
-            onClose={() => setShowDiscountModal(false)}
-            item={selectedItemForDiscount}
-            onApplyDiscount={applyItemDiscount}
-          />
-        )}
-
-       {/* Modale Recap */}
-       <RecapModal
-         open={showRecapModal}
-         onClose={() => setShowRecapModal(false)}
-         cartItems={cartItems}
-       />
-
-       {/* Modale de remise globale */}
-       <GlobalDiscountModal
-         open={showGlobalDiscountModal}
-         onClose={() => setShowGlobalDiscountModal(false)}
-         cartItems={cartItems}
-         onApplyDiscount={applyGlobalDiscount}
-       />
 
      </Box>
    );

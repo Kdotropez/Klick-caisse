@@ -24,6 +24,7 @@ interface CSVImportProps {
 const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showMapping, setShowMapping] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [csvData, setCsvData] = useState<CSVProduct[]>([]);
   const [importResult, setImportResult] = useState<{
@@ -42,6 +43,7 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setSelectedFile(file);
     setIsLoading(true);
     setImportResult(null);
 
@@ -119,7 +121,7 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
     }
   };
 
-  const handleMappingComplete = (mapping: Record<string, string>) => {
+  const handleMappingComplete = async (mapping: Record<string, string>) => {
     setIsLoading(true);
     
     try {
@@ -140,11 +142,15 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
       console.log('Nombre total de lignes mappées:', mappedData.length);
 
       // Traiter les données avec notre service
-      const result = CSVImportService.processCSVData(mappedData);
+      const result = await CSVImportService.importCSV(selectedFile!, mapping);
+      
+      if (!result.success) {
+        throw result.message;
+      }
       
       // Calculer les statistiques
       const totalVariations = result.products.reduce(
-        (sum, product) => sum + product.variations.length, 
+        (sum: number, product: Product) => sum + product.variations.length,
         0
       );
 
@@ -155,7 +161,8 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
       };
 
       // Sauvegarder les données
-      StorageService.autoSave(result.products, result.categories);
+      StorageService.saveProducts(result.products);
+      StorageService.saveCategories(result.categories);
 
       setImportResult({
         success: true,

@@ -3,9 +3,9 @@ import { Product, Category } from '../types/Product';
 export class StorageService {
   private static readonly PRODUCTS_KEY = 'klick_caisse_products';
   private static readonly CATEGORIES_KEY = 'klick_caisse_categories';
-  private static readonly POSITIONS_KEY = 'klick_caisse_positions';
+  private static readonly SETTINGS_KEY = 'klick_caisse_settings';
 
-  // Sauvegarde les produits
+  // Sauvegarder les produits
   static saveProducts(products: Product[]): void {
     try {
       localStorage.setItem(this.PRODUCTS_KEY, JSON.stringify(products));
@@ -14,7 +14,7 @@ export class StorageService {
     }
   }
 
-  // Charge les produits
+  // Charger les produits
   static loadProducts(): Product[] {
     try {
       const data = localStorage.getItem(this.PRODUCTS_KEY);
@@ -25,7 +25,7 @@ export class StorageService {
     }
   }
 
-  // Sauvegarde les catégories
+  // Sauvegarder les catégories
   static saveCategories(categories: Category[]): void {
     try {
       localStorage.setItem(this.CATEGORIES_KEY, JSON.stringify(categories));
@@ -34,7 +34,7 @@ export class StorageService {
     }
   }
 
-  // Charge les catégories
+  // Charger les catégories
   static loadCategories(): Category[] {
     try {
       const data = localStorage.getItem(this.CATEGORIES_KEY);
@@ -45,82 +45,57 @@ export class StorageService {
     }
   }
 
-  // Sauvegarde les positions par catégorie
-  static saveProductPositions(categoryId: string, productOrder: string[]): void {
+  // Sauvegarder les paramètres
+  static saveSettings(settings: any): void {
     try {
-      const positions = this.loadAllPositions();
-      positions[categoryId] = productOrder;
-      localStorage.setItem(this.POSITIONS_KEY, JSON.stringify(positions));
+      localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des positions:', error);
+      console.error('Erreur lors de la sauvegarde des paramètres:', error);
     }
   }
 
-  // Charge les positions pour une catégorie
-  static loadProductPositions(categoryId: string): string[] {
+  // Charger les paramètres
+  static loadSettings(): any {
     try {
-      const positions = this.loadAllPositions();
-      return positions[categoryId] || [];
-    } catch (error) {
-      console.error('Erreur lors du chargement des positions:', error);
-      return [];
-    }
-  }
-
-  // Charge toutes les positions
-  private static loadAllPositions(): Record<string, string[]> {
-    try {
-      const data = localStorage.getItem(this.POSITIONS_KEY);
+      const data = localStorage.getItem(this.SETTINGS_KEY);
       return data ? JSON.parse(data) : {};
     } catch (error) {
-      console.error('Erreur lors du chargement des positions:', error);
+      console.error('Erreur lors du chargement des paramètres:', error);
       return {};
     }
   }
 
-  // Sauvegarde automatique (appelée après chaque modification)
-  static autoSave(products: Product[], categories: Category[]): void {
-    this.saveProducts(products);
-    this.saveCategories(categories);
+  // Exporter les données
+  static exportData(): { products: Product[], categories: Category[], settings: any } {
+    return {
+      products: this.loadProducts(),
+      categories: this.loadCategories(),
+      settings: this.loadSettings()
+    };
   }
 
-  // Export des données en JSON (pour sauvegarde sur clé USB)
-  static exportData(): string {
-    try {
-      const data = {
-        products: this.loadProducts(),
-        categories: this.loadCategories(),
-        positions: this.loadAllPositions(),
-        exportDate: new Date().toISOString()
-      };
-      return JSON.stringify(data, null, 2);
-    } catch (error) {
-      console.error('Erreur lors de l\'export:', error);
-      return '';
+  // Importer les données
+  static importData(data: { products: Product[], categories: Category[], settings?: any }): void {
+    this.saveProducts(data.products);
+    this.saveCategories(data.categories);
+    if (data.settings) {
+      this.saveSettings(data.settings);
     }
   }
 
-  // Import des données depuis JSON
-  static importData(jsonData: string): boolean {
+  // Effacer toutes les données
+  static clearAllData(): void {
     try {
-      const data = JSON.parse(jsonData);
-      
-      if (data.products) {
-        localStorage.setItem(this.PRODUCTS_KEY, JSON.stringify(data.products));
-      }
-      
-      if (data.categories) {
-        localStorage.setItem(this.CATEGORIES_KEY, JSON.stringify(data.categories));
-      }
-      
-      if (data.positions) {
-        localStorage.setItem(this.POSITIONS_KEY, JSON.stringify(data.positions));
-      }
-      
-      return true;
+      localStorage.removeItem(this.PRODUCTS_KEY);
+      localStorage.removeItem(this.CATEGORIES_KEY);
+      localStorage.removeItem(this.SETTINGS_KEY);
     } catch (error) {
-      console.error('Erreur lors de l\'import:', error);
-      return false;
+      console.error('Erreur lors de la suppression des données:', error);
     }
+  }
+
+  // Vérifier si des données existent
+  static hasData(): boolean {
+    return !!(localStorage.getItem(this.PRODUCTS_KEY) || localStorage.getItem(this.CATEGORIES_KEY));
   }
 } 

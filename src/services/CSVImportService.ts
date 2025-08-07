@@ -1,115 +1,103 @@
-import { Product, ProductVariation, Category, CSVProduct } from '../types/Product';
+import { Product, Category } from '../types/Product';
+
+export interface ImportResult {
+  products: Product[];
+  categories: Category[];
+  success: boolean;
+  message: string;
+}
 
 export class CSVImportService {
-  
-  // Convertit une ligne CSV en objet Product
-  static parseCSVLine(line: CSVProduct): Product {
-    return {
-      id: line['Identifiant produit'],
-      name: line['Nom'],
-      ean13: line['ean13'],
-      reference: line['Référence'],
-      category: line['Nom catégorie par défaut'],
-      wholesalePrice: parseFloat(line['wholesale_price']) || 0,
-      finalPrice: parseFloat(line['Prix de vente TTC final']) || 0,
-      crossedPrice: parseFloat(line['Prix barré TTC']) || 0,
-      salesCount: 0, // Initialisé à 0
-      position: 0,   // Position initiale
-      variations: [] // Sera rempli lors du traitement
-    };
-  }
+  static async importCSV(file: File, mapping: any): Promise<ImportResult> {
+    try {
+      const text = await file.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      
+      const products: Product[] = [];
+      const categories: Category[] = [];
+      const categoryMap = new Map<string, string>();
 
-  // Traite le fichier CSV complet
-  static processCSVData(csvData: CSVProduct[]): { products: Product[], categories: Category[] } {
-    console.log('Début du traitement CSV avec', csvData.length, 'lignes');
-    console.log('Première ligne exemple:', csvData[0]);
-    
-    const productsMap = new Map<string, Product>();
-    const categoriesMap = new Map<string, Category>();
-    
-    // Première passe : créer les produits principaux
-    csvData.forEach((line, index) => {
-      const productId = line['Identifiant produit'];
-      
-      if (!productId) {
-        console.warn('Ligne', index, 'ignorée: pas d\'identifiant produit');
-        return;
-      }
-      
-      if (!productsMap.has(productId)) {
-        const product = this.parseCSVLine(line);
-        product.position = index; // Position initiale
-        productsMap.set(productId, product);
-        
-        if (index < 5) {
-          console.log('Produit créé:', product.name, 'ID:', productId, 'Catégorie:', product.category);
+      // Traiter chaque ligne (sauf l'en-tête)
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const values = line.split(',').map(v => v.trim());
+        if (values.length < headers.length) continue;
+
+        const row: any = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] || '';
+        });
+
+        // Créer le produit selon le mapping
+        const product = this.createProductFromRow(row, mapping);
+        if (product) {
+          products.push(product);
+          
+          // Ajouter la catégorie si elle n'existe pas
+          if (product.category && !categoryMap.has(product.category)) {
+            const categoryId = `cat_${categories.length + 1}`;
+            categoryMap.set(product.category, categoryId);
+            categories.push({
+              id: categoryId,
+              name: product.category,
+              color: this.getRandomColor(),
+              productOrder: []
+            });
+          }
         }
       }
-      
-      // Créer la catégorie si elle n'existe pas
-      const categoryName = line['Nom catégorie par défaut'];
-      if (categoryName && !categoriesMap.has(categoryName)) {
-        categoriesMap.set(categoryName, {
-          id: categoryName,
-          name: categoryName,
-          color: this.generateCategoryColor(categoryName),
-          productOrder: []
-        });
-        console.log('Catégorie créée:', categoryName);
-      }
-    });
 
-    // Deuxième passe : traiter les déclinaisons
-    csvData.forEach(line => {
-      const productId = line['Identifiant produit'];
-      const product = productsMap.get(productId);
-      
-      if (product && line['Identifiant déclinaison']) {
-        const variation: ProductVariation = {
-          id: line['Identifiant déclinaison'],
-          ean13: line['ean13 décl.'],
-          reference: line['Référence déclinaison'],
-          attributes: line['Liste des attributs'],
-          priceImpact: parseFloat(line['Impact sur prix de vente TTC']) || 0,
-          finalPrice: product.finalPrice + (parseFloat(line['Impact sur prix de vente TTC']) || 0)
-        };
-        
-        product.variations.push(variation);
-      }
-    });
-
-    // Organiser les produits par catégorie
-    productsMap.forEach(product => {
-      const category = categoriesMap.get(product.category);
-      if (category) {
-        category.productOrder.push(product.id);
-      }
-    });
-
-    const result = {
-      products: Array.from(productsMap.values()),
-      categories: Array.from(categoriesMap.values())
-    };
-    
-    console.log('Résultat final:', result.products.length, 'produits,', result.categories.length, 'catégories');
-    console.log('Premiers produits:', result.products.slice(0, 3).map(p => ({ id: p.id, name: p.name, category: p.category })));
-    console.log('Catégories:', result.categories.map(c => c.name));
-    
-    return result;
+      return {
+        products,
+        categories,
+        success: true,
+        message: `${products.length} produits importés avec succès`
+      };
+    } catch (error) {
+      return {
+        products: [],
+        categories: [],
+        success: false,
+        message: `Erreur lors de l'import: ${error}`
+      };
+    }
   }
 
-  // Génère une couleur pour chaque catégorie
-  private static generateCategoryColor(categoryName: string): string {
+  private static createProductFromRow(row: any, mapping: any): Product | null {
+    try {
+      const name = row[mapping.name] || 'Produit sans nom';
+      const category = row[mapping.category] || 'Général';
+      const price = parseFloat(row[mapping.price]) || 0;
+      const ean = row[mapping.ean] || '';
+
+      return {
+        id: `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name,
+        category,
+        finalPrice: price,
+        ean13: ean,
+        reference: '',
+        wholesalePrice: price,
+        crossedPrice: price,
+        salesCount: 0,
+        position: 0,
+        remisable: true, // Par défaut, tous les produits sont remisables
+        variations: []
+      };
+    } catch (error) {
+      console.error('Erreur lors de la création du produit:', error);
+      return null;
+    }
+  }
+
+  private static getRandomColor(): string {
     const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+      '#1976d2', '#388e3c', '#f57c00', '#d32f2f', '#7b1fa2',
+      '#303f9f', '#c2185b', '#5d4037', '#455a64', '#ff6f00'
     ];
-    
-    const hash = categoryName.split('').reduce((a, b) => {
-      a = ((a << 5) - a) + b.charCodeAt(0);
-      return a & a;
-    }, 0);
-    
-    return colors[Math.abs(hash) % colors.length];
+    return colors[Math.floor(Math.random() * colors.length)];
   }
 } 

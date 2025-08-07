@@ -10,6 +10,7 @@ export interface Product {
   crossedPrice: number;          // Prix barré TTC
   salesCount: number;            // Compteur de ventes
   position: number;              // Position dans la grille (pour drag & drop)
+  remisable: boolean;            // Si le produit peut recevoir une remise globale
   variations: ProductVariation[]; // Déclinaisons
 }
 

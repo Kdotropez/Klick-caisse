@@ -20,9 +20,6 @@ import {
 } from '@mui/icons-material';
 import { Product, Category, CartItem, ProductVariation } from '../types/Product';
 import VariationModal from './VariationModal';
-import RecapModal from './RecapModal';
-import GlobalDiscountModal from './GlobalDiscountModal';
-import ItemDiscountModal from './ItemDiscountModal';
 
 
 interface Window {
@@ -73,12 +70,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   // État pour la modale récapitulative
-  const [showRecapModal, setShowRecapModal] = useState(false);
-  const [showDiscountModal, setShowDiscountModal] = useState(false);
-  const [showGlobalDiscountModal, setShowGlobalDiscountModal] = useState(false);
-  const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null);
-  const [itemDiscounts, setItemDiscounts] = useState<{[key: string]: {type: 'euro' | 'percent' | 'price', value: number}}>({});
-  const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
+
 
   const [windows, setWindows] = useState<Window[]>([
                    {
@@ -194,6 +186,25 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>('');
 
+  // Système de cumul des règlements en espèces
+  const [cashTotal, setCashTotal] = useState<number>(() => {
+    const saved = localStorage.getItem('cashTotal');
+    return saved ? parseFloat(saved) : 0;
+  });
+
+  // Système de cumul des règlements par carte
+  const [cardTotal, setCardTotal] = useState<number>(() => {
+    const saved = localStorage.getItem('cardTotal');
+    return saved ? parseFloat(saved) : 0;
+  });
+
+  // Système de cumul journalier
+  const [dailyTotal, setDailyTotal] = useState<number>(() => {
+    const today = new Date().toDateString();
+    const saved = localStorage.getItem(`dailyTotal_${today}`);
+    return saved ? parseFloat(saved) : 0;
+  });
+
   // Calcul du facteur d'échelle optimal
   const calculateScaleFactor = () => {
     // Résolution de référence (écran de développement)
@@ -296,6 +307,35 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       return sum + (price * item.quantity);
     }, 0);
 
+    // Mettre à jour le cumul espèces si nécessaire
+    if (method === 'Espèces') {
+      setCashTotal(prev => {
+        const newTotal = prev + total;
+        localStorage.setItem('cashTotal', newTotal.toString());
+        console.log(`Cumul espèces mis à jour: ${prev} + ${total} = ${newTotal}`);
+        return newTotal;
+      });
+    }
+
+    // Mettre à jour le cumul carte si nécessaire
+    if (method === 'Carte') {
+      setCardTotal(prev => {
+        const newTotal = prev + total;
+        localStorage.setItem('cardTotal', newTotal.toString());
+        console.log(`Cumul carte mis à jour: ${prev} + ${total} = ${newTotal}`);
+        return newTotal;
+      });
+    }
+
+    // Mettre à jour le cumul journalier pour tous les paiements
+    const today = new Date().toDateString();
+    setDailyTotal(prev => {
+      const newDailyTotal = prev + total;
+      localStorage.setItem(`dailyTotal_${today}`, newDailyTotal.toString());
+      console.log(`Cumul journalier mis à jour: ${prev} + ${total} = ${newDailyTotal}`);
+      return newDailyTotal;
+    });
+
     // Afficher la notification de succès
     setPaymentMethod(method);
     setShowPaymentSuccess(true);
@@ -306,12 +346,34 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       setPaymentMethod('');
     }, 3000);
 
+
+
     // Vider le panier
     cartItems.forEach(item => {
       onRemoveItem(item.product.id, item.selectedVariation?.id || null);
     });
 
     console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€`);
+  };
+
+  // Fonction pour réinitialiser le cumul espèces
+  const resetCashTotal = () => {
+    setCashTotal(0);
+    localStorage.removeItem('cashTotal');
+    console.log('Cumul espèces réinitialisé');
+  };
+
+  // Fonction pour réinitialiser le cumul carte
+  const resetCardTotal = () => {
+    setCardTotal(0);
+    localStorage.removeItem('cardTotal');
+    console.log('Cumul carte réinitialisé');
+  };
+
+  // Fonction pour afficher le cumul du jour
+  const showDailyTotal = () => {
+    const today = new Date().toLocaleDateString('fr-FR');
+    alert(`Cumul du jour (${today}) : ${dailyTotal.toFixed(2)} €`);
   };
 
   // Fonction pour obtenir une couleur vive basée sur la catégorie
@@ -577,94 +639,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     }
   };
 
-  const openDiscountModal = (item: CartItem) => {
-    setSelectedItemForDiscount(item);
-    setShowDiscountModal(true);
-  };
-
-  const openGlobalDiscountModal = () => {
-    setShowGlobalDiscountModal(true);
-  };
-
-  const applyGlobalDiscount = (discountType: 'euro' | 'percent', value: number) => {
-    setGlobalDiscount({ type: discountType, value });
-  };
-
-  const applyItemDiscount = (itemId: string, variationId: string | null, discountType: 'euro' | 'percent' | 'price', value: number) => {
-    const discountKey = `${itemId}-${variationId || 'main'}`;
-    setItemDiscounts(prev => ({
-      ...prev,
-      [discountKey]: { type: discountType, value }
-    }));
-  };
-
-  const getItemFinalPrice = (item: CartItem) => {
-    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-    const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-    const discount = itemDiscounts[discountKey];
-
-    if (!discount) return originalPrice;
-
-    switch (discount.type) {
-      case 'euro':
-        return Math.max(0, originalPrice - discount.value);
-      case 'percent':
-        return originalPrice * (1 - discount.value / 100);
-      case 'price':
-        return discount.value;
-      default:
-        return originalPrice;
-    }
-  };
-
-  const getTotalWithGlobalDiscount = () => {
-    // Calculer le total des produits remisables et non remisés
-    const discountableTotal = cartItems.reduce((sum, item) => {
-      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-      const hasIndividualDiscount = itemDiscounts[discountKey];
-      
-      // Si le produit a une remise individuelle ou n'est pas remisable, ne pas l'inclure
-      if (hasIndividualDiscount || !item.product.remisable) {
-        const finalPrice = getItemFinalPrice(item);
-        return sum + (finalPrice * item.quantity);
-      } else {
-        const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-        return sum + (originalPrice * item.quantity);
-      }
-    }, 0);
-
-    // Calculer le total des produits non remisables (avec remises individuelles)
-    const nonDiscountableTotal = cartItems.reduce((sum, item) => {
-      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-      const hasIndividualDiscount = itemDiscounts[discountKey];
-      
-      if (hasIndividualDiscount || !item.product.remisable) {
-        const finalPrice = getItemFinalPrice(item);
-        return sum + (finalPrice * item.quantity);
-      }
-      return sum;
-    }, 0);
-
-    if (!globalDiscount) {
-      return discountableTotal + nonDiscountableTotal;
-    }
-
-    // Appliquer la remise globale seulement sur les produits remisables et non remisés
-    let discountedAmount = 0;
-    switch (globalDiscount.type) {
-      case 'euro':
-        discountedAmount = Math.max(0, discountableTotal - globalDiscount.value);
-        break;
-      case 'percent':
-        discountedAmount = discountableTotal * (1 - globalDiscount.value / 100);
-        break;
-      default:
-        discountedAmount = discountableTotal;
-    }
-
-    return discountedAmount + nonDiscountableTotal;
-  };
-
 
 
   const renderResizeHandles = (window: Window) => {
@@ -860,31 +834,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             
             <List dense sx={{ flexGrow: 1, overflow: 'auto' }}>
               {cartItems.map((item, index) => {
+                const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
                 const variationId = item.selectedVariation?.id || null;
                 
                 return (
-                  <ListItem 
-                    key={`${item.product.id}-${variationId || 'main'}`} 
-                    sx={{ py: 0.5, cursor: 'pointer' }}
-                    onClick={() => openDiscountModal(item)}
-                    onMouseDown={(e) => e.stopPropagation()}
-                  >
+                  <ListItem key={`${item.product.id}-${variationId || 'main'}`} sx={{ py: 0.5 }}>
                     <ListItemText
                       primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                             {item.product.name}
                           </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRemoveItem(item.product.id, variationId);
-                            }}
-                            sx={{ color: '#f44336', p: 0.5 }}
-                          >
-                            ✕
-                          </IconButton>
                           {item.selectedVariation && (
                             <Chip 
                               label={item.selectedVariation.attributes} 
@@ -910,7 +870,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     />
                     <ListItemSecondaryAction>
                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                        {(getItemFinalPrice(item) * item.quantity).toFixed(2)} €
+                        {(price * item.quantity).toFixed(2)} €
                       </Typography>
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -919,88 +879,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             </List>
             
             <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
-              {/* Sous-total */}
-              <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5 }}>
-                Sous-total: {cartItems.reduce((sum, item) => {
-                  const finalPrice = getItemFinalPrice(item);
-                  return sum + (finalPrice * item.quantity);
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                TOTAL: {cartItems.reduce((sum, item) => {
+                  const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                  return sum + (price * item.quantity);
                 }, 0).toFixed(2)} €
               </Typography>
-
-              {/* Montant de la remise globale */}
-              {globalDiscount && (
-                <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5, color: '#f44336', fontWeight: 'bold' }}>
-                  Remise globale: -{(cartItems.reduce((sum, item) => {
-                    const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-                    const hasIndividualDiscount = itemDiscounts[discountKey];
-                    
-                    if (hasIndividualDiscount || !item.product.remisable) {
-                      return sum; // Ne pas inclure les produits déjà remisés ou non remisables
-                    } else {
-                      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                      const discountedPrice = globalDiscount.type === 'euro' 
-                        ? Math.max(0, originalPrice - globalDiscount.value)
-                        : originalPrice * (1 - globalDiscount.value / 100);
-                      return sum + ((originalPrice - discountedPrice) * item.quantity);
-                    }
-                  }, 0)).toFixed(2)} €
-                </Typography>
-              )}
-
-              {/* Total final */}
-              <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'right' }}>
-                TOTAL: {getTotalWithGlobalDiscount().toFixed(2)} €
-              </Typography>
               
-              {/* Boutons du pied de page */}
-              <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => setShowRecapModal(true)}
-                  sx={{ 
-                    backgroundColor: '#1976d2',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  📋 Recap
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={openGlobalDiscountModal}
-                  sx={{ 
-                    backgroundColor: '#ff9800',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  💰 Remise
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => {
-                    // Effacer tous les articles du panier
-                    cartItems.forEach(item => {
-                      const variationId = item.selectedVariation?.id || null;
-                      onRemoveItem(item.product.id, variationId);
-                    });
-                    // Effacer toutes les remises individuelles
-                    setItemDiscounts({});
-                    // Effacer la remise globale
-                    setGlobalDiscount(null);
-                  }}
-                  sx={{ 
-                    backgroundColor: '#f44336',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  🔄 Reset
-                </Button>
-              </Box>
+
             </Box>
           </Box>
         );
@@ -1172,55 +1058,60 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 Modes de Règlement
               </Typography>
                            <Box sx={{ p: 0.5, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                 {/* Bouton Espèces - Prioritaire */}
-                 <Button
-                   variant="contained"
-                   fullWidth
-                   sx={{ 
-                     py: 1, 
-                     fontSize: '1.1rem', 
-                     fontWeight: 'bold', 
-                     minHeight: '45px',
-                     backgroundColor: '#2e7d32',
-                     '&:hover': { backgroundColor: '#1b5e20' },
-                     '&:disabled': { backgroundColor: '#ccc' }
-                   }}
-                   onClick={() => handleDirectPayment('Espèces')}
-                   disabled={cartItems.length === 0}
-                 >
-                                       💵 ESPÈCES : {totalAmount.toFixed(2)} €
-                 </Button>
-                 
-                 {/* Ligne SumUp + Carte - Secondaire */}
+                                 {/* Ligne Espèces - Encaissement + Cumul */}
                  <Box sx={{ display: 'flex', gap: 0.5 }}>
-                   {/* Bouton SumUp */}
+                   {/* Bouton Espèces - Encaissement */}
                    <Button
                      variant="contained"
                      sx={{ 
                        flex: 1,
-                       py: 0.75, 
-                       fontSize: '1rem', 
+                       py: 1, 
+                       fontSize: '1.1rem', 
                        fontWeight: 'bold', 
-                       minHeight: '40px',
-                       backgroundColor: '#1976d2',
-                       '&:hover': { backgroundColor: '#1565c0' },
+                       minHeight: '45px',
+                       backgroundColor: '#2e7d32',
+                       '&:hover': { backgroundColor: '#1b5e20' },
                        '&:disabled': { backgroundColor: '#ccc' }
                      }}
-                     onClick={() => handleDirectPayment('SumUp')}
+                     onClick={() => handleDirectPayment('Espèces')}
                      disabled={cartItems.length === 0}
                    >
-                                           📱 SumUp : {totalAmount.toFixed(2)} €
+                     💵 ESPÈCES : {totalAmount.toFixed(2)} €
                    </Button>
-                   
-                   {/* Bouton Carte */}
+
+                   {/* Bouton Espèces - Cumul */}
+                   <Button
+                     variant="outlined"
+                     sx={{ 
+                       flex: 0.5,
+                       py: 1, 
+                       fontSize: '0.9rem', 
+                       fontWeight: 'bold', 
+                       minHeight: '45px',
+                       borderColor: '#2e7d32',
+                       color: '#2e7d32',
+                       '&:hover': { 
+                         backgroundColor: '#2e7d32',
+                         color: 'white'
+                       }
+                     }}
+                     onClick={resetCashTotal}
+                   >
+                     Cumul : {cashTotal.toFixed(2)} €
+                   </Button>
+                 </Box>
+                 
+                 {/* Ligne Carte - Encaissement + Cumul */}
+                 <Box sx={{ display: 'flex', gap: 0.5 }}>
+                   {/* Bouton Carte - Encaissement */}
                    <Button
                      variant="contained"
                      sx={{ 
                        flex: 1,
-                       py: 0.75, 
-                       fontSize: '1rem', 
+                       py: 1, 
+                       fontSize: '1.1rem', 
                        fontWeight: 'bold', 
-                       minHeight: '40px',
+                       minHeight: '45px',
                        backgroundColor: '#ff9800',
                        '&:hover': { backgroundColor: '#f57c00' },
                        '&:disabled': { backgroundColor: '#ccc' }
@@ -1228,31 +1119,73 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      onClick={() => handleDirectPayment('Carte')}
                      disabled={cartItems.length === 0}
                    >
-                                           💳 Carte : {totalAmount.toFixed(2)} €
+                     💳 Carte : {totalAmount.toFixed(2)} €
+                   </Button>
+
+                   {/* Bouton Carte - Cumul */}
+                   <Button
+                     variant="outlined"
+                     sx={{ 
+                       flex: 0.5,
+                       py: 1, 
+                       fontSize: '0.9rem', 
+                       fontWeight: 'bold', 
+                       minHeight: '45px',
+                       borderColor: '#ff9800',
+                       color: '#ff9800',
+                       '&:hover': { 
+                         backgroundColor: '#ff9800',
+                         color: 'white'
+                       }
+                     }}
+                     onClick={resetCardTotal}
+                   >
+                     Cumul : {cardTotal.toFixed(2)} €
                    </Button>
                  </Box>
-                 
-                                   {/* Bouton Chèque - Tertiaire */}
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{ 
-                      py: 0.5, 
-                      fontSize: '0.9rem', 
-                      fontWeight: 'bold', 
-                      minHeight: '35px',
-                      backgroundColor: '#607d8b',
-                      color: 'white',
-                      '&:hover': { 
-                        backgroundColor: '#455a64'
-                      },
-                      '&:disabled': { backgroundColor: '#ccc', color: '#ccc' }
-                    }}
-                    onClick={() => handleDirectPayment('Chèque')}
-                    disabled={cartItems.length === 0}
-                  >
-                    📝 Chèque : {totalAmount.toFixed(2)} €
-                  </Button>
+
+                 {/* Ligne SumUp + Chèque - Réduits */}
+                 <Box sx={{ display: 'flex', gap: 0.5 }}>
+                   {/* Bouton SumUp */}
+                   <Button
+                     variant="contained"
+                     sx={{ 
+                       flex: 1,
+                       py: 0.5, 
+                       fontSize: '0.9rem', 
+                       fontWeight: 'bold', 
+                       minHeight: '35px',
+                       backgroundColor: '#1976d2',
+                       '&:hover': { backgroundColor: '#1565c0' },
+                       '&:disabled': { backgroundColor: '#ccc' }
+                     }}
+                     onClick={() => handleDirectPayment('SumUp')}
+                     disabled={cartItems.length === 0}
+                   >
+                     📱 SumUp : {totalAmount.toFixed(2)} €
+                   </Button>
+                   
+                   {/* Bouton Chèque */}
+                   <Button
+                     variant="contained"
+                     sx={{ 
+                       flex: 1,
+                       py: 0.5, 
+                       fontSize: '0.9rem', 
+                       fontWeight: 'bold', 
+                       minHeight: '35px',
+                       backgroundColor: '#607d8b',
+                       '&:hover': { 
+                         backgroundColor: '#455a64'
+                       },
+                       '&:disabled': { backgroundColor: '#ccc' }
+                     }}
+                     onClick={() => handleDirectPayment('Chèque')}
+                     disabled={cartItems.length === 0}
+                   >
+                     📝 Chèque : {totalAmount.toFixed(2)} €
+                   </Button>
+                 </Box>
               </Box>
            </Box>
          );
@@ -1763,9 +1696,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     backgroundColor: '#ff5722',
                     '&:hover': { backgroundColor: '#e64a19' }
                   }}
-                  onClick={() => console.log('Fonction 1')}
+                  onClick={showDailyTotal}
                 >
-                  Fonction 1
+                  Cumul Jour
                 </Button>
                 <Button
                   variant="contained"
@@ -2039,7 +1972,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 '& .MuiTypography-h6': { color: '#388e3c' }
               })
             }}
-            // onMouseDown={(e) => handleMouseDown(e, window.id)}
+            onMouseDown={(e) => handleMouseDown(e, window.id)}
           >
            {/* Contenu de la fenêtre */}
            <Box sx={{ flexGrow: 1, overflow: 'hidden', position: 'relative' }}>
@@ -2057,30 +1990,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          onSelectVariation={handleVariationSelect}
        />
 
-               {/* Modale de remise individuelle */}
-        {showDiscountModal && selectedItemForDiscount && (
-          <ItemDiscountModal
-            open={showDiscountModal}
-            onClose={() => setShowDiscountModal(false)}
-            item={selectedItemForDiscount}
-            onApplyDiscount={applyItemDiscount}
-          />
-        )}
-
-       {/* Modale Recap */}
-       <RecapModal
-         open={showRecapModal}
-         onClose={() => setShowRecapModal(false)}
-         cartItems={cartItems}
-       />
-
-       {/* Modale de remise globale */}
-       <GlobalDiscountModal
-         open={showGlobalDiscountModal}
-         onClose={() => setShowGlobalDiscountModal(false)}
-         cartItems={cartItems}
-         onApplyDiscount={applyGlobalDiscount}
-       />
 
      </Box>
    );

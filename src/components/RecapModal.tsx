@@ -87,96 +87,107 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
         </Button>
       </DialogTitle>
 
-             <DialogContent sx={{ p: 2 }}>
-         {/* En-tête du ticket */}
-         <Paper elevation={1} sx={{ p: 1.5, mb: 1.5, backgroundColor: '#f8f9fa' }}>
-           <Typography variant="h6" align="center" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-             TICKET DE CAISSE
-           </Typography>
-           <Typography variant="caption" align="center" display="block" color="text.secondary">
-             {formatDate()} - Ticket #{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}
-           </Typography>
-         </Paper>
+      <DialogContent sx={{ p: 3 }}>
+        {/* En-tête du ticket */}
+        <Paper elevation={2} sx={{ p: 2, mb: 2, backgroundColor: '#f8f9fa' }}>
+          <Typography variant="h5" align="center" sx={{ fontWeight: 'bold', mb: 1 }}>
+            TICKET DE CAISSE
+          </Typography>
+          <Typography variant="body2" align="center" color="text.secondary">
+            {formatDate()}
+          </Typography>
+          <Typography variant="body2" align="center" color="text.secondary">
+            Ticket #{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}
+          </Typography>
+        </Paper>
 
-         {/* Liste compacte des articles */}
-         <Box sx={{ mb: 2 }}>
-           <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
-             Récapitulatif des Articles
-           </Typography>
-           
-           <Paper elevation={1} sx={{ backgroundColor: 'white', border: '1px solid #e0e0e0' }}>
-             {cartItems.map((item, index) => {
-               const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-               const totalPrice = price * item.quantity;
-               
-               return (
-                 <Box key={`${item.product.id}-${item.selectedVariation?.id || 'main'}`}>
-                   <Box sx={{ 
-                     display: 'flex', 
-                     justifyContent: 'space-between', 
-                     alignItems: 'center',
-                     p: 1,
-                     py: 0.75,
-                     borderBottom: index < cartItems.length - 1 ? '1px solid #f0f0f0' : 'none'
-                   }}>
-                     {/* Quantité */}
-                     <Box sx={{ 
-                       minWidth: '40px',
-                       textAlign: 'center',
-                       backgroundColor: '#e3f2fd',
-                       borderRadius: '4px',
-                       px: 1,
-                       py: 0.25
-                     }}>
-                       <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                         {item.quantity}
-                       </Typography>
-                     </Box>
-                     
-                     {/* Nom du produit */}
-                     <Box sx={{ flex: 1, mx: 1 }}>
-                       <Typography variant="body2" sx={{ fontWeight: '600', lineHeight: 1.2 }}>
-                         {item.product.name}
-                       </Typography>
-                       {item.selectedVariation && (
-                         <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                           {item.selectedVariation.attributes}
-                         </Typography>
-                       )}
-                     </Box>
-                     
-                     {/* Prix total */}
-                     <Box sx={{ 
-                       minWidth: '60px',
-                       textAlign: 'right'
-                     }}>
-                       <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                         {totalPrice.toFixed(2)} €
-                       </Typography>
-                     </Box>
-                   </Box>
-                 </Box>
-               );
-             })}
-           </Paper>
-         </Box>
+        {/* Résumé des achats */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
+            Détail des Articles
+          </Typography>
+          
+          <List sx={{ backgroundColor: 'white', borderRadius: 1, border: '1px solid #e0e0e0' }}>
+            {cartItems.map((item, index) => {
+              const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+              const totalPrice = price * item.quantity;
+              
+              return (
+                <React.Fragment key={`${item.product.id}-${item.selectedVariation?.id || 'main'}`}>
+                  <ListItem sx={{ py: 1.5 }}>
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <Typography variant="body1" sx={{ fontWeight: '600', flex: 1 }}>
+                            {item.product.name}
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                            {totalPrice.toFixed(2)} €
+                          </Typography>
+                        </Box>
+                      }
+                      secondary={
+                        <Box sx={{ mt: 1 }}>
+                          {item.selectedVariation && (
+                            <Chip 
+                              label={item.selectedVariation.attributes} 
+                              size="small" 
+                              color="primary" 
+                              variant="outlined"
+                              sx={{ mr: 1, mb: 1 }}
+                            />
+                          )}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Quantité: {item.quantity}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Prix unitaire: {price.toFixed(2)} €
+                            </Typography>
+                          </Box>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  {index < cartItems.length - 1 && <Divider />}
+                </React.Fragment>
+              );
+            })}
+          </List>
+        </Box>
 
-         {/* Total compact */}
-         <Paper elevation={1} sx={{ p: 1.5, backgroundColor: '#e3f2fd' }}>
-           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-             <Box>
-               <Typography variant="body2" color="text.secondary">
-                 {totalItems} articles • {cartItems.length} produits
-               </Typography>
-             </Box>
-             <Box sx={{ textAlign: 'right' }}>
-               <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                 TOTAL: {totalAmount.toFixed(2)} €
-               </Typography>
-             </Box>
-           </Box>
-         </Paper>
-       </DialogContent>
+        {/* Résumé financier */}
+        <Paper elevation={2} sx={{ p: 2, backgroundColor: '#e3f2fd' }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
+            Résumé Financier
+          </Typography>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant="body1">Nombre d'articles:</Typography>
+            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              {totalItems}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant="body1">Nombre de produits différents:</Typography>
+            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              {cartItems.length}
+            </Typography>
+          </Box>
+          
+          <Divider sx={{ my: 1 }} />
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              TOTAL:
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+              {totalAmount.toFixed(2)} €
+            </Typography>
+          </Box>
+        </Paper>
+      </DialogContent>
 
       <DialogActions sx={{ p: 2, gap: 1 }}>
         <Button
