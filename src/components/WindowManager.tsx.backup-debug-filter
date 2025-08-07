@@ -389,23 +389,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const CARDS_PER_PAGE = 25; // 5×5 produits au lieu de 5×6
   const filteredProducts = products.filter(product => {
-    // Si aucune catégorie n'est sélectionnée, afficher tous les produits
-    if (!selectedCategory) {
-      const matchesSearch = !searchTerm || 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesSearch;
-    }
-    
     // Trouver la catégorie correspondante par nom
     const category = categories.find(cat => cat.name === product.category);
-    
-    // Vérifier si la catégorie correspond exactement
-    const matchesCategory = category && category.id === selectedCategory;
-    
+    const matchesCategory = !selectedCategory || (category && category.id === selectedCategory);
     const matchesSearch = !searchTerm || 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Debug: afficher les informations de filtrage
+    if (selectedCategory) {
+      console.log(`Produit: ${product.name}, Catégorie: ${product.category}, ID catégorie: ${category?.id}, Selected: ${selectedCategory}, Match: ${matchesCategory}`);
+    }
     
     return matchesCategory && matchesSearch;
   });
@@ -414,6 +408,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const endIndex = startIndex + CARDS_PER_PAGE;
   const currentProducts = filteredProducts.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredProducts.length / CARDS_PER_PAGE);
+  
+  // Debug: afficher le nombre de produits filtrés
+  console.log(`Catégorie sélectionnée: ${selectedCategory}, Produits filtrés: ${filteredProducts.length}, Page actuelle: ${currentPage}`);
 
   const bringToFront = (windowId: string) => {
     setWindows(prev => prev.map(w => ({

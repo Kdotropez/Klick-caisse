@@ -389,24 +389,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const CARDS_PER_PAGE = 25; // 5×5 produits au lieu de 5×6
   const filteredProducts = products.filter(product => {
-    // Si aucune catégorie n'est sélectionnée, afficher tous les produits
-    if (!selectedCategory) {
-      const matchesSearch = !searchTerm || 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesSearch;
-    }
-    
     // Trouver la catégorie correspondante par nom
     const category = categories.find(cat => cat.name === product.category);
-    
-    // Vérifier si la catégorie correspond exactement
-    const matchesCategory = category && category.id === selectedCategory;
-    
+    const matchesCategory = !selectedCategory || (category && category.id === selectedCategory);
     const matchesSearch = !searchTerm || 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase());
-    
     return matchesCategory && matchesSearch;
   });
 
@@ -750,8 +738,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
              <Box sx={{ 
                flexGrow: 1, 
                display: 'grid', 
-               gridTemplateColumns: 'repeat(5, 1fr)',
-               gridTemplateRows: 'repeat(5, 1fr)',
+               gridTemplateColumns: screenDimensions.width < 1200 ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)',
+               gridTemplateRows: screenDimensions.height < 800 ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)',
                gap: 0.5 * scaleFactor,
                p: 0.5 * scaleFactor,
                overflow: 'hidden',

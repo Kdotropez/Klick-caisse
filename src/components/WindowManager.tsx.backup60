@@ -171,11 +171,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Réinitialiser la pagination quand la catégorie ou la recherche change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, searchTerm]);
   const [draggedWindow, setDraggedWindow] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizingWindow, setResizingWindow] = useState<string | null>(null);
@@ -389,24 +384,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const CARDS_PER_PAGE = 25; // 5×5 produits au lieu de 5×6
   const filteredProducts = products.filter(product => {
-    // Si aucune catégorie n'est sélectionnée, afficher tous les produits
-    if (!selectedCategory) {
-      const matchesSearch = !searchTerm || 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesSearch;
-    }
-    
-    // Trouver la catégorie correspondante par nom
-    const category = categories.find(cat => cat.name === product.category);
-    
-    // Vérifier si la catégorie correspond exactement
-    const matchesCategory = category && category.id === selectedCategory;
-    
+    const matchesCategory = !selectedCategory || product.category === selectedCategory;
     const matchesSearch = !searchTerm || 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase());
-    
     return matchesCategory && matchesSearch;
   });
 
@@ -637,49 +618,51 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const getTotalWithGlobalDiscount = () => {
-    // Calculer le sous-total (prix originaux)
-    const subtotal = cartItems.reduce((sum, item) => {
-      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      return sum + (originalPrice * item.quantity);
-    }, 0);
-
-    // Calculer les remises individuelles
-    const individualDiscounts = cartItems.reduce((sum, item) => {
-      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      const originalTotal = originalPrice * item.quantity;
-      const finalPrice = getItemFinalPrice(item);
-      const finalTotal = finalPrice * item.quantity;
+    // Calculer le total des produits remisables et non remisés
+    const discountableTotal = cartItems.reduce((sum, item) => {
+      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+      const hasIndividualDiscount = itemDiscounts[discountKey];
       
-      return sum + (originalTotal - finalTotal);
+      // Si le produit a une remise individuelle ou n'est pas remisable, ne pas l'inclure
+      if (hasIndividualDiscount || !item.product.remisable) {
+        const finalPrice = getItemFinalPrice(item);
+        return sum + (finalPrice * item.quantity);
+      } else {
+        const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+        return sum + (originalPrice * item.quantity);
+      }
     }, 0);
 
-    // Calculer la remise globale
-    let globalDiscountAmount = 0;
-    if (globalDiscount) {
-      // Total des produits sans remise individuelle
-      const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
-        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-        const hasIndividualDiscount = itemDiscounts[discountKey];
-        
-        if (!hasIndividualDiscount) {
-          const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-          return sum + (originalPrice * item.quantity);
-        }
-        return sum;
-      }, 0);
-
-      // Appliquer la remise globale sur le total
-      if (globalDiscount.type === 'euro') {
-        globalDiscountAmount = Math.min(totalWithoutIndividualDiscount, globalDiscount.value);
-      } else {
-        globalDiscountAmount = totalWithoutIndividualDiscount * (globalDiscount.value / 100);
+    // Calculer le total des produits non remisables (avec remises individuelles)
+    const nonDiscountableTotal = cartItems.reduce((sum, item) => {
+      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+      const hasIndividualDiscount = itemDiscounts[discountKey];
+      
+      if (hasIndividualDiscount || !item.product.remisable) {
+        const finalPrice = getItemFinalPrice(item);
+        return sum + (finalPrice * item.quantity);
       }
+      return sum;
+    }, 0);
+
+    if (!globalDiscount) {
+      return discountableTotal + nonDiscountableTotal;
     }
 
-    const totalDiscounts = individualDiscounts + globalDiscountAmount;
-    
-    // Total final = Sous-total - Total des remises
-    return subtotal - totalDiscounts;
+    // Appliquer la remise globale seulement sur les produits remisables et non remisés
+    let discountedAmount = 0;
+    switch (globalDiscount.type) {
+      case 'euro':
+        discountedAmount = Math.max(0, discountableTotal - globalDiscount.value);
+        break;
+      case 'percent':
+        discountedAmount = discountableTotal * (1 - globalDiscount.value / 100);
+        break;
+      default:
+        discountedAmount = discountableTotal;
+    }
+
+    return discountedAmount + nonDiscountableTotal;
   };
 
 
@@ -750,8 +733,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
              <Box sx={{ 
                flexGrow: 1, 
                display: 'grid', 
-               gridTemplateColumns: 'repeat(5, 1fr)',
-               gridTemplateRows: 'repeat(5, 1fr)',
+               gridTemplateColumns: screenDimensions.width < 1200 ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)',
+               gridTemplateRows: screenDimensions.height < 800 ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)',
                gap: 0.5 * scaleFactor,
                p: 0.5 * scaleFactor,
                overflow: 'hidden',
@@ -939,54 +922,30 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               {/* Sous-total */}
               <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5 }}>
                 Sous-total: {cartItems.reduce((sum, item) => {
-                  const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                  return sum + (originalPrice * item.quantity);
+                  const finalPrice = getItemFinalPrice(item);
+                  return sum + (finalPrice * item.quantity);
                 }, 0).toFixed(2)} €
               </Typography>
 
-              {/* Montant total de toutes les remises */}
-              {(() => {
-                // Calculer les remises individuelles
-                const individualDiscounts = cartItems.reduce((sum, item) => {
-                  const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                  const originalTotal = originalPrice * item.quantity;
-                  const finalPrice = getItemFinalPrice(item);
-                  const finalTotal = finalPrice * item.quantity;
-                  
-                  return sum + (originalTotal - finalTotal);
-                }, 0);
-
-                // Calculer la remise globale
-                let globalDiscountAmount = 0;
-                if (globalDiscount) {
-                  // Total des produits sans remise individuelle
-                  const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
+              {/* Montant de la remise globale */}
+              {globalDiscount && (
+                <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5, color: '#f44336', fontWeight: 'bold' }}>
+                  Remise globale: -{(cartItems.reduce((sum, item) => {
                     const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
                     const hasIndividualDiscount = itemDiscounts[discountKey];
                     
-                    if (!hasIndividualDiscount) {
+                    if (hasIndividualDiscount || !item.product.remisable) {
+                      return sum; // Ne pas inclure les produits déjà remisés ou non remisables
+                    } else {
                       const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                      return sum + (originalPrice * item.quantity);
+                      const discountedPrice = globalDiscount.type === 'euro' 
+                        ? Math.max(0, originalPrice - globalDiscount.value)
+                        : originalPrice * (1 - globalDiscount.value / 100);
+                      return sum + ((originalPrice - discountedPrice) * item.quantity);
                     }
-                    return sum;
-                  }, 0);
-
-                  // Appliquer la remise globale sur le total
-                  if (globalDiscount.type === 'euro') {
-                    globalDiscountAmount = Math.min(totalWithoutIndividualDiscount, globalDiscount.value);
-                  } else {
-                    globalDiscountAmount = totalWithoutIndividualDiscount * (globalDiscount.value / 100);
-                  }
-                }
-
-                const totalDiscounts = individualDiscounts + globalDiscountAmount;
-                
-                return (
-                  <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5, color: '#f44336', fontWeight: 'bold' }}>
-                    Total remises: -{totalDiscounts.toFixed(2)} €
-                  </Typography>
-                );
-              })()}
+                  }, 0)).toFixed(2)} €
+                </Typography>
+              )}
 
               {/* Total final */}
               <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'right' }}>
@@ -1790,7 +1749,179 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             </Box>
           );
 
-
+              case 'settings':
+          return (
+            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
+              {/* Grille 3x4 pour les 12 boutons */}
+              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#ff5722',
+                    '&:hover': { backgroundColor: '#e64a19' }
+                  }}
+                  onClick={() => console.log('Fonction 1')}
+                >
+                  Fonction 1
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#795548',
+                    '&:hover': { backgroundColor: '#5d4037' }
+                  }}
+                  onClick={() => console.log('Fonction 2')}
+                >
+                  Fonction 2
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#607d8b',
+                    '&:hover': { backgroundColor: '#455a64' }
+                  }}
+                  onClick={() => console.log('Fonction 3')}
+                >
+                  Fonction 3
+                </Button>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#ff4081',
+                    '&:hover': { backgroundColor: '#e91e63' }
+                  }}
+                  onClick={() => console.log('Fonction 4')}
+                >
+                  Fonction 4
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#3f51b5',
+                    '&:hover': { backgroundColor: '#303f9f' }
+                  }}
+                  onClick={() => console.log('Fonction 5')}
+                >
+                  Fonction 5
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#4caf50',
+                    '&:hover': { backgroundColor: '#388e3c' }
+                  }}
+                  onClick={() => console.log('Fonction 6')}
+                >
+                  Fonction 6
+                </Button>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#ff9800',
+                    '&:hover': { backgroundColor: '#f57c00' }
+                  }}
+                  onClick={() => console.log('Fonction 7')}
+                >
+                  Fonction 7
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#9c27b0',
+                    '&:hover': { backgroundColor: '#7b1fa2' }
+                  }}
+                  onClick={() => console.log('Fonction 8')}
+                >
+                  Fonction 8
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#00bcd4',
+                    '&:hover': { backgroundColor: '#0097a7' }
+                  }}
+                  onClick={() => console.log('Fonction 9')}
+                >
+                  Fonction 9
+                </Button>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#009688',
+                    '&:hover': { backgroundColor: '#00796b' }
+                  }}
+                  onClick={() => console.log('Fonction 10')}
+                >
+                  Fonction 10
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#8bc34a',
+                    '&:hover': { backgroundColor: '#689f38' }
+                  }}
+                  onClick={() => console.log('Fonction 11')}
+                >
+                  Fonction 11
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    flex: 1,
+                    fontSize: '0.7rem', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#cddc39',
+                    '&:hover': { backgroundColor: '#afb42b' }
+                  }}
+                  onClick={() => console.log('Fonction 12')}
+                >
+                  Fonction 12
+                </Button>
+              </Box>
+            </Box>
+          );
 
       default:
         return null;

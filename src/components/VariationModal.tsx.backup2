@@ -12,6 +12,7 @@ import {
   Chip,
   Divider
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { Product, ProductVariation } from '../types/Product';
 
 interface VariationModalProps {
@@ -85,13 +86,9 @@ const VariationModal: React.FC<VariationModalProps> = ({
           Déclinaisons disponibles:
         </Typography>
         
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: 2 
-        }}>
+        <Grid container spacing={2}>
           {product.variations.map((variation) => (
-            <Box key={variation.id}>
+            <Grid item xs={12} sm={6} md={4} key={variation.id}>
               <Card 
                 sx={{ 
                   cursor: 'pointer',
@@ -139,9 +136,9 @@ const VariationModal: React.FC<VariationModalProps> = ({
                   )}
                 </CardContent>
               </Card>
-            </Box>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </DialogContent>
 
       <DialogActions sx={{ p: 3, pt: 0 }}>
