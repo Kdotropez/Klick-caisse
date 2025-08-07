@@ -73,10 +73,16 @@ export class CSVImportService {
       const price = parseFloat(row[mapping.price]) || 0;
       const ean = row[mapping.ean] || '';
 
+      // Extraire les catégories associées si le mapping existe
+      const associatedCategories = mapping.associatedCategories ? 
+        (row[mapping.associatedCategories] || '').split(',').map((cat: string) => cat.trim()).filter((cat: string) => cat) : 
+        [];
+
       return {
         id: `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name,
         category,
+        associatedCategories,
         finalPrice: price,
         ean13: ean,
         reference: '',

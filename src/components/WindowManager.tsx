@@ -32,7 +32,7 @@ import DailyReportModal from './DailyReportModal';
 interface Window {
   id: string;
   title: string;
-  type: 'products' | 'cart' | 'categories' | 'search' | 'settings' | 'import' | 'stats' | 'free';
+  type: 'products' | 'cart' | 'categories' | 'subcategories' | 'search' | 'settings' | 'import' | 'stats' | 'free';
   x: number;
   y: number;
   width: number;
@@ -99,6 +99,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     'Carte': 0
   });
   
+  // États pour l'import CSV
+  const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
+  const [importMessage, setImportMessage] = useState('');
+  
   // Force le re-rendu quand les catégories changent
   const [categoriesVersion, setCategoriesVersion] = useState(0);
   useEffect(() => {
@@ -114,9 +118,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         title: 'Grille Produits',
         type: 'products',
         x: 20, // Même x que la fenêtre catégories
-        y: 150, // Remonté de 60px (210 - 60 = 150)
+        y: 241, // Position pour toucher les fenêtres 5 et 6 avec gap de 1px
         width: 800, // Largeur personnalisée
-        height: 600, // Hauteur personnalisée
+        height: 518, // Hauteur réduite de 82px
         isMinimized: false,
         isMaximized: false,
         zIndex: 1,
@@ -133,18 +137,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          isMaximized: false,
          zIndex: 2,
        },
-                                                                                                                                                               {
-           id: 'categories',
-           title: 'Catégories',
-           type: 'categories',
-           x: 20, // Position personnalisée - coin haut gauche de l'espace fenêtre
-           y: 20, // Remonté de 60px (80 - 60 = 20)
-           width: 802.33, // Largeur exacte mesurée
-           height: 121.33, // Hauteur exacte mesurée
-           isMinimized: false,
-           isMaximized: false,
-           zIndex: 3,
-         },
+                                                                                                                                                                       {
+          id: 'categories',
+          title: 'Catégories',
+          type: 'categories',
+          x: 20, // Position personnalisée - coin haut gauche de l'espace fenêtre
+          y: 20, // Remonté de 60px (80 - 60 = 20)
+          width: 802.33, // Largeur exacte mesurée
+          height: 220, // Hauteur étendue jusqu'à la grille de la fenêtre 1
+          isMinimized: false,
+          isMaximized: false,
+          zIndex: 3,
+        },
                           {
          id: 'search',
          title: 'Modes de Règlement',
@@ -197,14 +201,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   ]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
+  const [subcategorySearchTerm, setSubcategorySearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Réinitialiser la pagination quand la catégorie ou la recherche change
+  // Réinitialiser la pagination quand la catégorie, sous-catégorie ou la recherche change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, searchTerm, categorySearchTerm]);
+  }, [selectedCategory, selectedSubcategory, searchTerm, categorySearchTerm, subcategorySearchTerm]);
   const [draggedWindow, setDraggedWindow] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizingWindow, setResizingWindow] = useState<string | null>(null);
@@ -217,6 +223,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Système de scaling automatique pour adaptation dynamique
   const [scaleFactor, setScaleFactor] = useState(1);
+
+  // Réinitialiser la page quand les filtres changent
+  useEffect(() => {
+    console.log('🔄 useEffect: Réinitialisation de la page à 1', {
+      selectedCategory,
+      selectedSubcategory,
+      searchTerm
+    });
+    setCurrentPage(1);
+  }, [selectedCategory, selectedSubcategory, searchTerm]);
+
+  // Forcer un re-render quand les filtres changent pour éviter les problèmes de cache
+  const filterKey = `${selectedCategory}-${selectedSubcategory}-${searchTerm}-${currentPage}`;
 
 
   // Système de drag and drop pour réorganiser les produits
@@ -435,32 +454,104 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const CARDS_PER_PAGE = 25; // 5×5 produits au lieu de 5×6
-  const filteredProducts = products.filter(product => {
-    // Si aucune catégorie n'est sélectionnée, afficher tous les produits
-    if (!selectedCategory) {
-      const matchesSearch = !searchTerm || 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesSearch;
+  
+  // Debug: Afficher les informations de filtrage
+  console.log('🔍 Debug Filtrage:', {
+    selectedCategory,
+    selectedSubcategory,
+    searchTerm,
+    totalProducts: products.length,
+    selectedCategoryName: selectedCategory ? categories.find(cat => cat.id === selectedCategory)?.name : null
+  });
+  
+  // D'abord, dédupliquer les produits par ID pour éviter les doublons
+  const uniqueProducts = products.reduce((acc, product) => {
+    if (!acc.find(p => p.id === product.id)) {
+      acc.push(product);
     }
-    
-    // Trouver la catégorie correspondante par nom
-    const category = categories.find(cat => cat.name === product.category);
-    
-    // Vérifier si la catégorie correspond exactement
-    const matchesCategory = category && category.id === selectedCategory;
-    
+    return acc;
+  }, [] as Product[]);
+  
+  console.log('🔍 Debug Déduplication:', {
+    originalCount: products.length,
+    uniqueCount: uniqueProducts.length,
+    duplicates: products.length - uniqueProducts.length
+  });
+  
+  const filteredProducts = uniqueProducts.filter(product => {
+    // Filtrage par recherche d'article
     const matchesSearch = !searchTerm || 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesCategory && matchesSearch;
+    // Si aucune catégorie n'est sélectionnée, afficher tous les produits
+    if (!selectedCategory && !selectedSubcategory) {
+      return matchesSearch;
+    }
+    
+    // Filtrage par sous-catégorie (priorité sur la catégorie)
+    if (selectedSubcategory) {
+      const hasSubcategory = product.associatedCategories && 
+        Array.isArray(product.associatedCategories) &&
+        product.associatedCategories.some(cat => cat.trim() === selectedSubcategory);
+      return hasSubcategory && matchesSearch;
+    }
+    
+    // Filtrage par catégorie par défaut
+    if (selectedCategory) {
+      const category = categories.find(cat => cat.name === product.category);
+      const matchesCategory = category && category.id === selectedCategory;
+      
+      // Debug: Afficher les détails de la comparaison
+      if (product.name.includes('tee shirt') || product.name.includes('vetement')) {
+        console.log('🔍 Debug Produit:', {
+          productName: product.name,
+          productCategory: product.category,
+          selectedCategory,
+          categoryFound: category,
+          categoryId: category?.id,
+          matchesCategory
+        });
+      }
+      
+      return matchesCategory && matchesSearch;
+    }
+    
+    return matchesSearch;
+  });
+  
+  console.log('🔍 Debug Résultat:', {
+    filteredCount: filteredProducts.length,
+    firstFewProducts: filteredProducts.slice(0, 3).map(p => ({ name: p.name, category: p.category }))
   });
 
   const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
   const endIndex = startIndex + CARDS_PER_PAGE;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  
+  // S'assurer que les produits sont bien triés et filtrés
+  const sortedAndFilteredProducts = [...filteredProducts].sort((a, b) => {
+    // Trier par catégorie d'abord, puis par nom
+    if (a.category !== b.category) {
+      return a.category.localeCompare(b.category);
+    }
+    // Si même catégorie, trier par nom
+    if (a.name !== b.name) {
+      return a.name.localeCompare(b.name);
+    }
+    // Si même nom, trier par ID pour garantir un ordre stable
+    return a.id.localeCompare(b.id);
+  });
+  
+  const currentProducts = sortedAndFilteredProducts.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredProducts.length / CARDS_PER_PAGE);
+  
+  // Debug: Vérifier les produits actuels
+  console.log('🔍 Debug CurrentProducts:', {
+    startIndex,
+    endIndex,
+    currentProductsCount: currentProducts.length,
+    currentProducts: currentProducts.map(p => ({ name: p.name, category: p.category }))
+  });
 
   const bringToFront = (windowId: string) => {
     setWindows(prev => prev.map(w => ({
@@ -663,6 +754,149 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     }
   };
 
+  // Fonction pour importer un fichier CSV
+  const handleImportCSV = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImportStatus('importing');
+    setImportMessage('Import en cours...');
+
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        throw new Error('Fichier CSV invalide - pas assez de lignes');
+      }
+
+      // Analyser les en-têtes
+      const headers = lines[0].split('\t').map(h => h.trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, ''));
+      
+      // Mapping des colonnes
+      const mapping = {
+        id: headers.findIndex(h => h.includes('Identifiant produit')),
+        name: headers.findIndex(h => h.includes('Nom')),
+        category: headers.findIndex(h => h.includes('catégorie par défaut')),
+        associatedCategories: headers.findIndex(h => h.includes('catégories associées')),
+        finalPrice: headers.findIndex(h => h.includes('Prix de vente TTC final')),
+        ean13: headers.findIndex(h => h.includes('ean13')),
+        reference: headers.findIndex(h => h.includes('Référence')),
+        wholesalePrice: headers.findIndex(h => h.includes('Prix de vente HT')),
+        stock: headers.findIndex(h => h.includes('Quantité disponible'))
+      };
+
+      // Vérifier les colonnes obligatoires
+      if (mapping.id === -1 || mapping.name === -1 || mapping.category === -1) {
+        throw new Error('Colonnes obligatoires manquantes dans le CSV');
+      }
+
+      const newProducts: Product[] = [];
+      const categoriesSet = new Set<string>();
+      const associatedCategoriesSet = new Set<string>();
+
+      // Traiter chaque ligne
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split('\t');
+        if (values.length < Math.max(...Object.values(mapping).filter(v => v !== -1)) + 1) continue;
+
+        try {
+          const id = (values[mapping.id] || `prod_${i}`).replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const name = (values[mapping.name] || 'Produit sans nom').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const category = (values[mapping.category] || 'Général').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const finalPrice = parseFloat(values[mapping.finalPrice]) || 0;
+          const ean13 = (values[mapping.ean13] || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const reference = (values[mapping.reference] || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          
+          // Traiter les catégories associées
+          const associatedCategoriesStr = (values[mapping.associatedCategories] || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const associatedCategories = associatedCategoriesStr
+            .split(',')
+            .map(cat => cat.trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, ''))
+            .filter(cat => cat && cat.length > 0);
+
+          const wholesalePrice = mapping.wholesalePrice !== -1 ? 
+            parseFloat(values[mapping.wholesalePrice]) || finalPrice * 0.8 : 
+            finalPrice * 0.8;
+
+          // Nettoyer les données
+          const cleanName = name.replace(/[^\w\s\-\.]/g, '').trim();
+          const cleanCategory = category.replace(/[^\w\s\-\.]/g, '').trim();
+          const cleanAssociatedCategories = associatedCategories
+            .map(cat => cat.replace(/[^\w\s\-\.]/g, '').trim())
+            .filter(cat => cat && cat.length > 0);
+
+          if (cleanName && cleanName !== 'Produit sans nom') {
+            const product: Product = {
+              id,
+              name: cleanName,
+              reference,
+              ean13,
+              category: cleanCategory,
+              associatedCategories: cleanAssociatedCategories,
+              wholesalePrice,
+              finalPrice,
+              crossedPrice: finalPrice,
+              salesCount: 0,
+              position: 0,
+              remisable: true,
+              variations: []
+            };
+
+            newProducts.push(product);
+            categoriesSet.add(cleanCategory);
+            cleanAssociatedCategories.forEach(cat => associatedCategoriesSet.add(cat));
+          }
+        } catch (error) {
+          console.error(`Erreur ligne ${i}:`, error);
+        }
+      }
+
+      // Créer les nouvelles catégories
+      const newCategories: Category[] = Array.from(categoriesSet).map((catName, index) => ({
+        id: `cat_${index + 1}`,
+        name: catName,
+        color: getRandomColor(),
+        productOrder: []
+      }));
+
+      // Appeler la fonction de callback pour mettre à jour les données
+      onImportComplete(newProducts, newCategories);
+
+      setImportStatus('success');
+      setImportMessage(`Import réussi : ${newProducts.length} produits, ${newCategories.length} catégories, ${associatedCategoriesSet.size} sous-catégories`);
+
+      // Réinitialiser le statut après 3 secondes
+      setTimeout(() => {
+        setImportStatus('idle');
+        setImportMessage('');
+      }, 3000);
+
+    } catch (error) {
+      console.error('Erreur lors de l\'import:', error);
+      setImportStatus('error');
+      setImportMessage(`Erreur d'import : ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+      
+      // Réinitialiser le statut après 5 secondes
+      setTimeout(() => {
+        setImportStatus('idle');
+        setImportMessage('');
+      }, 5000);
+    }
+
+    // Réinitialiser l'input file
+    event.target.value = '';
+  };
+
+  // Fonction utilitaire pour les couleurs
+  const getRandomColor = () => {
+    const colors = [
+      '#1976d2', '#388e3c', '#f57c00', '#d32f2f', '#7b1fa2',
+      '#303f9f', '#c2185b', '#5d4037', '#455a64', '#ff6f00'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
   const getItemFinalPrice = (item: CartItem) => {
     const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
     const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
@@ -748,49 +982,37 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       case 'products':
         return (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Indicateur de page discret */}
-            <Box sx={{ 
-              p: 0.5 * scaleFactor, 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center',
-              fontSize: `${0.75 * scaleFactor}rem`
-            }}>
-              <Chip 
-                label={`Page ${currentPage}/${totalPages} - ${filteredProducts.length} produits`} 
-                size="small" 
-                sx={{ 
-                  fontSize: `${0.75 * scaleFactor}rem`,
-                  backgroundColor: '#f0f0f0',
-                  color: '#666'
-                }}
-              />
-            </Box>
+
             
                          {/* Grille produits */}
-             <Box sx={{ 
-               flexGrow: 1, 
-               display: 'grid', 
-               gridTemplateColumns: 'repeat(5, 1fr)',
-               gridTemplateRows: 'repeat(5, 1fr)',
-               gap: '1px',
-               p: '1px',
-               overflow: 'hidden',
-               minHeight: 0,
-               width: '800px',
-               height: '552px',
-               justifyContent: 'center',
-               alignItems: 'center'
-             }}>
+             <Box 
+               key={filterKey}
+               sx={{ 
+                 flexGrow: 1, 
+                 display: 'grid', 
+                 gridTemplateColumns: 'repeat(5, 1fr)',
+                 gridTemplateRows: 'repeat(5, 1fr)',
+                 gap: '1px',
+                 p: '1px',
+                 overflow: 'hidden',
+                 minHeight: 0,
+                 width: '800px',
+                 height: 'calc(100% - 82px)',
+                 justifyContent: 'center',
+                 alignItems: 'center'
+               }}>
                {/* Rendu de la grille 5x5 avec navigation intégrée */}
                {Array.from({ length: 25 }, (_, index) => {
+                 // Calculer la hauteur dynamique des cartes
+                 const cardHeight = Math.max(60, Math.floor((window.height - 100) / 5 - 1)); // 5 lignes, -1 pour le gap
+                 const cardWidth = 150;
                  const position = index + 1;
                  
-                 // Positions des boutons de navigation
+                 // Positions des boutons de navigation - TOUJOURS fixes
                  const isPrevButton = position === 21;
                  const isNextButton = position === 25;
                  
-                 // Si c'est un bouton de navigation
+                 // Rendu des boutons de navigation - TOUJOURS aux mêmes positions
                  if (isPrevButton) {
                    return (
                      <Button
@@ -799,8 +1021,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                        disabled={currentPage === 1}
                        sx={{
-                         width: '150px',
-                         height: '103px',
+                         width: `${cardWidth}px`,
+                         height: `${cardHeight}px`,
                          display: 'flex',
                          flexDirection: 'column',
                          justifyContent: 'center',
@@ -808,12 +1030,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          backgroundColor: currentPage === 1 ? '#ccc' : '#2196f3',
                          color: 'white',
                          borderRadius: '8px',
+                         position: 'relative',
+                         minWidth: `${cardWidth}px`,
+                         minHeight: `${cardHeight}px`,
+                         maxWidth: `${cardWidth}px`,
+                         maxHeight: `${cardHeight}px`,
+                         boxSizing: 'border-box',
+                         p: '2px',
+                         border: '1px solid #ccc',
+                         boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                         flexShrink: 0,
+                         flexGrow: 0,
+
                          '&:hover': {
                            backgroundColor: currentPage === 1 ? '#ccc' : '#1976d2'
                          },
                          '&:disabled': {
                            backgroundColor: '#ccc',
-                           color: '#666'
+                           color: '#666',
+                           transform: 'none',
+                           boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
                          }
                        }}
                      >
@@ -833,8 +1069,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                        disabled={currentPage === totalPages}
                        sx={{
-                         width: '150px',
-                         height: '103px',
+                         width: `${cardWidth}px`,
+                         height: `${cardHeight}px`,
                          display: 'flex',
                          flexDirection: 'column',
                          justifyContent: 'center',
@@ -842,12 +1078,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          backgroundColor: currentPage === totalPages ? '#ccc' : '#2196f3',
                          color: 'white',
                          borderRadius: '8px',
+                         position: 'relative',
+                         minWidth: `${cardWidth}px`,
+                         minHeight: `${cardHeight}px`,
+                         maxWidth: `${cardWidth}px`,
+                         maxHeight: `${cardHeight}px`,
+                         boxSizing: 'border-box',
+                         p: '2px',
+                         border: '1px solid #ccc',
+                         boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                         flexShrink: 0,
+                         flexGrow: 0,
+
                          '&:hover': {
                            backgroundColor: currentPage === totalPages ? '#ccc' : '#1976d2'
                          },
                          '&:disabled': {
                            backgroundColor: '#ccc',
-                           color: '#666'
+                           color: '#666',
+                           transform: 'none',
+                           boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
                          }
                        }}
                      >
@@ -863,16 +1113,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   let productIndex = index;
                   if (index > 20) productIndex = index - 1; // Après le bouton précédent
                   if (index > 24) productIndex = index - 2; // Après le bouton suivant
+                  
+                  // Vérification supplémentaire : ne jamais afficher de produit aux positions des boutons
+                  if (position === 21 || position === 25) {
+                    return null; // Cette position est réservée aux boutons
+                  }
+                  
                   const product = currentProducts[productIndex];
                  
-                 // Si pas de produit pour cette position, afficher une case vide
+                 // Si pas de produit pour cette position, afficher une case vide (sauf aux positions des boutons)
                  if (!product) {
                    return (
                      <Box
                        key={`empty-${index}`}
                        sx={{
-                         width: '150px',
-                         height: '103px',
+                         width: `${cardWidth}px`,
+                         height: `${cardHeight}px`,
                          border: '1px dashed #ccc',
                          borderRadius: '8px',
                          display: 'flex',
@@ -884,28 +1140,30 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    );
                  }
                  
-                 // Rendu normal du produit
-                 const categoryColor = getCategoryColor(product.category);
-                 return (
-                   <Paper
-                     key={product.id}
-                     draggable
-                     sx={{
-                       width: '150px',
-                       height: '103px',
-                       p: '2px',
-                       cursor: 'grab',
-                       transition: 'all 0.2s',
-                       display: 'flex',
-                       flexDirection: 'column',
-                       justifyContent: 'space-between',
-                       minHeight: 0,
-                       background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}80 30%, ${categoryColor}40 70%, white 100%)`,
-                       border: `1px solid ${categoryColor}`,
-                       borderRadius: `8px`,
-                       boxShadow: `0 1px 2px rgba(0,0,0,0.1)`,
-                       color: '#2c3e50',
-                       fontWeight: '600',
+                                   // Rendu normal du produit
+                  const categoryColor = getCategoryColor(product.category);
+                  
+                  return (
+                                         <Paper
+                       key={product.id}
+                       draggable
+                       sx={{
+                         width: `${cardWidth}px`,
+                         height: `${cardHeight}px`,
+                         p: '2px',
+                         cursor: 'grab',
+                         transition: 'all 0.2s',
+                         display: 'flex',
+                         flexDirection: 'column',
+                         justifyContent: 'space-between',
+                         minHeight: 0,
+                         background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}80 30%, ${categoryColor}40 70%, white 100%)`,
+                         border: `1px solid ${categoryColor}`,
+                         borderRadius: `8px`,
+                         boxShadow: `0 1px 2px rgba(0,0,0,0.1)`,
+                         color: '#2c3e50',
+                         fontWeight: '600',
+
                        ...(dragOverProduct?.id === product.id && {
                          transform: 'scale(1.05)',
                          boxShadow: `0 ${8 * scaleFactor}px ${25 * scaleFactor}px rgba(0,0,0,0.3), 0 ${3 * scaleFactor}px ${8 * scaleFactor}px ${categoryColor}50`,
@@ -1299,7 +1557,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 }}>
                                      <Button
                      variant={selectedCategory === null ? "contained" : "outlined"}
-                     onClick={() => setSelectedCategory(null)}
+                     onClick={() => {
+                       setSelectedCategory(null);
+                       setSelectedSubcategory(null);
+                     }}
                      sx={{ 
                        textTransform: 'none',
                        whiteSpace: 'nowrap',
@@ -1326,7 +1587,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        <Button
                          key={category.id}
                          variant={selectedCategory === category.id ? "contained" : "outlined"}
-                         onClick={() => setSelectedCategory(category.id)}
+                         onClick={() => {
+                           setSelectedCategory(category.id);
+                           setSelectedSubcategory(null);
+                         }}
                          sx={{ 
                            textTransform: 'none',
                            whiteSpace: 'nowrap',
@@ -1388,7 +1652,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      }
                    }}
                    value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
+                   onChange={(e) => {
+                     setSearchTerm(e.target.value);
+                   }}
                    InputProps={{
                      startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#2196f3' }} />
                    }}
@@ -1424,6 +1690,190 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#ff9800' }} />
                    }}
                  />
+                 
+                 {/* Recherche des sous-catégories */}
+                 <TextField
+                   size="small"
+                   placeholder="Rechercher sous-catégorie..."
+                   variant="outlined"
+                   value={subcategorySearchTerm}
+                   onChange={(e) => setSubcategorySearchTerm(e.target.value)}
+                   sx={{ 
+                     flex: 1,
+                     '& .MuiOutlinedInput-root': {
+                       borderColor: '#9c27b0',
+                       backgroundColor: '#f3e5f5',
+                       '&:hover .MuiOutlinedInput-notchedOutline': {
+                         borderColor: '#7b1fa2'
+                       },
+                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                         borderColor: '#9c27b0'
+                       },
+                       '&:hover': {
+                         backgroundColor: '#e1bee7'
+                       },
+                       '&.Mui-focused': {
+                         backgroundColor: '#ce93d8'
+                       }
+                     }
+                   }}
+                   InputProps={{
+                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#9c27b0' }} />
+                   }}
+                 />
+              </Box>
+              
+              {/* Onglets des sous-catégories */}
+              <Box sx={{ 
+                p: 1,
+                borderTop: '1px solid #e0e0e0',
+                backgroundColor: '#f9f9f9'
+              }}>
+                <Typography variant="body2" sx={{ 
+                  mb: 1, 
+                  fontWeight: 'bold', 
+                  color: '#9c27b0',
+                  fontSize: '0.8rem'
+                }}>
+                  Sous-catégories :
+                </Typography>
+                <Box sx={{ 
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 0.5,
+                  alignItems: 'flex-start',
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  '&::-webkit-scrollbar': {
+                    display: 'none'
+                  },
+                  cursor: 'grab',
+                  '&:active': {
+                    cursor: 'grabbing'
+                  },
+                  WebkitOverflowScrolling: 'touch',
+                  scrollBehavior: 'smooth'
+                }}>
+                  <Button
+                    variant={selectedSubcategory === null ? "contained" : "outlined"}
+                    onClick={() => {
+                      setSelectedSubcategory(null);
+                    }}
+                    sx={{ 
+                      textTransform: 'none',
+                      whiteSpace: 'nowrap',
+                      minWidth: 'fit-content',
+                      flexShrink: 0,
+                      backgroundColor: selectedSubcategory === null ? '#9c27b0' : 'transparent',
+                      color: selectedSubcategory === null ? 'white' : '#9c27b0',
+                      borderColor: '#9c27b0',
+                      fontSize: '0.7rem',
+                      py: 0.5,
+                      px: 1,
+                      '&:hover': {
+                        backgroundColor: selectedSubcategory === null ? '#7b1fa2' : 'rgba(156, 39, 176, 0.1)'
+                      }
+                    }}
+                  >
+                    Toutes
+                  </Button>
+                  {/* Sous-catégories extraites des catégories associées de la catégorie sélectionnée */}
+                  {(() => {
+                    // Debug: Vérifier les données
+                    console.log('Debug - selectedCategory:', selectedCategory);
+                    console.log('Debug - total products:', products.length);
+                    console.log('Debug - products with associatedCategories:', products.filter(p => p.associatedCategories && p.associatedCategories.length > 0).length);
+                    console.log('Debug - sample product with associatedCategories:', products.find(p => p.associatedCategories && p.associatedCategories.length > 0));
+                    
+                    // Extraire les sous-catégories uniquement des produits de la catégorie sélectionnée
+                    const categorySubcategories = new Set<string>();
+                    
+                    if (selectedCategory) {
+                      // Si une catégorie est sélectionnée, filtrer les produits de cette catégorie
+                      // selectedCategory contient l'ID de la catégorie, il faut trouver le nom
+                      const selectedCategoryObj = categories.find(cat => cat.id === selectedCategory);
+                      const selectedCategoryName = selectedCategoryObj ? selectedCategoryObj.name : null;
+                      
+                      console.log('Debug - selectedCategory ID:', selectedCategory);
+                      console.log('Debug - selectedCategory name:', selectedCategoryName);
+                      
+                      const filteredProducts = selectedCategoryName ? 
+                        products.filter(product => product.category === selectedCategoryName) : 
+                        [];
+                      console.log('Debug - filteredProducts for category:', selectedCategoryName, filteredProducts.length);
+                      
+                      filteredProducts.forEach(product => {
+                        if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
+                          product.associatedCategories.forEach(cat => {
+                            if (cat && cat.trim()) {
+                              categorySubcategories.add(cat.trim());
+                            }
+                          });
+                        }
+                      });
+                    } else {
+                      // Si aucune catégorie n'est sélectionnée, afficher toutes les sous-catégories
+                      products.forEach(product => {
+                        if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
+                          product.associatedCategories.forEach(cat => {
+                            if (cat && cat.trim()) {
+                              categorySubcategories.add(cat.trim());
+                            }
+                          });
+                        }
+                      });
+                    }
+                    
+                    console.log('Debug - categorySubcategories found:', Array.from(categorySubcategories));
+                    
+                    // Si aucune sous-catégorie n'est trouvée, afficher des exemples temporaires
+                    const subcategoriesToShow = Array.from(categorySubcategories).length > 0 ? 
+                      Array.from(categorySubcategories) : 
+                      ['Sous-catégorie 1', 'Sous-catégorie 2', 'Sous-catégorie 3'];
+                    
+                    return subcategoriesToShow
+                      .filter(subcat => 
+                        !subcategorySearchTerm || 
+                        subcat.toLowerCase().includes(subcategorySearchTerm.toLowerCase())
+                      )
+                      .map((subcategory, index) => (
+                      <Button
+                        key={index}
+                        variant={selectedSubcategory === subcategory ? "contained" : "outlined"}
+                        onClick={() => {
+                          setSelectedSubcategory(subcategory);
+                        }}
+                        sx={{ 
+                          textTransform: 'none',
+                          whiteSpace: 'nowrap',
+                          minWidth: 'fit-content',
+                          flexShrink: 0,
+                          backgroundColor: selectedSubcategory === subcategory ? '#9c27b0' : 'transparent',
+                          color: selectedSubcategory === subcategory ? 'white' : '#9c27b0',
+                          borderColor: '#9c27b0',
+                          fontWeight: 'bold',
+                          fontSize: '0.7rem',
+                          py: 0.5,
+                          px: 1,
+                          '&:hover': {
+                            backgroundColor: selectedSubcategory === subcategory ? 
+                              '#7b1fa2' : 
+                              'rgba(156, 39, 176, 0.1)',
+                            transform: 'translateY(-1px)',
+                            boxShadow: '0 2px 8px rgba(156, 39, 176, 0.4)'
+                          },
+                          '&:active': {
+                            transform: 'scale(0.98)'
+                          }
+                        }}
+                      >
+                        {subcategory}
+                      </Button>
+                    ));
+                  })()}
+                </Box>
               </Box>
            </Box>
          );
@@ -1604,19 +2054,30 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
               {/* Grille 3x4 pour les 12 boutons */}
               <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff5722',
-                    '&:hover': { backgroundColor: '#e64a19' }
-                  }}
-                  onClick={() => console.log('Vide 1')}
-                >
-                  Vide 1
-                </Button>
+                <input
+                  type="file"
+                  accept=".csv"
+                  style={{ display: 'none' }}
+                  id="csv-import-settings"
+                  onChange={handleImportCSV}
+                />
+                <label htmlFor="csv-import-settings" style={{ flex: 1, display: 'block' }}>
+                  <Button
+                    variant="contained"
+                    component="span"
+                    disabled={importStatus === 'importing'}
+                    sx={{ 
+                      width: '100%',
+                      height: '100%',
+                      fontSize: '0.7rem', 
+                      fontWeight: 'bold', 
+                      backgroundColor: importStatus === 'importing' ? '#ccc' : '#ff5722',
+                      '&:hover': { backgroundColor: importStatus === 'importing' ? '#ccc' : '#e64a19' }
+                    }}
+                  >
+                    {importStatus === 'importing' ? 'Import...' : 'Import CSV'}
+                  </Button>
+                </label>
                 <Button
                   variant="contained"
                   sx={{ 
@@ -1786,17 +2247,45 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Typography variant="body2" align="center" sx={{ mb: 2 }}>
                   {categories.length} catégories
                 </Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<ImportExport />}
-                  onClick={() => {
-                    // TODO: Ouvrir l'import CSV
-                    alert('Fonctionnalité d\'import CSV à implémenter');
-                  }}
-                >
-                  Importer CSV
-                </Button>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    style={{ display: 'none' }}
+                    id="csv-import-input"
+                    onChange={handleImportCSV}
+                  />
+                  <label htmlFor="csv-import-input">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<ImportExport />}
+                      component="span"
+                      disabled={importStatus === 'importing'}
+                      sx={{
+                        width: '100%',
+                        backgroundColor: importStatus === 'importing' ? '#f5f5f5' : 'transparent'
+                      }}
+                    >
+                      {importStatus === 'importing' ? 'Import en cours...' : 'Importer CSV'}
+                    </Button>
+                  </label>
+                  
+                  {/* Affichage du statut */}
+                  {importStatus !== 'idle' && (
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        textAlign: 'center',
+                        color: importStatus === 'success' ? 'success.main' : 
+                               importStatus === 'error' ? 'error.main' : 'info.main',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {importMessage}
+                    </Typography>
+                  )}
+                </Box>
                 <Button
                   variant="outlined"
                   size="small"
@@ -1917,9 +2406,75 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             </Box>
           );
 
-              case 'free':
+        case 'subcategories':
           return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
+            <Box sx={{ 
+              height: '100%', 
+              display: 'flex', 
+              flexDirection: 'column',
+              backgroundColor: '#ff5722',
+              border: '3px solid #d84315',
+              borderRadius: '8px',
+              p: 1,
+              boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
+            }}>
+              <Typography variant="h6" sx={{ 
+                textAlign: 'center', 
+                fontWeight: 'bold', 
+                color: '#e65100',
+                mb: 1,
+                fontSize: '0.9rem'
+              }}>
+                Sous-Catégories
+              </Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: 0.5, 
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Chip 
+                  label="Sous-cat 1" 
+                  sx={{ 
+                    backgroundColor: '#ff9800', 
+                    color: 'white',
+                    fontSize: '0.7rem'
+                  }} 
+                />
+                <Chip 
+                  label="Sous-cat 2" 
+                  sx={{ 
+                    backgroundColor: '#ff9800', 
+                    color: 'white',
+                    fontSize: '0.7rem'
+                  }} 
+                />
+                <Chip 
+                  label="Sous-cat 3" 
+                  sx={{ 
+                    backgroundColor: '#ff9800', 
+                    color: 'white',
+                    fontSize: '0.7rem'
+                  }} 
+                />
+              </Box>
+            </Box>
+          );
+
+        case 'free':
+          return (
+            <Box sx={{ 
+              height: '100%', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              p: 0.5, 
+              gap: 0.25,
+              backgroundColor: window.id === 'window8' ? '#e8f5e8' : 'transparent',
+              border: window.id === 'window8' ? '2px solid #4caf50' : 'none',
+              borderRadius: window.id === 'window8' ? '8px' : '0px'
+            }}>
               {/* Grille 3x4 pour les 12 boutons */}
               <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button

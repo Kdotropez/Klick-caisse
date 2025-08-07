@@ -5,7 +5,7 @@ export interface Product {
   ean13: string;                 // Code-barre principal
   reference: string;             // Référence
   category: string;              // Nom catégorie par défaut
-  associatedCategories?: string[]; // Catégories associées (sous-familles) - optionnel pour compatibilité
+  associatedCategories: string[]; // Catégories associées (sous-familles)
   wholesalePrice: number;        // Prix de vente HT (prix d'achat)
   finalPrice: number;            // Prix de vente TTC final
   crossedPrice: number;          // Prix barré TTC
