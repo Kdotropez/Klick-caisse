@@ -9,7 +9,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
+  Divider,
   TextField,
 } from '@mui/material';
 import {
@@ -24,6 +24,7 @@ import RecapModal from './RecapModal';
 import GlobalDiscountModal from './GlobalDiscountModal';
 import ItemDiscountModal from './ItemDiscountModal';
 import CategoryManagementModal from './CategoryManagementModal';
+import DailyReportModal from './DailyReportModal';
 
 
 interface Window {
@@ -83,6 +84,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [itemDiscounts, setItemDiscounts] = useState<{[key: string]: {type: 'euro' | 'percent' | 'price', value: number}}>({});
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [showCategoryManagementModal, setShowCategoryManagementModal] = useState(false);
+  const [showDailyReportModal, setShowDailyReportModal] = useState(false);
   
   // États pour les notifications de paiement
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
@@ -139,7 +141,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          title: 'Modes de Règlement',
          type: 'search',
          x: 832.33, // Même x que la fenêtre ticket
-         y: 640, // Remonté de 60px (700 - 60 = 640)
+         y: 620, // Collée à la fenêtre 2 (20 + 600 = 620)
          width: 540, // Même largeur que le ticket élargi
          height: 187.33, // Hauteur exacte mesurée
          isMinimized: false,
@@ -206,7 +208,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Système de scaling automatique pour adaptation dynamique
   const [scaleFactor, setScaleFactor] = useState(1);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
 
   // Système de drag and drop pour réorganiser les produits
   const [draggedProduct, setDraggedProduct] = useState<Product | null>(null);
@@ -582,7 +584,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       setScaleFactor(newScaleFactor);
       
       // Détecter l'appareil tactile
-      setIsTouchDevice(detectTouchDevice());
+  
       
       console.log(`Écran: ${newDimensions.width}x${newDimensions.height}, Scale: ${newScaleFactor.toFixed(2)}, Touch: ${detectTouchDevice()}`);
     };
@@ -594,19 +596,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleMinimize = (windowId: string) => {
-    if (isLayoutLocked) return; // Désactive la minimisation si verrouillé
-    setWindows(prev => prev.map(w => 
-      w.id === windowId ? { ...w, isMinimized: !w.isMinimized } : w
-    ));
-  };
 
-  const toggleMaximize = (windowId: string) => {
-    if (isLayoutLocked) return; // Désactive la maximisation si verrouillé
-    setWindows(prev => prev.map(w => 
-      w.id === windowId ? { ...w, isMaximized: !w.isMaximized } : w
-    ));
-  };
 
   // Fonctions de gestion des déclinaisons
   const handleProductClick = (product: Product) => {
@@ -1355,92 +1345,133 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          
          return (
            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                           <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider', textAlign: 'center', fontWeight: 'bold' }}>
-                Modes de Règlement
-              </Typography>
-                           <Box sx={{ p: 0.5, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                 {/* Bouton Espèces - Prioritaire */}
+             <Box sx={{ p: 0.5, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+               {/* Bouton Espèces - Pleine largeur */}
+               <Button
+                 variant="contained"
+                 fullWidth
+                 sx={{ 
+                   py: 1, 
+                   fontSize: '1.1rem', 
+                   fontWeight: 'bold', 
+                   minHeight: '45px',
+                   backgroundColor: '#2e7d32',
+                   '&:hover': { backgroundColor: '#1b5e20' },
+                   '&:disabled': { backgroundColor: '#ccc' }
+                 }}
+                 onClick={() => handleDirectPayment('Espèces')}
+                 disabled={cartItems.length === 0}
+               >
+                 💵 ESPÈCES : {totalAmount.toFixed(2)} €
+               </Button>
+               
+               {/* Bouton SumUp - Pleine largeur */}
+               <Button
+                 variant="contained"
+                 fullWidth
+                 sx={{ 
+                   py: 1, 
+                   fontSize: '1.1rem', 
+                   fontWeight: 'bold', 
+                   minHeight: '45px',
+                   backgroundColor: '#1976d2',
+                   '&:hover': { backgroundColor: '#1565c0' },
+                   '&:disabled': { backgroundColor: '#ccc' }
+                 }}
+                 onClick={() => handleDirectPayment('SumUp')}
+                 disabled={cartItems.length === 0}
+               >
+                 📱 SumUp : {totalAmount.toFixed(2)} €
+               </Button>
+               
+               {/* Bouton Carte - Pleine largeur */}
+               <Button
+                 variant="contained"
+                 fullWidth
+                 sx={{ 
+                   py: 1, 
+                   fontSize: '1.1rem', 
+                   fontWeight: 'bold', 
+                   minHeight: '45px',
+                   backgroundColor: '#ff9800',
+                   '&:hover': { backgroundColor: '#f57c00' },
+                   '&:disabled': { backgroundColor: '#ccc' }
+                 }}
+                 onClick={() => handleDirectPayment('Carte')}
+                 disabled={cartItems.length === 0}
+               >
+                 💳 Carte : {totalAmount.toFixed(2)} €
+               </Button>
+               
+               {/* Séparateur */}
+               <Divider sx={{ my: 0.5 }} />
+               
+               {/* Boutons de total */}
+               <Box sx={{ display: 'flex', gap: 0.5 }}>
+                 {/* Total Espèces */}
                  <Button
-                   variant="contained"
-                   fullWidth
+                   variant="outlined"
                    sx={{ 
-                     py: 1, 
-                     fontSize: '1.1rem', 
+                     flex: 1,
+                     py: 0.5, 
+                     fontSize: '0.8rem', 
                      fontWeight: 'bold', 
-                     minHeight: '45px',
-                     backgroundColor: '#2e7d32',
-                     '&:hover': { backgroundColor: '#1b5e20' },
-                     '&:disabled': { backgroundColor: '#ccc' }
+                     minHeight: '35px',
+                     borderColor: '#2e7d32',
+                     color: '#2e7d32',
+                     '&:hover': { 
+                       borderColor: '#1b5e20',
+                       backgroundColor: '#e8f5e8'
+                     }
                    }}
-                   onClick={() => handleDirectPayment('Espèces')}
-                   disabled={cartItems.length === 0}
+                   onClick={() => console.log('Total Espèces')}
                  >
-                                       💵 ESPÈCES : {totalAmount.toFixed(2)} €
+                   Total Espèces
                  </Button>
                  
-                 {/* Ligne SumUp + Carte - Secondaire */}
-                 <Box sx={{ display: 'flex', gap: 0.5 }}>
-                   {/* Bouton SumUp */}
-                   <Button
-                     variant="contained"
-                     sx={{ 
-                       flex: 1,
-                       py: 0.75, 
-                       fontSize: '1rem', 
-                       fontWeight: 'bold', 
-                       minHeight: '40px',
-                       backgroundColor: '#1976d2',
-                       '&:hover': { backgroundColor: '#1565c0' },
-                       '&:disabled': { backgroundColor: '#ccc' }
-                     }}
-                     onClick={() => handleDirectPayment('SumUp')}
-                     disabled={cartItems.length === 0}
-                   >
-                                           📱 SumUp : {totalAmount.toFixed(2)} €
-                   </Button>
-                   
-                   {/* Bouton Carte */}
-                   <Button
-                     variant="contained"
-                     sx={{ 
-                       flex: 1,
-                       py: 0.75, 
-                       fontSize: '1rem', 
-                       fontWeight: 'bold', 
-                       minHeight: '40px',
-                       backgroundColor: '#ff9800',
-                       '&:hover': { backgroundColor: '#f57c00' },
-                       '&:disabled': { backgroundColor: '#ccc' }
-                     }}
-                     onClick={() => handleDirectPayment('Carte')}
-                     disabled={cartItems.length === 0}
-                   >
-                                           💳 Carte : {totalAmount.toFixed(2)} €
-                   </Button>
-                 </Box>
+                 {/* Total SumUp */}
+                 <Button
+                   variant="outlined"
+                   sx={{ 
+                     flex: 1,
+                     py: 0.5, 
+                     fontSize: '0.8rem', 
+                     fontWeight: 'bold', 
+                     minHeight: '35px',
+                     borderColor: '#1976d2',
+                     color: '#1976d2',
+                     '&:hover': { 
+                       borderColor: '#1565c0',
+                       backgroundColor: '#e3f2fd'
+                     }
+                   }}
+                   onClick={() => console.log('Total SumUp')}
+                 >
+                   Total SumUp
+                 </Button>
                  
-                                   {/* Bouton Chèque - Tertiaire */}
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{ 
-                      py: 0.5, 
-                      fontSize: '0.9rem', 
-                      fontWeight: 'bold', 
-                      minHeight: '35px',
-                      backgroundColor: '#607d8b',
-                      color: 'white',
-                      '&:hover': { 
-                        backgroundColor: '#455a64'
-                      },
-                      '&:disabled': { backgroundColor: '#ccc', color: '#ccc' }
-                    }}
-                    onClick={() => handleDirectPayment('Chèque')}
-                    disabled={cartItems.length === 0}
-                  >
-                    📝 Chèque : {totalAmount.toFixed(2)} €
-                  </Button>
-              </Box>
+                 {/* Total Carte */}
+                 <Button
+                   variant="outlined"
+                   sx={{ 
+                     flex: 1,
+                     py: 0.5, 
+                     fontSize: '0.8rem', 
+                     fontWeight: 'bold', 
+                     minHeight: '35px',
+                     borderColor: '#ff9800',
+                     color: '#ff9800',
+                     '&:hover': { 
+                       borderColor: '#f57c00',
+                       backgroundColor: '#fff3e0'
+                     }
+                   }}
+                   onClick={() => console.log('Total Carte')}
+                 >
+                   Total Carte
+                 </Button>
+               </Box>
+             </Box>
            </Box>
          );
 
@@ -1683,9 +1714,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     backgroundColor: '#2196f3',
                     '&:hover': { backgroundColor: '#1976d2' }
                   }}
-                  onClick={() => console.log('Fonction 1')}
+                  onClick={() => setShowDailyReportModal(true)}
                 >
-                  Fonction 1
+                  Rapport Journalier
                 </Button>
                 <Button
                   variant="contained"
@@ -2105,7 +2136,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          onUpdateCategories={handleUpdateCategories}
        />
 
-
+       {/* Modale de rapport journalier */}
+       <DailyReportModal
+         open={showDailyReportModal}
+         onClose={() => setShowDailyReportModal(false)}
+         cartItems={cartItems}
+       />
 
      </Box>
    );
