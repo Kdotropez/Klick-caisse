@@ -176,8 +176,10 @@ const App: React.FC = () => {
         open={showPaymentSuccess}
         autoHideDuration={3000}
         onClose={() => setShowPaymentSuccess(false)}
-        anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         sx={{
+          top: '50% !important',
+          transform: 'translateY(-50%) !important',
           '& .MuiSnackbar-root': {
             zIndex: 9999
           }
