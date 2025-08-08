@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Snackbar, Alert, Typography } from '@mui/material';
-import { CheckCircle } from '@mui/icons-material';
+import { Box } from '@mui/material';
 import CSVImport from './components/CSVImport';
 import WindowManager from './components/WindowManager';
 import { Product, Category, CartItem, ProductVariation } from './types/Product';
@@ -12,8 +11,7 @@ const App: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLayoutLocked] = useState<boolean>(false);
-  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
-  const [paymentMessage, setPaymentMessage] = useState('');
+
 
   // Charger les données de production au démarrage
   useEffect(() => {
@@ -117,16 +115,8 @@ const App: React.FC = () => {
     // Sauvegarder les produits mis à jour
     saveProductionData(updatedProducts, categories);
     
-    // Préparer le message de confirmation
-    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const message = `Paiement effectué ! ${totalItems} article(s) vendu(s)`;
-    
     // Vider le panier
     setCartItems([]);
-    
-    // Afficher la notification de succès
-    setPaymentMessage(message);
-    setShowPaymentSuccess(true);
     
     console.log('✅ Paiement effectué - Compteurs de ventes mis à jour');
   };
@@ -170,51 +160,6 @@ const App: React.FC = () => {
         onProductsReorder={handleProductsReorder}
         onUpdateCategories={handleUpdateCategories}
       />
-
-      {/* Notification de paiement réussi */}
-      <Snackbar
-        open={showPaymentSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowPaymentSuccess(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{
-          top: '50% !important',
-          transform: 'translateY(-50%) !important',
-          '& .MuiSnackbar-root': {
-            zIndex: 9999
-          }
-        }}
-      >
-        <Alert
-          onClose={() => setShowPaymentSuccess(false)}
-          severity="success"
-          icon={<CheckCircle />}
-          sx={{
-            width: '100%',
-            backgroundColor: '#4caf50',
-            color: 'white',
-            fontSize: '1.1rem',
-            fontWeight: 'bold',
-            padding: '16px 24px',
-            borderRadius: '12px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-            border: '2px solid #45a049',
-            '& .MuiAlert-icon': {
-              color: 'white',
-              fontSize: '2rem'
-            },
-            '& .MuiAlert-message': {
-              color: 'white',
-              fontSize: '1.1rem',
-              fontWeight: 'bold'
-            }
-          }}
-        >
-          <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
-            {paymentMessage}
-          </Typography>
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };
