@@ -206,7 +206,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [subcategorySearchTerm, setSubcategorySearchTerm] = useState('');
   const [isSaleMode, setIsSaleMode] = useState(false);
-  const [saleModeActive, setSaleModeActive] = useState(true); // Mode vente par défaut
+
   const [currentPage, setCurrentPage] = useState(1);
 
   // Réinitialiser la pagination quand la catégorie, sous-catégorie ou la recherche change
@@ -710,32 +710,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Fonction pour gérer le scan de code-barre
   const handleBarcodeScan = (barcode: string) => {
-    console.log(`🔍 Scan détecté: ${barcode}, Mode vente: ${saleModeActive}`);
+    console.log(`🔍 Scan détecté: ${barcode}`);
     
-    // En mode vente actif, scan direct au panier
-    if (saleModeActive) {
-      const scannedProduct = products.find(product => 
-        product.ean13 === barcode || 
-        product.reference === barcode
-      );
-      
-      if (scannedProduct) {
-        console.log(`✅ Produit trouvé: ${scannedProduct.name}`);
-        if (scannedProduct.variations && scannedProduct.variations.length > 0) {
-          // Ouvrir la modale de déclinaisons
-          setSelectedProduct(scannedProduct);
-          setVariationModalOpen(true);
-        } else {
-          // Ajouter directement au panier
-          onProductClick(scannedProduct);
-        }
+    const scannedProduct = products.find(product => 
+      product.ean13 === barcode || 
+      product.reference === barcode
+    );
+    
+    if (scannedProduct) {
+      console.log(`✅ Produit trouvé: ${scannedProduct.name}`);
+      if (scannedProduct.variations && scannedProduct.variations.length > 0) {
+        // Ouvrir la modale de déclinaisons
+        setSelectedProduct(scannedProduct);
+        setVariationModalOpen(true);
       } else {
-        console.log(`❌ Produit non trouvé: ${barcode}`);
-        // Afficher dans la recherche pour debug
-        setSearchTerm(barcode);
+        // Ajouter directement au panier
+        onProductClick(scannedProduct);
       }
     } else {
-      // Mode recherche normal
+      console.log(`❌ Produit non trouvé: ${barcode}`);
+      // Afficher dans la recherche pour debug
       setSearchTerm(barcode);
     }
   };
@@ -1019,26 +1013,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         return (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             
-            {/* Bannière Mode Vente */}
-            {saleModeActive && (
-              <Box sx={{
-                backgroundColor: '#f44336',
-                color: 'white',
-                p: 1,
-                textAlign: 'center',
-                fontWeight: 'bold',
-                fontSize: '1.1rem',
-                borderBottom: '2px solid #d32f2f',
-                animation: 'pulse 2s infinite',
-                '@keyframes pulse': {
-                  '0%': { opacity: 1 },
-                  '50%': { opacity: 0.8 },
-                  '100%': { opacity: 1 }
-                }
-              }}>
-                🛒 MODE VENTE ACTIF - Scan direct au panier
-              </Box>
-            )}
+
             
             {/* Grille produits */}
              <Box 
@@ -1053,7 +1028,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                  overflow: 'hidden',
                  minHeight: 0,
                  width: '800px',
-                 height: saleModeActive ? 'calc(100% - 82px - 50px)' : 'calc(100% - 82px)',
+                 height: 'calc(100% - 82px)',
                  justifyContent: 'center',
                  alignItems: 'center'
                }}>
@@ -2141,25 +2116,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   </Button>
                 </label>
                 <Button
-                  variant={saleModeActive ? "contained" : "outlined"}
+                  variant="contained"
                   sx={{ 
                     flex: 1,
                     fontSize: '0.7rem', 
                     fontWeight: 'bold', 
-                    backgroundColor: saleModeActive ? '#f44336' : 'transparent',
-                    color: saleModeActive ? 'white' : '#f44336',
-                    borderColor: '#f44336',
-                    '&:hover': { 
-                      backgroundColor: saleModeActive ? '#d32f2f' : '#ffebee',
-                      borderColor: '#d32f2f'
-                    }
+                    backgroundColor: '#795548',
+                    '&:hover': { backgroundColor: '#5d4037' }
                   }}
-                  onClick={() => {
-                    setSaleModeActive(!saleModeActive);
-                    console.log(`🔄 Changement de mode: ${!saleModeActive ? 'VENTE' : 'RECHERCHE'}`);
-                  }}
+                  onClick={() => console.log('Bouton libre')}
                 >
-                  {saleModeActive ? '🛒 VENTE' : '🔍 RECH'}
+                  Libre
                 </Button>
                 <Button
                   variant="contained"
