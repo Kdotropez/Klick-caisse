@@ -1796,6 +1796,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#9c27b0' }} />
                    }}
                  />
+                 
+                 {/* Bouton Reset */}
+                 <Button
+                   variant="outlined"
+                   size="small"
+                   onClick={() => {
+                     setSearchTerm('');
+                     setCategorySearchTerm('');
+                     setSubcategorySearchTerm('');
+                     setSelectedCategory(null);
+                     setSelectedSubcategory(null);
+                     setCurrentPage(1);
+                     console.log('🔄 Reset des recherches effectué');
+                   }}
+                   sx={{
+                     minWidth: 'auto',
+                     px: 1.5,
+                     backgroundColor: 'transparent',
+                     color: '#666',
+                     borderColor: '#666',
+                     fontSize: '0.7rem',
+                     '&:hover': {
+                       backgroundColor: '#f5f5f5',
+                       borderColor: '#333',
+                       color: '#333'
+                     }
+                   }}
+                 >
+                   🔄 Reset
+                 </Button>
               </Box>
               
               {/* Onglets des sous-catégories */}
