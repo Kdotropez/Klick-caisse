@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { Delete, Edit, Add, Save, Cancel } from '@mui/icons-material';
 import { Category } from '../types/Product';
+import { StorageService } from '../services/StorageService';
 
 interface SubcategoryManagementModalProps {
   open: boolean;
@@ -46,9 +47,9 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
   const [editSubcategoryName, setEditSubcategoryName] = useState('');
   const [error, setError] = useState('');
 
-  // Extraire toutes les sous-catégories existantes depuis les produits
+  // Extraire toutes les sous-catégories existantes depuis les produits + registre global
   const getAllExistingSubcategories = (): string[] => {
-    const allSubcategories = new Set<string>();
+    const allSubcategories = new Set<string>(StorageService.loadSubcategories());
     products.forEach(product => {
       if (product.associatedCategories) {
         product.associatedCategories.forEach((subcat: string) => {
@@ -109,6 +110,8 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
     const updatedSubcategories = [...subcategories, newSubcategoryName.trim()].sort();
     setSubcategories(updatedSubcategories);
     onUpdateSubcategories(selectedCategory, updatedSubcategories);
+    // Mettre à jour le registre global
+    StorageService.saveSubcategories(getAllExistingSubcategories());
     
     setNewSubcategoryName('');
     setError('');
@@ -142,6 +145,7 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
 
     setSubcategories(updatedSubcategories);
     onUpdateSubcategories(selectedCategory, updatedSubcategories);
+    StorageService.saveSubcategories(getAllExistingSubcategories());
     
     setEditingSubcategory(null);
     setEditSubcategoryName('');
@@ -155,10 +159,12 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
   };
 
   const handleDeleteSubcategory = (subcategoryToDelete: string) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la sous-catégorie "${subcategoryToDelete}" ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir retirer la sous-catégorie "${subcategoryToDelete}" de cette catégorie ?\n(Ceci ne la supprimera pas du système) `)) {
       const updatedSubcategories = subcategories.filter(subcat => subcat !== subcategoryToDelete);
       setSubcategories(updatedSubcategories);
       onUpdateSubcategories(selectedCategory, updatedSubcategories);
+      // Ne pas supprimer du registre global
+      StorageService.saveSubcategories(getAllExistingSubcategories());
     }
   };
 
@@ -185,6 +191,7 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
 
     setSubcategories(updatedSubcategories);
     onUpdateSubcategories(selectedCategory, updatedSubcategories);
+    StorageService.saveSubcategories(getAllExistingSubcategories());
   };
 
   const getCategoryName = (categoryId: string): string => {

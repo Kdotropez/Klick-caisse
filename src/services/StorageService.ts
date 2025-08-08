@@ -1,9 +1,11 @@
 import { Product, Category } from '../types/Product';
+import { defaultSubcategoriesRegistry } from '../data/subcategoriesRegistry';
 
 export class StorageService {
   private static readonly PRODUCTS_KEY = 'klick_caisse_products';
   private static readonly CATEGORIES_KEY = 'klick_caisse_categories';
   private static readonly SETTINGS_KEY = 'klick_caisse_settings';
+  private static readonly SUBCATEGORIES_KEY = 'klick_caisse_subcategories';
 
   // Sauvegarder les produits
   static saveProducts(products: Product[]): void {
@@ -62,6 +64,33 @@ export class StorageService {
     } catch (error) {
       console.error('Erreur lors du chargement des paramètres:', error);
       return {};
+    }
+  }
+
+  // Sous-catégories globales (registre)
+  static saveSubcategories(subcategories: string[]): void {
+    try {
+      const unique = Array.from(new Set(subcategories.map(s => s.trim()).filter(Boolean))).sort();
+      localStorage.setItem(this.SUBCATEGORIES_KEY, JSON.stringify(unique));
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des sous-catégories:', error);
+    }
+  }
+
+  static loadSubcategories(): string[] {
+    try {
+      const data = localStorage.getItem(this.SUBCATEGORIES_KEY);
+      const parsed: unknown = data ? JSON.parse(data) : [];
+      const fromStorage = Array.isArray(parsed) ? (parsed as string[]) : [];
+      // Fusionner avec le registre par défaut (restauré)
+      const merged = Array.from(new Set([
+        ...defaultSubcategoriesRegistry,
+        ...fromStorage
+      ].map((s: string) => (s || '').trim()).filter(Boolean))).sort();
+      return merged;
+    } catch (error) {
+      console.error('Erreur lors du chargement des sous-catégories:', error);
+      return [];
     }
   }
 
