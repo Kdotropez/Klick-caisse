@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔄 Import nouvelle structure - Articles + Déclinaisons');
-console.log('==================================================');
+console.log('🔄 Import WYSIWYG - Articles + Déclinaisons (EAN13 corrigés)');
+console.log('==========================================================');
 
 // Chemins des fichiers
-const articlesPath = './bdd article 8-8-25.csv';
-const declinaisonsPath = './bdd declinaison 8-8-25.csv';
+const articlesPath = './EXPORT VF ARTICLE WYSIWYG.csv';
+const declinaisonsPath = './EXPORT VF DECLINAISONS WYSIWYG.csv';
 const outputPath = './src/data/productionData.ts';
 
 // Fonction de nettoyage des chaînes
@@ -18,10 +18,13 @@ function cleanString(str) {
     .trim();
 }
 
-// Fonction de parsing des prix
+// Fonction de parsing des prix (format: "6,50 €")
 function parsePrice(priceStr) {
   if (!priceStr) return 0;
-  const cleanPrice = cleanString(priceStr).replace(',', '.');
+  const cleanPrice = cleanString(priceStr)
+    .replace('€', '') // Supprimer le symbole €
+    .replace(/\s+/g, '') // Supprimer les espaces
+    .replace(',', '.'); // Remplacer virgule par point
   const price = parseFloat(cleanPrice);
   return isNaN(price) ? 0 : price;
 }
@@ -32,50 +35,6 @@ function parseQuantity(qtyStr) {
   const cleanQty = cleanString(qtyStr);
   const qty = parseInt(cleanQty);
   return isNaN(qty) ? 0 : qty;
-}
-
-// Fonction pour corriger le format des EAN13
-function fixEan13(ean13Str) {
-  if (!ean13Str || ean13Str === '') return '';
-  
-  // Nettoyer la chaîne
-  let cleanEan = ean13Str.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
-  
-  // Si c'est déjà un format numérique simple, le retourner
-  if (/^\d{13}$/.test(cleanEan)) {
-    return cleanEan;
-  }
-  
-  // Si c'est au format scientifique (ex: 2,06714E+12)
-  if (cleanEan.includes('E') || cleanEan.includes('e')) {
-    try {
-      // Convertir en nombre
-      const number = parseFloat(cleanEan.replace(',', '.'));
-      if (!isNaN(number)) {
-        // Convertir en chaîne et s'assurer qu'il y a 13 chiffres
-        const fullNumber = Math.floor(number).toString();
-        if (fullNumber.length >= 13) {
-          return fullNumber.substring(0, 13);
-        } else {
-          // Ajouter des zéros si nécessaire
-          return fullNumber.padEnd(13, '0');
-        }
-      }
-    } catch (error) {
-      console.log(`❌ Erreur conversion EAN13: ${cleanEan}`);
-    }
-  }
-  
-  // Si c'est un format avec virgules (ex: 2,067,140,000,577)
-  if (cleanEan.includes(',')) {
-    const digitsOnly = cleanEan.replace(/,/g, '');
-    if (/^\d{13}$/.test(digitsOnly)) {
-      return digitsOnly;
-    }
-  }
-  
-  // Si rien ne fonctionne, retourner la chaîne originale
-  return cleanEan;
 }
 
 // Fonction de parsing des catégories associées
@@ -89,11 +48,11 @@ function parseAssociatedCategories(categoriesStr) {
 }
 
 try {
-  console.log('📖 Lecture du fichier articles...');
+  console.log('📖 Lecture du fichier articles WYSIWYG...');
   const articlesContent = fs.readFileSync(articlesPath, 'utf8');
   const articlesLines = articlesContent.split('\n').filter(line => line.trim());
   
-  console.log('📖 Lecture du fichier déclinaisons...');
+  console.log('📖 Lecture du fichier déclinaisons WYSIWYG...');
   const declinaisonsContent = fs.readFileSync(declinaisonsPath, 'utf8');
   const declinaisonsLines = declinaisonsContent.split('\n').filter(line => line.trim());
 
@@ -107,29 +66,28 @@ try {
     const line = declinaisonsLines[i];
     const values = line.split('\t');
     
-    if (values.length < 15) continue;
+    if (values.length < 5) continue;
     
-    const productId = cleanString(values[3]); // Identifiant produit
-    const variationId = cleanString(values[5]); // Identifiant déclinaison
-    const attributes = cleanString(values[1]); // Liste des attributs
-    const ean13 = fixEan13(cleanString(values[6])); // ean13 décl.
-    const reference = cleanString(values[7]); // Référence déclinaison
-    const priceImpact = parsePrice(values[10]); // Impact sur prix de vente TTC
-    const stock = parseQuantity(values[13]); // Quantité disponible
+    const attributes = cleanString(values[0]); // Liste des attributs (taille, couleur, ville)
+    const productName = cleanString(values[1]); // Nom du produit
+    const productId = cleanString(values[2]); // Identifiant produit
+    const variationId = cleanString(values[3]); // Identifiant déclinaison
+    const ean13 = cleanString(values[4]); // ean13 décl.
+    const priceImpact = parsePrice(values[7]); // Impact sur prix de vente TTC
     
     if (productId && variationId) {
       if (!declinaisonsMap.has(productId)) {
         declinaisonsMap.set(productId, []);
       }
       
-             declinaisonsMap.get(productId).push({
-         id: variationId,
-         ean13: ean13,
-         reference: reference,
-         attributes: attributes || 'Déclinaison',
-         priceImpact: priceImpact,
-         finalPrice: 0 // Sera calculé plus tard
-       });
+      declinaisonsMap.get(productId).push({
+        id: variationId,
+        ean13: ean13,
+        reference: `${productId}_${variationId}`,
+        attributes: attributes || 'Déclinaison',
+        priceImpact: priceImpact,
+        finalPrice: 0 // Sera calculé plus tard
+      });
     }
   }
 
@@ -144,25 +102,20 @@ try {
     const line = articlesLines[i];
     const values = line.split('\t');
     
-    if (values.length < 15) continue;
+    if (values.length < 11) continue;
     
     const name = cleanString(values[0]); // Nom
     const productId = cleanString(values[1]); // Identifiant produit
-    const reference = cleanString(values[2]); // Référence
-    const ean13 = fixEan13(cleanString(values[4])); // ean13
-    const category = cleanString(values[6]); // Nom catégorie par défaut
-    const wholesalePrice = parsePrice(values[7]); // Prix d'achat HT
-    const finalPrice = parsePrice(values[13]); // Prix de vente TTC final
-    const crossedPrice = parsePrice(values[12]); // Prix barré TTC
-    const stock = parseQuantity(values[14]); // Quantité disponible
-    const associatedCategories = parseAssociatedCategories(values[9]); // Liste catégories associées
+    const ean13 = cleanString(values[2]); // ean13
+    const category = cleanString(values[3]); // Nom catégorie par défaut
+    const wholesalePrice = parsePrice(values[4]); // Prix d'achat HT
+    const finalPrice = parsePrice(values[10]); // Prix de vente TTC final
+    const crossedPrice = parsePrice(values[9]); // Prix barré TTC
+    const associatedCategories = parseAssociatedCategories(values[6]); // Liste catégories associées
 
     if (name && productId && category) {
       // Récupérer les déclinaisons pour ce produit
       const variations = declinaisonsMap.get(productId) || [];
-      
-      // Calculer le stock total (article + déclinaisons)
-      const totalStock = stock + variations.reduce((sum, v) => sum + v.stock, 0);
       
       // Mettre à jour les prix des déclinaisons
       variations.forEach(variation => {
@@ -172,7 +125,7 @@ try {
       const product = {
         id: productId,
         name: name,
-        reference: reference,
+        reference: productId,
         ean13: ean13,
         category: category,
         associatedCategories: associatedCategories,
@@ -208,7 +161,7 @@ try {
   console.log('\n📋 Exemples de produits:');
   products.slice(0, 3).forEach(product => {
     console.log(`   - ${product.name} (${product.category})`);
-    console.log(`     Prix: ${product.finalPrice}€, Stock: ${product.stock || 0}`);
+    console.log(`     EAN13: ${product.ean13}, Prix: ${product.finalPrice}€`);
     if (product.variations.length > 0) {
       console.log(`     Déclinaisons: ${product.variations.length} (${product.variations.map(v => v.attributes).join(', ')})`);
     }
@@ -221,15 +174,16 @@ try {
     const exampleProduct = productsWithVariations[0];
     exampleProduct.variations.slice(0, 3).forEach(variation => {
       console.log(`   - ${exampleProduct.name} (${variation.attributes})`);
-      console.log(`     Prix: ${variation.finalPrice}€, Stock: ${variation.stock}`);
+      console.log(`     EAN13: ${variation.ean13}, Prix: ${variation.finalPrice}€`);
     });
   }
 
   // Générer le fichier TypeScript
   console.log('\n📝 Génération du fichier TypeScript...');
   
-  const tsContent = `// Données générées automatiquement par import-new-structure.js
+  const tsContent = `// Données générées automatiquement par import-wysiwyg.js
 // Date: ${new Date().toISOString()}
+// Source: EXPORT VF ARTICLE WYSIWYG.csv + EXPORT VF DECLINAISONS WYSIWYG.csv
 
 import { Product, Category } from '../types/Product';
 
@@ -239,7 +193,7 @@ export const categories: Category[] = ${JSON.stringify(categories, null, 2)};
 
 export const loadProductionData = (): { products: Product[]; categories: Category[] } => {
   // Forcer le rechargement des nouvelles données (temporaire pour nettoyer le cache)
-  console.log('🔄 Forçage du rechargement des nouvelles données...');
+  console.log('🔄 Forçage du rechargement des nouvelles données WYSIWYG...');
 
   // Nettoyer le localStorage pour forcer le rechargement
   try {
@@ -251,7 +205,7 @@ export const loadProductionData = (): { products: Product[]; categories: Categor
   }
 
   // Charger les nouvelles données par défaut
-  console.log('📦 Chargement des nouvelles données (structure articles + déclinaisons)');
+  console.log('📦 Chargement des nouvelles données WYSIWYG (EAN13 corrigés)');
   return {
     products,
     categories
@@ -277,12 +231,12 @@ export const saveProductionData = (newProducts: Product[], newCategories: Catego
   
   console.log('✅ Fichier TypeScript généré avec succès');
   console.log(`📁 Fichier généré: ${outputPath}`);
-  console.log('\n🎉 Import nouvelle structure terminé avec succès !');
-  console.log('💡 Structure optimisée:');
-  console.log('   - Articles et déclinaisons unifiés');
-  console.log('   - Variations intégrées dans les produits');
-  console.log('   - Stock total calculé automatiquement');
-  console.log('   - Prix des déclinaisons mis à jour');
+  console.log('\n🎉 Import WYSIWYG terminé avec succès !');
+  console.log('💡 Avantages de cette nouvelle structure:');
+  console.log('   - EAN13 au format correct (13 chiffres)');
+  console.log('   - Structure simplifiée et plus claire');
+  console.log('   - Prix formatés avec symboles €');
+  console.log('   - Déclinaisons bien structurées (tailles, couleurs)');
 
 } catch (error) {
   console.error('❌ Erreur lors de l\'import:', error);
