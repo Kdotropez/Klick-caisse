@@ -16,7 +16,7 @@ import {
   Divider,
   Alert
 } from '@mui/material';
-import { Delete, Edit, Add, ColorLens } from '@mui/icons-material';
+import { Delete, Edit, Add, ColorLens, KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 import { Category } from '../types/Product';
 
 interface CategoryManagementModalProps {
@@ -142,6 +142,20 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
     setError('');
   };
 
+  const handleMoveCategory = (categoryId: string, direction: 'up' | 'down') => {
+    const currentIndex = categories.findIndex(cat => cat.id === categoryId);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= categories.length) return;
+
+    const updatedCategories = [...categories];
+    const [movedCategory] = updatedCategories.splice(currentIndex, 1);
+    updatedCategories.splice(newIndex, 0, movedCategory);
+
+    onUpdateCategories(updatedCategories);
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -173,38 +187,51 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
               size="small"
             />
             <TextField
-              label="Couleur"
+              label="Couleur de fond"
               value={newCategoryColor}
               onChange={(e) => setNewCategoryColor(e.target.value)}
               size="small"
               sx={{ width: 120 }}
               InputProps={{
-                style: { backgroundColor: newCategoryColor }
+                style: { 
+                  backgroundColor: newCategoryColor,
+                  color: '#000',
+                  fontWeight: 'bold'
+                }
               }}
             />
           </Box>
 
           {/* Couleurs prédéfinies */}
           <Typography variant="body2" sx={{ mb: 1 }}>
-            Couleurs prédéfinies :
+            Couleurs de fond prédéfinies :
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
             {predefinedColors.map((color) => (
               <Box
                 key={color}
                 sx={{
-                  width: 30,
+                  width: 40,
                   height: 30,
                   backgroundColor: color,
                   border: newCategoryColor === color ? '3px solid #000' : '1px solid #ccc',
-                  borderRadius: '50%',
+                  borderRadius: '4px',
                   cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#000',
+                  fontWeight: 'bold',
+                  fontSize: '0.8rem',
                   '&:hover': {
-                    transform: 'scale(1.1)'
+                    transform: 'scale(1.05)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                   }
                 }}
                 onClick={() => setNewCategoryColor(color)}
-              />
+              >
+                Aa
+              </Box>
             ))}
           </Box>
 
@@ -244,11 +271,11 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
 
         {/* Liste des catégories existantes */}
         <Typography variant="h6" sx={{ mb: 2 }}>
-          Catégories existantes ({categories.length})
+          Catégories existantes ({categories.length}) - Glissez pour réorganiser
         </Typography>
         
         <List sx={{ maxHeight: 400, overflow: 'auto' }}>
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <ListItem
               key={category.id}
               sx={{
@@ -256,24 +283,70 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
                 borderColor: 'divider',
                 borderRadius: 1,
                 mb: 1,
-                backgroundColor: 'background.paper'
+                backgroundColor: 'background.paper',
+                display: 'flex',
+                alignItems: 'center'
               }}
             >
+              {/* Indicateur de position */}
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  mr: 1, 
+                  color: '#666',
+                  minWidth: '20px',
+                  textAlign: 'center'
+                }}
+              >
+                {index + 1}
+              </Typography>
+
+              {/* Aperçu de la couleur de fond */}
               <Box
                 sx={{
-                  width: 20,
-                  height: 20,
-                  backgroundColor: category.color,
-                  borderRadius: '50%',
+                  width: 60,
+                  height: 30,
+                  backgroundColor: category.color || '#757575',
+                  borderRadius: '4px',
                   mr: 2,
-                  flexShrink: 0
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#000',
+                  fontWeight: 'bold',
+                  fontSize: '0.8rem',
+                  border: '1px solid #ccc'
                 }}
-              />
+              >
+                {category.name.slice(0, 2)}
+              </Box>
+
               <ListItemText
                 primary={category.name}
-                secondary={`ID: ${category.id}`}
+                secondary={`Position: ${index + 1} | ID: ${category.id}`}
               />
+
               <ListItemSecondaryAction>
+                {/* Boutons de déplacement */}
+                <IconButton
+                  size="small"
+                  onClick={() => handleMoveCategory(category.id, 'up')}
+                  disabled={index === 0}
+                  sx={{ mr: 0.5 }}
+                >
+                  <KeyboardArrowUp />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => handleMoveCategory(category.id, 'down')}
+                  disabled={index === categories.length - 1}
+                  sx={{ mr: 1 }}
+                >
+                  <KeyboardArrowDown />
+                </IconButton>
+
+                {/* Boutons d'édition et suppression */}
                 <IconButton
                   edge="end"
                   onClick={() => handleEditCategory(category)}
