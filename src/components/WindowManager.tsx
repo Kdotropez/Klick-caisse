@@ -711,6 +711,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Fonction pour gérer le scan de code-barre
   const handleBarcodeScan = (barcode: string) => {
     console.log(`🔍 Scan détecté: ${barcode}`);
+    console.log(`📦 Nombre de produits disponibles: ${products.length}`);
     
     const scannedProduct = products.find(product => 
       product.ean13 === barcode || 
@@ -719,16 +720,28 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     
     if (scannedProduct) {
       console.log(`✅ Produit trouvé: ${scannedProduct.name}`);
+      console.log(`💰 Prix: ${scannedProduct.finalPrice}€`);
+      console.log(`📋 Déclinaisons: ${scannedProduct.variations ? scannedProduct.variations.length : 0}`);
+      
       if (scannedProduct.variations && scannedProduct.variations.length > 0) {
+        console.log(`🔄 Ouverture modale déclinaisons...`);
         // Ouvrir la modale de déclinaisons
         setSelectedProduct(scannedProduct);
         setVariationModalOpen(true);
       } else {
+        console.log(`🛒 Ajout direct au panier...`);
         // Ajouter directement au panier
         onProductClick(scannedProduct);
+        console.log(`✅ Produit ajouté au panier!`);
       }
     } else {
       console.log(`❌ Produit non trouvé: ${barcode}`);
+      console.log(`🔍 Recherche dans les produits...`);
+      products.forEach((product, index) => {
+        if (index < 5) { // Afficher les 5 premiers pour debug
+          console.log(`  ${index}: ${product.name} - EAN: ${product.ean13}`);
+        }
+      });
       // Afficher dans la recherche pour debug
       setSearchTerm(barcode);
     }
