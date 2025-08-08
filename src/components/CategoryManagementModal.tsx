@@ -55,10 +55,13 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
       return;
     }
 
+    // Utiliser une couleur unique par défaut si aucune couleur n'est sélectionnée
+    const finalColor = newCategoryColor === '#757575' ? getUniqueColor(categories.length) : newCategoryColor;
+
     const newCategory: Category = {
       id: (categories.length + 1).toString(),
       name: newCategoryName.trim(),
-      color: newCategoryColor,
+      color: finalColor,
       productOrder: []
     };
 
@@ -107,14 +110,6 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    // Vérifier si la catégorie contient des produits
-    const hasProducts = false; // TODO: Vérifier avec les produits
-    
-    if (hasProducts) {
-      setError('Impossible de supprimer une catégorie qui contient des produits');
-      return;
-    }
-
     // Trouver la catégorie à supprimer pour afficher son nom
     const categoryToDelete = categories.find(cat => cat.id === categoryId);
     
@@ -124,15 +119,35 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
     }
 
     // Demander confirmation avant la suppression
-    const confirmMessage = `Êtes-vous sûr de vouloir supprimer la catégorie "${categoryToDelete.name}" ?\n\nCette action est irréversible.`;
+    const confirmMessage = `Êtes-vous sûr de vouloir supprimer la catégorie "${categoryToDelete.name}" ?\n\nLes articles de cette catégorie seront déplacés vers "À classer".`;
     
     if (!window.confirm(confirmMessage)) {
       return; // L'utilisateur a annulé
     }
 
+    // Créer ou trouver la catégorie "À classer"
+    let aClasserCategory = categories.find(cat => cat.name.toLowerCase() === 'à classer');
+    
+    if (!aClasserCategory) {
+      aClasserCategory = {
+        id: `cat_${Date.now()}`,
+        name: 'À classer',
+        color: '#f5f5f5', // Fond gris clair
+        productOrder: []
+      };
+    }
+
+    // Supprimer la catégorie et ajouter "À classer" si elle n'existe pas
     const updatedCategories = categories.filter(cat => cat.id !== categoryId);
+    
+    if (!categories.find(cat => cat.name.toLowerCase() === 'à classer')) {
+      updatedCategories.push(aClasserCategory);
+    }
+
     onUpdateCategories(updatedCategories);
     setError('');
+    
+    console.log(`🗑️ Catégorie "${categoryToDelete.name}" supprimée. Articles redirigés vers "À classer"`);
   };
 
   const handleCancelEdit = () => {
@@ -154,6 +169,32 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
     updatedCategories.splice(newIndex, 0, movedCategory);
 
     onUpdateCategories(updatedCategories);
+  };
+
+  // Fonction pour déterminer la couleur de police selon la couleur de fond
+  const getTextColor = (backgroundColor: string) => {
+    // Convertir la couleur hex en RGB
+    const hex = backgroundColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Calculer la luminosité
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Retourner blanc si le fond est sombre, noir sinon
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+  };
+
+  // Fonction pour générer une couleur unique pour chaque catégorie
+  const getUniqueColor = (index: number) => {
+    const colors = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+      '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2',
+      '#FAD7A0', '#A9DFBF', '#F9E79F', '#D5A6BD', '#A3E4D7'
+    ];
+    return colors[index % colors.length];
   };
 
   return (
@@ -186,54 +227,54 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
               fullWidth
               size="small"
             />
-            <TextField
-              label="Couleur de fond"
-              value={newCategoryColor}
-              onChange={(e) => setNewCategoryColor(e.target.value)}
-              size="small"
-              sx={{ width: 120 }}
-              InputProps={{
-                style: { 
-                  backgroundColor: newCategoryColor,
-                  color: '#000',
-                  fontWeight: 'bold'
-                }
-              }}
-            />
+                         <TextField
+               label="Couleur de fond"
+               value={newCategoryColor}
+               onChange={(e) => setNewCategoryColor(e.target.value)}
+               size="small"
+               sx={{ width: 120 }}
+               InputProps={{
+                 style: { 
+                   backgroundColor: newCategoryColor,
+                   color: getTextColor(newCategoryColor),
+                   fontWeight: 'bold'
+                 }
+               }}
+             />
           </Box>
 
           {/* Couleurs prédéfinies */}
           <Typography variant="body2" sx={{ mb: 1 }}>
             Couleurs de fond prédéfinies :
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
-            {predefinedColors.map((color) => (
-              <Box
-                key={color}
-                sx={{
-                  width: 40,
-                  height: 30,
-                  backgroundColor: color,
-                  border: newCategoryColor === color ? '3px solid #000' : '1px solid #ccc',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#000',
-                  fontWeight: 'bold',
-                  fontSize: '0.8rem',
-                  '&:hover': {
-                    transform: 'scale(1.05)',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                  }
-                }}
-                onClick={() => setNewCategoryColor(color)}
-              >
-                Aa
-              </Box>
-            ))}
-          </Box>
+                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+             {predefinedColors.map((color) => (
+               <Box
+                 key={color}
+                 sx={{
+                   width: 40,
+                   height: 30,
+                   backgroundColor: color,
+                   border: newCategoryColor === color ? '3px solid #000' : '1px solid #ccc',
+                   borderRadius: '4px',
+                   cursor: 'pointer',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   color: getTextColor(color),
+                   fontWeight: 'bold',
+                   fontSize: '0.8rem',
+                   '&:hover': {
+                     transform: 'scale(1.05)',
+                     boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                   }
+                 }}
+                 onClick={() => setNewCategoryColor(color)}
+               >
+                 Aa
+               </Box>
+             ))}
+           </Box>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
             {editingCategory ? (
@@ -301,26 +342,26 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
                 {index + 1}
               </Typography>
 
-              {/* Aperçu de la couleur de fond */}
-              <Box
-                sx={{
-                  width: 60,
-                  height: 30,
-                  backgroundColor: category.color || '#757575',
-                  borderRadius: '4px',
-                  mr: 2,
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#000',
-                  fontWeight: 'bold',
-                  fontSize: '0.8rem',
-                  border: '1px solid #ccc'
-                }}
-              >
-                {category.name.slice(0, 2)}
-              </Box>
+                             {/* Aperçu de la couleur de fond */}
+               <Box
+                 sx={{
+                   width: 60,
+                   height: 30,
+                   backgroundColor: category.color || '#757575',
+                   borderRadius: '4px',
+                   mr: 2,
+                   flexShrink: 0,
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   color: getTextColor(category.color || '#757575'),
+                   fontWeight: 'bold',
+                   fontSize: '0.8rem',
+                   border: '1px solid #ccc'
+                 }}
+               >
+                 {category.name.slice(0, 2)}
+               </Box>
 
               <ListItemText
                 primary={category.name}
