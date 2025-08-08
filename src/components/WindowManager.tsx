@@ -206,6 +206,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [subcategorySearchTerm, setSubcategorySearchTerm] = useState('');
   const [isSaleMode, setIsSaleMode] = useState(false);
+  const [saleModeActive, setSaleModeActive] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Réinitialiser la pagination quand la catégorie, sous-catégorie ou la recherche change
@@ -709,10 +710,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Fonction pour gérer le scan de code-barre
   const handleBarcodeScan = (barcode: string) => {
-    setSearchTerm(barcode);
-    
-    // En mode vente, chercher et ajouter automatiquement le produit
-    if (isSaleMode) {
+    // En mode vente actif, scan direct au panier
+    if (saleModeActive) {
       const scannedProduct = products.find(product => 
         product.ean13 === barcode || 
         product.reference === barcode
@@ -727,9 +726,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           // Ajouter directement au panier
           onProductClick(scannedProduct);
         }
-        // Vider la recherche après ajout
-        setTimeout(() => setSearchTerm(''), 1000);
+        // Feedback visuel
+        console.log(`✅ Produit scanné: ${scannedProduct.name}`);
+      } else {
+        console.log(`❌ Produit non trouvé: ${barcode}`);
       }
+    } else {
+      // Mode recherche normal
+      setSearchTerm(barcode);
     }
   };
 
@@ -1011,9 +1015,29 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       case 'products':
         return (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-
             
-                         {/* Grille produits */}
+            {/* Bannière Mode Vente */}
+            {saleModeActive && (
+              <Box sx={{
+                backgroundColor: '#f44336',
+                color: 'white',
+                p: 1,
+                textAlign: 'center',
+                fontWeight: 'bold',
+                fontSize: '1.1rem',
+                borderBottom: '2px solid #d32f2f',
+                animation: 'pulse 2s infinite',
+                '@keyframes pulse': {
+                  '0%': { opacity: 1 },
+                  '50%': { opacity: 0.8 },
+                  '100%': { opacity: 1 }
+                }
+              }}>
+                🛒 MODE VENTE ACTIF - Scan direct au panier
+              </Box>
+            )}
+            
+            {/* Grille produits */}
              <Box 
                key={filterKey}
                sx={{ 
@@ -1026,7 +1050,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                  overflow: 'hidden',
                  minHeight: 0,
                  width: '800px',
-                 height: 'calc(100% - 82px)',
+                 height: saleModeActive ? 'calc(100% - 82px - 50px)' : 'calc(100% - 82px)',
                  justifyContent: 'center',
                  alignItems: 'center'
                }}>
@@ -1659,60 +1683,73 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                                  {/* Recherche des articles */}
                  <TextField
                    size="small"
-                   placeholder="Rechercher article..."
+                   placeholder={saleModeActive ? "Mode vente actif - Scan direct" : "Rechercher article..."}
                    variant="outlined"
+                   disabled={saleModeActive}
                    sx={{ 
                      flex: 1,
                      '& .MuiOutlinedInput-root': {
-                       borderColor: '#2196f3',
-                       backgroundColor: '#e3f2fd',
+                       borderColor: saleModeActive ? '#f44336' : '#2196f3',
+                       backgroundColor: saleModeActive ? '#ffebee' : '#e3f2fd',
                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#1976d2'
+                         borderColor: saleModeActive ? '#d32f2f' : '#1976d2'
                        },
                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#2196f3'
+                         borderColor: saleModeActive ? '#f44336' : '#2196f3'
                        },
                        '&:hover': {
-                         backgroundColor: '#bbdefb'
+                         backgroundColor: saleModeActive ? '#ffcdd2' : '#bbdefb'
                        },
                        '&.Mui-focused': {
-                         backgroundColor: '#90caf9'
+                         backgroundColor: saleModeActive ? '#ef9a9a' : '#90caf9'
+                       },
+                       '&.Mui-disabled': {
+                         backgroundColor: '#ffebee',
+                         color: '#f44336'
                        }
                      }
                    }}
                    value={searchTerm}
                    onChange={(e) => {
-                     const value = e.target.value;
-                     setSearchTerm(value);
-                     
-                     // Si c'est un code-barre (13 chiffres), utiliser handleBarcodeScan
-                     if (value.length === 13 && /^\d{13}$/.test(value)) {
-                       handleBarcodeScan(value);
+                     if (!saleModeActive) {
+                       const value = e.target.value;
+                       setSearchTerm(value);
+                       
+                       // Si c'est un code-barre (13 chiffres), utiliser handleBarcodeScan
+                       if (value.length === 13 && /^\d{13}$/.test(value)) {
+                         handleBarcodeScan(value);
+                       }
                      }
                    }}
                    InputProps={{
-                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#2196f3' }} />
+                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: saleModeActive ? '#f44336' : '#2196f3' }} />
                    }}
                  />
                  
                  {/* Bouton Mode Vente/Recherche */}
                  <Button
-                   variant={isSaleMode ? "contained" : "outlined"}
+                   variant={saleModeActive ? "contained" : "outlined"}
                    size="small"
-                   onClick={() => setIsSaleMode(!isSaleMode)}
+                   onClick={() => {
+                     setSaleModeActive(!saleModeActive);
+                     if (saleModeActive) {
+                       setSearchTerm(''); // Vider la recherche quand on sort du mode vente
+                     }
+                   }}
                    sx={{
                      minWidth: 'auto',
                      px: 2,
-                     backgroundColor: isSaleMode ? '#4caf50' : 'transparent',
-                     color: isSaleMode ? 'white' : '#4caf50',
-                     borderColor: '#4caf50',
+                     backgroundColor: saleModeActive ? '#f44336' : 'transparent',
+                     color: saleModeActive ? 'white' : '#f44336',
+                     borderColor: '#f44336',
+                     fontWeight: 'bold',
                      '&:hover': {
-                       backgroundColor: isSaleMode ? '#45a049' : '#e8f5e8',
-                       borderColor: '#45a049'
+                       backgroundColor: saleModeActive ? '#d32f2f' : '#ffebee',
+                       borderColor: '#d32f2f'
                      }
                    }}
                  >
-                   {isSaleMode ? '🛒 Vente' : '🔍 Recherche'}
+                   {saleModeActive ? '🛒 MODE VENTE ACTIF' : '🔍 Mode Recherche'}
                  </Button>
                  
                  {/* Recherche des catégories */}
