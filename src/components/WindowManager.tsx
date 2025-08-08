@@ -206,7 +206,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [subcategorySearchTerm, setSubcategorySearchTerm] = useState('');
   const [isSaleMode, setIsSaleMode] = useState(false);
-  const [saleModeActive, setSaleModeActive] = useState(false);
+  const [saleModeActive, setSaleModeActive] = useState(true); // Mode vente par défaut
   const [currentPage, setCurrentPage] = useState(1);
 
   // Réinitialiser la pagination quand la catégorie, sous-catégorie ou la recherche change
@@ -710,6 +710,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Fonction pour gérer le scan de code-barre
   const handleBarcodeScan = (barcode: string) => {
+    console.log(`🔍 Scan détecté: ${barcode}, Mode vente: ${saleModeActive}`);
+    
     // En mode vente actif, scan direct au panier
     if (saleModeActive) {
       const scannedProduct = products.find(product => 
@@ -718,7 +720,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       );
       
       if (scannedProduct) {
-        if (scannedProduct.variations.length > 0) {
+        console.log(`✅ Produit trouvé: ${scannedProduct.name}`);
+        if (scannedProduct.variations && scannedProduct.variations.length > 0) {
           // Ouvrir la modale de déclinaisons
           setSelectedProduct(scannedProduct);
           setVariationModalOpen(true);
@@ -726,10 +729,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           // Ajouter directement au panier
           onProductClick(scannedProduct);
         }
-        // Feedback visuel
-        console.log(`✅ Produit scanné: ${scannedProduct.name}`);
       } else {
         console.log(`❌ Produit non trouvé: ${barcode}`);
+        // Afficher dans la recherche pour debug
+        setSearchTerm(barcode);
       }
     } else {
       // Mode recherche normal
@@ -1683,74 +1686,41 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                                  {/* Recherche des articles */}
                  <TextField
                    size="small"
-                   placeholder={saleModeActive ? "Mode vente actif - Scan direct" : "Rechercher article..."}
+                   placeholder="Rechercher article ou scanner code-barre..."
                    variant="outlined"
-                   disabled={saleModeActive}
                    sx={{ 
                      flex: 1,
                      '& .MuiOutlinedInput-root': {
-                       borderColor: saleModeActive ? '#f44336' : '#2196f3',
-                       backgroundColor: saleModeActive ? '#ffebee' : '#e3f2fd',
+                       borderColor: '#2196f3',
+                       backgroundColor: '#e3f2fd',
                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                         borderColor: saleModeActive ? '#d32f2f' : '#1976d2'
+                         borderColor: '#1976d2'
                        },
                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                         borderColor: saleModeActive ? '#f44336' : '#2196f3'
+                         borderColor: '#2196f3'
                        },
                        '&:hover': {
-                         backgroundColor: saleModeActive ? '#ffcdd2' : '#bbdefb'
+                         backgroundColor: '#bbdefb'
                        },
                        '&.Mui-focused': {
-                         backgroundColor: saleModeActive ? '#ef9a9a' : '#90caf9'
-                       },
-                       '&.Mui-disabled': {
-                         backgroundColor: '#ffebee',
-                         color: '#f44336'
+                         backgroundColor: '#90caf9'
                        }
                      }
                    }}
                    value={searchTerm}
                    onChange={(e) => {
-                     if (!saleModeActive) {
-                       const value = e.target.value;
-                       setSearchTerm(value);
-                       
-                       // Si c'est un code-barre (13 chiffres), utiliser handleBarcodeScan
-                       if (value.length === 13 && /^\d{13}$/.test(value)) {
-                         handleBarcodeScan(value);
-                       }
+                     const value = e.target.value;
+                     setSearchTerm(value);
+                     
+                     // Si c'est un code-barre (13 chiffres), utiliser handleBarcodeScan
+                     if (value.length === 13 && /^\d{13}$/.test(value)) {
+                       handleBarcodeScan(value);
                      }
                    }}
                    InputProps={{
-                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: saleModeActive ? '#f44336' : '#2196f3' }} />
+                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#2196f3' }} />
                    }}
                  />
-                 
-                 {/* Bouton Mode Vente/Recherche */}
-                 <Button
-                   variant={saleModeActive ? "contained" : "outlined"}
-                   size="small"
-                   onClick={() => {
-                     setSaleModeActive(!saleModeActive);
-                     if (saleModeActive) {
-                       setSearchTerm(''); // Vider la recherche quand on sort du mode vente
-                     }
-                   }}
-                   sx={{
-                     minWidth: 'auto',
-                     px: 2,
-                     backgroundColor: saleModeActive ? '#f44336' : 'transparent',
-                     color: saleModeActive ? 'white' : '#f44336',
-                     borderColor: '#f44336',
-                     fontWeight: 'bold',
-                     '&:hover': {
-                       backgroundColor: saleModeActive ? '#d32f2f' : '#ffebee',
-                       borderColor: '#d32f2f'
-                     }
-                   }}
-                 >
-                   {saleModeActive ? '🛒 MODE VENTE ACTIF' : '🔍 Mode Recherche'}
-                 </Button>
                  
                  {/* Recherche des catégories */}
                  <TextField
@@ -2171,17 +2141,25 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   </Button>
                 </label>
                 <Button
-                  variant="contained"
+                  variant={saleModeActive ? "contained" : "outlined"}
                   sx={{ 
                     flex: 1,
                     fontSize: '0.7rem', 
                     fontWeight: 'bold', 
-                    backgroundColor: '#795548',
-                    '&:hover': { backgroundColor: '#5d4037' }
+                    backgroundColor: saleModeActive ? '#f44336' : 'transparent',
+                    color: saleModeActive ? 'white' : '#f44336',
+                    borderColor: '#f44336',
+                    '&:hover': { 
+                      backgroundColor: saleModeActive ? '#d32f2f' : '#ffebee',
+                      borderColor: '#d32f2f'
+                    }
                   }}
-                  onClick={() => console.log('Vide 2')}
+                  onClick={() => {
+                    setSaleModeActive(!saleModeActive);
+                    console.log(`🔄 Changement de mode: ${!saleModeActive ? 'VENTE' : 'RECHERCHE'}`);
+                  }}
                 >
-                  Vide 2
+                  {saleModeActive ? '🛒 VENTE' : '🔍 RECH'}
                 </Button>
                 <Button
                   variant="contained"
