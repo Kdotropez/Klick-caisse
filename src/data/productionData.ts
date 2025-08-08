@@ -28067,20 +28067,33 @@ export const categories: Category[] = [
 ];
 
 export const loadProductionData = (): { products: Product[]; categories: Category[] } => {
-  // Forcer le rechargement des nouvelles données (temporaire pour nettoyer le cache)
-  console.log('🔄 Forçage du rechargement des nouvelles données WYSIWYG...');
+  console.log('🔄 Chargement des données de production...');
 
-  // Nettoyer le localStorage pour forcer le rechargement
   try {
-    localStorage.removeItem('klickCaisse_categories');
-    localStorage.removeItem('klickCaisse_products');
-    console.log('🗑️  Cache localStorage nettoyé');
+    // Essayer de charger les données depuis localStorage
+    const savedProducts = localStorage.getItem('klickCaisse_products');
+    const savedCategories = localStorage.getItem('klickCaisse_categories');
+
+    if (savedProducts && savedCategories) {
+      const parsedProducts = JSON.parse(savedProducts);
+      const parsedCategories = JSON.parse(savedCategories);
+      
+      console.log('✅ Données chargées depuis localStorage:', { 
+        products: parsedProducts.length, 
+        categories: parsedCategories.length 
+      });
+      
+      return {
+        products: parsedProducts,
+        categories: parsedCategories
+      };
+    }
   } catch (error) {
-    console.error('❌ Erreur lors du nettoyage du cache:', error);
+    console.error('❌ Erreur lors du chargement depuis localStorage:', error);
   }
 
-  // Charger les nouvelles données par défaut
-  console.log('📦 Chargement des nouvelles données WYSIWYG (EAN13 corrigés)');
+  // Si pas de données sauvegardées, charger les données par défaut
+  console.log('📦 Chargement des données par défaut WYSIWYG');
   return {
     products,
     categories

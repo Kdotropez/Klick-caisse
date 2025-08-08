@@ -21,12 +21,15 @@ import {
   NavigateNext,
 } from '@mui/icons-material';
 import { Product, Category, CartItem, ProductVariation } from '../types/Product';
+import { saveProductionData } from '../data/productionData';
 import VariationModal from './VariationModal';
 import RecapModal from './RecapModal';
 import GlobalDiscountModal from './GlobalDiscountModal';
 import ItemDiscountModal from './ItemDiscountModal';
 import CategoryManagementModal from './CategoryManagementModal';
 import DailyReportModal from './DailyReportModal';
+import ProductEditModal from './ProductEditModal';
+import SubcategoryManagementModal from './SubcategoryManagementModal';
 
 
 interface Window {
@@ -87,6 +90,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [showCategoryManagementModal, setShowCategoryManagementModal] = useState(false);
   const [showDailyReportModal, setShowDailyReportModal] = useState(false);
+  const [showProductEditModal, setShowProductEditModal] = useState(false);
+  const [selectedProductForEdit, setSelectedProductForEdit] = useState<Product | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [showEditModeNotification, setShowEditModeNotification] = useState(false);
+  const [showSubcategoryManagementModal, setShowSubcategoryManagementModal] = useState(false);
   
   // États pour les notifications de paiement
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
@@ -315,6 +323,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         if (onProductsReorder) {
           onProductsReorder(newProducts);
         }
+        
+        // Sauvegarder automatiquement dans localStorage
+        saveProductionData(newProducts, categories);
       }
     }
     
@@ -804,6 +815,66 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       console.log('Nouvelles catégories:', newCategories);
       alert(`Catégories mises à jour: ${newCategories.length} catégories`);
     }
+    
+    // Sauvegarder automatiquement dans localStorage
+    saveProductionData(products, newCategories);
+    
+    console.log('✅ Catégories sauvegardées avec succès');
+  };
+
+  const handleSaveProduct = (updatedProduct: Product) => {
+    // Mettre à jour le produit dans la liste
+    const updatedProducts = products.map(p => 
+      p.id === updatedProduct.id ? updatedProduct : p
+    );
+    
+    if (onProductsReorder) {
+      onProductsReorder(updatedProducts);
+    }
+    
+    // Sauvegarder automatiquement dans localStorage
+    saveProductionData(updatedProducts, categories);
+    
+    console.log('✅ Article modifié et sauvegardé avec succès:', updatedProduct.name);
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    // Supprimer le produit de la liste
+    const updatedProducts = products.filter(p => p.id !== productId);
+    
+    if (onProductsReorder) {
+      onProductsReorder(updatedProducts);
+    }
+    
+    // Sauvegarder automatiquement dans localStorage
+    saveProductionData(updatedProducts, categories);
+    
+    console.log('🗑️ Article supprimé et sauvegardé avec succès');
+  };
+
+  const handleUpdateSubcategories = (categoryId: string, newSubcategories: string[]) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    // Mettre à jour les produits qui appartiennent à cette catégorie
+    const updatedProducts = products.map(product => {
+      if (product.category === category.name) {
+        return {
+          ...product,
+          associatedCategories: newSubcategories
+        };
+      }
+      return product;
+    });
+
+    if (onProductsReorder) {
+      onProductsReorder(updatedProducts);
+    }
+
+    // Sauvegarder automatiquement dans localStorage
+    saveProductionData(updatedProducts, categories);
+
+    console.log(`✅ Sous-catégories mises à jour pour ${category.name}:`, newSubcategories);
   };
 
   // Fonction pour importer un fichier CSV
@@ -1242,7 +1313,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      onDragLeave={handleDragLeave}
                      onDrop={(e) => handleDrop(e, product)}
                      onDragEnd={handleDragEnd}
-                     onClick={() => handleProductClick(product)}
+                     onClick={() => {
+                       if (isEditMode) {
+                         // Mode édition : ouvrir la modale de modification
+                         setSelectedProductForEdit(product);
+                         setShowProductEditModal(true);
+                       } else {
+                         // Mode vente : ajouter au panier
+                         handleProductClick(product);
+                       }
+                     }}
                    >
                      <Typography variant="body2" sx={{ 
                        fontWeight: '600', 
@@ -1268,23 +1348,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        mt: 0.25 * scaleFactor, 
                        gap: 0.25 * scaleFactor 
                      }}>
-                       <Chip 
-                         label={`📊 ${product.salesCount || 0}`} 
-                         size="small" 
+                       <Typography 
+                         variant="caption" 
                          sx={{ 
                            fontSize: `${Math.max(0.6, 0.7 * scaleFactor)}rem`, 
-                           height: `${Math.max(20, 22 * scaleFactor)}px`, 
-                           backgroundColor: '#4CAF50', 
-                           color: 'white', 
-                           fontWeight: 'bold', 
-                           boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.3)`,
-                           border: '1px solid #45a049',
-                           '&:hover': {
-                             backgroundColor: '#45a049',
-                             transform: 'scale(1.05)'
-                           }
-                         }} 
-                       />
+                           color: '#666',
+                           fontWeight: '500',
+                           alignSelf: 'flex-end'
+                         }}
+                       >
+                         {product.salesCount || 0}
+                       </Typography>
                        {product.variations.length > 0 && (
                          <Chip 
                            label={`${product.variations.length} var.`} 
@@ -2298,7 +2372,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 </Button>
               </Box>
               
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+                            <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
@@ -2318,12 +2392,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     flex: 1,
                     fontSize: '0.7rem', 
                     fontWeight: 'bold', 
-                    backgroundColor: '#8bc34a',
-                    '&:hover': { backgroundColor: '#689f38' }
+                    backgroundColor: '#673ab7',
+                    '&:hover': { backgroundColor: '#5e35b1' }
                   }}
-                  onClick={() => console.log('Vide 11')}
+                  onClick={() => setShowSubcategoryManagementModal(true)}
                 >
-                  Vide 11
+                  Gestion Sous-catégories
                 </Button>
                 <Button
                   variant="contained"
@@ -2331,12 +2405,23 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     flex: 1,
                     fontSize: '0.7rem', 
                     fontWeight: 'bold', 
-                    backgroundColor: '#cddc39',
-                    '&:hover': { backgroundColor: '#afb42b' }
+                    backgroundColor: isEditMode ? '#f44336' : '#ff9800',
+                    '&:hover': { backgroundColor: isEditMode ? '#d32f2f' : '#f57c00' }
                   }}
-                  onClick={() => console.log('Vide 12')}
+                  onClick={() => {
+                    // Basculer entre le mode vente et le mode édition
+                    const newEditMode = !isEditMode;
+                    setIsEditMode(newEditMode);
+                    setShowEditModeNotification(newEditMode);
+                    
+                    if (newEditMode) {
+                      console.log('🖊️ Mode édition activé - Cliquez sur un article pour le modifier');
+                    } else {
+                      console.log('💰 Mode vente activé - Cliquez sur un article pour l\'ajouter au panier');
+                    }
+                  }}
                 >
-                  Vide 12
+                  {isEditMode ? 'Mode Vente' : 'Modifier Article'}
                 </Button>
               </Box>
             </Box>
@@ -2929,6 +3014,65 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          onClose={() => setShowDailyReportModal(false)}
          cartItems={cartItems}
        />
+
+       {/* Modale de modification d'article */}
+       <ProductEditModal
+         open={showProductEditModal}
+         onClose={() => setShowProductEditModal(false)}
+         product={selectedProductForEdit}
+         categories={categories}
+         onSave={handleSaveProduct}
+         onDelete={handleDeleteProduct}
+       />
+
+       {/* Modale de gestion des sous-catégories */}
+       <SubcategoryManagementModal
+         open={showSubcategoryManagementModal}
+         onClose={() => setShowSubcategoryManagementModal(false)}
+         categories={categories}
+         products={products}
+         onUpdateSubcategories={handleUpdateSubcategories}
+       />
+
+       {/* Notification permanente du mode édition */}
+       {showEditModeNotification && (
+         <Box
+           sx={{
+             position: 'fixed',
+             top: '20px',
+             right: '20px',
+             zIndex: 9999,
+             backgroundColor: '#f44336',
+             color: 'white',
+             padding: '16px 20px',
+             borderRadius: '8px',
+             boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+             border: '2px solid #d32f2f',
+             maxWidth: '350px',
+             animation: 'slideIn 0.3s ease-out'
+           }}
+         >
+           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+             <Box
+               sx={{
+                 width: '12px',
+                 height: '12px',
+                 backgroundColor: 'white',
+                 borderRadius: '50%',
+                 animation: 'pulse 2s infinite'
+               }}
+             />
+             <Box>
+               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                 Mode Édition Activé
+               </Typography>
+               <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                 Cliquez sur "Mode Vente" pour retourner à la vente
+               </Typography>
+             </Box>
+           </Box>
+         </Box>
+       )}
 
      </Box>
    );
