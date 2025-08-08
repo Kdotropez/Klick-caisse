@@ -760,8 +760,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const handleVariationSelect = (variation: ProductVariation) => {
+    console.log(`🔄 Sélection déclinaison: ${variation.attributes}`);
+    console.log(`📦 Produit: ${selectedProduct?.name}`);
+    console.log(`💰 Prix déclinaison: ${variation.finalPrice}€`);
+    
     if (selectedProduct) {
       onProductWithVariationClick(selectedProduct, variation);
+      console.log(`✅ Produit avec déclinaison ajouté au panier!`);
+      
+      // Fermer la modale après ajout
+      setVariationModalOpen(false);
+      setSelectedProduct(null);
+    } else {
+      console.log(`❌ Erreur: selectedProduct est null`);
     }
   };
 
