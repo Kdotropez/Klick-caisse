@@ -205,6 +205,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [subcategorySearchTerm, setSubcategorySearchTerm] = useState('');
+  const [isSaleMode, setIsSaleMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Réinitialiser la pagination quand la catégorie, sous-catégorie ou la recherche change
@@ -480,9 +481,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   
   const filteredProducts = uniqueProducts.filter(product => {
     // Filtrage par recherche d'article
-    const matchesSearch = !searchTerm || 
+        const matchesSearch = !searchTerm ||
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase());
+      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.ean13.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.reference.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Si aucune catégorie n'est sélectionnée, afficher tous les produits
     if (!selectedCategory && !selectedSubcategory) {
@@ -703,6 +706,32 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   }, []);
 
 
+
+  // Fonction pour gérer le scan de code-barre
+  const handleBarcodeScan = (barcode: string) => {
+    setSearchTerm(barcode);
+    
+    // En mode vente, chercher et ajouter automatiquement le produit
+    if (isSaleMode) {
+      const scannedProduct = products.find(product => 
+        product.ean13 === barcode || 
+        product.reference === barcode
+      );
+      
+      if (scannedProduct) {
+        if (scannedProduct.variations.length > 0) {
+          // Ouvrir la modale de déclinaisons
+          setSelectedProduct(scannedProduct);
+          setVariationModalOpen(true);
+        } else {
+          // Ajouter directement au panier
+          onProductClick(scannedProduct);
+        }
+        // Vider la recherche après ajout
+        setTimeout(() => setSearchTerm(''), 1000);
+      }
+    }
+  };
 
   // Fonctions de gestion des déclinaisons
   const handleProductClick = (product: Product) => {
@@ -1653,12 +1682,38 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    }}
                    value={searchTerm}
                    onChange={(e) => {
-                     setSearchTerm(e.target.value);
+                     const value = e.target.value;
+                     setSearchTerm(value);
+                     
+                     // Si c'est un code-barre (13 chiffres), utiliser handleBarcodeScan
+                     if (value.length === 13 && /^\d{13}$/.test(value)) {
+                       handleBarcodeScan(value);
+                     }
                    }}
                    InputProps={{
                      startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#2196f3' }} />
                    }}
                  />
+                 
+                 {/* Bouton Mode Vente/Recherche */}
+                 <Button
+                   variant={isSaleMode ? "contained" : "outlined"}
+                   size="small"
+                   onClick={() => setIsSaleMode(!isSaleMode)}
+                   sx={{
+                     minWidth: 'auto',
+                     px: 2,
+                     backgroundColor: isSaleMode ? '#4caf50' : 'transparent',
+                     color: isSaleMode ? 'white' : '#4caf50',
+                     borderColor: '#4caf50',
+                     '&:hover': {
+                       backgroundColor: isSaleMode ? '#45a049' : '#e8f5e8',
+                       borderColor: '#45a049'
+                     }
+                   }}
+                 >
+                   {isSaleMode ? '🛒 Vente' : '🔍 Recherche'}
+                 </Button>
                  
                  {/* Recherche des catégories */}
                  <TextField
