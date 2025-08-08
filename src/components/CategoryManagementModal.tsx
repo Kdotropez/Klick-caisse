@@ -73,7 +73,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
   const handleEditCategory = (category: Category) => {
     setEditingCategory(category);
     setNewCategoryName(category.name);
-    setNewCategoryColor(category.color);
+    setNewCategoryColor(category.color || '#757575');
     setError('');
   };
 

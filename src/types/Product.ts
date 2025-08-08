@@ -27,8 +27,8 @@ export interface ProductVariation {
 export interface Category {
   id: string;
   name: string;
-  color: string;
-  productOrder: string[];        // Ordre des produits dans cette catégorie
+  color?: string;                // Optionnel pour compatibilité
+  productOrder?: string[];       // Optionnel pour compatibilité
 }
 
 export interface CSVProduct {

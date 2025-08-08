@@ -4278,9 +4278,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 0,
-        "stock": 0
-      }
+        "finalPrice": 0}
     ]
   },
   {
@@ -4305,9 +4303,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 0,
-        "stock": 0
-      }
+        "finalPrice": 0}
     ]
   },
   {
@@ -4695,9 +4691,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 5,
-        "stock": 5
-      }
+        "finalPrice": 5}
     ]
   },
   {
@@ -5260,9 +5254,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 0,
-        "stock": 0
-      }
+        "finalPrice": 0}
     ]
   },
   {
@@ -5763,9 +5755,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 0.3,
-        "stock": 0
-      }
+        "finalPrice": 0.3}
     ]
   },
   {
@@ -6449,36 +6439,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "SAINT TROPEZ",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "2072",
         "ean13": "2,05892E+12",
         "reference": "",
         "attributes": "SAINTE MAXIME",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "2074",
         "ean13": "2,06563E+12",
         "reference": "",
         "attributes": "CAVALAIRE",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "2073",
         "ean13": "2,00662E+12",
         "reference": "",
         "attributes": "PORT GRIMAUD",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      }
+        "finalPrice": 12}
     ]
   },
   {
@@ -7743,36 +7725,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "SAINT TROPEZ",
         "priceImpact": 4.083333,
-        "finalPrice": 19.083333,
-        "stock": 19
-      },
+        "finalPrice": 19.083333},
       {
         "id": "2076",
         "ean13": "2,00056E+12",
         "reference": "",
         "attributes": "SAINTE MAXIME",
         "priceImpact": 4.083333,
-        "finalPrice": 19.083333,
-        "stock": 19
-      },
+        "finalPrice": 19.083333},
       {
         "id": "2077",
         "ean13": "2,06091E+12",
         "reference": "",
         "attributes": "PORT GRIMAUD",
         "priceImpact": 4.083333,
-        "finalPrice": 19.083333,
-        "stock": 19
-      },
+        "finalPrice": 19.083333},
       {
         "id": "2078",
         "ean13": "2,04626E+12",
         "reference": "",
         "attributes": "CAVALAIRE",
         "priceImpact": 4.083333,
-        "finalPrice": 19.083333,
-        "stock": 19
-      }
+        "finalPrice": 19.083333}
     ]
   },
   {
@@ -8229,72 +8203,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2276",
         "ean13": "2,06567E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2273",
         "ean13": "2,03877E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2272",
         "ean13": "2,04233E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2279",
         "ean13": "2,06143E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2278",
         "ean13": "2,09115E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2275",
         "ean13": "2,05325E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2277",
         "ean13": "2,03828E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8320,72 +8278,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2281",
         "ean13": "2,07495E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2282",
         "ean13": "2,03605E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2283",
         "ean13": "2,07072E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2285",
         "ean13": "2,01649E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2287",
         "ean13": "2,09413E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2286",
         "ean13": "2,00792E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2284",
         "ean13": "2,09419E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8411,72 +8353,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2289",
         "ean13": "2,04624E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2290",
         "ean13": "2,0395E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2293",
         "ean13": "2,02876E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2292",
         "ean13": "2,06602E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2291",
         "ean13": "2,00692E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2295",
         "ean13": "2,04205E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2294",
         "ean13": "2,05515E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8502,72 +8428,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2299",
         "ean13": "2,06387E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2297",
         "ean13": "2,07405E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2296",
         "ean13": "2,01173E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2300",
         "ean13": "2,06754E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2303",
         "ean13": "2,03414E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2301",
         "ean13": "2,05157E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2302",
         "ean13": "2,03211E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8593,72 +8503,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2305",
         "ean13": "2,03381E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2306",
         "ean13": "2,06673E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2307",
         "ean13": "2,02182E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2309",
         "ean13": "2,02616E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2311",
         "ean13": "2,03826E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2310",
         "ean13": "2,0751E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2308",
         "ean13": "2,06752E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8684,72 +8578,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2313",
         "ean13": "2,06609E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2314",
         "ean13": "2,02569E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2315",
         "ean13": "2,0401E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2316",
         "ean13": "2,06374E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2319",
         "ean13": "2,01712E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2318",
         "ean13": "2,03903E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2317",
         "ean13": "2,00536E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8775,72 +8653,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2320",
         "ean13": "2,01345E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2321",
         "ean13": "2,03854E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2325",
         "ean13": "2,06435E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2324",
         "ean13": "2,04048E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2326",
         "ean13": "2,02093E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2323",
         "ean13": "2,04509E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2327",
         "ean13": "2,07391E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8866,72 +8728,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2330",
         "ean13": "2,0751E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2328",
         "ean13": "2,05586E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2331",
         "ean13": "2,08941E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2333",
         "ean13": "2,05102E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2335",
         "ean13": "2,04539E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2334",
         "ean13": "2,04763E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2332",
         "ean13": "2,02381E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -8957,72 +8803,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2248",
         "ean13": "2,05664E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2249",
         "ean13": "2,09125E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2254",
         "ean13": "2,06545E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2251",
         "ean13": "2,05571E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2250",
         "ean13": "2,03094E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2253",
         "ean13": "2,07808E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2252",
         "ean13": "2,05302E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9048,72 +8878,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2240",
         "ean13": "2,06865E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2243",
         "ean13": "2,09634E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2241",
         "ean13": "2,00408E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2245",
         "ean13": "2,01246E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2247",
         "ean13": "2,08779E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2246",
         "ean13": "2,01322E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2244",
         "ean13": "2,01649E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9139,72 +8953,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2257",
         "ean13": "2,08818E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2258",
         "ean13": "2,01848E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2259",
         "ean13": "2,01407E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2261",
         "ean13": "2,07193E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2263",
         "ean13": "2,0415E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2262",
         "ean13": "2,09142E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2260",
         "ean13": "2,04927E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9230,72 +9028,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2265",
         "ean13": "2,04209E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2266",
         "ean13": "2,01793E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2267",
         "ean13": "2,01308E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2268",
         "ean13": "2,09926E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2271",
         "ean13": "2,07755E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2270",
         "ean13": "2,0173E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2269",
         "ean13": "2,06777E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9321,72 +9103,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2338",
         "ean13": "2,08592E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2336",
         "ean13": "2,07177E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2339",
         "ean13": "2,08178E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2340",
         "ean13": "2,09042E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2342",
         "ean13": "2,01265E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2341",
         "ean13": "2,06185E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2343",
         "ean13": "2,09937E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9412,72 +9178,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2346",
         "ean13": "2,02267E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2344",
         "ean13": "2,02558E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2348",
         "ean13": "2,07745E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2347",
         "ean13": "2,07353E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2350",
         "ean13": "2,06553E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2349",
         "ean13": "2,05528E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2351",
         "ean13": "2,0832E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9503,72 +9253,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2352",
         "ean13": "2,04201E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2353",
         "ean13": "2,07018E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2357",
         "ean13": "2,08186E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2356",
         "ean13": "2,03363E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2354",
         "ean13": "2,00468E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2355",
         "ean13": "2,05469E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2359",
         "ean13": "2,07296E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9594,72 +9328,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2361",
         "ean13": "2,06906E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2360",
         "ean13": "2,0664E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2364",
         "ean13": "2,01508E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2363",
         "ean13": "2,09088E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2366",
         "ean13": "2,04593E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2365",
         "ean13": "2,07399E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2362",
         "ean13": "2,07632E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9685,72 +9403,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2369",
         "ean13": "",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2370",
         "ean13": "2,14548E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2371",
         "ean13": "2,15315E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2374",
         "ean13": "",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2372",
         "ean13": "",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2375",
         "ean13": "",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2373",
         "ean13": "",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9776,54 +9478,42 @@ export const products: Product[] = [
         "reference": "2677XS",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2378",
         "ean13": "2,19038E+12",
         "reference": "2677S",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2379",
         "ean13": "2,19579E+12",
         "reference": "2677M",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2380",
         "ean13": "2,21986E+12",
         "reference": "2677L",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2382",
         "ean13": "",
         "reference": "2677XXL",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2381",
         "ean13": "2,27324E+12",
         "reference": "2677XL",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9849,81 +9539,63 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2220",
         "ean13": "1,65227E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2222",
         "ean13": "1,72597E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2219",
         "ean13": "1,65167E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2224",
         "ean13": "2,08305E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2225",
         "ean13": "2,08306E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2226",
         "ean13": "2,05848E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2810",
         "ean13": "1,61361E+12",
         "reference": "",
         "attributes": "16 ANS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2223",
         "ean13": "1,75458E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -9949,45 +9621,35 @@ export const products: Product[] = [
         "reference": "9502",
         "attributes": "2",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1800",
         "ean13": "2,01227E+12",
         "reference": "9501",
         "attributes": "1",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1802",
         "ean13": "2,02462E+12",
         "reference": "9503",
         "attributes": "3",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1803",
         "ean13": "2,04083E+12",
         "reference": "9504",
         "attributes": "4",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1804",
         "ean13": "2,0585E+12",
         "reference": "9505",
         "attributes": "5",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      }
+        "finalPrice": 39}
     ]
   },
   {
@@ -10013,45 +9675,35 @@ export const products: Product[] = [
         "reference": "9514",
         "attributes": "4",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1806",
         "ean13": "2,00172E+12",
         "reference": "9512",
         "attributes": "2",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1809",
         "ean13": "2,02223E+12",
         "reference": "9515",
         "attributes": "5",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1805",
         "ean13": "2,07977E+12",
         "reference": "9511",
         "attributes": "1",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1807",
         "ean13": "2,00179E+12",
         "reference": "9513",
         "attributes": "3",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      }
+        "finalPrice": 39}
     ]
   },
   {
@@ -10077,45 +9729,35 @@ export const products: Product[] = [
         "reference": "9521",
         "attributes": "1",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1811",
         "ean13": "2,04966E+12",
         "reference": "9522",
         "attributes": "2",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1812",
         "ean13": "2,03487E+12",
         "reference": "9523",
         "attributes": "3",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1813",
         "ean13": "2,0534E+12",
         "reference": "9524",
         "attributes": "4",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1814",
         "ean13": "2,08562E+12",
         "reference": "9525",
         "attributes": "5",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      }
+        "finalPrice": 39}
     ]
   },
   {
@@ -10141,45 +9783,35 @@ export const products: Product[] = [
         "reference": "9531",
         "attributes": "1",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1816",
         "ean13": "2,00197E+12",
         "reference": "9532",
         "attributes": "2",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1817",
         "ean13": "2,09239E+12",
         "reference": "9533",
         "attributes": "3",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1818",
         "ean13": "2,04276E+12",
         "reference": "9534",
         "attributes": "4",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1819",
         "ean13": "2,08713E+12",
         "reference": "9535",
         "attributes": "5",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      }
+        "finalPrice": 39}
     ]
   },
   {
@@ -10205,45 +9837,35 @@ export const products: Product[] = [
         "reference": "9542",
         "attributes": "2",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1820",
         "ean13": "2,0748E+12",
         "reference": "9541",
         "attributes": "1",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1824",
         "ean13": "2,00772E+12",
         "reference": "9545",
         "attributes": "5",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1823",
         "ean13": "2,0391E+12",
         "reference": "9544",
         "attributes": "4",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      },
+        "finalPrice": 39},
       {
         "id": "1822",
         "ean13": "2,05844E+12",
         "reference": "9543",
         "attributes": "3",
         "priceImpact": 0,
-        "finalPrice": 39,
-        "stock": 39
-      }
+        "finalPrice": 39}
     ]
   },
   {
@@ -10797,63 +10419,49 @@ export const products: Product[] = [
         "reference": "7001",
         "attributes": "0 � 1",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1834",
         "ean13": "2,04227E+12",
         "reference": "7002",
         "attributes": "1 � 2",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1835",
         "ean13": "2,09353E+12",
         "reference": "7003",
         "attributes": "2 � 3",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1836",
         "ean13": "2,0598E+12",
         "reference": "7004",
         "attributes": "3 � 4",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1838",
         "ean13": "2,00861E+12",
         "reference": "7006",
         "attributes": "9 � 10",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1839",
         "ean13": "2,04975E+12",
         "reference": "7007",
         "attributes": "12 � 14",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1837",
         "ean13": "2,01207E+12",
         "reference": "7005",
         "attributes": "6 � 7",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -10879,63 +10487,49 @@ export const products: Product[] = [
         "reference": "7011",
         "attributes": "0 � 1",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1841",
         "ean13": "2,04513E+12",
         "reference": "7012",
         "attributes": "1 � 2",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1842",
         "ean13": "2,05994E+12",
         "reference": "7013",
         "attributes": "2 � 3",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1844",
         "ean13": "2,08035E+12",
         "reference": "7015",
         "attributes": "6 � 7",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1843",
         "ean13": "2,06427E+12",
         "reference": "7014",
         "attributes": "3 � 4",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1846",
         "ean13": "2,05985E+12",
         "reference": "7017",
         "attributes": "12 � 14",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1845",
         "ean13": "2,05518E+12",
         "reference": "7016",
         "attributes": "9 � 10",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -10961,63 +10555,49 @@ export const products: Product[] = [
         "reference": "7027",
         "attributes": "12 � 14",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1849",
         "ean13": "2,00986E+12",
         "reference": "7023",
         "attributes": "2 � 3",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1848",
         "ean13": "2,05801E+12",
         "reference": "7022",
         "attributes": "1 � 2",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1852",
         "ean13": "2,00209E+12",
         "reference": "7026",
         "attributes": "9 � 10",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1847",
         "ean13": "2,01635E+12",
         "reference": "7021",
         "attributes": "0 � 1",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1850",
         "ean13": "2,08338E+12",
         "reference": "7024",
         "attributes": "3 � 4",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "1851",
         "ean13": "2,01083E+12",
         "reference": "7025",
         "attributes": "6 � 7",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -11636,81 +11216,63 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 4.99,
-        "stock": 4
-      },
+        "finalPrice": 4.99},
       {
         "id": "2155",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 100.008334,
-        "finalPrice": 104.998334,
-        "stock": 125
-      },
+        "finalPrice": 104.998334},
       {
         "id": "2877",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 33.341667,
-        "finalPrice": 38.331667,
-        "stock": 45
-      },
+        "finalPrice": 38.331667},
       {
         "id": "2955",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 79.175,
-        "finalPrice": 84.16499999999999,
-        "stock": 100
-      },
+        "finalPrice": 84.16499999999999},
       {
         "id": "2882",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 8.341667,
-        "finalPrice": 13.331667,
-        "stock": 15
-      },
+        "finalPrice": 13.331667},
       {
         "id": "3251",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 5.841667,
-        "finalPrice": 10.831667,
-        "stock": 12
-      },
+        "finalPrice": 10.831667},
       {
         "id": "3216",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 37.508334,
-        "finalPrice": 42.498334,
-        "stock": 50
-      },
+        "finalPrice": 42.498334},
       {
         "id": "3014",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 4.091667,
-        "finalPrice": 9.081667,
-        "stock": 9
-      },
+        "finalPrice": 9.081667},
       {
         "id": "3304",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 12.508334,
-        "finalPrice": 17.498334,
-        "stock": 20
-      }
+        "finalPrice": 17.498334}
     ]
   },
   {
@@ -11735,18 +11297,14 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": -1.666667,
-        "finalPrice": 0.3333330000000001,
-        "stock": 0
-      },
+        "finalPrice": 0.3333330000000001},
       {
         "id": "2065",
         "ean13": "",
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 2,
-        "stock": 2
-      }
+        "finalPrice": 2}
     ]
   },
   {
@@ -11896,9 +11454,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 0,
-        "stock": 0
-      }
+        "finalPrice": 0}
     ]
   },
   {
@@ -12804,63 +12360,49 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "NOIR",
         "priceImpact": 2.09,
-        "finalPrice": 2.21,
-        "stock": 2
-      },
+        "finalPrice": 2.21},
       {
         "id": "1959",
         "ean13": "2,04295E+12",
         "reference": "",
         "attributes": "BLANC",
         "priceImpact": 3.49,
-        "finalPrice": 3.6100000000000003,
-        "stock": 4
-      },
+        "finalPrice": 3.6100000000000003},
       {
         "id": "1961",
         "ean13": "2,04601E+12",
         "reference": "",
         "attributes": "OR",
         "priceImpact": 5.29,
-        "finalPrice": 5.41,
-        "stock": 6
-      },
+        "finalPrice": 5.41},
       {
         "id": "2934",
         "ean13": "",
         "reference": "",
         "attributes": "ARGENT",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      },
+        "finalPrice": 0.12},
       {
         "id": "1962",
         "ean13": "2,05123E+12",
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 2.09,
-        "finalPrice": 2.21,
-        "stock": 2
-      },
+        "finalPrice": 2.21},
       {
         "id": "2935",
         "ean13": "",
         "reference": "",
         "attributes": "GRIS FONCE",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      },
+        "finalPrice": 0.12},
       {
         "id": "3040",
         "ean13": "",
         "reference": "",
         "attributes": "ROSE",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      }
+        "finalPrice": 0.12}
     ]
   },
   {
@@ -13120,45 +12662,35 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "MARRON",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "2008",
         "ean13": "2,0376E+12",
         "reference": "",
         "attributes": "JAUNE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "2010",
         "ean13": "2,00229E+12",
         "reference": "",
         "attributes": "ORANGE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "2009",
         "ean13": "2,06323E+12",
         "reference": "",
         "attributes": "MAUVE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "2012",
         "ean13": "2,00224E+12",
         "reference": "",
         "attributes": "ROSE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      }
+        "finalPrice": 8}
     ]
   },
   {
@@ -13183,90 +12715,70 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "BLANC,54,BLANC,54",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "1998",
         "ean13": "2,00261E+12",
         "reference": "",
         "attributes": "ROUGE,54,ROUGE,54",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "1999",
         "ean13": "2,05596E+12",
         "reference": "",
         "attributes": "BLANC,58,BLANC,58",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "1995",
         "ean13": "2,03856E+12",
         "reference": "",
         "attributes": "BLEU,54,BLEU,54",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2003",
         "ean13": "2,06273E+12",
         "reference": "",
         "attributes": "ROUGE,58,ROUGE,58",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2001",
         "ean13": "2,07493E+12",
         "reference": "",
         "attributes": "ROSE,58,ROSE,58",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2000",
         "ean13": "2,03117E+12",
         "reference": "",
         "attributes": "BLEU,58,BLEU,58",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "1996",
         "ean13": "2,03171E+12",
         "reference": "",
         "attributes": "ROSE,54,ROSE,54",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "1997",
         "ean13": "2,01171E+12",
         "reference": "",
         "attributes": "BEIGE,54,BEIGE,54",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2002",
         "ean13": "2,09993E+12",
         "reference": "",
         "attributes": "BEIGE,58,BEIGE,58",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      }
+        "finalPrice": 20}
     ]
   },
   {
@@ -13310,36 +12822,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "ROUGE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "3125",
         "ean13": "",
         "reference": "",
         "attributes": "OR",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "3124",
         "ean13": "",
         "reference": "",
         "attributes": "ORANGE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "3092",
         "ean13": "",
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      }
+        "finalPrice": 8}
     ]
   },
   {
@@ -13382,63 +12886,49 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "BLANC,STRASS PETITE LETTRE,BLANC,STRASS PETITE LETTRE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2013",
         "ean13": "2,0046E+12",
         "reference": "",
         "attributes": "BLANC,STRASS GRANDE LETTRE,BLANC,STRASS GRANDE LETTRE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2014",
         "ean13": "2,05367E+12",
         "reference": "",
         "attributes": "NOIR,STRASS GRANDE LETTRE,NOIR,STRASS GRANDE LETTRE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2025",
         "ean13": "2,02122E+12",
         "reference": "",
         "attributes": "BLEU CIEL,LETTRE METAL,BLEU CIEL,LETTRE METAL",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2026",
         "ean13": "2,06892E+12",
         "reference": "",
         "attributes": "BLEU ROI,LETTRE METAL,BLEU ROI,LETTRE METAL",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2019",
         "ean13": "2,01296E+12",
         "reference": "",
         "attributes": "NOIR,STRASS PETITE LETTRE,NOIR,STRASS PETITE LETTRE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2027",
         "ean13": "2,01217E+12",
         "reference": "",
         "attributes": "ROSE,LETTRE METAL,ROSE,LETTRE METAL",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      }
+        "finalPrice": 10}
     ]
   },
   {
@@ -14187,72 +13677,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      },
+        "finalPrice": 15},
       {
         "id": "2230",
         "ean13": "2,08123E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      },
+        "finalPrice": 15},
       {
         "id": "2227",
         "ean13": "2,0922E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      },
+        "finalPrice": 15},
       {
         "id": "2228",
         "ean13": "2,02873E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      },
+        "finalPrice": 15},
       {
         "id": "2231",
         "ean13": "2,07529E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      },
+        "finalPrice": 15},
       {
         "id": "2234",
         "ean13": "2,05254E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      },
+        "finalPrice": 15},
       {
         "id": "2233",
         "ean13": "2,033E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      },
+        "finalPrice": 15},
       {
         "id": "2232",
         "ean13": "2,04419E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 15,
-        "stock": 15
-      }
+        "finalPrice": 15}
     ]
   },
   {
@@ -14298,72 +13772,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2409",
         "ean13": "2,01517E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2408",
         "ean13": "2,00523E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2413",
         "ean13": "2,03581E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2410",
         "ean13": "2,01713E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2407",
         "ean13": "2,08595E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2411",
         "ean13": "2,07559E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2412",
         "ean13": "2,04274E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -14389,72 +13847,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2415",
         "ean13": "2,03359E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2419",
         "ean13": "2,03312E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2420",
         "ean13": "2,09008E+12",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2418",
         "ean13": "2,05474E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2421",
         "ean13": "2,06183E+12",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2416",
         "ean13": "2,03511E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2422",
         "ean13": "2,06672E+12",
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -15617,27 +15059,21 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2623",
         "ean13": "2,02513E+12",
         "reference": "",
         "attributes": "NOIR",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2622",
         "ean13": "2,02768E+12",
         "reference": "",
         "attributes": "BEIGE",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      }
+        "finalPrice": 20}
     ]
   },
   {
@@ -15662,45 +15098,35 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "BEIGE",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2629",
         "ean13": "2,0938E+12",
         "reference": "",
         "attributes": "GRIS FONCE",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2632",
         "ean13": "2,02779E+12",
         "reference": "",
         "attributes": "NOIR",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2628",
         "ean13": "2,08727E+12",
         "reference": "",
         "attributes": "ARGENT",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2630",
         "ean13": "2,05758E+12",
         "reference": "",
         "attributes": "VERT",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      }
+        "finalPrice": 20}
     ]
   },
   {
@@ -15795,27 +15221,21 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "MANDALA",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2634",
         "ean13": "2,06735E+12",
         "reference": "",
         "attributes": "ETOILE",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2635",
         "ean13": "2,04888E+12",
         "reference": "",
         "attributes": "UNIE",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      }
+        "finalPrice": 20}
     ]
   },
   {
@@ -15842,18 +15262,14 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "UNIE",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      },
+        "finalPrice": 20},
       {
         "id": "2637",
         "ean13": "2,04954E+12",
         "reference": "",
         "attributes": "ETOILE",
         "priceImpact": 0,
-        "finalPrice": 20,
-        "stock": 20
-      }
+        "finalPrice": 20}
     ]
   },
   {
@@ -16589,9 +16005,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -17522,36 +16936,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "2780",
         "ean13": "2,04477E+12",
         "reference": "",
         "attributes": "MAUVE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "2779",
         "ean13": "2,01623E+12",
         "reference": "",
         "attributes": "ROUGE",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      },
+        "finalPrice": 8},
       {
         "id": "2781",
         "ean13": "2,09881E+12",
         "reference": "",
         "attributes": "VERT",
         "priceImpact": 0,
-        "finalPrice": 8,
-        "stock": 8
-      }
+        "finalPrice": 8}
     ]
   },
   {
@@ -17984,36 +17390,28 @@ export const products: Product[] = [
         "reference": "2676M",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2805",
         "ean13": "2,34568E+12",
         "reference": "2676S",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2807",
         "ean13": "2,44716E+12",
         "reference": "2676L",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2808",
         "ean13": "2,65214E+12",
         "reference": "2676XL",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -18213,36 +17611,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "2817",
         "ean13": "1,9848E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "2818",
         "ean13": "2,04421E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "2819",
         "ean13": "2,07477E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      }
+        "finalPrice": 59}
     ]
   },
   {
@@ -18268,36 +17658,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "2824",
         "ean13": "3,1651E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "2823",
         "ean13": "3,32282E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "2822",
         "ean13": "3,2029E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      }
+        "finalPrice": 59}
     ]
   },
   {
@@ -18323,36 +17705,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2827",
         "ean13": "3,10508E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2826",
         "ean13": "3,08427E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "2828",
         "ean13": "3,13054E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -18861,27 +18235,21 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2852",
         "ean13": "1,73259E+11",
         "reference": "",
         "attributes": "ROSE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "2851",
         "ean13": "1,29587E+12",
         "reference": "",
         "attributes": "MAUVE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      }
+        "finalPrice": 10}
     ]
   },
   {
@@ -20485,27 +19853,21 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "ROSE",
         "priceImpact": 0,
-        "finalPrice": 14,
-        "stock": 14
-      },
+        "finalPrice": 14},
       {
         "id": "3247",
         "ean13": "",
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 0,
-        "finalPrice": 14,
-        "stock": 14
-      },
+        "finalPrice": 14},
       {
         "id": "3248",
         "ean13": "",
         "reference": "",
         "attributes": "BEIGE",
         "priceImpact": 0,
-        "finalPrice": 14,
-        "stock": 14
-      }
+        "finalPrice": 14}
     ]
   },
   {
@@ -21563,9 +20925,7 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "Déclinaison",
         "priceImpact": 0,
-        "finalPrice": 100,
-        "stock": 100
-      }
+        "finalPrice": 100}
     ]
   },
   {
@@ -23349,54 +22709,42 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "VIOLET",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "3047",
         "ean13": "2,00295E+12",
         "reference": "",
         "attributes": "OR",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "3054",
         "ean13": "2,00777E+12",
         "reference": "",
         "attributes": "PINK",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "3053",
         "ean13": "2,06438E+12",
         "reference": "",
         "attributes": "SILVER",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "3052",
         "ean13": "2,0612E+12",
         "reference": "",
         "attributes": "OR ROSE",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      },
+        "finalPrice": 12},
       {
         "id": "3334",
         "ean13": "2,07383E+12",
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 0,
-        "finalPrice": 12,
-        "stock": 12
-      }
+        "finalPrice": 12}
     ]
   },
   {
@@ -23663,45 +23011,35 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      },
+        "finalPrice": 0.12},
       {
         "id": "3072",
         "ean13": "2,0889E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      },
+        "finalPrice": 0.12},
       {
         "id": "3073",
         "ean13": "2,0155E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      },
+        "finalPrice": 0.12},
       {
         "id": "3074",
         "ean13": "2,09346E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      },
+        "finalPrice": 0.12},
       {
         "id": "3075",
         "ean13": "2,01781E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 0.12,
-        "stock": 0
-      }
+        "finalPrice": 0.12}
     ]
   },
   {
@@ -24444,54 +23782,42 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 62,
-        "stock": 62
-      },
+        "finalPrice": 62},
       {
         "id": "3099",
         "ean13": "2,07585E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 62,
-        "stock": 62
-      },
+        "finalPrice": 62},
       {
         "id": "3100",
         "ean13": "2,06184E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 62,
-        "stock": 62
-      },
+        "finalPrice": 62},
       {
         "id": "3101",
         "ean13": "2,03175E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 62,
-        "stock": 62
-      },
+        "finalPrice": 62},
       {
         "id": "3103",
         "ean13": "2,06524E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 62,
-        "stock": 62
-      },
+        "finalPrice": 62},
       {
         "id": "3102",
         "ean13": "2,05808E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 62,
-        "stock": 62
-      }
+        "finalPrice": 62}
     ]
   },
   {
@@ -24517,54 +23843,42 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3135",
         "ean13": "2,03652E+12",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3137",
         "ean13": "2,07291E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3136",
         "ean13": "2,07704E+12",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3139",
         "ean13": "2,08246E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3138",
         "ean13": "2,06554E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      }
+        "finalPrice": 59}
     ]
   },
   {
@@ -24591,36 +23905,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "3118",
         "ean13": "2,01598E+12",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "3117",
         "ean13": "2,06103E+12",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "3119",
         "ean13": "2,01254E+12",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -24646,36 +23952,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "3122",
         "ean13": "",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "3121",
         "ean13": "",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      },
+        "finalPrice": 25},
       {
         "id": "3120",
         "ean13": "",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 25,
-        "stock": 25
-      }
+        "finalPrice": 25}
     ]
   },
   {
@@ -25807,18 +25105,14 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "ROUGE",
         "priceImpact": 0,
-        "finalPrice": 6,
-        "stock": 6
-      },
+        "finalPrice": 6},
       {
         "id": "3152",
         "ean13": "2,03243E+12",
         "reference": "",
         "attributes": "ROSE",
         "priceImpact": 0,
-        "finalPrice": 6,
-        "stock": 6
-      }
+        "finalPrice": 6}
     ]
   },
   {
@@ -25912,72 +25206,56 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "XXS",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3166",
         "ean13": "",
         "reference": "",
         "attributes": "XS",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3170",
         "ean13": "",
         "reference": "",
         "attributes": "XL",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3171",
         "ean13": "",
         "reference": "",
         "attributes": "XXL",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3168",
         "ean13": "",
         "reference": "",
         "attributes": "M",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3167",
         "ean13": "",
         "reference": "",
         "attributes": "S",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3169",
         "ean13": "",
         "reference": "",
         "attributes": "L",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      },
+        "finalPrice": 59},
       {
         "id": "3172",
         "ean13": "",
         "reference": "",
         "attributes": "XXXL",
         "priceImpact": 0,
-        "finalPrice": 59,
-        "stock": 59
-      }
+        "finalPrice": 59}
     ]
   },
   {
@@ -26123,36 +25401,28 @@ export const products: Product[] = [
         "reference": "",
         "attributes": "MAUVE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "3200",
         "ean13": "",
         "reference": "",
         "attributes": "BLEU",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "3199",
         "ean13": "",
         "reference": "",
         "attributes": "ROSE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      },
+        "finalPrice": 10},
       {
         "id": "3198",
         "ean13": "",
         "reference": "",
         "attributes": "ORANGE",
         "priceImpact": 0,
-        "finalPrice": 10,
-        "stock": 10
-      }
+        "finalPrice": 10}
     ]
   },
   {
@@ -28431,4 +27701,18 @@ export const loadProductionData = (): { products: Product[]; categories: Categor
     products,
     categories
   };
+};
+
+export const saveProductionData = (newProducts: Product[], newCategories: Category[]): void => {
+  // Sauvegarder dans localStorage pour persistance
+  try {
+    localStorage.setItem('klickCaisse_categories', JSON.stringify(newCategories));
+    localStorage.setItem('klickCaisse_products', JSON.stringify(newProducts));
+    console.log('✅ Données sauvegardées dans localStorage:', { 
+      products: newProducts.length, 
+      categories: newCategories.length 
+    });
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde:', error);
+  }
 };

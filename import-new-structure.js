@@ -78,15 +78,14 @@ try {
         declinaisonsMap.set(productId, []);
       }
       
-      declinaisonsMap.get(productId).push({
-        id: variationId,
-        ean13: ean13,
-        reference: reference,
-        attributes: attributes || 'Déclinaison',
-        priceImpact: priceImpact,
-        finalPrice: 0, // Sera calculé plus tard
-        stock: stock
-      });
+             declinaisonsMap.get(productId).push({
+         id: variationId,
+         ean13: ean13,
+         reference: reference,
+         attributes: attributes || 'Déclinaison',
+         priceImpact: priceImpact,
+         finalPrice: 0 // Sera calculé plus tard
+       });
     }
   }
 
@@ -195,11 +194,38 @@ export const products: Product[] = ${JSON.stringify(products, null, 2)};
 export const categories: Category[] = ${JSON.stringify(categories, null, 2)};
 
 export const loadProductionData = (): { products: Product[]; categories: Category[] } => {
+  // Forcer le rechargement des nouvelles données (temporaire pour nettoyer le cache)
+  console.log('🔄 Forçage du rechargement des nouvelles données...');
+
+  // Nettoyer le localStorage pour forcer le rechargement
+  try {
+    localStorage.removeItem('klickCaisse_categories');
+    localStorage.removeItem('klickCaisse_products');
+    console.log('🗑️  Cache localStorage nettoyé');
+  } catch (error) {
+    console.error('❌ Erreur lors du nettoyage du cache:', error);
+  }
+
+  // Charger les nouvelles données par défaut
   console.log('📦 Chargement des nouvelles données (structure articles + déclinaisons)');
   return {
     products,
     categories
   };
+};
+
+export const saveProductionData = (newProducts: Product[], newCategories: Category[]): void => {
+  // Sauvegarder dans localStorage pour persistance
+  try {
+    localStorage.setItem('klickCaisse_categories', JSON.stringify(newCategories));
+    localStorage.setItem('klickCaisse_products', JSON.stringify(newProducts));
+    console.log('✅ Données sauvegardées dans localStorage:', { 
+      products: newProducts.length, 
+      categories: newCategories.length 
+    });
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde:', error);
+  }
 };
 `;
 
