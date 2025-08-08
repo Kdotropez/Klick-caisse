@@ -1344,6 +1344,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                             {item.product.name}
+                            {item.selectedVariation && (
+                              <Typography 
+                                component="span" 
+                                variant="body2" 
+                                sx={{ 
+                                  color: '#2196f3', 
+                                  fontWeight: 'normal',
+                                  ml: 0.5,
+                                  fontStyle: 'italic'
+                                }}
+                              >
+                                ({item.selectedVariation.attributes})
+                              </Typography>
+                            )}
                           </Typography>
                           <IconButton
                             size="small"
