@@ -4,6 +4,7 @@ import CSVImport from './components/CSVImport';
 import WindowManager from './components/WindowManager';
 import { Product, Category, CartItem, ProductVariation } from './types/Product';
 import { loadProductionData, saveProductionData } from './data/productionData';
+import { StorageService } from './services/StorageService';
 
 const App: React.FC = () => {
   const [showImport, setShowImport] = useState(false); // Changé à false pour démarrer directement
@@ -19,6 +20,39 @@ const App: React.FC = () => {
     setProducts(loadedProducts);
     setCategories(loadedCategories);
   }, []);
+
+  // Migration de nettoyage sous-catégories (une seule fois)
+  useEffect(() => {
+    const MIGRATION_FLAG = 'subcats_migrated_v1';
+    if (localStorage.getItem(MIGRATION_FLAG)) return;
+    if (products.length === 0 || categories.length === 0) return;
+
+    // Nettoyer associatedCategories de tous les produits
+    const cleanedProducts = products.map(p => {
+      const ac = (p.associatedCategories || [])
+        .map(s => StorageService.sanitizeLabel(s))
+        .filter(Boolean);
+      const unique = Array.from(new Set(ac));
+      return unique.length !== (p.associatedCategories || []).length ||
+        (p.associatedCategories || []).some((v, i) => v !== unique[i])
+        ? { ...p, associatedCategories: unique }
+        : p;
+    });
+
+    // Réécrire le registre global avec nettoyage
+    const merged = StorageService.loadSubcategories();
+    StorageService.saveSubcategories(merged);
+
+    // Sauvegarder si des produits ont changé
+    const changed = cleanedProducts.some((p, idx) => p !== products[idx]);
+    if (changed) {
+      setProducts(cleanedProducts);
+      saveProductionData(cleanedProducts, categories);
+    }
+
+    localStorage.setItem(MIGRATION_FLAG, '1');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products, categories]);
 
   const handleImportComplete = (importedProducts: Product[], importedCategories: Category[]) => {
     setProducts(importedProducts);
