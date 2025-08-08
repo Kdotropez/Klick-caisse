@@ -365,12 +365,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       setPaymentMethod('');
     }, 3000);
 
-    // Vider le panier
-    cartItems.forEach(item => {
-      onRemoveItem(item.product.id, item.selectedVariation?.id || null);
-    });
+    // Mettre à jour les compteurs de ventes et vider le panier
+    onCheckout();
 
-    console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€`);
+    console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€ - Compteurs de ventes mis à jour`);
   };
 
   // Fonction pour obtenir une couleur basée sur la catégorie
@@ -1271,15 +1269,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        gap: 0.25 * scaleFactor 
                      }}>
                        <Chip 
-                         label={`${product.salesCount || 0}`} 
+                         label={`📊 ${product.salesCount || 0}`} 
                          size="small" 
                          sx={{ 
                            fontSize: `${Math.max(0.6, 0.7 * scaleFactor)}rem`, 
                            height: `${Math.max(20, 22 * scaleFactor)}px`, 
-                           backgroundColor: categoryColor, 
+                           backgroundColor: '#4CAF50', 
                            color: 'white', 
-                           fontWeight: '600', 
-                           boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
+                           fontWeight: 'bold', 
+                           boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.3)`,
+                           border: '1px solid #45a049',
+                           '&:hover': {
+                             backgroundColor: '#45a049',
+                             transform: 'scale(1.05)'
+                           }
                          }} 
                        />
                        {product.variations.length > 0 && (

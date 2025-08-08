@@ -91,9 +91,34 @@ const App: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    // TODO: Implémenter le processus de paiement
-    console.log('Paiement pour:', cartItems);
-    alert('Fonctionnalité de paiement à implémenter');
+    if (cartItems.length === 0) {
+      alert('Le panier est vide !');
+      return;
+    }
+
+    // Mettre à jour les compteurs de ventes pour chaque produit vendu
+    const updatedProducts = products.map(product => {
+      const soldItems = cartItems.filter(item => item.product.id === product.id);
+      if (soldItems.length > 0) {
+        const totalSold = soldItems.reduce((sum, item) => sum + item.quantity, 0);
+        return {
+          ...product,
+          salesCount: (product.salesCount || 0) + totalSold
+        };
+      }
+      return product;
+    });
+
+    setProducts(updatedProducts);
+    
+    // Sauvegarder les produits mis à jour
+    saveProductionData(updatedProducts, categories);
+    
+    // Vider le panier
+    setCartItems([]);
+    
+    console.log('✅ Paiement effectué - Compteurs de ventes mis à jour');
+    alert(`Paiement effectué ! ${cartItems.length} article(s) vendu(s)`);
   };
 
   const handleProductsReorder = (newProducts: Product[]) => {
