@@ -170,6 +170,23 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
     setError('');
   };
 
+  const handleToggleSubcategory = (subcategoryToToggle: string) => {
+    if (!selectedCategory) return;
+
+    let updatedSubcategories: string[];
+    
+    if (subcategories.includes(subcategoryToToggle)) {
+      // Désélectionner la sous-catégorie
+      updatedSubcategories = subcategories.filter(subcat => subcat !== subcategoryToToggle);
+    } else {
+      // Sélectionner la sous-catégorie
+      updatedSubcategories = [...subcategories, subcategoryToToggle].sort();
+    }
+
+    setSubcategories(updatedSubcategories);
+    onUpdateSubcategories(selectedCategory, updatedSubcategories);
+  };
+
   const getCategoryName = (categoryId: string): string => {
     const category = categories.find(cat => cat.id === categoryId);
     return category ? category.name : '';
@@ -243,7 +260,7 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
                 Catégorie : {getCategoryName(selectedCategory)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {subcategories.length} sous-catégorie(s) trouvée(s)
+                {subcategories.length} sous-catégorie(s) sélectionnée(s) sur {getAllExistingSubcategories().length} disponibles
               </Typography>
             </Box>
 
@@ -365,19 +382,38 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
               <Typography variant="h6" sx={{ mb: 2, color: '#666', fontWeight: 'bold' }}>
                 Toutes les sous-catégories du système
               </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Cliquez sur une sous-catégorie pour l'ajouter ou la retirer de cette catégorie
+              </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {getAllExistingSubcategories().map((subcat) => (
-                  <Chip
-                    key={subcat}
-                    label={subcat}
-                    size="small"
-                    variant="outlined"
-                    sx={{ 
-                      backgroundColor: subcategories.includes(subcat) ? '#e3f2fd' : '#f5f5f5',
-                      borderColor: subcategories.includes(subcat) ? '#1976d2' : '#ddd'
-                    }}
-                  />
-                ))}
+                {getAllExistingSubcategories().map((subcat) => {
+                  const isSelected = subcategories.includes(subcat);
+                  return (
+                    <Chip
+                      key={subcat}
+                      label={subcat}
+                      size="small"
+                      variant="outlined"
+                      onClick={() => handleToggleSubcategory(subcat)}
+                      sx={{ 
+                        backgroundColor: isSelected ? '#e3f2fd' : '#f5f5f5',
+                        borderColor: isSelected ? '#1976d2' : '#ddd',
+                        color: isSelected ? '#1976d2' : '#666',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          backgroundColor: isSelected ? '#bbdefb' : '#e8e8e8',
+                          borderColor: isSelected ? '#1565c0' : '#bbb',
+                          transform: 'scale(1.05)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                        },
+                        '&:active': {
+                          transform: 'scale(0.95)'
+                        }
+                      }}
+                    />
+                  );
+                })}
               </Box>
             </Box>
           </>
