@@ -77,6 +77,23 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Dimensions pour l'émulation 1920×1080
   const APP_BAR_HEIGHT = 64;
 
+  // Facteur d'échelle global pour réduire l'ensemble du programme de 10%
+  const GLOBAL_SCALE_FACTOR = 0.9;
+
+  // Fonction helper pour appliquer le facteur d'échelle
+  // Garder des décimales pour éviter de tomber à 0rem
+  const applyScale = (value: number) => Number((value * GLOBAL_SCALE_FACTOR).toFixed(2));
+
+  // Fonction helper pour calculer la taille de police adaptée
+  const getScaledFontSize = (baseSize: string) => {
+    const numericSize = parseFloat(baseSize);
+    const unit = baseSize.replace(/[\d.]/g, '');
+    const scaled = applyScale(numericSize);
+    // Assure une taille minimale visible
+    const safe = Math.max(scaled, 0.7);
+    return `${safe}${unit || 'rem'}`;
+  };
+
   // États pour la modale de déclinaisons
   const [variationModalOpen, setVariationModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -125,10 +142,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         id: 'products',
         title: 'Grille Produits',
         type: 'products',
-        x: 20, // Même x que la fenêtre catégories
-        y: 241, // Position pour toucher les fenêtres 5 et 6 avec gap de 1px
-        width: 800, // Largeur personnalisée
-        height: 518, // Hauteur réduite de 82px
+        x: applyScale(20), // Même x que la fenêtre catégories
+        y: applyScale(241), // Position pour toucher les fenêtres 5 et 6 avec gap de 1px
+        width: 722, // Largeur exacte observée par l'utilisateur
+        height: 466, // Hauteur exacte observée par l'utilisateur
         isMinimized: false,
         isMaximized: false,
         zIndex: 1,
@@ -137,10 +154,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          id: 'cart',
          title: 'Panier & Ticket',
          type: 'cart',
-         x: 832.33, // Position avec espacement de 10px (20 + 802.33 + 10)
-         y: 20, // Remonté de 60px (80 - 60 = 20)
-         width: 540, // Élargi d'un tiers (405 * 1.33 = 540)
-         height: 600, // Hauteur exacte mesurée
+         x: applyScale(832.33), // Position avec espacement de 10px (20 + 802.33 + 10)
+         y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
+         width: applyScale(540), // Élargi d'un tiers (405 * 1.33 = 540)
+         height: applyScale(600), // Hauteur exacte mesurée
          isMinimized: false,
          isMaximized: false,
          zIndex: 2,
@@ -149,10 +166,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           id: 'categories',
           title: 'Catégories',
           type: 'categories',
-          x: 20, // Position personnalisée - coin haut gauche de l'espace fenêtre
-          y: 20, // Remonté de 60px (80 - 60 = 20)
-          width: 802.33, // Largeur exacte mesurée
-          height: 220, // Hauteur étendue jusqu'à la grille de la fenêtre 1
+          x: applyScale(20), // Position personnalisée - coin haut gauche de l'espace fenêtre
+          y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
+          width: applyScale(802.33), // Largeur exacte mesurée
+          height: applyScale(220), // Hauteur étendue jusqu'à la grille de la fenêtre 1
           isMinimized: false,
           isMaximized: false,
           zIndex: 3,
@@ -161,10 +178,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          id: 'search',
          title: 'Modes de Règlement',
          type: 'search',
-         x: 832.33, // Même x que la fenêtre ticket
-         y: 620, // Collée à la fenêtre 2 (20 + 600 = 620)
-         width: 540, // Même largeur que le ticket élargi
-         height: 217.33, // Étirée pour se rapprocher de la fenêtre 7
+         x: applyScale(832.33), // Même x que la fenêtre ticket
+         y: applyScale(620), // Collée à la fenêtre 2 (20 + 600 = 620)
+         width: applyScale(540), // Même largeur que le ticket élargi
+         height: applyScale(217.33), // Étirée pour se rapprocher de la fenêtre 7
          isMinimized: false,
          isMaximized: false,
          zIndex: 4,
@@ -173,10 +190,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          id: 'window5',
          title: 'Fonction',
          type: 'settings',
-         x: 20, // À gauche
-         y: 760, // Remonté de 60px (820 - 60 = 760)
-         width: 401.3, // Largeur exacte mesurée
-         height: 189.33, // Hauteur exacte mesurée
+         x: applyScale(20), // À gauche
+         y: applyScale(760), // Remonté de 60px (820 - 60 = 760)
+         width: applyScale(401.3), // Largeur exacte mesurée
+         height: applyScale(189.33), // Hauteur exacte mesurée
          isMinimized: false,
          isMaximized: false,
          zIndex: 5,
@@ -185,10 +202,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          id: 'window6',
          title: 'Fenêtre Libre 2',
          type: 'free',
-         x: 431.3, // À côté de la première avec espacement (20 + 401.3 + 10)
-         y: 760, // Remonté de 60px (820 - 60 = 760)
-         width: 388.63, // Largeur ajustée par l'utilisateur
-         height: 190.66, // Hauteur ajustée par l'utilisateur
+         x: applyScale(431.3), // À côté de la première avec espacement (20 + 401.3 + 10)
+         y: applyScale(760), // Remonté de 60px (820 - 60 = 760)
+         width: applyScale(388.63), // Largeur ajustée par l'utilisateur
+         height: applyScale(190.66), // Hauteur ajustée par l'utilisateur
          isMinimized: false,
          isMaximized: false,
          zIndex: 6,
@@ -197,10 +214,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           id: 'window7',
           title: 'Fonction Stat',
           type: 'stats',
-          x: 832.33, // Même x que la fenêtre Modes de Règlement
-          y: 837.33, // Remonté de 60px (897.33 - 60 = 837.33)
-          width: 540, // Même largeur que les fenêtres au-dessus
-          height: 113, // Hauteur ajustée par l'utilisateur
+          x: applyScale(832.33), // Même x que la fenêtre Modes de Règlement
+          y: applyScale(837.33), // Remonté de 60px (897.33 - 60 = 837.33)
+          width: applyScale(540), // Même largeur que les fenêtres au-dessus
+          height: applyScale(113), // Hauteur ajustée par l'utilisateur
           isMinimized: false,
           isMaximized: false,
           zIndex: 7,
@@ -1108,28 +1125,81 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             
 
             
-            {/* Grille produits */}
-             <Box 
-               key={filterKey}
-               sx={{ 
-                 flexGrow: 1, 
-                 display: 'grid', 
-                 gridTemplateColumns: 'repeat(5, 1fr)',
-                 gridTemplateRows: 'repeat(5, 1fr)',
-                 gap: '1px',
-                 p: '1px',
-                 overflow: 'hidden',
-                 minHeight: 0,
-                 width: '800px',
-                 height: 'calc(100% - 82px)',
-                 justifyContent: 'center',
-                 alignItems: 'center'
-               }}>
-               {/* Rendu de la grille 5x5 avec navigation intégrée */}
-               {Array.from({ length: 25 }, (_, index) => {
-                 // Calculer la hauteur dynamique des cartes
-                 const cardHeight = Math.max(60, Math.floor((window.height - 100) / 5 - 1)); // 5 lignes, -1 pour le gap
-                 const cardWidth = 150;
+                         {/* Grille produits */}
+            {/* Calculer les dimensions dynamiques des cartes pour occuper le maximum d'espace */}
+            {(() => {
+              const windowWidth = window.width;
+              const windowHeight = window.height;
+              const headerHeight = 82;
+              
+              // Calculer les dimensions disponibles pour la grille selon votre logique exacte
+              // Fenêtre 1 fait 722x466 (déjà réduite de 10%)
+              // 4 gaps de 1px = 4, 2 gaps de chaque extrémité = 2, total gaps = 6
+              // 5 bordures de 1px = 5, total bordures = 5
+              // Total à soustraire = 6 + 5 = 11
+              // Largeur disponible = 722 - 11 = 711
+              // Largeur par carte = 711 / 5 = 142.2
+              
+              const totalGapsWidth = 6; // 4 gaps entre colonnes + 2 gaps aux extrémités
+              const totalBordersWidth = 5; // 5 cartes × 1px de bordure chacune
+              const totalWidthToSubtract = totalGapsWidth + totalBordersWidth; // 11px
+              
+              const totalGapsHeight = 6; // 4 gaps entre lignes + 2 gaps aux extrémités
+              const totalBordersHeight = 5; // 5 cartes × 1px de bordure chacune
+              const totalHeightToSubtract = totalGapsHeight + totalBordersHeight; // 11px
+              
+              const availableWidth = windowWidth - totalWidthToSubtract;
+              const availableHeight = windowHeight - headerHeight - totalHeightToSubtract;
+              
+              const cardWidth = Math.floor(availableWidth / 5);
+              // Calcul optimisé pour utiliser au maximum l'espace vertical disponible
+              // Fenêtre: 466px de hauteur totale
+              // Header: 82px
+              // Hauteur disponible pour la grille: 466 - 82 = 384px
+              // Pour 5 cartes de 91px: 5 × 91 = 455px
+              // Gaps et bordures: 6 + 5 = 11px
+              // Total nécessaire: 455 + 11 = 466px (parfait!)
+              // Donc on peut avoir exactement 91px par carte
+              const cardHeight = 91;
+              
+              // Logs de débogage pour vérifier les calculs
+              console.log('🔍 DEBUG - Calculs des cartes:', {
+                windowWidth,
+                windowHeight,
+                headerHeight,
+                totalWidthToSubtract,
+                totalHeightToSubtract,
+                availableWidth,
+                availableHeight,
+                cardWidth,
+                cardHeight,
+                expectedCardWidth: 142,
+                expectedCardHeight: 91,
+                totalHeightNeeded: cardHeight * 5 + totalHeightToSubtract
+              });
+              
+              return (
+                <Box 
+                  key={filterKey}
+                  sx={{ 
+                    flexGrow: 1, 
+                    display: 'grid', 
+                    gridTemplateColumns: `repeat(5, ${cardWidth}px)`,
+                    gridTemplateRows: `repeat(5, ${cardHeight}px)`,
+                    gap: '1px',
+                    p: '1px',
+                    overflow: 'hidden',
+                    minHeight: 0,
+                    width: '100%',
+                    height: '466px', // Hauteur fixe pour utiliser toute la hauteur de la fenêtre
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    boxSizing: 'border-box'
+                  }}>
+                  {/* Rendu de la grille 5x5 avec navigation intégrée */}
+                  {Array.from({ length: 25 }, (_, index) => {
+                    // Calculer un facteur d'échelle adapté aux dimensions des cartes
+                    const cardScaleFactor = Math.min(cardWidth / 150, cardHeight / 120); // Basé sur les dimensions originales
                  const position = index + 1;
                  
                  // Positions des boutons de navigation - TOUJOURS fixes
@@ -1165,6 +1235,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
                          flexShrink: 0,
                          flexGrow: 0,
+                         overflow: 'hidden',
 
                          '&:hover': {
                            backgroundColor: currentPage === 1 ? '#ccc' : '#1976d2'
@@ -1213,6 +1284,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
                          flexShrink: 0,
                          flexGrow: 0,
+                         overflow: 'hidden',
 
                          '&:hover': {
                            backgroundColor: currentPage === totalPages ? '#ccc' : '#1976d2'
@@ -1258,7 +1330,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          display: 'flex',
                          alignItems: 'center',
                          justifyContent: 'center',
-                         backgroundColor: '#f9f9f9'
+                         backgroundColor: '#f9f9f9',
+                         boxSizing: 'border-box',
+                         overflow: 'hidden'
                        }}
                      />
                    );
@@ -1287,11 +1361,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          boxShadow: `0 1px 2px rgba(0,0,0,0.1)`,
                          color: '#2c3e50',
                          fontWeight: '600',
+                         boxSizing: 'border-box',
 
                        ...(dragOverProduct?.id === product.id && {
                          transform: 'scale(1.05)',
-                         boxShadow: `0 ${8 * scaleFactor}px ${25 * scaleFactor}px rgba(0,0,0,0.3), 0 ${3 * scaleFactor}px ${8 * scaleFactor}px ${categoryColor}50`,
-                         border: `${3 * scaleFactor}px solid ${categoryColor}`,
+                         boxShadow: `0 ${8 * cardScaleFactor}px ${25 * cardScaleFactor}px rgba(0,0,0,0.3), 0 ${3 * cardScaleFactor}px ${8 * cardScaleFactor}px ${categoryColor}50`,
+                         border: `${3 * cardScaleFactor}px solid ${categoryColor}`,
                          background: `linear-gradient(135deg, ${categoryColor}20 0%, ${categoryColor}40 30%, ${categoryColor}20 70%, white 100%)`
                        }),
                        '&:hover': { 
@@ -1303,7 +1378,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        },
                        '&:active': { 
                          transform: 'translateY(0px) scale(0.98)',
-                         boxShadow: `0 ${2 * scaleFactor}px ${6 * scaleFactor}px rgba(0,0,0,0.25), 0 ${1 * scaleFactor}px ${2 * scaleFactor}px ${categoryColor}30`,
+                         boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(0,0,0,0.25), 0 ${1 * cardScaleFactor}px ${2 * cardScaleFactor}px ${categoryColor}30`,
                          background: `linear-gradient(135deg, ${categoryColor}80 0%, ${categoryColor}60 40%, ${categoryColor}30 80%, white 100%)`,
                          cursor: 'grabbing'
                        }
@@ -1326,7 +1401,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    >
                      <Typography variant="body2" sx={{ 
                        fontWeight: '600', 
-                       fontSize: `${Math.max(0.75, 0.85 * scaleFactor)}rem`, 
+                       fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`, 
                        lineHeight: 1.2, 
                        flexGrow: 1, 
                        color: '#2c3e50' 
@@ -1335,28 +1410,28 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      </Typography>
                      <Typography variant="h6" sx={{ 
                        fontWeight: 'bold', 
-                       fontSize: `${Math.max(1, 1.1 * scaleFactor)}rem`, 
+                       fontSize: `${Math.max(1, 1.1 * cardScaleFactor)}rem`, 
                        textAlign: 'center', 
                        color: categoryColor, 
-                       letterSpacing: `${0.5 * scaleFactor}px` 
+                       letterSpacing: `${0.5 * cardScaleFactor}px` 
                      }}>
                        {product.finalPrice.toFixed(2)} €
                      </Typography>
                      <Box sx={{ 
                        display: 'flex', 
                        justifyContent: 'space-between', 
-                       mt: 0.25 * scaleFactor, 
-                       gap: 0.25 * scaleFactor 
+                       mt: 0.25 * cardScaleFactor, 
+                       gap: 0.25 * cardScaleFactor 
                      }}>
-                       <Typography 
-                         variant="caption" 
-                         sx={{ 
-                           fontSize: `${Math.max(0.6, 0.7 * scaleFactor)}rem`, 
-                           color: '#666',
-                           fontWeight: '500',
-                           alignSelf: 'flex-end'
-                         }}
-                       >
+                                                <Typography 
+                           variant="caption" 
+                           sx={{ 
+                             fontSize: `${Math.max(0.6, 0.7 * cardScaleFactor)}rem`, 
+                             color: '#666',
+                             fontWeight: '500',
+                             alignSelf: 'flex-end'
+                           }}
+                         >
                          {product.salesCount || 0}
                        </Typography>
                        {product.variations.length > 0 && (
@@ -1364,12 +1439,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                            label={`${product.variations.length} var.`} 
                            size="small" 
                             sx={{ 
-                              fontSize: `${Math.max(0.6, 0.7 * scaleFactor)}rem`, 
-                              height: `${Math.max(20, 22 * scaleFactor)}px`, 
+                              fontSize: `${Math.max(0.6, 0.7 * cardScaleFactor)}rem`, 
+                              height: `${Math.max(20, 22 * cardScaleFactor)}px`, 
                               backgroundColor: '#95a5a6', 
                               color: 'white', 
                               fontWeight: '600', 
-                              boxShadow: `0 ${1 * scaleFactor}px ${3 * scaleFactor}px rgba(0,0,0,0.2)` 
+                              boxShadow: `0 ${1 * cardScaleFactor}px ${3 * cardScaleFactor}px rgba(0,0,0,0.2)` 
                             }} 
                           />
                         )}
@@ -1378,7 +1453,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 );
               })}
             </Box>
-          </Box>
+          );
+        })()}
+        </Box>
         );
 
       case 'cart':
@@ -2232,10 +2309,54 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          );
 
                            case 'settings':
-          return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
-              {/* Grille 3x4 pour les 12 boutons */}
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+          return (() => {
+            // Calcul des dimensions des boutons pour la fenêtre 5 (361x170)
+            const windowWidth = window.width; // 361px
+            const windowHeight = window.height; // 170px
+            const padding = 4; // 0.5 * 8px = 4px de padding
+            const gap = 2; // 0.25 * 8px = 2px de gap
+            
+            // Calcul pour 4 lignes de 3 boutons
+            const totalGapsWidth = 4; // 2 gaps entre colonnes + 2 gaps aux extrémités
+            const totalGapsHeight = 6; // 3 gaps entre lignes + 2 gaps aux extrémités
+            const totalPaddingWidth = 8; // 2 * 4px de padding
+            const totalPaddingHeight = 8; // 2 * 4px de padding
+            
+            const availableWidth = windowWidth - totalGapsWidth - totalPaddingWidth; // 361 - 4 - 8 = 349
+            const availableHeight = windowHeight - totalGapsHeight - totalPaddingHeight; // 170 - 6 - 8 = 156
+            
+            const buttonWidth = Math.floor(availableWidth / 3); // Math.floor(349 / 3) = 116
+            const buttonHeight = Math.floor(availableHeight / 4); // Math.floor(156 / 4) = 39
+            
+            console.log('🔍 DEBUG - Calculs des boutons fenêtre 5:', {
+              windowWidth,
+              windowHeight,
+              padding,
+              gap,
+              totalGapsWidth,
+              totalGapsHeight,
+              totalPaddingWidth,
+              totalPaddingHeight,
+              availableWidth,
+              availableHeight,
+              buttonWidth,
+              buttonHeight,
+              expectedButtonWidth: 116,
+              expectedButtonHeight: 39
+            });
+            
+            return (
+              <Box sx={{ 
+                height: '100%', 
+                display: 'grid', 
+                gridTemplateColumns: `repeat(3, ${buttonWidth}px)`,
+                gridTemplateRows: `repeat(4, ${buttonHeight}px)`,
+                gap: `${gap}px`,
+                p: 0.5,
+                boxSizing: 'border-box',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
                 <input
                   type="file"
                   accept=".csv"
@@ -2243,7 +2364,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   id="csv-import-settings"
                   onChange={handleImportCSV}
                 />
-                <label htmlFor="csv-import-settings" style={{ flex: 1, display: 'block' }}>
+                <label htmlFor="csv-import-settings" style={{ width: '100%', height: '100%', display: 'block' }}>
                   <Button
                     variant="contained"
                     component="span"
@@ -2251,10 +2372,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     sx={{ 
                       width: '100%',
                       height: '100%',
-                      fontSize: '0.7rem', 
-                      fontWeight: 'bold', 
-                      backgroundColor: importStatus === 'importing' ? '#ccc' : '#ff5722',
-                      '&:hover': { backgroundColor: importStatus === 'importing' ? '#ccc' : '#e64a19' }
+                                          fontSize: getScaledFontSize('0.5rem'), 
+                    fontWeight: 'bold', 
+                    backgroundColor: importStatus === 'importing' ? '#ccc' : '#ff5722',
+                    '&:hover': { backgroundColor: importStatus === 'importing' ? '#ccc' : '#e64a19' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                     }}
                   >
                     {importStatus === 'importing' ? 'Import...' : 'Import CSV'}
@@ -2263,11 +2389,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#795548',
-                    '&:hover': { backgroundColor: '#5d4037' }
+                    '&:hover': { backgroundColor: '#5d4037' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Bouton libre')}
                 >
@@ -2276,27 +2408,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#455a64' }
+                    '&:hover': { backgroundColor: '#455a64' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Vide 3')}
                 >
                   Vide 3
                 </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#ff4081',
-                    '&:hover': { backgroundColor: '#e91e63' }
+                    '&:hover': { backgroundColor: '#e91e63' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Vide 4')}
                 >
@@ -2305,11 +2446,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#3f51b5',
-                    '&:hover': { backgroundColor: '#303f9f' }
+                    '&:hover': { backgroundColor: '#303f9f' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Vide 5')}
                 >
@@ -2318,27 +2465,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' }
+                    '&:hover': { backgroundColor: '#388e3c' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Vide 6')}
                 >
                   Vide 6
                 </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#ff9800',
-                    '&:hover': { backgroundColor: '#f57c00' }
+                    '&:hover': { backgroundColor: '#f57c00' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Vide 7')}
                 >
@@ -2347,11 +2503,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' }
+                    '&:hover': { backgroundColor: '#7b1fa2' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Vide 8')}
                 >
@@ -2360,27 +2522,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#00bcd4',
-                    '&:hover': { backgroundColor: '#0097a7' }
+                    '&:hover': { backgroundColor: '#0097a7' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => console.log('Vide 9')}
                 >
                   Vide 9
                 </Button>
-              </Box>
-              
-                            <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#009688',
-                    '&:hover': { backgroundColor: '#00796b' }
+                    '&:hover': { backgroundColor: '#00796b' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => setShowCategoryManagementModal(true)}
                 >
@@ -2389,11 +2560,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#673ab7',
-                    '&:hover': { backgroundColor: '#5e35b1' }
+                    '&:hover': { backgroundColor: '#5e35b1' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => setShowSubcategoryManagementModal(true)}
                 >
@@ -2402,11 +2579,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.5rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: isEditMode ? '#f44336' : '#ff9800',
-                    '&:hover': { backgroundColor: isEditMode ? '#d32f2f' : '#f57c00' }
+                    '&:hover': { backgroundColor: isEditMode ? '#d32f2f' : '#f57c00' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.0,
+                    padding: '1px'
                   }}
                   onClick={() => {
                     // Basculer entre le mode vente et le mode édition
@@ -2424,8 +2607,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   {isEditMode ? 'Mode Vente' : 'Modifier Article'}
                 </Button>
               </Box>
-            </Box>
-          );
+            );
+          })()
 
                            case 'import':
           return (
@@ -2506,36 +2689,68 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             </Box>
           );
 
-              case 'stats':
-          return (
+        case 'stats':
+          return (() => {
+            // Mise à l'échelle dynamique 2 colonnes x 3 lignes
+            const windowWidth = window.width;
+            const windowHeight = window.height;
+            const padding = 4; // 0.5 * 8px
+            const gap = 2; // 0.25 * 8px
+            const cols = 2;
+            const rows = 3;
+            const totalGapsWidth = (cols - 1) * gap + 2 * gap;
+            const totalGapsHeight = (rows - 1) * gap + 2 * gap;
+            const totalPaddingWidth = 2 * padding;
+            const totalPaddingHeight = 2 * padding;
+            const usableWidth = Math.max(0, windowWidth - totalGapsWidth - totalPaddingWidth);
+            const usableHeight = Math.max(0, windowHeight - totalGapsHeight - totalPaddingHeight);
+            const cellWidth = usableWidth / cols;
+            const cellHeight = usableHeight / rows;
+            const buttonSize = Math.min(cellWidth, cellHeight);
+            const fontPx = Math.max(11, Math.floor(buttonSize * 0.18));
+            const buttonFont = `${(fontPx / 16).toFixed(2)}rem`;
+            const commonButtonSx = {
+              flex: 1,
+              height: '100%',
+              fontSize: buttonFont,
+              fontWeight: 'bold',
+              color: '#fff',
+              textTransform: 'none' as const,
+              lineHeight: 1.2,
+              padding: '4px',
+              overflow: 'hidden',
+              whiteSpace: 'normal' as const,
+              wordBreak: 'break-word' as const,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center' as const,
+            };
+            return (
             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
               {/* Grille 2x3 pour les 6 boutons de fonction */}
               <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
+                    ...commonButtonSx,
                     backgroundColor: '#2196f3',
-                    '&:hover': { backgroundColor: '#1976d2' }
+                    '&:hover': { backgroundColor: '#1976d2' },
                   }}
                   onClick={() => setShowDailyReportModal(true)}
                 >
-                  Rapport Journalier
+                  Rapport
                 </Button>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
+                    ...commonButtonSx,
                     backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' }
+                    '&:hover': { backgroundColor: '#388e3c' },
                   }}
-                  onClick={() => console.log('Fonction 2')}
+                  onClick={() => openGlobalDiscountModal()}
                 >
-                  Fonction 2
+                  Remise
                 </Button>
               </Box>
               
@@ -2543,24 +2758,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
+                    ...commonButtonSx,
                     backgroundColor: '#ff9800',
-                    '&:hover': { backgroundColor: '#f57c00' }
+                    '&:hover': { backgroundColor: '#f57c00' },
                   }}
-                  onClick={() => console.log('Fonction 3')}
+                  onClick={() => setIsEditMode(!isEditMode)}
                 >
-                  Fonction 3
+                  Édition
                 </Button>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
+                    ...commonButtonSx,
                     backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' }
+                    '&:hover': { backgroundColor: '#7b1fa2' },
                   }}
                   onClick={() => console.log('Fonction 4')}
                 >
@@ -2572,11 +2783,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
+                    ...commonButtonSx,
                     backgroundColor: '#e91e63',
-                    '&:hover': { backgroundColor: '#c2185b' }
+                    '&:hover': { backgroundColor: '#c2185b' },
                   }}
                   onClick={() => console.log('Fonction 5')}
                 >
@@ -2585,11 +2794,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.8rem', 
-                    fontWeight: 'bold', 
+                    ...commonButtonSx,
                     backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#455a64' }
+                    '&:hover': { backgroundColor: '#455a64' },
                   }}
                   onClick={() => console.log('Fonction 6')}
                 >
@@ -2597,7 +2804,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 </Button>
               </Box>
             </Box>
-          );
+            );
+          })();
 
         case 'subcategories':
           return (
@@ -2657,27 +2865,71 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           );
 
         case 'free':
-          return (
-            <Box sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              p: 0.5, 
-              gap: 0.25,
-              backgroundColor: window.id === 'window8' ? '#e8f5e8' : 'transparent',
-              border: window.id === 'window8' ? '2px solid #4caf50' : 'none',
-              borderRadius: window.id === 'window8' ? '8px' : '0px'
-            }}>
-              {/* Grille 3x4 pour les 12 boutons */}
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+          return (() => {
+            // Calcul des dimensions des boutons pour la fenêtre 6 (361x170)
+            const windowWidth = window.width; // 361px
+            const windowHeight = window.height; // 170px
+            const padding = 4; // 0.5 * 8px = 4px de padding
+            const gap = 2; // 0.25 * 8px = 2px de gap
+            
+            // Calcul pour 4 lignes de 3 boutons (12 boutons total)
+            const totalGapsWidth = 4; // 2 gaps entre colonnes + 2 gaps aux extrémités
+            const totalGapsHeight = 6; // 3 gaps entre lignes + 2 gaps aux extrémités
+            const totalPaddingWidth = 8; // 2 * 4px de padding
+            const totalPaddingHeight = 8; // 2 * 4px de padding
+            
+            const availableWidth = windowWidth - totalGapsWidth - totalPaddingWidth; // 361 - 4 - 8 = 349
+            const availableHeight = windowHeight - totalGapsHeight - totalPaddingHeight; // 170 - 6 - 8 = 156
+            
+            const buttonWidth = Math.floor(availableWidth / 3); // Math.floor(349 / 3) = 116
+            const buttonHeight = Math.floor(availableHeight / 4); // Math.floor(156 / 4) = 39
+            
+            console.log('🔍 DEBUG - Calculs des boutons fenêtre 6:', {
+              windowWidth,
+              windowHeight,
+              padding,
+              gap,
+              totalGapsWidth,
+              totalGapsHeight,
+              totalPaddingWidth,
+              totalPaddingHeight,
+              availableWidth,
+              availableHeight,
+              buttonWidth,
+              buttonHeight,
+              expectedButtonWidth: 116,
+              expectedButtonHeight: 39
+            });
+            
+            return (
+              <Box sx={{ 
+                height: '100%', 
+                display: 'grid', 
+                gridTemplateColumns: `repeat(3, ${buttonWidth}px)`,
+                gridTemplateRows: `repeat(4, ${buttonHeight}px)`,
+                gap: `${gap}px`,
+                p: 0.5,
+                boxSizing: 'border-box',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: window.id === 'window8' ? '#e8f5e8' : 'transparent',
+                border: window.id === 'window8' ? '2px solid #4caf50' : 'none',
+                borderRadius: window.id === 'window8' ? '8px' : '0px'
+              }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#f44336',
-                    '&:hover': { backgroundColor: '#d32f2f' }
+                    '&:hover': { backgroundColor: '#d32f2f' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 1')}
                 >
@@ -2686,11 +2938,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#e91e63',
-                    '&:hover': { backgroundColor: '#c2185b' }
+                    '&:hover': { backgroundColor: '#c2185b' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 2')}
                 >
@@ -2699,27 +2957,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' }
+                    '&:hover': { backgroundColor: '#7b1fa2' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 3')}
                 >
                   Libre 3
                 </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#673ab7',
-                    '&:hover': { backgroundColor: '#512da8' }
+                    '&:hover': { backgroundColor: '#512da8' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 4')}
                 >
@@ -2728,11 +2995,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#3f51b5',
-                    '&:hover': { backgroundColor: '#303f9f' }
+                    '&:hover': { backgroundColor: '#303f9f' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 5')}
                 >
@@ -2741,27 +3014,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#2196f3',
-                    '&:hover': { backgroundColor: '#1976d2' }
+                    '&:hover': { backgroundColor: '#1976d2' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 6')}
                 >
                   Libre 6
                 </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#03a9f4',
-                    '&:hover': { backgroundColor: '#0288d1' }
+                    '&:hover': { backgroundColor: '#0288d1' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 7')}
                 >
@@ -2770,11 +3052,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#00bcd4',
-                    '&:hover': { backgroundColor: '#0097a7' }
+                    '&:hover': { backgroundColor: '#0097a7' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 8')}
                 >
@@ -2783,27 +3071,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#009688',
-                    '&:hover': { backgroundColor: '#00796b' }
+                    '&:hover': { backgroundColor: '#00796b' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 9')}
                 >
                   Libre 9
                 </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' }
+                    '&:hover': { backgroundColor: '#388e3c' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 10')}
                 >
@@ -2812,11 +3109,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#8bc34a',
-                    '&:hover': { backgroundColor: '#689f38' }
+                    '&:hover': { backgroundColor: '#689f38' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 11')}
                 >
@@ -2825,19 +3128,25 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant="contained"
                   sx={{ 
-                    flex: 1,
-                    fontSize: '0.7rem', 
+                    width: '100%',
+                    height: '100%',
+                    fontSize: getScaledFontSize('0.65rem'), 
                     fontWeight: 'bold', 
                     backgroundColor: '#cddc39',
-                    '&:hover': { backgroundColor: '#afb42b' }
+                    '&:hover': { backgroundColor: '#afb42b' },
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
+                    textTransform: 'none',
+                    lineHeight: 1.1,
+                    padding: '2px'
                   }}
                   onClick={() => console.log('Libre 12')}
                 >
                   Libre 12
                 </Button>
               </Box>
-            </Box>
-          );
+            );
+          })();
 
 
 
