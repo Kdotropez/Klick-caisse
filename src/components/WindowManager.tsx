@@ -144,7 +144,28 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [filterAmountMax, setFilterAmountMax] = useState<string>('');
   const [filterAmountExact, setFilterAmountExact] = useState<string>('');
   const [filterProductText, setFilterProductText] = useState<string>('');
+  // Tickets globaux (toutes sauvegardes)
+  const [showGlobalTickets, setShowGlobalTickets] = useState(false);
+  const [globalFilterPayment, setGlobalFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup'>('all');
+  const [globalAmountMin, setGlobalAmountMin] = useState<string>('');
+  const [globalAmountMax, setGlobalAmountMax] = useState<string>('');
+  const [globalAmountExact, setGlobalAmountExact] = useState<string>('');
+  const [globalProductText, setGlobalProductText] = useState<string>('');
+  const [globalDateFrom, setGlobalDateFrom] = useState<string>(''); // yyyy-mm-dd
+  const [globalDateTo, setGlobalDateTo] = useState<string>('');
+  const [globalTimeFrom, setGlobalTimeFrom] = useState<string>(''); // HH:MM
+  const [globalTimeTo, setGlobalTimeTo] = useState<string>('');
+  const [globalSelectedIds, setGlobalSelectedIds] = useState<Set<string>>(new Set());
+  const [globalOnlyToday, setGlobalOnlyToday] = useState<boolean>(false);
+  // Expansion des lignes (détails des tickets)
+  const [expandedDayTicketIds, setExpandedDayTicketIds] = useState<Set<string>>(new Set());
+  const [expandedGlobalTicketIds, setExpandedGlobalTicketIds] = useState<Set<string>>(new Set());
+  const [daySelectedIds, setDaySelectedIds] = useState<Set<string>>(new Set());
   const [productSortMode, setProductSortMode] = useState<'sales' | 'name'>('sales');
+  // Éditeur pour un ticket sélectionné dans Tickets globaux
+  const [showGlobalEditor, setShowGlobalEditor] = useState(false);
+  const [globalEditorDraft, setGlobalEditorDraft] = useState<any | null>(null);
+  const [globalEditorIsToday, setGlobalEditorIsToday] = useState<boolean>(false);
 
   // Compteur quotidien par produit (toutes variations confondues)
   const dailyQtyByProduct = useMemo(() => {
@@ -2874,23 +2895,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   variant="contained"
                   sx={{ 
                     ...commonButtonSx,
-                    backgroundColor: '#455a64',
-                    '&:hover': { backgroundColor: '#37474f' },
-                  }}
-                  onClick={() => setShowTransactionHistory(true)}
-                >
-                  Tickets jour
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
                     backgroundColor: '#9e9e9e',
                     '&:hover': { backgroundColor: '#757575' },
                   }}
-                  onClick={() => console.log('Libre')}
+                  onClick={() => { setGlobalOnlyToday(false); setShowGlobalTickets(true); }}
                 >
-                  Libre
+                  Tickets globaux
                 </Button>
               </Box>
               
@@ -3454,7 +3464,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             <TextField size="small" label="Montant max" value={filterAmountMax} onChange={(e) => setFilterAmountMax(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
             <TextField size="small" label="Montant exact" value={filterAmountExact} onChange={(e) => setFilterAmountExact(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
           </Box>
-          <TextField size="small" fullWidth label="Contient produit" value={filterProductText} onChange={(e) => setFilterProductText(e.target.value)} sx={{ mb: 1 }} />
+          <TextField size="small" fullWidth label="Contient article" value={filterProductText} onChange={(e) => setFilterProductText(e.target.value)} sx={{ mb: 1 }} />
 
           <List dense>
             {todayTransactions
@@ -3471,9 +3481,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 if (!Number.isNaN(min) && amount < min) return false;
                 if (!Number.isNaN(max) && amount > max) return false;
                 if (filterProductText.trim()) {
-                  const needle = filterProductText.toLowerCase();
+                  const needle = StorageService.normalizeLabel(filterProductText);
                   const items = Array.isArray(t.items) ? t.items : [];
-                  const has = items.some(it => it.product.name.toLowerCase().includes(needle));
+                  const has = items.some(it => StorageService.normalizeLabel(it.product.name).includes(needle));
                   if (!has) return false;
                 }
                 return true;
@@ -3481,24 +3491,29 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               .map(t => {
                 const firstName = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
                 const qty = Array.isArray(t.items) ? t.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
+                const toggleSelect = (tid: string) => {
+                  setDaySelectedIds(prev => {
+                    const next = new Set(prev);
+                    if (next.has(tid)) next.delete(tid); else next.add(tid);
+                    return next;
+                  });
+                };
                 return (
                   <ListItem key={t.id} sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1 }}>
                     <Box sx={{
                       display: 'grid',
-                      gridTemplateColumns: '90px 98px 72px 48px 12px 1fr 120px auto auto',
+                      gridTemplateColumns: '26px 84px 120px 110px 86px auto auto',
                       alignItems: 'center',
-                      gap: 1,
+                      gap: 0.5,
                       width: '100%'
                     }}>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#666' }}>#{t.id.slice(-6)}</Typography>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp as any).toLocaleDateString('fr-FR')}</Typography>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp as any).toLocaleTimeString('fr-FR')}</Typography>
-                      <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace' }}>{qty}</Typography>
-                      <Typography variant="body2">x</Typography>
-                      <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{firstName}</Typography>
-                      <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
-                      <Button size="small" variant="outlined" onClick={() => console.log('Libre')}>Modifier</Button>
-                      <Button size="small" color="error" onClick={() => {
+                      <input type="checkbox" checked={daySelectedIds.has(String(t.id))} onChange={() => toggleSelect(String(t.id))} />
+                      <Typography noWrap variant="caption" onClick={() => setExpandedDayTicketIds(prev => { const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next; })} sx={{ fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer' }}>#{t.id.slice(-6)}</Typography>
+                      <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp as any).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} {new Date(t.timestamp as any).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</Typography>
+                      <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>{`${qty} article${qty>1?'s':''}`}</Typography>
+                      <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
+                      <Button size="small" variant="outlined" sx={{ minWidth: 64, px: 1 }} onClick={() => console.log('Libre')}>Modif</Button>
+                      <Button size="small" color="error" sx={{ minWidth: 64, px: 1 }} onClick={() => {
                         if (!window.confirm('Inverser les ventes de ce ticket (retour) ?')) return;
                         const inverse = {
                           ...t,
@@ -3509,8 +3524,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                         } as any;
                         StorageService.addDailyTransaction(inverse);
                         setTodayTransactions(StorageService.loadTodayTransactions());
-                      }}>Inverser</Button>
+                      }}>Inv</Button>
                     </Box>
+                    {expandedDayTicketIds.has(String(t.id)) && (
+                      <Box sx={{ mt: 0.5, ml: 1 }}>
+                        {(Array.isArray(t.items)?t.items:[]).map((it:any) => (
+                          <Box key={it.product.id} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, pl: 1 }}>
+                            <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
+                            <Typography variant="caption">x</Typography>
+                            <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
+                            <Typography variant="caption" sx={{ minWidth: 90, textAlign: 'right', fontFamily: 'monospace' }}>{(it.quantity * (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice)).toFixed(2)} €</Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    )}
                   </ListItem>
                 );
               })}
@@ -3537,8 +3564,295 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           </List>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowTransactionHistory(false)}>Fermer</Button>
-          <Button color="error" onClick={() => { StorageService.clearTodayTransactions(); setTodayTransactions([]); }}>Vider</Button>
+          <Button onClick={() => { setShowTransactionHistory(false); setDaySelectedIds(new Set()); }}>Fermer</Button>
+          <Button color="error" variant="contained" disabled={daySelectedIds.size===0} onClick={() => {
+            const now = new Date();
+            const expected = `${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}`; // jjmm
+            const code = prompt('code ?');
+            if (code !== expected) return;
+            Array.from(daySelectedIds).forEach((tid) => {
+              try { StorageService.deleteDailyTransaction(String(tid)); } catch {}
+            });
+            setTodayTransactions(StorageService.loadTodayTransactions());
+            setDaySelectedIds(new Set());
+            alert('Tickets du jour supprimés.');
+          }}>Supprimer sélection</Button>
+          <Button color="error" onClick={() => { StorageService.clearTodayTransactions(); setTodayTransactions([]); setDaySelectedIds(new Set()); }}>Vider</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modale tickets globaux (toutes clôtures cumulées) */}
+      <Dialog open={showGlobalTickets} onClose={() => setShowGlobalTickets(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Tickets globaux</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 0.5, mb: 1 }}>
+            <Button size="small" variant={globalFilterPayment==='all'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('all')}>Tous</Button>
+            <Button size="small" variant={globalFilterPayment==='cash'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('cash')}>Espèces</Button>
+            <Button size="small" variant={globalFilterPayment==='card'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('card')}>Carte</Button>
+            <Button size="small" variant={globalFilterPayment==='sumup'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('sumup')}>SumUp</Button>
+            <Button size="small" variant={globalOnlyToday?'contained':'outlined'} onClick={() => setGlobalOnlyToday(v=>!v)}>Aujourd'hui</Button>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, mb: 1 }}>
+            <TextField size="small" label="Montant min" value={globalAmountMin} onChange={(e) => setGlobalAmountMin(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
+            <TextField size="small" label="Montant max" value={globalAmountMax} onChange={(e) => setGlobalAmountMax(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
+            <TextField size="small" label="Montant exact" value={globalAmountExact} onChange={(e) => setGlobalAmountExact(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.5, mb: 1 }}>
+            <TextField size="small" type="date" label="Date de" value={globalDateFrom} onChange={(e) => setGlobalDateFrom(e.target.value)} InputLabelProps={{ shrink: true }} />
+            <TextField size="small" type="date" label="Date à" value={globalDateTo} onChange={(e) => setGlobalDateTo(e.target.value)} InputLabelProps={{ shrink: true }} />
+            <TextField size="small" type="time" label="Heure de" value={globalTimeFrom} onChange={(e) => setGlobalTimeFrom(e.target.value)} InputLabelProps={{ shrink: true }} />
+            <TextField size="small" type="time" label="Heure à" value={globalTimeTo} onChange={(e) => setGlobalTimeTo(e.target.value)} InputLabelProps={{ shrink: true }} />
+          </Box>
+          <TextField size="small" fullWidth label="Contient article" value={globalProductText} onChange={(e) => setGlobalProductText(e.target.value)} sx={{ mb: 1 }} />
+
+          {(() => {
+            // Aplatir toutes les transactions de toutes clôtures + inclure celles du jour
+            const allClosures = StorageService.loadClosures();
+            const allTx: any[] = [];
+            for (const c of allClosures) {
+              const txs = Array.isArray(c.transactions) ? c.transactions : [];
+              for (const t of txs) allTx.push(t);
+            }
+            // Ajouter les tickets du jour
+            const todayTxs = StorageService.loadTodayTransactions();
+            for (const t of todayTxs) allTx.push(t);
+            // Si "Aujourd'hui" est activé, borner la date au jour courant
+            if (globalOnlyToday) {
+              const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+              const todayEnd = new Date(); todayEnd.setHours(23,59,59,999);
+              const onlyToday = allTx.filter((t: any) => {
+                const ts = new Date(t.timestamp);
+                return ts >= todayStart && ts <= todayEnd;
+              });
+              // Filtrer sur place
+              allTx.length = 0; onlyToday.forEach(x => allTx.push(x));
+            }
+            const filtered = allTx.filter((t: any) => {
+              const m = String(t.paymentMethod || '').toLowerCase();
+              if (globalFilterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
+              if (globalFilterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
+              if (globalFilterPayment === 'sumup' && m!=='sumup') return false;
+              const amount = t.total || 0;
+              const min = parseFloat(globalAmountMin || 'NaN');
+              const max = parseFloat(globalAmountMax || 'NaN');
+              const exact = parseFloat(globalAmountExact || 'NaN');
+              if (!Number.isNaN(exact) && Math.abs(amount - exact) > 0.009) return false;
+              if (!Number.isNaN(min) && amount < min) return false;
+              if (!Number.isNaN(max) && amount > max) return false;
+              if (globalProductText.trim()) {
+                const needle = StorageService.normalizeLabel(globalProductText);
+                const items = Array.isArray(t.items) ? t.items : [];
+                if (!items.some((it: any) => StorageService.normalizeLabel(it.product.name).includes(needle))) return false;
+              }
+              const ts = new Date(t.timestamp);
+              if (globalDateFrom) {
+                const dfrom = new Date(globalDateFrom + 'T00:00:00');
+                if (ts < dfrom) return false;
+              }
+              if (globalDateTo) {
+                const dto = new Date(globalDateTo + 'T23:59:59');
+                if (ts > dto) return false;
+              }
+              if (globalTimeFrom) {
+                const [h,m] = globalTimeFrom.split(':').map(Number);
+                const tf = new Date(ts); tf.setHours(h||0, m||0, 0, 0);
+                if (ts < tf) return false;
+              }
+              if (globalTimeTo) {
+                const [h,m] = globalTimeTo.split(':').map(Number);
+                const tt = new Date(ts); tt.setHours(h||23, m||59, 59, 999);
+                if (ts > tt) return false;
+              }
+              return true;
+            });
+
+            const toggleSelect = (tid: string) => {
+              setGlobalSelectedIds(prev => {
+                const next = new Set(prev);
+                if (next.has(tid)) next.delete(tid); else next.add(tid);
+                return next;
+              });
+            };
+
+
+            return (
+              <List dense>
+                {filtered.map((t: any) => {
+                  const qty = Array.isArray(t.items) ? t.items.reduce((s: number, it: any) => s + (it.quantity || 0), 0) : 0;
+                  const name = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
+                  const isEx = expandedGlobalTicketIds.has(String(t.id));
+                  return (
+                    <ListItem key={`${t.id}-${t.timestamp}`} sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1 }}>
+                      <Box sx={{ display: 'grid', gridTemplateColumns: '26px 84px 120px 110px 86px', alignItems: 'center', gap: 0.5, width: '100%' }}>
+                        <input type="checkbox" checked={globalSelectedIds.has(String(t.id))} onChange={() => toggleSelect(String(t.id))} />
+                        <Typography noWrap variant="caption" onClick={() => setExpandedGlobalTicketIds(prev=>{const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next;})} sx={{ fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer' }}>#{String(t.id).slice(-6)}</Typography>
+                        <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} {new Date(t.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</Typography>
+                        <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>{`${qty} article${qty>1?'s':''}`}</Typography>
+                        <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
+                      </Box>
+                      {isEx && (
+                        <Box sx={{ mt: 0.5, ml: 1 }}>
+                          {(Array.isArray(t.items)?t.items:[]).map((it:any) => (
+                            <Box key={it.product.id} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, pl: 1 }}>
+                              <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
+                              <Typography variant="caption">x</Typography>
+                              <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
+                              <Typography variant="caption" sx={{ minWidth: 90, textAlign: 'right', fontFamily: 'monospace' }}>{(it.quantity * (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice)).toFixed(2)} €</Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      )}
+                    </ListItem>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>Aucun ticket pour ces filtres</Box>
+                )}
+              </List>
+            );
+          })()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowGlobalTickets(false)}>Fermer</Button>
+          <Button disabled={globalSelectedIds.size!==1} onClick={() => {
+            const [tid] = Array.from(globalSelectedIds);
+            // rechercher dans jour puis archives
+            const todays = StorageService.loadTodayTransactions();
+            let tx: any = todays.find(t => String(t.id) === String(tid));
+            let isToday = !!tx;
+            if (!tx) {
+              const closures = StorageService.loadClosures();
+              outer: for (const c of closures) {
+                const arr = Array.isArray(c.transactions) ? c.transactions : [];
+                const found = arr.find((t: any) => String(t.id) === String(tid));
+                if (found) { tx = found; break outer; }
+              }
+            }
+            if (!tx) return;
+            const draft = { ...tx, items: (Array.isArray(tx.items)?tx.items:[]).map((it:any)=>({ ...it })) };
+            setGlobalEditorDraft(draft);
+            setGlobalEditorIsToday(!!isToday);
+            setShowGlobalEditor(true);
+          }}>Modifier</Button>
+          <Button disabled={globalSelectedIds.size!==1} onClick={() => {
+            const [tid] = Array.from(globalSelectedIds);
+            const todays = StorageService.loadTodayTransactions();
+            let tx: any = todays.find(t => String(t.id) === String(tid));
+            if (!tx) {
+              const closures = StorageService.loadClosures();
+              outer: for (const c of closures) {
+                const arr = Array.isArray(c.transactions) ? c.transactions : [];
+                const found = arr.find((t: any) => String(t.id) === String(tid));
+                if (found) { tx = found; break outer; }
+              }
+            }
+            if (!tx) return;
+            if (!window.confirm('Inverser les ventes de ce ticket (retour) ?')) return;
+            const inverse: any = {
+              ...tx,
+              id: `${tx.id}-R-${Date.now().toString().slice(-4)}`,
+              total: -Math.abs(tx.total||0),
+              items: (Array.isArray(tx.items)?tx.items:[]).map((it:any) => ({ ...it, quantity: -Math.abs(it.quantity||0) })),
+              timestamp: new Date(),
+            };
+            StorageService.addDailyTransaction(inverse);
+            setTodayTransactions(StorageService.loadTodayTransactions());
+            alert('Ticket inversé et ajouté aux tickets du jour.');
+          }}>Inverser</Button>
+          <Button color="error" variant="contained" disabled={globalSelectedIds.size===0} onClick={() => {
+            const now = new Date();
+            const expected = `${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}`; // jjmm
+            const code = prompt('code ?');
+            if (code !== expected) return;
+            const closures = StorageService.loadClosures();
+            const selected = new Set(globalSelectedIds);
+            // 1) Nettoyer les archives
+            const updated = closures.map(c => {
+              const txs = Array.isArray(c.transactions) ? c.transactions : [];
+              const keep = txs.filter((t: any) => !selected.has(String(t.id)));
+              return { ...c, transactions: keep };
+            });
+            StorageService.saveAllClosures(updated);
+            // 2) Supprimer aussi des tickets du jour
+            Array.from(selected).forEach((tid) => {
+              try { StorageService.deleteDailyTransaction(String(tid)); } catch {}
+            });
+            setTodayTransactions(StorageService.loadTodayTransactions());
+            setGlobalSelectedIds(new Set());
+            alert('Tickets supprimés définitivement.');
+          }}>Supprimer sélection</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Éditeur d'un ticket depuis Tickets globaux */}
+      <Dialog open={showGlobalEditor} onClose={() => setShowGlobalEditor(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Modifier ticket</DialogTitle>
+        <DialogContent>
+          {globalEditorDraft && (
+            <List dense>
+              {globalEditorDraft.items.map((it: any, idx: number) => {
+                const unitPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+                return (
+                  <ListItem key={it.product.id + '-' + idx} sx={{ py: 0.25 }}
+                    secondaryAction={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <IconButton size="small" onClick={() => setGlobalEditorDraft((prev: any) => {
+                          const d = { ...prev, items: prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: Math.max(0, (x.quantity||0)-1) } : x) };
+                          return d;
+                        })}><Remove fontSize="small" /></IconButton>
+                        <Typography variant="caption" sx={{ fontFamily: 'monospace', minWidth: 20, textAlign: 'center' }}>{it.quantity}</Typography>
+                        <IconButton size="small" onClick={() => setGlobalEditorDraft((prev: any) => {
+                          const d = { ...prev, items: prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: (x.quantity||0)+1 } : x) };
+                          return d;
+                        })}><Add fontSize="small" /></IconButton>
+                        <IconButton size="small" color="error" onClick={() => setGlobalEditorDraft((prev:any) => {
+                          const d = { ...prev, items: prev.items.filter((_:any,i:number)=> i!==idx) };
+                          return d;
+                        })}>✕</IconButton>
+                      </Box>
+                    }
+                  >
+                    <ListItemText
+                      primary={it.product.name}
+                      secondary={`${it.quantity} x ${unitPrice.toFixed(2)} € = ${(it.quantity*unitPrice).toFixed(2)} €`}
+                    />
+                  </ListItem>
+                );
+              })}
+              {globalEditorDraft.items.length===0 && (
+                <ListItem><ListItemText primary="Ticket vide" /></ListItem>
+              )}
+            </List>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowGlobalEditor(false)}>Annuler</Button>
+          <Button variant="contained" onClick={() => {
+            if (!globalEditorDraft) return;
+            const total = (globalEditorDraft.items || []).reduce((s:number, it:any) => {
+              const up = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+              return s + (up * (it.quantity||0));
+            }, 0);
+            const updated = { ...globalEditorDraft, total };
+            if (globalEditorIsToday) {
+              StorageService.updateDailyTransaction(updated);
+              setTodayTransactions(StorageService.loadTodayTransactions());
+            } else {
+              const closures = StorageService.loadClosures();
+              const newClosures = closures.map(c => {
+                const arr = Array.isArray(c.transactions) ? c.transactions : [];
+                const idx = arr.findIndex((t:any) => t.id === updated.id);
+                if (idx >= 0) {
+                  const copy = [...arr];
+                  copy[idx] = updated;
+                  return { ...c, transactions: copy };
+                }
+                return c;
+              });
+              StorageService.saveAllClosures(newClosures);
+            }
+            setShowGlobalEditor(false);
+          }}>Enregistrer</Button>
         </DialogActions>
       </Dialog>
 

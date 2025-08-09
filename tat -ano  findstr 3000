@@ -1,0 +1,5 @@
+[33m9d8338e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: Suppression de la notification de paiement - interface plus épurée
+[33m3ab8dae[m fix: Correction de l'erreur TypeScript pour le positionnement de la notification de paiement
+[33m54ae95c[m feat: Remplacement du message localhost par une notification éphémère au centre de l'écran pour la confirmation de paiement
+[33mb3a3b4d[m feat: Ajout de la sélection/désélection des sous-catégories par clic
+[33m70b38a8[m feat: Ajout de la modale de gestion des sous-catégories et amélioration du mode édition

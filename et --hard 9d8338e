@@ -1,0 +1,20 @@
+[33m7645224[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: Fenêtres 5 et 6 corrigées - structure uniforme 2x3 avec boutons responsives identiques
+[33m30708cb[m feat: Fenêtres 5 et 6 adaptées comme la fenêtre 1 - boutons responsives avec dimensions calculées dynamiquement
+[33m48b4101[m feat: Texte des cartes sur 3 lignes maximum avec adaptation automatique
+[33m6f7e049[m feat: Grille 5x5 responsive avec cartes adaptatives - les cartes occupent tout l'espace disponible
+[33m71bd004[m test: Adaptation des fenêtres et cartes produits au système responsive
+[33m1f8274c[m test: Adaptation des boutons de la barre d'outils au système responsive
+[33m8f2464f[m test: Ajout d'un composant de test pour vérifier le système responsive
+[33m987942f[m fix: Export du type ResponsiveConfig pour corriger l'erreur TypeScript
+[33md1bff77[m feat: Implémentation du système responsive - première étape avec hook et contexte
+[33m9d8338e[m feat: Suppression de la notification de paiement - interface plus épurée
+[33m3ab8dae[m fix: Correction de l'erreur TypeScript pour le positionnement de la notification de paiement
+[33m54ae95c[m feat: Remplacement du message localhost par une notification éphémère au centre de l'écran pour la confirmation de paiement
+[33mb3a3b4d[m feat: Ajout de la sélection/désélection des sous-catégories par clic
+[33m70b38a8[m feat: Ajout de la modale de gestion des sous-catégories et amélioration du mode édition
+[33mc718f74[m feat: Implémentation du compteur de ventes journalières - Mise à jour automatique lors des paiements, affichage amélioré
+[33mb977484[m feat: Amélioration complète de la gestion des catégories - Suppression avec redirection vers 'À classer', couleurs de police adaptatives, couleurs uniques par défaut
+[33mfcd0d74[m feat: Amélioration de la gestion des catégories - Ajout du réordonnancement et correction des couleurs de fond
+[33mf4ebcf0[m feat: Ajout du bouton Reset dans la fenêtre 3 - Efface toutes les recherches et réinitialise l'affichage
+[33ma9f1728[m fix: Affichage des attributs de déclinaison dans le panier - Ajout de l'attribut entre parenthèses
+[33m9e29373[m fix: Correction de la sélection des déclinaisons - Ajout de logs et fermeture automatique de la modale
