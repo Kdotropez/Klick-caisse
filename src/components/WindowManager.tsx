@@ -233,6 +233,51 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setCategoriesVersion(prev => prev + 1);
     console.log('🔄 Version des catégories mise à jour:', categoriesVersion + 1);
   }, [categories]);
+  
+  // Écouteur global pour les codes-barres
+  useEffect(() => {
+    let barcodeBuffer = '';
+    let barcodeTimeout: NodeJS.Timeout;
+    
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ignorer si on est dans un champ de saisie
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      
+      // Ajouter le caractère au buffer
+      barcodeBuffer += e.key;
+      
+      // Réinitialiser le timeout
+      clearTimeout(barcodeTimeout);
+      
+      // Si on a 13 chiffres, traiter comme un code-barres
+      if (barcodeBuffer.length === 13 && /^\d{13}$/.test(barcodeBuffer)) {
+        console.log(`🎯 Code-barres détecté globalement: ${barcodeBuffer}`);
+        e.preventDefault();
+        e.stopPropagation();
+        handleBarcodeScan(barcodeBuffer);
+        barcodeBuffer = '';
+      } else if (barcodeBuffer.length > 13) {
+        // Buffer trop long, réinitialiser
+        barcodeBuffer = '';
+      } else {
+        // Attendre plus de caractères
+        barcodeTimeout = setTimeout(() => {
+          barcodeBuffer = '';
+        }, 100); // 100ms de délai entre les caractères
+      }
+    };
+    
+    // Ajouter l'écouteur global
+    document.addEventListener('keypress', handleKeyPress);
+    
+    // Nettoyer l'écouteur
+    return () => {
+      document.removeEventListener('keypress', handleKeyPress);
+      clearTimeout(barcodeTimeout);
+    };
+  }, [products, isEditMode, cartItems]); // Dépendances pour handleBarcodeScan
 
 
 
@@ -850,16 +895,38 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const handleBarcodeScan = (barcode: string) => {
     console.log(`🔍 Scan détecté: ${barcode}`);
     console.log(`📦 Nombre de produits disponibles: ${products.length}`);
+    console.log(`🎯 Mode actuel: ${isEditMode ? 'Édition' : 'Vente'}`);
     
-    const scannedProduct = products.find(product => 
-      product.ean13 === barcode || 
-      product.reference === barcode
-    );
+    // En mode édition, ne pas traiter le scan comme un ajout au panier
+    if (isEditMode) {
+      console.log(`⚠️ Mode édition actif - scan ignoré pour éviter le basculement de mode`);
+      setSearchTerm(barcode);
+      return;
+    }
+    
+    // Recherche plus détaillée du produit
+    console.log(`🔍 Recherche du produit avec EAN: ${barcode}`);
+    
+    // Afficher tous les EAN disponibles pour debug
+    console.log(`📋 EAN disponibles dans la base:`);
+    products.forEach((product, index) => {
+      if (index < 10) { // Afficher les 10 premiers pour debug
+        console.log(`  ${index}: "${product.name}" - EAN: "${product.ean13}" - Ref: "${product.reference}"`);
+      }
+    });
+    
+    const scannedProduct = products.find(product => {
+      const eanMatch = product.ean13 === barcode;
+      const refMatch = product.reference === barcode;
+      console.log(`🔍 Vérification "${product.name}": EAN="${product.ean13}" (${eanMatch}) | Ref="${product.reference}" (${refMatch})`);
+      return eanMatch || refMatch;
+    });
     
     if (scannedProduct) {
       console.log(`✅ Produit trouvé: ${scannedProduct.name}`);
       console.log(`💰 Prix: ${scannedProduct.finalPrice}€`);
       console.log(`📋 Déclinaisons: ${scannedProduct.variations ? scannedProduct.variations.length : 0}`);
+      console.log(`🆔 ID: ${scannedProduct.id}`);
       
       if (scannedProduct.variations && scannedProduct.variations.length > 0) {
         console.log(`🔄 Ouverture modale déclinaisons...`);
@@ -868,18 +935,27 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         setVariationModalOpen(true);
       } else {
         console.log(`🛒 Ajout direct au panier...`);
+        console.log(`📞 Appel de onProductClick avec:`, scannedProduct);
         // Ajouter directement au panier
         onProductClick(scannedProduct);
         console.log(`✅ Produit ajouté au panier!`);
+        
+        // Vérifier si le produit a été ajouté
+        setTimeout(() => {
+          console.log(`🔍 Vérification panier après ajout - Nombre d'articles: ${cartItems.length}`);
+          cartItems.forEach((item, index) => {
+            console.log(`  ${index}: ${item.product.name} - Qté: ${item.quantity}`);
+          });
+        }, 200);
       }
+      
+      // Vider le champ de recherche après scan réussi
+      setTimeout(() => {
+        setSearchTerm('');
+      }, 100);
     } else {
       console.log(`❌ Produit non trouvé: ${barcode}`);
-      console.log(`🔍 Recherche dans les produits...`);
-      products.forEach((product, index) => {
-        if (index < 5) { // Afficher les 5 premiers pour debug
-          console.log(`  ${index}: ${product.name} - EAN: ${product.ean13}`);
-        }
-      });
+      console.log(`🔍 Aucun produit avec cet EAN ou référence dans la base`);
       // Afficher dans la recherche pour debug
       setSearchTerm(barcode);
     }
@@ -1509,32 +1585,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      onDragLeave={handleDragLeave}
                      onDrop={(e) => handleDrop(e, product)}
                      onDragEnd={handleDragEnd}
-                     onClick={(e) => {
-                       if (isEditMode) {
-                         // Mode édition : sélectionner/désélectionner l'article
-                         e.stopPropagation();
-                         setSelectedProductsForDeletion(prev => {
-                           const next = new Set(prev);
-                           if (next.has(product.id)) {
-                             next.delete(product.id);
-                           } else {
-                             next.add(product.id);
-                           }
-                           return next;
-                         });
-                       } else {
-                         // Mode vente : ajouter au panier
-                         handleProductClick(product);
-                       }
-                     }}
-                     onDoubleClick={(e) => {
-                       if (isEditMode) {
-                         e.preventDefault();
-                         // Double-clic en mode édition : ouvrir la modale de modification
-                         setSelectedProductForEdit(product);
-                         setShowProductEditModal(true);
-                       }
-                     }}
+                             onClick={(e) => {
+            if (isEditMode) {
+                // Mode édition : ouvrir la modale de modification
+                e.stopPropagation();
+                setSelectedProductForEdit(product);
+                setShowProductEditModal(true);
+            } else {
+                // Mode vente : ajouter au panier
+                handleProductClick(product);
+            }
+        }}
+                     
                    >
                      <Box sx={{ position: 'relative', flexGrow: 1 }}>
                        {isEditMode && (
@@ -2055,7 +2117,28 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      
                      // Si c'est un code-barre (13 chiffres), utiliser handleBarcodeScan
                      if (value.length === 13 && /^\d{13}$/.test(value)) {
+                       // Empêcher la propagation d'événements qui pourraient basculer le mode
+                       e.stopPropagation();
+                       console.log(`🎯 Détection code-barre dans le champ de recherche: ${value}`);
                        handleBarcodeScan(value);
+                     }
+                   }}
+                   onKeyPress={(e) => {
+                     // Détecter aussi les codes-barres qui arrivent par événement keypress
+                     const target = e.currentTarget as HTMLInputElement;
+                     const value = target.value + e.key;
+                     if (value.length === 13 && /^\d{13}$/.test(value)) {
+                       console.log(`🎯 Détection code-barre par keypress: ${value}`);
+                       e.preventDefault();
+                       e.stopPropagation();
+                       handleBarcodeScan(value);
+                     }
+                   }}
+                   onKeyDown={(e) => {
+                     // Empêcher les touches de déclencher d'autres actions pendant le scan
+                     const target = e.target as HTMLInputElement;
+                     if (target.value.length === 13 && /^\d{13}$/.test(target.value)) {
+                       e.stopPropagation();
                      }
                    }}
                    InputProps={{
