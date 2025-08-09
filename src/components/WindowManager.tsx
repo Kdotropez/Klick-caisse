@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Paper,
@@ -125,6 +125,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
   const [todayTransactions, setTodayTransactions] = useState(() => StorageService.loadTodayTransactions());
   const [showSalesRecap, setShowSalesRecap] = useState(false);
+  const [showTicketEditor, setShowTicketEditor] = useState(false);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+
+  // Compteur quotidien par produit (toutes variations confondues)
+  const dailyQtyByProduct = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const tx of todayTransactions) {
+      const items = Array.isArray(tx.items) ? tx.items : [];
+      for (const it of items) {
+        const pid = it.product.id;
+        map[pid] = (map[pid] || 0) + (it.quantity || 0);
+      }
+    }
+    return map;
+  }, [todayTransactions]);
 
   const computeDailyProductSales = (transactions: Transaction[]) => {
     const byProduct: Record<string, { product: Product; totalQty: number; totalAmount: number }> = {};
@@ -142,12 +157,34 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return Object.values(byProduct).sort((a, b) => b.totalQty - a.totalQty);
   };
   
+  const computePaymentTotalsFromTransactions = (transactions: Transaction[]) => {
+    let cash = 0, card = 0, sumup = 0;
+    for (const tx of transactions) {
+      const method = String((tx as any).paymentMethod || '').toLowerCase();
+      if (method === 'cash' || method.includes('esp')) cash += tx.total;
+      else if (method === 'card' || method.includes('carte')) card += tx.total;
+      else if (method === 'sumup') sumup += tx.total;
+    }
+    return { 'Espèces': cash, 'SumUp': sumup, 'Carte': card } as typeof paymentTotals;
+  };
+  
   // États pour les totaux par méthode de paiement
   const [paymentTotals, setPaymentTotals] = useState({
     'Espèces': 0,
     'SumUp': 0,
     'Carte': 0
   });
+
+  useEffect(() => {
+    setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
+  }, [todayTransactions]);
+
+  // Si le ticket sélectionné n'existe plus (ex.: vidage), réinitialiser la sélection
+  useEffect(() => {
+    if (!selectedTicketId) return;
+    const exists = todayTransactions.some(t => t.id === selectedTicketId);
+    if (!exists) setSelectedTicketId(null);
+  }, [todayTransactions, selectedTicketId]);
   
   // États pour l'import CSV
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
@@ -1469,7 +1506,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                              alignSelf: 'flex-end'
                            }}
                          >
-                         {product.salesCount || 0}
+                          {(dailyQtyByProduct[product.id] || 0)}
                        </Typography>
                        {product.variations.length > 0 && (
                          <Chip 
@@ -2807,6 +2844,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   variant="contained"
                   sx={{ 
                     ...commonButtonSx,
+                    backgroundColor: '#8d6e63',
+                    '&:hover': { backgroundColor: '#6d4c41' },
+                  }}
+                  onClick={() => setShowTicketEditor(true)}
+                >
+                  Modifier ticket
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    ...commonButtonSx,
                     backgroundColor: '#455a64',
                     '&:hover': { backgroundColor: '#37474f' },
                   }}
@@ -3417,6 +3465,75 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowSalesRecap(false)}>Fermer</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modale d'édition/suppression d'un ticket */}
+      <Dialog open={showTicketEditor} onClose={() => setShowTicketEditor(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Modifier un ticket</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <TextField
+              select
+              fullWidth
+              label="Sélectionner un ticket"
+              value={selectedTicketId || ''}
+              onChange={(e) => setSelectedTicketId(e.target.value)}
+              SelectProps={{ native: true }}
+            >
+              <option value="" disabled>Choisir…</option>
+              {todayTransactions.map(t => (
+                <option key={t.id} value={t.id}>#{t.id.slice(-6)} — {new Date(t.timestamp).toLocaleTimeString('fr-FR')}</option>
+              ))}
+            </TextField>
+          </Box>
+
+          {selectedTicketId && (() => {
+            const tx = todayTransactions.find(t => t.id === selectedTicketId);
+            if (!tx) return null;
+            const updateQty = (productId: string, delta: number) => {
+              const baseItems = Array.isArray(tx.items) ? tx.items : [];
+              const newItems = baseItems.map(it =>
+                it.product.id === productId ? { ...it, quantity: Math.max(0, it.quantity + delta) } : it
+              ).filter(it => it.quantity > 0);
+              const newTotal = newItems.reduce((s, it) => s + (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * it.quantity, 0);
+              const updated = { ...tx, items: newItems, total: newTotal } as Transaction;
+              StorageService.updateDailyTransaction(updated);
+              setTodayTransactions(StorageService.loadTodayTransactions());
+            };
+            const removeLine = (productId: string) => updateQty(productId, -9999);
+
+            return (
+              <List dense>
+                {tx.items.map(it => (
+                  <ListItem key={it.product.id} sx={{ py: 0.25 }}>
+                    <ListItemText
+                      primaryTypographyProps={{ variant: 'body2' }}
+                      secondaryTypographyProps={{ variant: 'caption' }}
+                      primary={it.product.name}
+                      secondary={`${it.quantity} x ${(it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice).toFixed(2)} € = ${(it.quantity * (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice)).toFixed(2)} €`}
+                    />
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <Button size="small" variant="outlined" onClick={() => updateQty(it.product.id, -1)}>-</Button>
+                      <Button size="small" variant="outlined" onClick={() => updateQty(it.product.id, +1)}>+</Button>
+                      <Button size="small" color="error" onClick={() => removeLine(it.product.id)}>Suppr</Button>
+                    </Box>
+                  </ListItem>
+                ))}
+                <Divider sx={{ my: 1 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2 }}>
+                  <Typography variant="body2" fontWeight="bold">Total</Typography>
+                  <Typography variant="body2" fontWeight="bold">{tx.total.toFixed(2)} €</Typography>
+                </Box>
+              </List>
+            );
+          })()}
+        </DialogContent>
+        <DialogActions>
+          {selectedTicketId && (
+            <Button color="error" onClick={() => { StorageService.deleteDailyTransaction(selectedTicketId); setTodayTransactions(StorageService.loadTodayTransactions()); setSelectedTicketId(null); }}>Supprimer le ticket</Button>
+          )}
+          <Button onClick={() => setShowTicketEditor(false)}>Fermer</Button>
         </DialogActions>
       </Dialog>
 
