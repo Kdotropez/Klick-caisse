@@ -166,6 +166,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showGlobalEditor, setShowGlobalEditor] = useState(false);
   const [globalEditorDraft, setGlobalEditorDraft] = useState<any | null>(null);
   const [globalEditorIsToday, setGlobalEditorIsToday] = useState<boolean>(false);
+  // Sélection multiple en mode édition
+  const [selectedProductsForDeletion, setSelectedProductsForDeletion] = useState<Set<string>>(new Set());
 
   // Compteur quotidien par produit (toutes variations confondues)
   const dailyQtyByProduct = useMemo(() => {
@@ -1306,12 +1308,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     alignItems: 'center',
                     boxSizing: 'border-box'
                   }}>
-                  {/* Barre d'outils tri */}
-                  <Box sx={{ gridColumn: '1 / -1', mb: 0.5, display: 'flex', gap: 0.5 }}>
-                    <Button size="small" variant={productSortMode==='sales'?'contained':'outlined'} onClick={() => setProductSortMode('sales')}>Tri ventes</Button>
-                    <Button size="small" variant={productSortMode==='name'?'contained':'outlined'} onClick={() => setProductSortMode('name')}>Tri nom</Button>
-                  </Box>
 
+
+
+                  
                   {/* Rendu de la grille 5x5 avec navigation intégrée */}
                   {Array.from({ length: 25 }, (_, index) => {
                     // Calculer un facteur d'échelle adapté aux dimensions des cartes
@@ -1479,6 +1479,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          fontWeight: '600',
                          boxSizing: 'border-box',
 
+                       ...(isEditMode && selectedProductsForDeletion.has(product.id) && {
+                         border: '3px solid #f44336',
+                         backgroundColor: '#ffebee',
+                         boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(244, 67, 54, 0.3)`
+                       }),
                        ...(dragOverProduct?.id === product.id && {
                          transform: 'scale(1.05)',
                          boxShadow: `0 ${8 * cardScaleFactor}px ${25 * cardScaleFactor}px rgba(0,0,0,0.3), 0 ${3 * cardScaleFactor}px ${8 * cardScaleFactor}px ${categoryColor}50`,
@@ -1504,26 +1509,79 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      onDragLeave={handleDragLeave}
                      onDrop={(e) => handleDrop(e, product)}
                      onDragEnd={handleDragEnd}
-                     onClick={() => {
+                     onClick={(e) => {
                        if (isEditMode) {
-                         // Mode édition : ouvrir la modale de modification
-                         setSelectedProductForEdit(product);
-                         setShowProductEditModal(true);
+                         // Mode édition : sélectionner/désélectionner l'article
+                         e.stopPropagation();
+                         setSelectedProductsForDeletion(prev => {
+                           const next = new Set(prev);
+                           if (next.has(product.id)) {
+                             next.delete(product.id);
+                           } else {
+                             next.add(product.id);
+                           }
+                           return next;
+                         });
                        } else {
                          // Mode vente : ajouter au panier
                          handleProductClick(product);
                        }
                      }}
+                     onDoubleClick={(e) => {
+                       if (isEditMode) {
+                         e.preventDefault();
+                         // Double-clic en mode édition : ouvrir la modale de modification
+                         setSelectedProductForEdit(product);
+                         setShowProductEditModal(true);
+                       }
+                     }}
                    >
-                     <Typography variant="body2" sx={{ 
-                       fontWeight: '600', 
-                       fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`, 
-                       lineHeight: 1.2, 
-                       flexGrow: 1, 
-                       color: '#2c3e50' 
-                     }}>
-                       {product.name}
-                     </Typography>
+                     <Box sx={{ position: 'relative', flexGrow: 1 }}>
+                       {isEditMode && (
+                         <Box sx={{
+                           position: 'absolute',
+                           top: -5,
+                           left: -5,
+                           width: 20,
+                           height: 20,
+                           backgroundColor: selectedProductsForDeletion.has(product.id) ? '#f44336' : '#fff',
+                           borderRadius: '50%',
+                           display: 'flex',
+                           alignItems: 'center',
+                           justifyContent: 'center',
+                           color: selectedProductsForDeletion.has(product.id) ? 'white' : '#ccc',
+                           fontSize: '12px',
+                           fontWeight: 'bold',
+                           zIndex: 10,
+                           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                           border: '2px solid #ccc',
+                           cursor: 'pointer'
+                         }}
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setSelectedProductsForDeletion(prev => {
+                             const next = new Set(prev);
+                             if (next.has(product.id)) {
+                               next.delete(product.id);
+                             } else {
+                               next.add(product.id);
+                             }
+                             return next;
+                           });
+                         }}>
+                           {selectedProductsForDeletion.has(product.id) ? '✓' : ''}
+                         </Box>
+                       )}
+                       <Typography variant="body2" sx={{ 
+                         fontWeight: '600', 
+                         fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`, 
+                         lineHeight: 1.2, 
+                         flexGrow: 1, 
+                         color: '#2c3e50' 
+                       }}>
+                         {product.name}
+                       </Typography>
+                     </Box>
                      <Typography variant="h6" sx={{ 
                        fontWeight: 'bold', 
                        fontSize: `${Math.max(1, 1.1 * cardScaleFactor)}rem`, 
@@ -2067,8 +2125,72 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    }}
                  />
                  
-                 {/* Bouton Reset */}
-                  <Button
+                 {/* Boutons de tri et Reset */}
+                 <Button
+                   variant="outlined"
+                   size="small"
+                   onClick={() => setProductSortMode('sales')}
+                   sx={{
+                     minWidth: 'auto',
+                     px: 1.5,
+                     backgroundColor: productSortMode==='sales' ? '#4caf50' : 'transparent',
+                     color: productSortMode==='sales' ? 'white' : '#4caf50',
+                     borderColor: '#4caf50',
+                     fontSize: '0.7rem',
+                     '&:hover': {
+                       backgroundColor: productSortMode==='sales' ? '#45a049' : '#e8f5e8',
+                       borderColor: '#45a049'
+                     }
+                   }}
+                 >
+                   📊 Tri ventes
+                 </Button>
+                 <Button
+                   variant="outlined"
+                   size="small"
+                   onClick={() => setProductSortMode('name')}
+                   sx={{
+                     minWidth: 'auto',
+                     px: 1.5,
+                     backgroundColor: productSortMode==='name' ? '#2196f3' : 'transparent',
+                     color: productSortMode==='name' ? 'white' : '#2196f3',
+                     borderColor: '#2196f3',
+                     fontSize: '0.7rem',
+                     '&:hover': {
+                       backgroundColor: productSortMode==='name' ? '#1976d2' : '#e3f2fd',
+                       borderColor: '#1976d2'
+                     }
+                   }}
+                 >
+                   🔤 Tri nom
+                 </Button>
+                 {/* Bouton de suppression en mode édition */}
+                 {isEditMode && selectedProductsForDeletion.size > 0 && (
+                   <Button
+                     variant="contained"
+                     color="error"
+                     size="small"
+                     onClick={() => {
+                       // eslint-disable-next-line no-restricted-globals
+                       if (confirm(`Supprimer ${selectedProductsForDeletion.size} article(s) sélectionné(s) ?`)) {
+                         const selectedIds = Array.from(selectedProductsForDeletion);
+                         const updatedProducts = products.filter(p => !selectedIds.includes(p.id));
+                         onProductsReorder?.(updatedProducts);
+                         setSelectedProductsForDeletion(new Set());
+                         console.log(`🗑️ ${selectedIds.length} articles supprimés`);
+                       }
+                     }}
+                     sx={{
+                       backgroundColor: '#f44336',
+                       '&:hover': { backgroundColor: '#d32f2f' },
+                       fontSize: '0.7rem',
+                       px: 1.5
+                     }}
+                   >
+                     🗑️ Supprimer ({selectedProductsForDeletion.size})
+                   </Button>
+                 )}
+                 <Button
                    variant="outlined"
                    size="small"
                    onClick={() => {
@@ -2077,6 +2199,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      setSubcategorySearchTerm('');
                      setSelectedCategory(null);
                      setSelectedSubcategory(null);
+                     setProductSortMode('sales');
                      setCurrentPage(1);
                      console.log('🔄 Reset des recherches effectué');
                    }}
@@ -2723,14 +2846,62 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     setShowEditModeNotification(newEditMode);
                     
                     if (newEditMode) {
-                      console.log('🖊️ Mode édition activé - Cliquez sur un article pour le modifier');
+                      console.log('🖊️ Mode édition activé - Cliquez sur un article pour le sélectionner, double-clic pour modifier');
+                      setSelectedProductsForDeletion(new Set());
                     } else {
                       console.log('💰 Mode vente activé - Cliquez sur un article pour l\'ajouter au panier');
+                      setSelectedProductsForDeletion(new Set());
                     }
                   }}
                 >
                   {isEditMode ? 'Mode Vente' : 'Modifier Article'}
                 </Button>
+                {isEditMode && (
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                    {selectedProductsForDeletion.size > 0 && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={() => {
+                          // eslint-disable-next-line no-restricted-globals
+                          if (confirm(`Supprimer ${selectedProductsForDeletion.size} article(s) sélectionné(s) ?`)) {
+                            const selectedIds = Array.from(selectedProductsForDeletion);
+                            const updatedProducts = products.filter(p => !selectedIds.includes(p.id));
+                            onProductsReorder?.(updatedProducts);
+                            setSelectedProductsForDeletion(new Set());
+                            console.log(`🗑️ ${selectedIds.length} articles supprimés`);
+                          }
+                        }}
+                        sx={{
+                          backgroundColor: '#f44336',
+                          '&:hover': { backgroundColor: '#d32f2f' },
+                          fontSize: '0.7rem',
+                          px: 1
+                        }}
+                      >
+                        🗑️ Supprimer ({selectedProductsForDeletion.size})
+                      </Button>
+                    )}
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => {
+                        if (selectedProductsForDeletion.size === products.length) {
+                          setSelectedProductsForDeletion(new Set());
+                        } else {
+                          setSelectedProductsForDeletion(new Set(products.map(p => p.id)));
+                        }
+                      }}
+                      sx={{
+                        fontSize: '0.7rem',
+                        px: 1
+                      }}
+                    >
+                      {selectedProductsForDeletion.size === products.length ? '☐ Tout désélectionner' : '☑️ Tout sélectionner'}
+                    </Button>
+                  </Box>
+                )}
               </Box>
             );
           })()
