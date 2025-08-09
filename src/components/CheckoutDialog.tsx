@@ -108,11 +108,20 @@ const CheckoutDialog: React.FC<CheckoutDialogProps> = ({
             </Typography>
             <TextField
               fullWidth
+              size="small"
               label="Nom du caissier"
               value={cashierName}
               onChange={(e) => setCashierName(e.target.value)}
               margin="normal"
               required
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontSize: '0.95rem',
+                  lineHeight: 1.4,
+                  letterSpacing: '0.2px',
+                }
+              }}
             />
             <FormControl fullWidth margin="normal">
               <InputLabel>Méthode de paiement</InputLabel>

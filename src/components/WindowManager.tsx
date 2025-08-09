@@ -130,9 +130,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
   const [todayTransactions, setTodayTransactions] = useState(() => StorageService.loadTodayTransactions());
   const [showSalesRecap, setShowSalesRecap] = useState(false);
-  const [showTicketEditor, setShowTicketEditor] = useState(false);
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
-  const [selectedTicketDraft, setSelectedTicketDraft] = useState<Transaction | null>(null);
+  
   const [showPaymentRecap, setShowPaymentRecap] = useState(false);
   const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
   const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
@@ -200,11 +198,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   }, [todayTransactions]);
 
   // Si le ticket sélectionné n'existe plus (ex.: vidage), réinitialiser la sélection
-  useEffect(() => {
-    if (!selectedTicketId) return;
-    const exists = todayTransactions.some(t => t.id === selectedTicketId);
-    if (!exists) setSelectedTicketId(null);
-  }, [todayTransactions, selectedTicketId]);
+  // Nettoyage d'anciens états (modale édition supprimée)
   
   // États pour l'import CSV
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
@@ -2250,7 +2244,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                {/* Boutons de mode de règlement côte à côte */}
                <Box sx={{ display: 'flex', gap: 0.5, flex: 1 }}>
                  {/* Bouton Espèces - 1/3 de la largeur */}
-                 <Button
+                  <Button
                    variant="contained"
                    sx={{ 
                      flex: 1,
@@ -2267,19 +2261,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      justifyContent: 'center',
                      textAlign: 'center'
                    }}
-                   onClick={() => handleDirectPayment('Espèces')}
+                    onClick={() => handleDirectPayment('Espèces')}
                    disabled={cartItems.length === 0}
                  >
-                   <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>
-                     💵 ESPÈCES
-                   </Box>
+                    <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>ESPÈCES</Box>
                    <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>
                      {totalAmount.toFixed(2)} €
                    </Box>
                  </Button>
                  
                  {/* Bouton SumUp - 1/3 de la largeur */}
-                 <Button
+                  <Button
                    variant="contained"
                    sx={{ 
                      flex: 1,
@@ -2299,16 +2291,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    onClick={() => handleDirectPayment('SumUp')}
                    disabled={cartItems.length === 0}
                  >
-                   <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>
-                     📱 SumUp
-                   </Box>
+                    <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>SumUp</Box>
                    <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>
                      {totalAmount.toFixed(2)} €
                    </Box>
                  </Button>
                  
                  {/* Bouton Carte - 1/3 de la largeur */}
-                 <Button
+                  <Button
                    variant="contained"
                    sx={{ 
                      flex: 1,
@@ -2328,9 +2318,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    onClick={() => handleDirectPayment('Carte')}
                    disabled={cartItems.length === 0}
                  >
-                   <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>
-                     💳 Carte
-                   </Box>
+                    <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>Carte</Box>
                    <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>
                      {totalAmount.toFixed(2)} €
                    </Box>
@@ -2343,7 +2331,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                {/* Boutons de total */}
                <Box sx={{ display: 'flex', gap: 0.5 }}>
                  {/* Total Espèces */}
-                 <Button
+                  <Button
                    variant="outlined"
                    sx={{ 
                      flex: 1,
@@ -2360,7 +2348,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    }}
                     onClick={() => { setPaymentRecapMethod('cash'); setShowPaymentRecap(true); }}
                  >
-                   {paymentTotals['Espèces'].toFixed(2)} €
+                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul espèces</Typography>
+                      <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>
+                        {paymentTotals['Espèces'].toFixed(2)} €
+                      </Typography>
+                    </Box>
                  </Button>
                  
                  {/* Total SumUp */}
@@ -2381,7 +2374,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    }}
                     onClick={() => { setPaymentRecapMethod('sumup'); setShowPaymentRecap(true); }}
                  >
-                   {paymentTotals['SumUp'].toFixed(2)} €
+                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul SumUp</Typography>
+                      <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>
+                        {paymentTotals['SumUp'].toFixed(2)} €
+                      </Typography>
+                    </Box>
                  </Button>
                  
                  {/* Total Carte */}
@@ -2402,7 +2400,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    }}
                     onClick={() => { setPaymentRecapMethod('card'); setShowPaymentRecap(true); }}
                  >
-                   {paymentTotals['Carte'].toFixed(2)} €
+                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul carte</Typography>
+                      <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>
+                        {paymentTotals['Carte'].toFixed(2)} €
+                      </Typography>
+                    </Box>
                  </Button>
                </Box>
              </Box>
@@ -2882,12 +2885,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   variant="contained"
                   sx={{ 
                     ...commonButtonSx,
-                    backgroundColor: '#8d6e63',
-                    '&:hover': { backgroundColor: '#6d4c41' },
+                    backgroundColor: '#9e9e9e',
+                    '&:hover': { backgroundColor: '#757575' },
                   }}
-                  onClick={() => setShowTicketEditor(true)}
+                  onClick={() => console.log('Libre')}
                 >
-                  Modifier ticket
+                  Libre
                 </Button>
               </Box>
               
@@ -3494,7 +3497,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                       <Typography variant="body2">x</Typography>
                       <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{firstName}</Typography>
                       <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
-                      <Button size="small" variant="outlined" onClick={() => { setSelectedTicketId(t.id); setSelectedTicketDraft({ ...t, items: (Array.isArray(t.items)?t.items:[]).map(i=>({ ...i })) } as any); setShowTicketEditor(true); }}>Modifier</Button>
+                      <Button size="small" variant="outlined" onClick={() => console.log('Libre')}>Modifier</Button>
                       <Button size="small" color="error" onClick={() => {
                         if (!window.confirm('Inverser les ventes de ce ticket (retour) ?')) return;
                         const inverse = {
@@ -3861,82 +3864,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Modale d'édition/suppression d'un ticket */}
-      <Dialog open={showTicketEditor} onClose={() => setShowTicketEditor(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Modifier un ticket</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-            <TextField
-              select
-              fullWidth
-              label="Sélectionner un ticket"
-              value={selectedTicketId || ''}
-              onChange={(e) => setSelectedTicketId(e.target.value)}
-              SelectProps={{ native: true }}
-            >
-              <option value="" disabled>Choisir…</option>
-              {todayTransactions.map(t => (
-                <option key={t.id} value={t.id}>#{t.id.slice(-6)} — {new Date(t.timestamp).toLocaleTimeString('fr-FR')}</option>
-              ))}
-            </TextField>
-          </Box>
-
-          {selectedTicketId && (() => {
-            const tx = selectedTicketDraft || todayTransactions.find(t => t.id === selectedTicketId);
-            if (!tx) return null;
-            const updateQty = (productId: string, delta: number) => {
-              const baseItems = Array.isArray(tx.items) ? tx.items : [];
-              const newItems = baseItems.map(it =>
-                it.product.id === productId ? { ...it, quantity: Math.max(0, it.quantity + delta) } : it
-              ).filter(it => it.quantity > 0);
-              const newTotal = newItems.reduce((s, it) => s + (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * it.quantity, 0);
-              const updated = { ...tx, items: newItems, total: newTotal } as Transaction;
-              setSelectedTicketDraft(updated);
-            };
-            const removeLine = (productId: string) => updateQty(productId, -9999);
-
-            return (
-              <List dense>
-                {tx.items.map(it => (
-                  <ListItem key={it.product.id} sx={{ py: 0.25 }}>
-                    <ListItemText
-                      primaryTypographyProps={{ variant: 'body2' }}
-                      secondaryTypographyProps={{ variant: 'caption' }}
-                      primary={it.product.name}
-                      secondary={`${it.quantity} x ${(it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice).toFixed(2)} € = ${(it.quantity * (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice)).toFixed(2)} €`}
-                    />
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <Button size="small" variant="outlined" onClick={() => updateQty(it.product.id, -1)}>-</Button>
-                      <Button size="small" variant="outlined" onClick={() => updateQty(it.product.id, +1)}>+</Button>
-                      <Button size="small" color="error" onClick={() => removeLine(it.product.id)}>Suppr</Button>
-                    </Box>
-                  </ListItem>
-                ))}
-                <Divider sx={{ my: 1 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2 }}>
-                  <Typography variant="body2" fontWeight="bold">Total</Typography>
-                  <Typography variant="body2" fontWeight="bold">{tx.total.toFixed(2)} €</Typography>
-                </Box>
-              </List>
-            );
-          })()}
-        </DialogContent>
-        <DialogActions>
-          {selectedTicketId && (
-            <>
-              <Button color="error" onClick={() => { StorageService.deleteDailyTransaction(selectedTicketId); setTodayTransactions(StorageService.loadTodayTransactions()); setSelectedTicketId(null); setSelectedTicketDraft(null); }}>Supprimer le ticket</Button>
-              <Button variant="contained" onClick={() => {
-                if (!selectedTicketDraft) { setShowTicketEditor(false); return; }
-                StorageService.updateDailyTransaction(selectedTicketDraft);
-                setTodayTransactions(StorageService.loadTodayTransactions());
-                setSelectedTicketDraft(null);
-                setShowTicketEditor(false);
-              }}>Valider</Button>
-            </>
-          )}
-          <Button onClick={() => { setSelectedTicketDraft(null); setShowTicketEditor(false); }}>Fermer</Button>
-        </DialogActions>
-      </Dialog>
+      {/* Modale d'édition de ticket supprimée (remplacée par l'édition via Tickets jour) */}
 
        {/* Modale de modification d'article */}
        <ProductEditModal
