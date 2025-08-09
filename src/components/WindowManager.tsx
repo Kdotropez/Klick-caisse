@@ -15,7 +15,12 @@ import {
   ListItemText,
   Divider,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
+import { Edit as EditIcon, Undo as UndoIcon } from '@mui/icons-material';
 import {
   Add,
   Remove,
@@ -127,6 +132,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showSalesRecap, setShowSalesRecap] = useState(false);
   const [showTicketEditor, setShowTicketEditor] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [selectedTicketDraft, setSelectedTicketDraft] = useState<Transaction | null>(null);
+  const [showPaymentRecap, setShowPaymentRecap] = useState(false);
+  const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
+  const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
+  const [showEndOfDay, setShowEndOfDay] = useState(false);
+  const [showClosures, setShowClosures] = useState(false);
+  const [closures, setClosures] = useState<any[]>([]);
+  const [selectedClosureIdx, setSelectedClosureIdx] = useState<number | null>(null);
+  // Filtres pour la modale tickets jour
+  const [filterPayment, setFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup'>('all');
+  const [filterAmountMin, setFilterAmountMin] = useState<string>('');
+  const [filterAmountMax, setFilterAmountMax] = useState<string>('');
+  const [filterAmountExact, setFilterAmountExact] = useState<string>('');
+  const [filterProductText, setFilterProductText] = useState<string>('');
+  const [productSortMode, setProductSortMode] = useState<'sales' | 'name'>('sales');
 
   // Compteur quotidien par produit (toutes variations confondues)
   const dailyQtyByProduct = useMemo(() => {
@@ -632,17 +652,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
   const endIndex = startIndex + CARDS_PER_PAGE;
   
-  // S'assurer que les produits sont bien triés et filtrés
+  // Tri: articles les plus vendus aujourd'hui en premier (toutes variations confondues)
   const sortedAndFilteredProducts = [...filteredProducts].sort((a, b) => {
-    // Trier par catégorie d'abord, puis par nom
-    if (a.category !== b.category) {
-      return a.category.localeCompare(b.category);
+    if (productSortMode === 'sales') {
+      const qa = dailyQtyByProduct[a.id] || 0;
+      const qb = dailyQtyByProduct[b.id] || 0;
+      if (qa !== qb) return qb - qa;
+    } else if (productSortMode === 'name') {
+      if (a.name !== b.name) return a.name.localeCompare(b.name); // A->Z
     }
-    // Si même catégorie, trier par nom
-    if (a.name !== b.name) {
-      return a.name.localeCompare(b.name);
-    }
-    // Si même nom, trier par ID pour garantir un ordre stable
+    // Fallback stable
+    if (a.category !== b.category) return a.category.localeCompare(b.category);
+    if (a.name !== b.name) return a.name.localeCompare(b.name);
     return a.id.localeCompare(b.id);
   });
   
@@ -1252,8 +1273,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 totalHeightNeeded: cardHeight * 5 + totalHeightToSubtract
               });
               
-              return (
-                <Box 
+            return (
+              <Box 
                   key={filterKey}
                   sx={{ 
                     flexGrow: 1, 
@@ -1270,6 +1291,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     alignItems: 'center',
                     boxSizing: 'border-box'
                   }}>
+                  {/* Barre d'outils tri */}
+                  <Box sx={{ gridColumn: '1 / -1', mb: 0.5, display: 'flex', gap: 0.5 }}>
+                    <Button size="small" variant={productSortMode==='sales'?'contained':'outlined'} onClick={() => setProductSortMode('sales')}>Tri ventes</Button>
+                    <Button size="small" variant={productSortMode==='name'?'contained':'outlined'} onClick={() => setProductSortMode('name')}>Tri nom</Button>
+                  </Box>
+
                   {/* Rendu de la grille 5x5 avec navigation intégrée */}
                   {Array.from({ length: 25 }, (_, index) => {
                     // Calculer un facteur d'échelle adapté aux dimensions des cartes
@@ -2026,7 +2053,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                  />
                  
                  {/* Bouton Reset */}
-                 <Button
+                  <Button
                    variant="outlined"
                    size="small"
                    onClick={() => {
@@ -2331,13 +2358,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        backgroundColor: '#e8f5e8'
                      }
                    }}
-                   onClick={() => console.log('Total Espèces:', paymentTotals['Espèces'])}
+                    onClick={() => { setPaymentRecapMethod('cash'); setShowPaymentRecap(true); }}
                  >
                    {paymentTotals['Espèces'].toFixed(2)} €
                  </Button>
                  
                  {/* Total SumUp */}
-                 <Button
+                  <Button
                    variant="outlined"
                    sx={{ 
                      flex: 1,
@@ -2352,13 +2379,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        backgroundColor: '#e3f2fd'
                      }
                    }}
-                   onClick={() => console.log('Total SumUp:', paymentTotals['SumUp'])}
+                    onClick={() => { setPaymentRecapMethod('sumup'); setShowPaymentRecap(true); }}
                  >
                    {paymentTotals['SumUp'].toFixed(2)} €
                  </Button>
                  
                  {/* Total Carte */}
-                 <Button
+                  <Button
                    variant="outlined"
                    sx={{ 
                      flex: 1,
@@ -2373,7 +2400,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        backgroundColor: '#fff3e0'
                      }
                    }}
-                   onClick={() => console.log('Total Carte:', paymentTotals['Carte'])}
+                    onClick={() => { setPaymentRecapMethod('card'); setShowPaymentRecap(true); }}
                  >
                    {paymentTotals['Carte'].toFixed(2)} €
                  </Button>
@@ -2844,23 +2871,23 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   variant="contained"
                   sx={{ 
                     ...commonButtonSx,
-                    backgroundColor: '#8d6e63',
-                    '&:hover': { backgroundColor: '#6d4c41' },
-                  }}
-                  onClick={() => setShowTicketEditor(true)}
-                >
-                  Modifier ticket
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
                     backgroundColor: '#455a64',
                     '&:hover': { backgroundColor: '#37474f' },
                   }}
                   onClick={() => setShowTransactionHistory(true)}
                 >
                   Tickets jour
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    ...commonButtonSx,
+                    backgroundColor: '#8d6e63',
+                    '&:hover': { backgroundColor: '#6d4c41' },
+                  }}
+                  onClick={() => setShowTicketEditor(true)}
+                >
+                  Modifier ticket
                 </Button>
               </Box>
               
@@ -2869,23 +2896,23 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   variant="contained"
                   sx={{ 
                     ...commonButtonSx,
-                    backgroundColor: '#ff9800',
-                    '&:hover': { backgroundColor: '#f57c00' },
+                    backgroundColor: '#9c27b0',
+                    '&:hover': { backgroundColor: '#7b1fa2' },
                   }}
-                  onClick={() => setIsEditMode(!isEditMode)}
+                  onClick={() => { setClosures(StorageService.loadClosures()); setSelectedClosureIdx(null); setShowClosures(true); }}
                 >
-                  Édition
+                  Historique clôture
                 </Button>
                 <Button
                   variant="contained"
                   sx={{ 
                     ...commonButtonSx,
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' },
+                    backgroundColor: '#9e9e9e',
+                    '&:hover': { backgroundColor: '#757575' },
                   }}
-                  onClick={() => console.log('Fonction 4')}
+                  onClick={() => setShowEndOfDay(true)}
                 >
-                  Fonction 4
+                  Fin de journée
                 </Button>
               </Box>
             </Box>
@@ -3413,11 +3440,307 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       <Dialog open={showTransactionHistory} onClose={() => setShowTransactionHistory(false)} maxWidth="md" fullWidth>
         <DialogTitle>Tickets de la journée</DialogTitle>
         <DialogContent>
-          <TransactionHistory transactions={todayTransactions} />
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.5, mb: 1 }}>
+            <Button size="small" variant={filterPayment==='all'?'contained':'outlined'} onClick={() => setFilterPayment('all')}>Tous</Button>
+            <Button size="small" variant={filterPayment==='cash'?'contained':'outlined'} onClick={() => setFilterPayment('cash')}>Espèces</Button>
+            <Button size="small" variant={filterPayment==='card'?'contained':'outlined'} onClick={() => setFilterPayment('card')}>Carte</Button>
+            <Button size="small" variant={filterPayment==='sumup'?'contained':'outlined'} onClick={() => setFilterPayment('sumup')}>SumUp</Button>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, mb: 1 }}>
+            <TextField size="small" label="Montant min" value={filterAmountMin} onChange={(e) => setFilterAmountMin(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
+            <TextField size="small" label="Montant max" value={filterAmountMax} onChange={(e) => setFilterAmountMax(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
+            <TextField size="small" label="Montant exact" value={filterAmountExact} onChange={(e) => setFilterAmountExact(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
+          </Box>
+          <TextField size="small" fullWidth label="Contient produit" value={filterProductText} onChange={(e) => setFilterProductText(e.target.value)} sx={{ mb: 1 }} />
+
+          <List dense>
+            {todayTransactions
+              .filter(t => {
+                const m = String((t as any).paymentMethod || '').toLowerCase();
+                if (filterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
+                if (filterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
+                if (filterPayment === 'sumup' && m!=='sumup') return false;
+                const amount = t.total || 0;
+                const min = parseFloat(filterAmountMin || 'NaN');
+                const max = parseFloat(filterAmountMax || 'NaN');
+                const exact = parseFloat(filterAmountExact || 'NaN');
+                if (!Number.isNaN(exact) && Math.abs(amount - exact) > 0.009) return false;
+                if (!Number.isNaN(min) && amount < min) return false;
+                if (!Number.isNaN(max) && amount > max) return false;
+                if (filterProductText.trim()) {
+                  const needle = filterProductText.toLowerCase();
+                  const items = Array.isArray(t.items) ? t.items : [];
+                  const has = items.some(it => it.product.name.toLowerCase().includes(needle));
+                  if (!has) return false;
+                }
+                return true;
+              })
+              .map(t => {
+                const firstName = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
+                const qty = Array.isArray(t.items) ? t.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
+                return (
+                  <ListItem key={t.id} sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1 }}>
+                    <Box sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '90px 98px 72px 48px 12px 1fr 120px auto auto',
+                      alignItems: 'center',
+                      gap: 1,
+                      width: '100%'
+                    }}>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#666' }}>#{t.id.slice(-6)}</Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp as any).toLocaleDateString('fr-FR')}</Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp as any).toLocaleTimeString('fr-FR')}</Typography>
+                      <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace' }}>{qty}</Typography>
+                      <Typography variant="body2">x</Typography>
+                      <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{firstName}</Typography>
+                      <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
+                      <Button size="small" variant="outlined" onClick={() => { setSelectedTicketId(t.id); setSelectedTicketDraft({ ...t, items: (Array.isArray(t.items)?t.items:[]).map(i=>({ ...i })) } as any); setShowTicketEditor(true); }}>Modifier</Button>
+                      <Button size="small" color="error" onClick={() => {
+                        if (!window.confirm('Inverser les ventes de ce ticket (retour) ?')) return;
+                        const inverse = {
+                          ...t,
+                          id: `${t.id}-R`,
+                          total: -Math.abs(t.total||0),
+                          items: (Array.isArray(t.items)?t.items:[]).map(it => ({ ...it, quantity: -Math.abs(it.quantity||0) })),
+                          timestamp: new Date(),
+                        } as any;
+                        StorageService.addDailyTransaction(inverse);
+                        setTodayTransactions(StorageService.loadTodayTransactions());
+                      }}>Inverser</Button>
+                    </Box>
+                  </ListItem>
+                );
+              })}
+            {todayTransactions.filter(t => {
+              const m = String((t as any).paymentMethod || '').toLowerCase();
+              if (filterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
+              if (filterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
+              if (filterPayment === 'sumup' && m!=='sumup') return false;
+              const amount = t.total || 0;
+              const min = parseFloat(filterAmountMin || 'NaN');
+              const max = parseFloat(filterAmountMax || 'NaN');
+              if (!Number.isNaN(min) && amount < min) return false;
+              if (!Number.isNaN(max) && amount > max) return false;
+              if (filterProductText.trim()) {
+                const needle = filterProductText.toLowerCase();
+                const items = Array.isArray(t.items) ? t.items : [];
+                const has = items.some(it => it.product.name.toLowerCase().includes(needle));
+                if (!has) return false;
+              }
+              return true;
+            }).length === 0 && (
+              <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>Aucun ticket pour ces filtres</Box>
+            )}
+          </List>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowTransactionHistory(false)}>Fermer</Button>
           <Button color="error" onClick={() => { StorageService.clearTodayTransactions(); setTodayTransactions([]); }}>Vider</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modale des clôtures (archives) */}
+      <Dialog open={showClosures} onClose={() => setShowClosures(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Clôtures archivées</DialogTitle>
+        <DialogContent>
+          {closures.length === 0 ? (
+            <Typography>Aucune clôture enregistrée.</Typography>
+          ) : (
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ width: 260 }}>
+                <List dense>
+                  {closures.map((c, idx) => (
+                    <ListItem key={idx} button selected={selectedClosureIdx===idx} onClick={() => setSelectedClosureIdx(idx)}>
+                      <ListItemText
+                        primary={`Clôture Z${c.zNumber || '?'} — ${new Date(c.closedAt).toLocaleDateString('fr-FR')}`}
+                        secondary={new Date(c.closedAt).toLocaleTimeString('fr-FR')}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                {selectedClosureIdx === null ? (
+                  <Typography variant="body2">Sélectionnez une clôture pour la visualiser.</Typography>
+                ) : (() => {
+                  const c = closures[selectedClosureIdx];
+                  const txs = c.transactions || [];
+                  const totalCA = txs.reduce((s: number, t: any) => s + (t.total || 0), 0);
+                  const byMethod = txs.reduce((acc: Record<string, number>, t: any) => {
+                    const m = String(t.paymentMethod || '').toLowerCase();
+                    const key = m.includes('esp') || m==='cash' ? 'Espèces' : m.includes('carte') || m==='card' ? 'Carte' : 'SumUp';
+                    acc[key] = (acc[key] || 0) + (t.total || 0);
+                    return acc;
+                  }, {} as Record<string, number>);
+                  const rows = computeDailyProductSales(txs).slice(0, 10);
+                  return (
+                    <Box>
+                      <Typography variant="h6" sx={{ mb: 1 }}>Clôture Z{c.zNumber}</Typography>
+                      <Typography variant="body2" sx={{ mb: 1 }}>Clôturée le {new Date(c.closedAt).toLocaleString('fr-FR')}</Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle1">Total CA</Typography>
+                        <Typography variant="subtitle1">{totalCA.toFixed(2)} €</Typography>
+                      </Box>
+                      <Divider sx={{ my: 1 }} />
+                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Totaux par mode de règlement</Typography>
+                      <List dense>
+                        {['Espèces','Carte','SumUp'].map(k => (
+                          <ListItem key={k} sx={{ py: 0.25 }}>
+                            <ListItemText primary={k} />
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{(byMethod[k]||0).toFixed(2)} €</Typography>
+                          </ListItem>
+                        ))}
+                      </List>
+                      <Divider sx={{ my: 1 }} />
+                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Top 10 articles</Typography>
+                      <List dense>
+                        {rows.map(({ product, totalQty, totalAmount }) => (
+                          <ListItem key={product.id} sx={{ py: 0.25 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
+                              <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {product.name}
+                              </Typography>
+                              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                {`Qté: ${totalQty} • CA: ${totalAmount.toFixed(2)} €`}
+                              </Typography>
+                            </Box>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  );
+                })()}
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowClosures(false)}>Fermer</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modale récap par mode de règlement */}
+      <Dialog open={showPaymentRecap} onClose={() => setShowPaymentRecap(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {paymentRecapMethod === 'cash' ? 'Tickets Espèces' : paymentRecapMethod === 'card' ? 'Tickets Carte' : 'Tickets SumUp'}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', gap: 0.5, mb: 1, flexWrap: 'wrap' }}>
+            {/* Tri dans la modale: par quantité, montant, nom, famille, sous-famille */}
+            <Button size="small" variant={paymentRecapSort==='qty'?'contained':'outlined'} onClick={() => setPaymentRecapSort('qty')}>Tri quantité</Button>
+            <Button size="small" variant={paymentRecapSort==='amount'?'contained':'outlined'} onClick={() => setPaymentRecapSort('amount')}>Tri montant</Button>
+            <Button size="small" variant={paymentRecapSort==='name'?'contained':'outlined'} onClick={() => setPaymentRecapSort('name')}>Tri nom</Button>
+            <Button size="small" variant={paymentRecapSort==='category'?'contained':'outlined'} onClick={() => setPaymentRecapSort('category')}>Tri famille</Button>
+            <Button size="small" variant={paymentRecapSort==='subcategory'?'contained':'outlined'} onClick={() => setPaymentRecapSort('subcategory')}>Tri sous-famille</Button>
+          </Box>
+          {(() => {
+            const filtered = todayTransactions.filter(t => {
+              const m = String((t as any).paymentMethod || '').toLowerCase();
+              if (paymentRecapMethod === 'cash') return m === 'cash' || m.includes('esp');
+              if (paymentRecapMethod === 'card') return m === 'card' || m.includes('carte');
+              if (paymentRecapMethod === 'sumup') return m === 'sumup';
+              return true;
+            });
+            const sorted = [...filtered].sort((a, b) => {
+              if (paymentRecapSort === 'qty') {
+                const qa = Array.isArray(a.items) ? a.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
+                const qb = Array.isArray(b.items) ? b.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
+                if (qa !== qb) return qb - qa;
+              } else if (paymentRecapSort === 'amount') {
+                if (a.total !== b.total) return b.total - a.total;
+              } else if (paymentRecapSort === 'name') {
+                const an = Array.isArray(a.items) && a.items.length > 0 ? a.items[0].product.name : '';
+                const bn = Array.isArray(b.items) && b.items.length > 0 ? b.items[0].product.name : '';
+                if (an !== bn) return an.localeCompare(bn);
+              } else if (paymentRecapSort === 'category') {
+                const ac = Array.isArray(a.items) && a.items.length > 0 ? a.items[0].product.category : '';
+                const bc = Array.isArray(b.items) && b.items.length > 0 ? b.items[0].product.category : '';
+                if (ac !== bc) return ac.localeCompare(bc);
+              } else if (paymentRecapSort === 'subcategory') {
+                const asub = Array.isArray(a.items) && a.items.length > 0 ? ((a.items[0].product.associatedCategories && a.items[0].product.associatedCategories[0]) || '') : '';
+                const bsub = Array.isArray(b.items) && b.items.length > 0 ? ((b.items[0].product.associatedCategories && b.items[0].product.associatedCategories[0]) || '') : '';
+                if (asub !== bsub) return asub.localeCompare(bsub);
+              }
+              return String(a.id).localeCompare(String(b.id));
+            });
+            const totalAmount = filtered.reduce((s, t) => s + (t.total || 0), 0);
+            return (
+              <>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                    Total: {totalAmount.toFixed(2)} €
+                  </Typography>
+                </Box>
+                {paymentRecapSort !== 'category' ? (
+                  <List dense>
+                    {sorted.map(t => {
+                      const firstName = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
+                      const qty = Array.isArray(t.items) ? t.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
+                      return (
+                        <ListItem key={t.id} sx={{ py: 0.25, borderBottom: '1px solid #eee' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
+                            <Typography variant="body2" sx={{ width: 48, textAlign: 'right', fontFamily: 'monospace' }}>
+                              {qty}
+                            </Typography>
+                            <Typography variant="body2" sx={{ px: 0.5 }}>x</Typography>
+                            <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {firstName}
+                            </Typography>
+                            <Typography variant="body2" sx={{ width: 110, textAlign: 'right', fontFamily: 'monospace' }}>
+                              {t.total.toFixed(2)} €
+                            </Typography>
+                          </Box>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                ) : (
+                  <List dense>
+                    {(() => {
+                      const categoryMap = new Map<string, Map<string, { name: string; qty: number; amount: number }>>();
+                      for (const tx of filtered) {
+                        const items = Array.isArray(tx.items) ? tx.items : [];
+                        for (const it of items) {
+                          const cat = it.product.category || '';
+                          const key = it.product.id;
+                          const amount = (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * (it.quantity || 0);
+                          if (!categoryMap.has(cat)) categoryMap.set(cat, new Map());
+                          const prodMap = categoryMap.get(cat)!;
+                          const prev = prodMap.get(key) || { name: it.product.name, qty: 0, amount: 0 };
+                          prev.qty += (it.quantity || 0);
+                          prev.amount += amount;
+                          prodMap.set(key, prev);
+                        }
+                      }
+                      const categories = Array.from(categoryMap.keys()).sort((a, b) => a.localeCompare(b));
+                      return categories.map(cat => {
+                        const prodMap = categoryMap.get(cat)!;
+                        const lines = Array.from(prodMap.values()).sort((a, b) => b.qty - a.qty);
+                        return (
+                          <Box key={cat} sx={{ mb: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2', mb: 0.5 }}>Famille {cat}:</Typography>
+                            {lines.map(line => (
+                              <ListItem key={cat + '::' + line.name} sx={{ py: 0.25, borderBottom: '1px dashed #eee' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
+                                  <Typography variant="body2" sx={{ width: 48, textAlign: 'right', fontFamily: 'monospace' }}>{line.qty}</Typography>
+                                  <Typography variant="body2" sx={{ px: 0.5 }}>x</Typography>
+                                  <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{line.name}</Typography>
+                                  <Typography variant="body2" sx={{ width: 110, textAlign: 'right', fontFamily: 'monospace' }}>{line.amount.toFixed(2)} €</Typography>
+                                </Box>
+                              </ListItem>
+                            ))}
+                          </Box>
+                        );
+                      });
+                    })()}
+                  </List>
+                )}
+              </>
+            );
+          })()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowPaymentRecap(false)}>Fermer</Button>
         </DialogActions>
       </Dialog>
 
@@ -3468,6 +3791,76 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         </DialogActions>
       </Dialog>
 
+      {/* Modale fin de journée / Clôture */}
+      <Dialog open={showEndOfDay} onClose={() => setShowEndOfDay(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Clôture de la journée</DialogTitle>
+        <DialogContent>
+          {(() => {
+            const txs = todayTransactions;
+            const totalCA = txs.reduce((s, t) => s + (t.total || 0), 0);
+            const byMethod = txs.reduce((acc: Record<string, number>, t) => {
+              const m = String((t as any).paymentMethod || '').toLowerCase();
+              const key = m.includes('esp') || m==='cash' ? 'Espèces' : m.includes('carte') || m==='card' ? 'Carte' : 'SumUp';
+              acc[key] = (acc[key] || 0) + (t.total || 0);
+              return acc;
+            }, {} as Record<string, number>);
+            const rows = computeDailyProductSales(txs).slice(0, 10);
+            return (
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1 }}>Heure de clôture: {new Date().toLocaleString('fr-FR')}</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="h6">Total CA</Typography>
+                  <Typography variant="h6">{totalCA.toFixed(2)} €</Typography>
+                </Box>
+                <Divider sx={{ my: 1 }} />
+                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Totaux par mode de règlement</Typography>
+                <List dense>
+                  {['Espèces','Carte','SumUp'].map(k => (
+                    <ListItem key={k} sx={{ py: 0.25 }}>
+                      <ListItemText primary={k} />
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{(byMethod[k]||0).toFixed(2)} €</Typography>
+                    </ListItem>
+                  ))}
+                </List>
+                <Divider sx={{ my: 1 }} />
+                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Top 10 articles</Typography>
+                <List dense>
+                  {rows.map(({ product, totalQty, totalAmount }) => (
+                    <ListItem key={product.id} sx={{ py: 0.25 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {product.name}
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          {`Qté: ${totalQty} • CA: ${totalAmount.toFixed(2)} €`}
+                        </Typography>
+                      </Box>
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            );
+          })()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowEndOfDay(false)}>Annuler</Button>
+          <Button color="error" onClick={() => {
+            if (!window.confirm('Valider la clôture de la journée ? Cette action archivera et remettra à zéro.')) return;
+            const z = StorageService.incrementZNumber();
+            const payload = {
+              zNumber: z,
+              closedAt: new Date().toISOString(),
+              transactions: todayTransactions,
+            };
+            StorageService.saveClosure(payload);
+            StorageService.clearTodayTransactions();
+            setTodayTransactions([]);
+            setShowEndOfDay(false);
+            alert(`Clôture effectuée. Z${z} enregistré.`);
+          }}>Valider la clôture</Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Modale d'édition/suppression d'un ticket */}
       <Dialog open={showTicketEditor} onClose={() => setShowTicketEditor(false)} maxWidth="md" fullWidth>
         <DialogTitle>Modifier un ticket</DialogTitle>
@@ -3489,7 +3882,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           </Box>
 
           {selectedTicketId && (() => {
-            const tx = todayTransactions.find(t => t.id === selectedTicketId);
+            const tx = selectedTicketDraft || todayTransactions.find(t => t.id === selectedTicketId);
             if (!tx) return null;
             const updateQty = (productId: string, delta: number) => {
               const baseItems = Array.isArray(tx.items) ? tx.items : [];
@@ -3498,8 +3891,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               ).filter(it => it.quantity > 0);
               const newTotal = newItems.reduce((s, it) => s + (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * it.quantity, 0);
               const updated = { ...tx, items: newItems, total: newTotal } as Transaction;
-              StorageService.updateDailyTransaction(updated);
-              setTodayTransactions(StorageService.loadTodayTransactions());
+              setSelectedTicketDraft(updated);
             };
             const removeLine = (productId: string) => updateQty(productId, -9999);
 
@@ -3531,9 +3923,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         </DialogContent>
         <DialogActions>
           {selectedTicketId && (
-            <Button color="error" onClick={() => { StorageService.deleteDailyTransaction(selectedTicketId); setTodayTransactions(StorageService.loadTodayTransactions()); setSelectedTicketId(null); }}>Supprimer le ticket</Button>
+            <>
+              <Button color="error" onClick={() => { StorageService.deleteDailyTransaction(selectedTicketId); setTodayTransactions(StorageService.loadTodayTransactions()); setSelectedTicketId(null); setSelectedTicketDraft(null); }}>Supprimer le ticket</Button>
+              <Button variant="contained" onClick={() => {
+                if (!selectedTicketDraft) { setShowTicketEditor(false); return; }
+                StorageService.updateDailyTransaction(selectedTicketDraft);
+                setTodayTransactions(StorageService.loadTodayTransactions());
+                setSelectedTicketDraft(null);
+                setShowTicketEditor(false);
+              }}>Valider</Button>
+            </>
           )}
-          <Button onClick={() => setShowTicketEditor(false)}>Fermer</Button>
+          <Button onClick={() => { setSelectedTicketDraft(null); setShowTicketEditor(false); }}>Fermer</Button>
         </DialogActions>
       </Dialog>
 
