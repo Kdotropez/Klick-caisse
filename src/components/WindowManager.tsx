@@ -5,6 +5,10 @@ import {
   Typography,
   IconButton,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Chip,
   List,
   ListItem,
@@ -20,10 +24,12 @@ import {
   NavigateBefore,
   NavigateNext,
 } from '@mui/icons-material';
-import { Product, Category, CartItem, ProductVariation } from '../types/Product';
+import { Product, Category, CartItem, ProductVariation, Transaction } from '../types/Product';
 import { saveProductionData } from '../data/productionData';
 import VariationModal from './VariationModal';
 import RecapModal from './RecapModal';
+import TransactionHistory from './TransactionHistory';
+import { StorageService } from '../services/StorageService';
 import GlobalDiscountModal from './GlobalDiscountModal';
 import ItemDiscountModal from './ItemDiscountModal';
 import CategoryManagementModal from './CategoryManagementModal';
@@ -116,6 +122,25 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // États pour les notifications de paiement
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [showTransactionHistory, setShowTransactionHistory] = useState(false);
+  const [todayTransactions, setTodayTransactions] = useState(() => StorageService.loadTodayTransactions());
+  const [showSalesRecap, setShowSalesRecap] = useState(false);
+
+  const computeDailyProductSales = (transactions: Transaction[]) => {
+    const byProduct: Record<string, { product: Product; totalQty: number; totalAmount: number }> = {};
+    for (const tx of transactions) {
+      for (const item of tx.items) {
+        const key = item.product.id;
+        const lineAmount = (item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice) * item.quantity;
+        if (!byProduct[key]) {
+          byProduct[key] = { product: item.product, totalQty: 0, totalAmount: 0 };
+        }
+        byProduct[key].totalQty += item.quantity;
+        byProduct[key].totalAmount += lineAmount;
+      }
+    }
+    return Object.values(byProduct).sort((a, b) => b.totalQty - a.totalQty);
+  };
   
   // États pour les totaux par méthode de paiement
   const [paymentTotals, setPaymentTotals] = useState({
@@ -392,6 +417,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       setShowPaymentSuccess(false);
       setPaymentMethod('');
     }, 3000);
+
+    // Construire la transaction et persister
+    const tx = {
+      id: Date.now().toString(),
+      items: cartItems.map(i => ({ ...i })),
+      total,
+      paymentMethod: method as any,
+      cashierName: 'Caissier',
+      timestamp: new Date(),
+    };
+    StorageService.addDailyTransaction(tx as any);
+    setTodayTransactions(StorageService.loadTodayTransactions());
 
     // Mettre à jour les compteurs de ventes et vider le panier
     onCheckout();
@@ -2759,6 +2796,31 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   variant="contained"
                   sx={{ 
                     ...commonButtonSx,
+                    backgroundColor: '#607d8b',
+                    '&:hover': { backgroundColor: '#546e7a' },
+                  }}
+                  onClick={() => setShowSalesRecap(true)}
+                >
+                  Récap ventes
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    ...commonButtonSx,
+                    backgroundColor: '#455a64',
+                    '&:hover': { backgroundColor: '#37474f' },
+                  }}
+                  onClick={() => setShowTransactionHistory(true)}
+                >
+                  Tickets jour
+                </Button>
+              </Box>
+              
+              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
+                <Button
+                  variant="contained"
+                  sx={{ 
+                    ...commonButtonSx,
                     backgroundColor: '#ff9800',
                     '&:hover': { backgroundColor: '#f57c00' },
                   }}
@@ -2776,31 +2838,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   onClick={() => console.log('Fonction 4')}
                 >
                   Fonction 4
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#e91e63',
-                    '&:hover': { backgroundColor: '#c2185b' },
-                  }}
-                  onClick={() => console.log('Fonction 5')}
-                >
-                  Fonction 5
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#455a64' },
-                  }}
-                  onClick={() => console.log('Fonction 6')}
-                >
-                  Fonction 6
                 </Button>
               </Box>
             </Box>
@@ -3317,12 +3354,71 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          onUpdateCategories={handleUpdateCategories}
        />
 
-       {/* Modale de rapport journalier */}
+      {/* Modale de rapport journalier */}
        <DailyReportModal
          open={showDailyReportModal}
          onClose={() => setShowDailyReportModal(false)}
          cartItems={cartItems}
        />
+
+      {/* Modale historique des transactions du jour */}
+      <Dialog open={showTransactionHistory} onClose={() => setShowTransactionHistory(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Tickets de la journée</DialogTitle>
+        <DialogContent>
+          <TransactionHistory transactions={todayTransactions} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowTransactionHistory(false)}>Fermer</Button>
+          <Button color="error" onClick={() => { StorageService.clearTodayTransactions(); setTodayTransactions([]); }}>Vider</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modale récapitulatif ventes du jour */}
+      <Dialog open={showSalesRecap} onClose={() => setShowSalesRecap(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Récapitulatif des ventes du jour</DialogTitle>
+        <DialogContent>
+          {(() => {
+            const rows = computeDailyProductSales(todayTransactions);
+            if (rows.length === 0) {
+              return <Typography>Aucune vente aujourd'hui.</Typography>;
+            }
+            const totalQty = rows.reduce((a, r) => a + r.totalQty, 0);
+            const totalAmount = rows.reduce((a, r) => a + r.totalAmount, 0);
+            return (
+              <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, fontWeight: 'bold' }}>
+                  <Typography variant="body2">Articles: {totalQty}</Typography>
+                  <Typography variant="body2">CA: {totalAmount.toFixed(2)} €</Typography>
+                </Box>
+                <List dense sx={{ pt: 0 }}>
+                  {rows.map(({ product, totalQty, totalAmount }) => (
+                    <ListItem
+                      key={product.id}
+                      disableGutters
+                      sx={{ py: 0.25, borderBottom: '1px solid #f0f0f0' }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
+                        <Typography variant="body2" sx={{ width: 56, textAlign: 'right', fontFamily: 'monospace' }}>
+                          {totalQty}
+                        </Typography>
+                        <Typography variant="body2" sx={{ width: 90, textAlign: 'right', fontFamily: 'monospace' }}>
+                          {totalAmount.toFixed(2)} €
+                        </Typography>
+                        <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {product.name}
+                        </Typography>
+                      </Box>
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            );
+          })()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowSalesRecap(false)}>Fermer</Button>
+        </DialogActions>
+      </Dialog>
 
        {/* Modale de modification d'article */}
        <ProductEditModal
