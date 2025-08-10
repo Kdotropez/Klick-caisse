@@ -4048,7 +4048,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         <DialogTitle>Modifier ticket</DialogTitle>
         <DialogContent>
           {globalEditorDraft && (
-            <List dense>
+            <>
+              {/* Sélection du mode de règlement */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Mode de règlement:</Typography>
+                {['Espèces','Carte','SumUp'].map((m) => (
+                  <Button
+                    key={m}
+                    size="small"
+                    variant={(String(globalEditorDraft.paymentMethod||'').toLowerCase().includes('esp') && m==='Espèces') ||
+                            (String(globalEditorDraft.paymentMethod||'').toLowerCase().includes('carte') && m==='Carte') ||
+                            (String(globalEditorDraft.paymentMethod||'').toLowerCase()==='sumup' && m==='SumUp')
+                            ? 'contained' : 'outlined'}
+                    onClick={() => setGlobalEditorDraft((prev:any) => ({ ...prev, paymentMethod: m }))}
+                  >
+                    {m}
+                  </Button>
+                ))}
+              </Box>
+
+              <List dense>
               {globalEditorDraft.items.map((it: any, idx: number) => {
                 const unitPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
                 return (
@@ -4082,6 +4101,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <ListItem><ListItemText primary="Ticket vide" /></ListItem>
               )}
             </List>
+            </>
           )}
         </DialogContent>
         <DialogActions>
