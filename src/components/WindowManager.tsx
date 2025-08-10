@@ -905,7 +905,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [handleMouseMove]);
+  }, []);
 
 
 
