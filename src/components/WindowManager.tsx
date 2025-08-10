@@ -1577,8 +1577,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                          flexDirection: 'column',
                          justifyContent: 'space-between',
                          minHeight: 0,
-                         background: `radial-gradient(circle at 50% 50%, ${categoryColor}C0 0%, ${categoryColor}90 35%, ${categoryColor}60 60%, ${categoryColor}20 85%, #ffffff 100%)`,
-                         border: `1px solid ${categoryColor}`,
+                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}66 0%, ${categoryColor}33 40%, ${categoryColor}14 70%, #ffffff 90%, #ffffff 100%)`,
+                          border: `1px solid ${categoryColor}66`,
                          borderRadius: `8px`,
                          boxShadow: `0 1px 2px rgba(0,0,0,0.1)`,
                          color: '#2c3e50',
@@ -1592,21 +1592,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        }),
                        ...(dragOverProduct?.id === product.id && {
                          transform: 'scale(1.05)',
-                         boxShadow: `0 ${8 * cardScaleFactor}px ${25 * cardScaleFactor}px rgba(0,0,0,0.3), 0 ${3 * cardScaleFactor}px ${8 * cardScaleFactor}px ${categoryColor}50`,
-                         border: `${3 * cardScaleFactor}px solid ${categoryColor}`,
-                         background: `radial-gradient(circle at 50% 50%, ${categoryColor}A0 0%, ${categoryColor}70 45%, ${categoryColor}30 75%, #ffffff 100%)`
+                          boxShadow: `0 ${8 * cardScaleFactor}px ${25 * cardScaleFactor}px rgba(0,0,0,0.25), 0 ${3 * cardScaleFactor}px ${8 * cardScaleFactor}px ${categoryColor}40`,
+                          border: `${3 * cardScaleFactor}px solid ${categoryColor}66`,
+                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}66 0%, ${categoryColor}33 50%, ${categoryColor}14 80%, #ffffff 100%)`
                        }),
                        '&:hover': { 
                          transform: 'translateY(-1px)', 
-                          boxShadow: `0 3px 6px rgba(0,0,0,0.15)`,
-                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}D0 0%, ${categoryColor}A0 40%, ${categoryColor}50 75%, #ffffff 100%)`,
-                         border: `1px solid ${categoryColor}`,
+                          boxShadow: `0 3px 6px rgba(0,0,0,0.12)`,
+                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}80 0%, ${categoryColor}40 45%, ${categoryColor}1A 80%, #ffffff 100%)`,
+                          border: `1px solid ${categoryColor}66`,
                          cursor: 'grab'
                        },
                        '&:active': { 
                          transform: 'translateY(0px) scale(0.98)',
-                          boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(0,0,0,0.25), 0 ${1 * cardScaleFactor}px ${2 * cardScaleFactor}px ${categoryColor}30`,
-                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}E0 0%, ${categoryColor}A0 45%, ${categoryColor}50 80%, #ffffff 100%)`,
+                          boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(0,0,0,0.2), 0 ${1 * cardScaleFactor}px ${2 * cardScaleFactor}px ${categoryColor}26`,
+                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}80 0%, ${categoryColor}40 50%, ${categoryColor}1A 85%, #ffffff 100%)`,
                          cursor: 'grabbing'
                        }
                      }}
