@@ -667,12 +667,24 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   });
   
   const filteredProducts = uniqueProducts.filter(product => {
-    // Filtrage par recherche d'article
-        const matchesSearch = !searchTerm ||
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.ean13.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.reference.toLowerCase().includes(searchTerm.toLowerCase());
+    // Filtrage par recherche d'article (multi-mots, insensible aux accents/casse, ordre libre)
+    const matchesSearch = (() => {
+      const raw = String(searchTerm || '').trim();
+      if (!raw) return true;
+      const tokens = StorageService
+        .normalizeLabel(raw)
+        .split(/\s+/)
+        .filter(Boolean);
+      if (tokens.length === 0) return true;
+      const haystack = StorageService.normalizeLabel([
+        product.name,
+        product.category,
+        product.ean13 || '',
+        product.reference || '',
+        Array.isArray(product.associatedCategories) ? product.associatedCategories.join(' ') : ''
+      ].join(' '));
+      return tokens.every(token => haystack.includes(token));
+    })();
     
     // Si aucune catégorie n'est sélectionnée, afficher tous les produits
     if (!selectedCategory && !selectedSubcategory) {
