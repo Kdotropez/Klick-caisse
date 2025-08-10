@@ -15,12 +15,7 @@ import {
   ListItemText,
   Divider,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from '@mui/material';
-import { Edit as EditIcon, Undo as UndoIcon } from '@mui/icons-material';
 import {
   Add,
   Remove,
@@ -34,7 +29,7 @@ import { Cashier } from '../types/Cashier';
 import { saveProductionData } from '../data/productionData';
 import VariationModal from './VariationModal';
 import RecapModal from './RecapModal';
-import TransactionHistory from './TransactionHistory';
+
 import { StorageService } from '../services/StorageService';
 import GlobalDiscountModal from './GlobalDiscountModal';
 import ItemDiscountModal from './ItemDiscountModal';
@@ -383,7 +378,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [subcategorySearchTerm, setSubcategorySearchTerm] = useState('');
-  const [isSaleMode, setIsSaleMode] = useState(false);
+
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -524,11 +519,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       return;
     }
 
-    // Calculer le total
-    const total = cartItems.reduce((sum, item) => {
-      const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      return sum + (price * item.quantity);
-    }, 0);
+    // Calculer le total en tenant compte des remises (individuelles + globale)
+    const total = getTotalWithGlobalDiscount();
 
     // Accumuler le total pour cette méthode de paiement
     setPaymentTotals(prev => ({
@@ -560,6 +552,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     // Mettre à jour les compteurs de ventes et vider le panier
     onCheckout();
+
+    // Réinitialiser les filtres après validation du paiement
+    resetFilters();
 
     console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€ - Compteurs de ventes mis à jour`);
   };
@@ -756,13 +751,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     })));
   };
 
-  const handleMouseDown = (e: React.MouseEvent, windowId: string) => {
-    if (isLayoutLocked) return; // Désactive le déplacement si verrouillé
-    
-    const window = windows.find(w => w.id === windowId);
-    if (!window) return;
+  const handleMouseDown = (e: React.MouseEvent<HTMLElement>, windowId: string) => {
+    // Désactive le déplacement si verrouillé
+    const win = windows.find(w => w.id === windowId);
+    if (!win) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setDragOffset({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
@@ -843,18 +837,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setResizeDirection('');
   };
 
-  const handleResizeStart = (e: React.MouseEvent, windowId: string, direction: string) => {
-    if (isLayoutLocked) return; // Désactive le redimensionnement si verrouillé
-    
+  const handleResizeStart = (
+    e: React.MouseEvent<HTMLElement>,
+    windowId: string,
+    direction: string
+  ) => {
+    // Désactive le redimensionnement si verrouillé
     e.stopPropagation();
-    const window = windows.find(w => w.id === windowId);
-    if (!window) return;
+    const win = windows.find(w => w.id === windowId);
+    if (!win) return;
 
     setResizeStart({
       x: e.clientX,
       y: e.clientY,
-      width: window.width,
-      height: window.height
+      width: win.width,
+      height: win.height
     });
     setResizingWindow(windowId);
     setResizeDirection(direction);
@@ -896,7 +893,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [handleMouseMove]);
 
 
 
@@ -1108,7 +1105,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       }
 
       // Analyser les en-têtes
-      const headers = lines[0].split('\t').map(h => h.trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, ''));
+      const headers = lines[0].split('\t').map(h => h.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
       
       // Mapping des colonnes
       const mapping = {
@@ -1138,18 +1135,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         if (values.length < Math.max(...Object.values(mapping).filter(v => v !== -1)) + 1) continue;
 
         try {
-          const id = (values[mapping.id] || `prod_${i}`).replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-          const name = (values[mapping.name] || 'Produit sans nom').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-          const category = (values[mapping.category] || 'Général').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const id = (values[mapping.id] || `prod_${i}`).replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const name = (values[mapping.name] || 'Produit sans nom').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           const finalPrice = parseFloat(values[mapping.finalPrice]) || 0;
-          const ean13 = (values[mapping.ean13] || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-          const reference = (values[mapping.reference] || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const ean13 = (values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const reference = (values[mapping.reference] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           
           // Traiter les catégories associées
-          const associatedCategoriesStr = (values[mapping.associatedCategories] || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+          const associatedCategoriesStr = (values[mapping.associatedCategories] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           const associatedCategories = associatedCategoriesStr
             .split(',')
-            .map(cat => cat.trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, ''))
+            .map(cat => cat.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''))
             .filter(cat => cat && cat.length > 0);
 
           const wholesalePrice = mapping.wholesalePrice !== -1 ? 
@@ -1157,10 +1154,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             finalPrice * 0.8;
 
           // Nettoyer les données
-          const cleanName = name.replace(/[^\w\s\-\.]/g, '').trim();
-          const cleanCategory = category.replace(/[^\w\s\-\.]/g, '').trim();
+          const cleanName = name.replace(/[^\w\s\-.]/g, '').trim();
+          const cleanCategory = category.replace(/[^\w\s\-.]/g, '').trim();
           const cleanAssociatedCategories = associatedCategories
-            .map(cat => cat.replace(/[^\w\s\-\.]/g, '').trim())
+            .map(cat => cat.replace(/[^\w\s\-.]/g, '').trim())
             .filter(cat => cat && cat.length > 0);
 
           if (cleanName && cleanName !== 'Produit sans nom') {
@@ -1251,6 +1248,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       default:
         return originalPrice;
     }
+  };
+
+  // Réinitialiser les filtres de recherche/catégories
+  const resetFilters = () => {
+    setSearchTerm('');
+    setCategorySearchTerm('');
+    setSubcategorySearchTerm('');
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
+    setProductSortMode('sales');
+    setCurrentPage(1);
+    console.log('🔄 Reset des recherches effectué');
   };
 
   const getTotalWithGlobalDiscount = () => {
@@ -2282,19 +2291,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      🗑️ Supprimer ({selectedProductsForDeletion.size})
                    </Button>
                  )}
-                 <Button
+                  <Button
                    variant="outlined"
                    size="small"
-                   onClick={() => {
-                     setSearchTerm('');
-                     setCategorySearchTerm('');
-                     setSubcategorySearchTerm('');
-                     setSelectedCategory(null);
-                     setSelectedSubcategory(null);
-                     setProductSortMode('sales');
-                     setCurrentPage(1);
-                     console.log('🔄 Reset des recherches effectué');
-                   }}
+                    onClick={resetFilters}
                    sx={{
                      minWidth: 'auto',
                      px: 1.5,
@@ -2469,10 +2469,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          );
 
              case 'search':
-         const totalAmount = cartItems.reduce((sum, item) => {
-           const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-           return sum + (price * item.quantity);
-         }, 0);
+         const totalAmount = getTotalWithGlobalDiscount();
          
          return (
            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
