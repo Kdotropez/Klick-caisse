@@ -2104,10 +2104,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 gap: 1,
                 alignItems: 'center'
               }}>
-                                 {/* Recherche des articles */}
+                 {/* Recherche des articles */}
                  <TextField
                    size="small"
-                   placeholder="Rechercher article ou scanner code-barre..."
+                   placeholder="Article (ou scanner code-barres)"
                    variant="outlined"
                    sx={{ 
                      flex: 1,
@@ -2167,7 +2167,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                  {/* Recherche des catégories */}
                  <TextField
                    size="small"
-                   placeholder="Rechercher catégorie..."
+                   placeholder="Catégorie"
                    variant="outlined"
                    value={categorySearchTerm}
                    onChange={(e) => setCategorySearchTerm(e.target.value)}
@@ -2198,7 +2198,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                  {/* Recherche des sous-catégories */}
                  <TextField
                    size="small"
-                   placeholder="Rechercher sous-catégorie..."
+                   placeholder="Sous-catégorie"
                    variant="outlined"
                    value={subcategorySearchTerm}
                    onChange={(e) => setSubcategorySearchTerm(e.target.value)}
