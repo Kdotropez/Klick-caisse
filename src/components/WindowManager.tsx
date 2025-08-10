@@ -1664,15 +1664,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                            {selectedProductsForDeletion.has(product.id) ? '✓' : ''}
                          </Box>
                        )}
-                       <Typography variant="body2" sx={{ 
-                         fontWeight: '600', 
-                         fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`, 
-                         lineHeight: 1.2, 
-                         flexGrow: 1, 
-                         color: '#2c3e50' 
-                       }}>
-                         {product.name}
-                       </Typography>
+                        <Typography variant="body2" sx={{ 
+                          fontWeight: '600', 
+                          fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`, 
+                          lineHeight: 1.2, 
+                          flexGrow: 1, 
+                          color: '#2c3e50',
+                          textAlign: 'center',
+                          width: '100%'
+                        }}>
+                          {product.name}
+                        </Typography>
                      </Box>
                      <Typography variant="h6" sx={{ 
                        fontWeight: 'bold', 
@@ -1689,17 +1691,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                        mt: 0.25 * cardScaleFactor, 
                        gap: 0.25 * cardScaleFactor 
                      }}>
-                         <Typography 
-                           variant="caption" 
-                           sx={{ 
-                             fontSize: `${Math.max(0.85, 0.95 * cardScaleFactor)}rem`, 
-                             color: '#111',
-                             fontWeight: 800,
-                             alignSelf: 'flex-end'
-                           }}
-                         >
-                          {(dailyQtyByProduct[product.id] || 0)}
-                       </Typography>
+                        <Chip
+                          label={(dailyQtyByProduct[product.id] || 0)}
+                          size="small"
+                          sx={{
+                            fontSize: `${Math.max(0.8, 0.9 * cardScaleFactor)}rem`,
+                            height: `${Math.max(20, 22 * cardScaleFactor)}px`,
+                            backgroundColor: '#ffffff',
+                            color: '#111',
+                            fontWeight: 800,
+                            border: '1px solid #dddddd',
+                            borderRadius: `${Math.max(10, 10 * cardScaleFactor)}px`,
+                            alignSelf: 'flex-end',
+                            boxShadow: `0 ${1 * cardScaleFactor}px ${3 * cardScaleFactor}px rgba(0,0,0,0.15)`
+                          }}
+                        />
                        {product.variations.length > 0 && (
                          <Chip 
                            label={`${product.variations.length} var.`} 
