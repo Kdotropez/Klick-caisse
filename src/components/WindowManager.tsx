@@ -30,6 +30,7 @@ import {
   NavigateNext,
 } from '@mui/icons-material';
 import { Product, Category, CartItem, ProductVariation, Transaction } from '../types/Product';
+import { Cashier } from '../types/Cashier';
 import { saveProductionData } from '../data/productionData';
 import VariationModal from './VariationModal';
 import RecapModal from './RecapModal';
@@ -61,6 +62,8 @@ interface WindowManagerProps {
   categories: Category[];
   cartItems: CartItem[];
   isLayoutLocked: boolean;
+  cashiers: Cashier[];
+  currentCashier: Cashier | null;
   onProductClick: (product: Product) => void;
   onProductWithVariationClick: (product: Product, variation: ProductVariation) => void;
   onUpdateQuantity: (productId: string, variationId: string | null, quantity: number) => void;
@@ -69,6 +72,8 @@ interface WindowManagerProps {
   onImportComplete: (products: Product[], categories: Category[]) => void;
   onProductsReorder?: (newProducts: Product[]) => void;
   onUpdateCategories?: (newCategories: Category[]) => void;
+  onUpdateCashiers?: (newCashiers: Cashier[]) => void;
+  onCashierLogin?: (cashier: Cashier) => void;
 }
 
 const WindowManager: React.FC<WindowManagerProps> = ({
@@ -76,6 +81,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   categories,
   cartItems,
   isLayoutLocked,
+  cashiers,
+  currentCashier,
   onProductClick,
   onProductWithVariationClick,
   onUpdateQuantity,
@@ -84,6 +91,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   onImportComplete,
   onProductsReorder,
   onUpdateCategories,
+  onUpdateCashiers,
+  onCashierLogin,
 }) => {
   // Dimensions pour l'émulation 1920×1080
   const APP_BAR_HEIGHT = 64;
@@ -3650,7 +3659,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
            {/* Contenu de la fenêtre */}
            <Box sx={{ flexGrow: 1, overflow: 'hidden', position: 'relative' }}>
              {renderWindowContent(window)}
-             {renderResizeHandles(window)}
            </Box>
          </Paper>
       ))}

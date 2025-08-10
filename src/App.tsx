@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import CSVImport from './components/CSVImport';
 import WindowManager from './components/WindowManager';
 import { Product, Category, CartItem, ProductVariation } from './types/Product';
+import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
 
@@ -12,6 +13,10 @@ const App: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLayoutLocked] = useState<boolean>(false);
+  const [cashiers, setCashiers] = useState<Cashier[]>([]);
+  const [currentCashier, setCurrentCashier] = useState<Cashier | null>(null);
+  const [rootSize, setRootSize] = useState({ width: '1187px', height: '874px' });
+  const [isResizingRoot, setIsResizingRoot] = useState(false);
 
 
   // Charger les données de production au démarrage
@@ -19,6 +24,10 @@ const App: React.FC = () => {
     const { products: loadedProducts, categories: loadedCategories } = loadProductionData();
     setProducts(loadedProducts);
     setCategories(loadedCategories);
+    
+    // Initialiser les caissiers
+    const loadedCashiers = StorageService.initializeDefaultCashier();
+    setCashiers(loadedCashiers);
   }, []);
 
   // Migration de nettoyage sous-catégories (une seule fois)
@@ -169,22 +178,113 @@ const App: React.FC = () => {
     console.log('Nouvelles catégories sauvegardées:', newCategories.length);
   };
 
-  if (showImport) {
-    return (
-      <Box sx={{ height: '100vh', width: '100vw', p: 3 }}>
-        <CSVImport onImportComplete={handleImportComplete} />
-      </Box>
-    );
-  }
+  const handleUpdateCashiers = (newCashiers: Cashier[]) => {
+    setCashiers(newCashiers);
+    StorageService.saveCashiers(newCashiers);
+  };
+
+  const handleCashierLogin = (cashier: Cashier) => {
+    setCurrentCashier(cashier);
+    StorageService.updateCashierLastLogin(cashier.id);
+  };
+
+     if (showImport) {
+     return (
+       <Box sx={{ height: '100vh', width: '100vw', p: 3 }}>
+         <CSVImport onImportComplete={handleImportComplete} />
+       </Box>
+     );
+   }
+
+  const handleRootResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingRoot(true);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = parseInt(rootSize.width);
+    const startHeight = parseInt(rootSize.height);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      const newWidth = Math.max(800, startWidth + deltaX);
+      const newHeight = Math.max(600, startHeight + deltaY);
+      setRootSize({ width: `${newWidth}px`, height: `${newHeight}px` });
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingRoot(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
 
   return (
-    <Box sx={{ height: '100vh', width: '100vw', position: 'relative' }}>
+    <Box sx={{ 
+      height: rootSize.height, 
+      width: rootSize.width, 
+      position: 'relative',
+      border: '2px solid #1976d2',
+      backgroundColor: '#f5f5f5',
+      overflow: 'hidden'
+    }}>
+      {/* Poignée de redimensionnement du div#root */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: '20px',
+          height: '20px',
+          backgroundColor: '#1976d2',
+          cursor: 'se-resize',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          '&:hover': {
+            backgroundColor: '#1565c0'
+          }
+        }}
+        onMouseDown={handleRootResizeStart}
+      >
+        ⬌
+      </Box>
+
+      {/* Affichage de la taille du div#root */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 5,
+          right: 5,
+          backgroundColor: 'rgba(25, 118, 210, 0.9)',
+          color: 'white',
+          px: 1,
+          py: 0.5,
+          borderRadius: 1,
+          fontSize: '0.7rem',
+          fontFamily: 'monospace',
+          zIndex: 1000,
+          pointerEvents: 'none'
+        }}
+      >
+        {parseInt(rootSize.width)}×{parseInt(rootSize.height)}
+      </Box>
+
       {/* Zone des fenêtres - plein écran */}
       <WindowManager
         products={products}
         categories={categories}
         cartItems={cartItems}
         isLayoutLocked={isLayoutLocked}
+        cashiers={cashiers}
+        currentCashier={currentCashier}
         onProductClick={handleProductClick}
         onProductWithVariationClick={handleProductWithVariationClick}
         onUpdateQuantity={handleUpdateQuantity}
@@ -193,6 +293,8 @@ const App: React.FC = () => {
         onImportComplete={handleImportComplete}
         onProductsReorder={handleProductsReorder}
         onUpdateCategories={handleUpdateCategories}
+        onUpdateCashiers={handleUpdateCashiers}
+        onCashierLogin={handleCashierLogin}
       />
     </Box>
   );

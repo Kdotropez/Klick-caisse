@@ -19,11 +19,15 @@ export interface Transaction {
   finalTotal: number;
   paymentMethod: 'cash' | 'card' | 'check';
   timestamp: Date;
-  cashier: string;
+  cashierId?: string; // ID du caissier qui a effectué la transaction
+  cashierName?: string; // Nom du caissier (pour compatibilité)
 }
 
 export interface Category {
   id: string;
   name: string;
   color: string;
-} 
+}
+
+// Export des types de caissiers
+export * from './Cashier'; 
