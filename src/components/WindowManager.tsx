@@ -3925,6 +3925,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               return true;
             });
 
+            // Trier par date décroissante (plus récent en premier)
+            const sortedByDateDesc = [...filtered].sort((a: any, b: any) => {
+              const ta = new Date(a.timestamp).getTime();
+              const tb = new Date(b.timestamp).getTime();
+              return tb - ta;
+            });
+
             const toggleSelect = (tid: string) => {
               setGlobalSelectedIds(prev => {
                 const next = new Set(prev);
@@ -3936,7 +3943,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
             return (
               <List dense>
-                {filtered.map((t: any) => {
+                {sortedByDateDesc.map((t: any) => {
                   const qty = Array.isArray(t.items) ? t.items.reduce((s: number, it: any) => s + (it.quantity || 0), 0) : 0;
                   const name = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
                   const isEx = expandedGlobalTicketIds.has(String(t.id));
@@ -3964,7 +3971,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     </ListItem>
                   );
                 })}
-                {filtered.length === 0 && (
+                {sortedByDateDesc.length === 0 && (
                   <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>Aucun ticket pour ces filtres</Box>
                 )}
               </List>
