@@ -4131,6 +4131,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               StorageService.saveAllClosures(newClosures);
             }
             setShowGlobalEditor(false);
+            // Vider la sélection dans la liste des tickets globaux après modification
+            setGlobalSelectedIds(new Set());
           }}>Enregistrer</Button>
         </DialogActions>
       </Dialog>
