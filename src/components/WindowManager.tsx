@@ -2238,45 +2238,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                    }}
                  />
                  
-                 {/* Boutons de tri et Reset */}
-                 <Button
-                   variant="outlined"
-                   size="small"
-                   onClick={() => setProductSortMode('sales')}
-                   sx={{
-                     minWidth: 'auto',
-                     px: 1.5,
-                     backgroundColor: productSortMode==='sales' ? '#4caf50' : 'transparent',
-                     color: productSortMode==='sales' ? 'white' : '#4caf50',
-                     borderColor: '#4caf50',
-                     fontSize: '0.7rem',
-                     '&:hover': {
-                       backgroundColor: productSortMode==='sales' ? '#45a049' : '#e8f5e8',
-                       borderColor: '#45a049'
-                     }
-                   }}
-                 >
-                   📊 Tri ventes
-                 </Button>
-                 <Button
-                   variant="outlined"
-                   size="small"
-                   onClick={() => setProductSortMode('name')}
-                   sx={{
-                     minWidth: 'auto',
-                     px: 1.5,
-                     backgroundColor: productSortMode==='name' ? '#2196f3' : 'transparent',
-                     color: productSortMode==='name' ? 'white' : '#2196f3',
-                     borderColor: '#2196f3',
-                     fontSize: '0.7rem',
-                     '&:hover': {
-                       backgroundColor: productSortMode==='name' ? '#1976d2' : '#e3f2fd',
-                       borderColor: '#1976d2'
-                     }
-                   }}
-                 >
-                   🔤 Tri nom
-                 </Button>
+                 {/* Boutons de tri déplacés plus bas dans la section sous-catégories */}
                  {/* Bouton de suppression en mode édition */}
                  {isEditMode && selectedProductsForDeletion.size > 0 && (
                    <Button
@@ -2303,42 +2265,76 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      🗑️ Supprimer ({selectedProductsForDeletion.size})
                    </Button>
                  )}
-                  <Button
-                   variant="outlined"
-                   size="small"
-                    onClick={resetFilters}
-                   sx={{
-                     minWidth: 'auto',
-                     px: 1.5,
-                     backgroundColor: 'transparent',
-                     color: '#666',
-                     borderColor: '#666',
-                     fontSize: '0.7rem',
-                     '&:hover': {
-                       backgroundColor: '#f5f5f5',
-                       borderColor: '#333',
-                       color: '#333'
-                     }
-                   }}
-                 >
-                   🔄 Reset
-                 </Button>
+                 {/* Bouton Reset déplacé plus bas dans la section sous-catégories */}
               </Box>
               
               {/* Onglets des sous-catégories */}
               <Box sx={{ 
-                p: 1,
+                p: 0.5,
                 borderTop: '1px solid #e0e0e0',
                 backgroundColor: '#f9f9f9'
               }}>
-                <Typography variant="body2" sx={{ 
-                  mb: 1, 
-                  fontWeight: 'bold', 
-                  color: '#9c27b0',
-                  fontSize: '0.8rem'
-                }}>
-                  Sous-catégories :
-                </Typography>
+                {/* Ligne d'actions: tri et reset */}
+                <Box sx={{ display: 'flex', gap: 0.5, mb: 0.5, flexWrap: 'wrap' }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setProductSortMode('sales')}
+                    sx={{
+                      minWidth: 'auto',
+                      px: 1.5,
+                      backgroundColor: productSortMode==='sales' ? '#4caf50' : 'transparent',
+                      color: productSortMode==='sales' ? 'white' : '#4caf50',
+                      borderColor: '#4caf50',
+                      fontSize: '0.7rem',
+                      '&:hover': {
+                        backgroundColor: productSortMode==='sales' ? '#45a049' : '#e8f5e8',
+                        borderColor: '#45a049'
+                      }
+                    }}
+                  >
+                    📊 Tri ventes
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setProductSortMode('name')}
+                    sx={{
+                      minWidth: 'auto',
+                      px: 1.5,
+                      backgroundColor: productSortMode==='name' ? '#2196f3' : 'transparent',
+                      color: productSortMode==='name' ? 'white' : '#2196f3',
+                      borderColor: '#2196f3',
+                      fontSize: '0.7rem',
+                      '&:hover': {
+                        backgroundColor: productSortMode==='name' ? '#1976d2' : '#e3f2fd',
+                        borderColor: '#1976d2'
+                      }
+                    }}
+                  >
+                    🔤 Tri nom
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={resetFilters}
+                    sx={{
+                      minWidth: 'auto',
+                      px: 1.5,
+                      backgroundColor: 'transparent',
+                      color: '#666',
+                      borderColor: '#666',
+                      fontSize: '0.7rem',
+                      '&:hover': {
+                        backgroundColor: '#f5f5f5',
+                        borderColor: '#333',
+                        color: '#333'
+                      }
+                    }}
+                  >
+                    🔄 Reset
+                  </Button>
+                </Box>
                 <Box sx={{ 
                   display: 'flex',
                   flexDirection: 'row',
