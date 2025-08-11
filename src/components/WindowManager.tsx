@@ -748,13 +748,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   });
   
   const filteredProducts = uniqueProducts.filter(product => {
-    // Filtrage par recherche d'article (ordre libre, tokens partiels, sans accents)
+    // Filtrage par recherche flexible: ordre libre, débuts de mots, sous-séquence, sans accents
     const normalize = (s: string) => (s || '')
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
-    const tokens = normalize(searchTerm).split(/\s+/).filter(Boolean);
-    const haystack = [
+    const rawTokens = normalize(searchTerm).trim().split(/\s+/).filter(Boolean);
+    const tokens = rawTokens.filter(t => t.length >= 2);
+    const effectiveTokens = tokens.length > 0 ? tokens : rawTokens; // si l'utilisateur tape <2 lettres
+
+    const fields = [
       product.name,
       product.category,
       product.reference,
@@ -762,7 +765,30 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       ...(Array.isArray(product.associatedCategories) ? product.associatedCategories : []),
       ...(Array.isArray(product.variations) ? product.variations.map(v => v.attributes) : [])
     ].map(normalize).join(' ');
-    const matchesSearch = tokens.length === 0 || tokens.every(t => haystack.includes(t));
+
+    const words = fields.split(/[^a-z0-9]+/).filter(Boolean);
+    const nameWords = normalize(product.name).split(/[^a-z0-9]+/).filter(Boolean);
+    const acronym = nameWords.map(w => w[0]).join('');
+    const isSubsequence = (word: string, token: string) => {
+      let i = 0;
+      for (let c of word) {
+        if (c === token[i]) i++;
+        if (i === token.length) return true;
+      }
+      return false;
+    };
+    const tokenMatches = (token: string) => {
+      // correspond si: préfixe de mot, inclusion, sous-séquence d'un mot, ou sous-séquence de l'acronyme
+      if (acronym && isSubsequence(acronym, token)) return true;
+      for (const w of words) {
+        if (w.startsWith(token)) return true;
+        if (w.includes(token)) return true;
+        if (isSubsequence(w, token)) return true;
+      }
+      return false;
+    };
+
+    const matchesSearch = effectiveTokens.length === 0 || effectiveTokens.every(tokenMatches);
     
     // Si aucune catégorie ni sous-catégorie n'est sélectionnée, afficher tous les produits
     if (!selectedCategory && !selectedSubcategory) {

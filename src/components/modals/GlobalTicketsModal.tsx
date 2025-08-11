@@ -67,6 +67,22 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   }
   const todayTxs = StorageService.loadTodayTransactions();
   for (const t of todayTxs) allTx.push(t);
+  // Ajouter toutes les transactions archivées par jour (y compris les jours précédents)
+  try {
+    const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+    if (raw) {
+      const map = JSON.parse(raw) as Record<string, any[]>;
+      const todayStr = new Date().toISOString().slice(0,10);
+      Object.keys(map).forEach((day) => {
+        const list = Array.isArray(map[day]) ? map[day] : [];
+        // Éviter le doublon de la journée en cours (déjà ajoutée via loadTodayTransactions)
+        if (day === todayStr) {
+          return;
+        }
+        list.forEach((t: any) => allTx.push(t));
+      });
+    }
+  } catch {}
   if (onlyToday) {
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
     const todayEnd = new Date(); todayEnd.setHours(23,59,59,999);
@@ -130,6 +146,45 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
           <TextField size="small" type="date" label="Date à" value={dateTo} onChange={(e) => setDateTo(e.target.value)} InputLabelProps={{ shrink: true }} />
           <TextField size="small" type="time" label="Heure de" value={timeFrom} onChange={(e) => setTimeFrom(e.target.value)} InputLabelProps={{ shrink: true }} />
           <TextField size="small" type="time" label="Heure à" value={timeTo} onChange={(e) => setTimeTo(e.target.value)} InputLabelProps={{ shrink: true }} />
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 0.5, mb: 1 }}>
+          <Button size="small" variant="outlined" onClick={() => {
+            setFilterPayment('all');
+            setOnlyToday(false);
+            setAmountMin('');
+            setAmountMax('');
+            setAmountExact('');
+            setDateFrom('');
+            setDateTo('');
+            setTimeFrom('');
+            setTimeTo('');
+            setSelectedIds(() => new Set());
+            setExpandedIds(() => new Set());
+          }}>Réinitialiser filtres</Button>
+
+          <Button size="small" variant="contained" onClick={() => {
+            try {
+              const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+              if (!raw) { alert('Aucune sauvegarde de tickets trouvée.'); return; }
+              const map = JSON.parse(raw) as Record<string, any[]>;
+              const days = Object.keys(map)
+                .filter(d => Array.isArray(map[d]) && map[d].length > 0)
+                .sort();
+              if (days.length === 0) { alert('Aucune date avec tickets trouvée.'); return; }
+              setOnlyToday(false);
+              setFilterPayment('all');
+              setAmountMin('');
+              setAmountMax('');
+              setAmountExact('');
+              setTimeFrom('');
+              setTimeTo('');
+              setDateFrom(days[0]);
+              setDateTo(days[days.length - 1]);
+            } catch {
+              alert('Erreur lors de la lecture des dates disponibles.');
+            }
+          }}>Charger dates</Button>
         </Box>
 
         <List dense>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, Typography } from '@mui/material';
 import { Transaction, Product } from '../../types/Product';
 
@@ -50,6 +50,9 @@ const PaymentRecapByMethodModal: React.FC<PaymentRecapByMethodModalProps> = ({ o
 
   const title = method === 'cash' ? 'Tickets Espèces' : method === 'card' ? 'Tickets Carte' : 'Tickets SumUp';
 
+  // État local pour expansion par ticket
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
@@ -69,16 +72,29 @@ const PaymentRecapByMethodModal: React.FC<PaymentRecapByMethodModalProps> = ({ o
         {sort !== 'category' ? (
           <List dense>
             {sorted.map(t => {
-              const firstName = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
               const qty = Array.isArray(t.items) ? t.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
+              const isEx = expandedIds.has(String(t.id));
               return (
-                <ListItem key={String(t.id)} sx={{ py: 0.25, borderBottom: '1px solid #eee' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
-                    <Typography variant="body2" sx={{ width: 48, textAlign: 'right', fontFamily: 'monospace' }}>{qty}</Typography>
-                    <Typography variant="body2" sx={{ px: 0.5 }}>x</Typography>
-                    <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{firstName}</Typography>
+                <ListItem key={String(t.id)} sx={{ py: 0.25, borderBottom: '1px solid #eee', display: 'block' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }} onClick={() => setExpandedIds(prev=>{const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next;})}>
+                    <Typography variant="body2" sx={{ width: 56, textAlign: 'right', fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer' }}>#{String(t.id).slice(-6)}</Typography>
+                    <Typography variant="body2" sx={{ width: 120, fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} {new Date(t.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</Typography>
+                    <Typography variant="body2" sx={{ width: 60, textAlign: 'right', fontFamily: 'monospace' }}>{qty}</Typography>
+                    <Typography variant="body2" sx={{ flex: 1 }} />
                     <Typography variant="body2" sx={{ width: 110, textAlign: 'right', fontFamily: 'monospace' }}>{(t.total||0).toFixed(2)} €</Typography>
                   </Box>
+                  {isEx && (
+                    <Box sx={{ mt: 0.5, pl: 1 }}>
+                      {(Array.isArray(t.items)?t.items:[]).map((it:any, idx:number) => (
+                        <Box key={`${t.id}-${idx}`} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="caption" sx={{ width: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
+                          <Typography variant="caption">x</Typography>
+                          <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
+                          <Typography variant="caption" sx={{ width: 90, textAlign: 'right', fontFamily: 'monospace' }}>{((it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * (it.quantity || 0)).toFixed(2)} €</Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
                 </ListItem>
               );
             })}
