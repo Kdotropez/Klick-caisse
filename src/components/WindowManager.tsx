@@ -383,7 +383,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           x: applyScale(20), // Position personnalisée - coin haut gauche de l'espace fenêtre
           y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
           width: applyScale(802.33), // Largeur exacte mesurée
-          height: applyScale(220), // Hauteur étendue jusqu'à la grille de la fenêtre 1
+          height: applyScale(260), // Hauteur augmentée pour afficher la barre des sous-catégories
           isMinimized: false,
           isMaximized: false,
           zIndex: 3,
@@ -611,10 +611,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       timestamp: new Date(),
     };
     StorageService.addDailyTransaction(tx as any);
+    // Sauvegarde automatique complète après encaissement
+    try { StorageService.addAutoBackup(); } catch {}
+    // Téléchargement d'un fichier backup JSON
+    try { StorageService.downloadFullBackup(); } catch {}
     setTodayTransactions(StorageService.loadTodayTransactions());
 
     // Mettre à jour les compteurs de ventes et vider le panier
     onCheckout();
+
+    // Réinitialiser toutes les remises pour la vente suivante
+    setItemDiscounts({});
+    setGlobalDiscount(null);
 
     console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€ - Compteurs de ventes mis à jour`);
   };
@@ -750,10 +758,24 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     
     // Filtrage par sous-catégorie (priorité sur la catégorie)
     if (selectedSubcategory) {
-      const hasSubcategory = product.associatedCategories && 
-        Array.isArray(product.associatedCategories) &&
-        product.associatedCategories.some(cat => cat.trim() === selectedSubcategory);
-      return hasSubcategory && matchesSearch;
+      const target = StorageService.normalizeLabel(String(selectedSubcategory));
+      const hasSubcategory = Array.isArray(product.associatedCategories) &&
+        product.associatedCategories.some(cat => StorageService.normalizeLabel(String(cat)) === target);
+
+      if (hasSubcategory) {
+        return true && matchesSearch;
+      }
+
+      // Fallback: si la sous-catégorie vient du registre global, autoriser le match par nom/catégorie/référence
+      const hay = StorageService.normalizeLabel([
+        product.name,
+        product.category,
+        product.reference,
+        product.ean13
+      ].filter(Boolean).join(' '));
+      const targetTokens = target.split(/\s+/).filter(Boolean);
+      const matchesByText = targetTokens.every(tok => hay.includes(tok));
+      return matchesByText && matchesSearch;
     }
     
     // Filtrage par catégorie par défaut
@@ -1435,7 +1457,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', overflowX: 'auto', overflowY: 'hidden', '&::-webkit-scrollbar': { display: 'none' } }}>
                 <Button
                   variant={selectedCategory === null ? 'contained' : 'outlined'}
-                  onClick={() => setSelectedCategory(null)}
+                  onClick={() => { setSelectedCategory(null); setSelectedSubcategory(null); }}
                   sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
                 >
                   Toutes
@@ -1444,13 +1466,62 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   <Button
                     key={category.id}
                     variant={selectedCategory === category.id ? 'contained' : 'outlined'}
-                    onClick={() => setSelectedCategory(category.id)}
+                    onClick={() => { setSelectedCategory(category.id); setSelectedSubcategory(null); }}
                     sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
                   >
                     {category.name}
                   </Button>
                 ))}
               </Box>
+            </Box>
+
+            {/* Ligne 1bis: Sous-catégories (dynamiques) */}
+            <Box sx={{ px: 1, py: 0.5, borderBottom: '1px solid #eee', backgroundColor: '#fafafa', overflow: 'hidden' }}>
+              {(() => {
+                const set = new Set<string>();
+                const selectedCatName = selectedCategory ? (categories.find(c => c.id === selectedCategory)?.name || '') : '';
+                for (const p of products) {
+                  if (selectedCatName && p.category !== selectedCatName) continue;
+                  if (Array.isArray(p.associatedCategories)) {
+                    const cleaned = p.associatedCategories
+                      .map(sc => String(sc || '').trim())
+                      .filter(sc => sc && sc !== '\\u0000');
+                    for (const n of cleaned) set.add(n);
+                  }
+                }
+                let list = Array.from(set).sort((a,b)=>a.localeCompare(b));
+                if (list.length === 0 && !selectedCategory) {
+                  try {
+                    const registry = StorageService.loadSubcategories();
+                    list = Array.isArray(registry) ? registry.slice(0, 200) : [];
+                  } catch {
+                    list = [];
+                  }
+                }
+                return (
+                  <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center', overflowX: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
+                    <Button
+                      size="small"
+                      variant={selectedSubcategory === null ? 'contained' : 'outlined'}
+                      onClick={() => setSelectedSubcategory(null)}
+                      sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                    >
+                      Toutes
+                    </Button>
+                    {list.map(sc => (
+                      <Button
+                        key={sc}
+                        size="small"
+                        variant={selectedSubcategory === sc ? 'contained' : 'outlined'}
+                        onClick={() => setSelectedSubcategory(sc)}
+                        sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                      >
+                        {sc}
+                      </Button>
+                    ))}
+                  </Box>
+                );
+              })()}
             </Box>
 
             {/* Ligne 2: Recherche + création + suppression séléction */}
@@ -1470,6 +1541,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   setSearchTerm('');
                   setCategorySearchTerm('');
                   setSubcategorySearchTerm('');
+                  setSelectedCategory(null);
+                  setSelectedSubcategory(null);
+                  setCurrentPage(1);
                 }}
               >
                 Reset

@@ -12,6 +12,7 @@ export class StorageService {
   private static readonly CLOSURES_KEY = 'klick_caisse_closures';
   private static readonly Z_COUNTER_KEY = 'klick_caisse_z_counter';
   private static readonly CASHIERS_KEY = 'klick_caisse_cashiers';
+  private static readonly AUTO_BACKUPS_KEY = 'klick_caisse_auto_backups';
 
   // Sauvegarder les produits
   static saveProducts(products: Product[]): void {
@@ -78,7 +79,8 @@ export class StorageService {
     const map: Array<[RegExp, string]> = [
       [/[^\S\r\n]+/g, ' '],
       //[control chars]\x00-\x1F, \x7F
-      [/[\x00-\x1F\x7F]/g, ' '],
+      // eslint-disable-next-line no-control-regex
+      [/[^\x20-\x7E]/g, ' '],
       [/\uFFFD/g, ''],
       // Common mojibake (UTF-8 read as CP1252)
       [/â‚¬/g, '€'],
@@ -437,6 +439,33 @@ export class StorageService {
     }
   }
 
+  static downloadFullBackup(): void {
+    try {
+      const data = this.exportFullBackup();
+      if (!data) return;
+      const content = JSON.stringify(data, null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      const filename = `klick-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Erreur téléchargement backup:', e);
+    }
+  }
+
   static importFullBackup(data: any): void {
     if (!data || typeof data !== 'object') return;
     try {
@@ -459,6 +488,22 @@ export class StorageService {
     } catch (e) {
       console.error('Erreur import backup:', e);
       throw e;
+    }
+  }
+
+  // Sauvegarde automatique locale (rotation limitée)
+  static addAutoBackup(): void {
+    try {
+      const data = this.exportFullBackup();
+      if (!data) return;
+      const raw = localStorage.getItem(this.AUTO_BACKUPS_KEY);
+      const list: Array<{ ts: string; data: any }> = raw ? JSON.parse(raw) : [];
+      const entry = { ts: new Date().toISOString(), data };
+      list.unshift(entry);
+      const LIMITED = list.slice(0, 20); // garder les 20 dernières
+      localStorage.setItem(this.AUTO_BACKUPS_KEY, JSON.stringify(LIMITED));
+    } catch (e) {
+      console.error('Erreur sauvegarde auto:', e);
     }
   }
 } 

@@ -115,6 +115,9 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
                       timestamp: new Date(),
                     } as any;
                     StorageService.addDailyTransaction(inverse);
+                    // Sauvegarde auto + téléchargement après ajout d'un ticket inverse
+                    try { StorageService.addAutoBackup(); } catch {}
+                    try { StorageService.downloadFullBackup(); } catch {}
                     setTransactions(StorageService.loadTodayTransactions());
                   }}>Inv</Button>
                 </Box>
