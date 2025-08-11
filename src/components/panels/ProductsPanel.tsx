@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Button, Chip, Paper, Typography } from '@mui/material';
+import { Box, Button, Chip, Paper, Typography, IconButton } from '@mui/material';
 import { Product } from '../../types/Product';
-import { NavigateBefore, NavigateNext } from '@mui/icons-material';
+import { NavigateBefore, NavigateNext, Edit as EditIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
 
 interface ProductsPanelProps {
   width: number;
@@ -162,12 +162,12 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           return (
             <Paper
               key={product.id}
-              draggable
+              draggable={!isEditMode}
               sx={{
                 width: `${cardWidth}px`,
                 height: `${cardHeight}px`,
                 p: '2px',
-                cursor: 'grab',
+                cursor: isEditMode ? 'pointer' : 'grab',
                 transition: 'all 0.2s',
                 display: 'flex',
                 flexDirection: 'column',
@@ -196,49 +196,51 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                   boxShadow: `0 3px 6px rgba(0,0,0,0.15)`,
                   background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}90 25%, ${categoryColor}50 65%, white 100%)`,
                   border: `1px solid ${categoryColor}`,
-                  cursor: 'grab',
+                  cursor: isEditMode ? 'pointer' : 'grab',
                 },
                 '&:active': {
                   transform: 'translateY(0px) scale(0.98)',
                   boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(0,0,0,0.25), 0 ${1 * cardScaleFactor}px ${2 * cardScaleFactor}px ${categoryColor}30`,
                   background: `linear-gradient(135deg, ${categoryColor}80 0%, ${categoryColor}60 40%, ${categoryColor}30 80%, white 100%)`,
-                  cursor: 'grabbing',
+                  cursor: isEditMode ? 'pointer' : 'grabbing',
                 },
               }}
-              onDragStart={(e) => onDragStart(e, product)}
+              onDragStart={(e) => { if (!isEditMode) onDragStart(e, product); }}
+              onClick={(e) => {
+                if (isEditMode) {
+                  const next = new Set(selectedProductsForDeletion);
+                  if (next.has(product.id)) next.delete(product.id);
+                  else next.add(product.id);
+                  setSelectedProductsForDeletion(next);
+                  return;
+                }
+                onProductClick(product);
+              }}
               onDragOver={(e) => onDragOver(e, product)}
               onDragLeave={onDragLeave}
               onDrop={(e) => onDrop(e, product)}
-              onDragEnd={onDragEnd}
-              onClick={(e) => {
-                if (isEditMode) {
-                  e.stopPropagation();
-                  onEditProduct(product);
-                } else {
-                  onProductClick(product);
-                }
-              }}
+              onDragEnd={(e) => { if (!isEditMode) onDragEnd(e); }}
             >
               <Box sx={{ position: 'relative', flexGrow: 1 }}>
                 {isEditMode && (
                   <Box
                     sx={{
                       position: 'absolute',
-                      top: -5,
-                      left: -5,
-                      width: 20,
-                      height: 20,
+                      top: -6,
+                      left: -6,
+                      width: 16,
+                      height: 16,
                       backgroundColor: selectedProductsForDeletion.has(product.id) ? '#f44336' : '#fff',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: selectedProductsForDeletion.has(product.id) ? 'white' : '#ccc',
-                      fontSize: '12px',
+                      fontSize: '10px',
                       fontWeight: 'bold',
                       zIndex: 10,
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                      border: '2px solid #ccc',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                      border: '1px solid #ccc',
                       cursor: 'pointer',
                     }}
                     onClick={(e) => {
@@ -250,6 +252,28 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                     }}
                   >
                     {selectedProductsForDeletion.has(product.id) ? '✓' : ''}
+                  </Box>
+                )}
+
+                {isEditMode && (
+                  <Box sx={{ position: 'absolute', top: -6, right: -4, display: 'flex', gap: 0.5, zIndex: 11 }}>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => { e.stopPropagation(); onEditProduct(product); }}
+                      sx={{ width: 22, height: 22, p: 0, bgcolor: 'white', border: '1px solid #ddd', '&:hover': { bgcolor: '#f5f5f5' } }}
+                    >
+                      <EditIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      draggable
+                      onDragStart={(e) => onDragStart(e, product)}
+                      onDragEnd={onDragEnd}
+                      sx={{ width: 22, height: 22, p: 0, cursor: 'grab', bgcolor: 'white', border: '1px solid #ddd', '&:hover': { bgcolor: '#f5f5f5' } }}
+                      title="Glisser pour réordonner"
+                    >
+                      <DragIndicatorIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
                   </Box>
                 )}
                 <Typography

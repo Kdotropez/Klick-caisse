@@ -550,28 +550,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     e.preventDefault();
     
     if (draggedProduct && draggedProduct.id !== targetProduct.id) {
-      // Réorganiser les produits
+      // Réorganiser les produits par échange (swap) entre source et cible
       const draggedIndex = products.findIndex(p => p.id === draggedProduct.id);
       const targetIndex = products.findIndex(p => p.id === targetProduct.id);
       
       if (draggedIndex !== -1 && targetIndex !== -1) {
         const newProducts = [...products];
-        const [removed] = newProducts.splice(draggedIndex, 1);
-        newProducts.splice(targetIndex, 0, removed);
+        const tmp = newProducts[draggedIndex];
+        newProducts[draggedIndex] = newProducts[targetIndex];
+        newProducts[targetIndex] = tmp;
         
-        // Mettre à jour l'état des produits
-        console.log('Réorganisation des produits:', {
-          dragged: draggedProduct.name,
-          target: targetProduct.name,
-          newOrder: newProducts.map(p => p.name)
+        console.log('Échange de produits:', {
+          from: { index: draggedIndex, name: draggedProduct.name },
+          to: { index: targetIndex, name: targetProduct.name },
         });
         
-        // Appeler la fonction pour sauvegarder le nouvel ordre
-        if (onProductsReorder) {
-          onProductsReorder(newProducts);
-        }
-        
-        // Sauvegarder automatiquement dans localStorage
+        onProductsReorder?.(newProducts);
         saveProductionData(newProducts, categories);
       }
     }
@@ -816,19 +810,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const endIndex = startIndex + CARDS_PER_PAGE;
   
   // Tri: articles les plus vendus aujourd'hui en premier (toutes variations confondues)
-  const sortedAndFilteredProducts = [...filteredProducts].sort((a, b) => {
-    if (productSortMode === 'sales') {
-      const qa = dailyQtyByProduct[a.id] || 0;
-      const qb = dailyQtyByProduct[b.id] || 0;
-      if (qa !== qb) return qb - qa;
-    } else if (productSortMode === 'name') {
-      if (a.name !== b.name) return a.name.localeCompare(b.name); // A->Z
-    }
-    // Fallback stable
-    if (a.category !== b.category) return a.category.localeCompare(b.category);
-    if (a.name !== b.name) return a.name.localeCompare(b.name);
-    return a.id.localeCompare(b.id);
-  });
+  const sortedAndFilteredProducts = isEditMode
+    ? filteredProducts
+    : [...filteredProducts].sort((a, b) => {
+        if (productSortMode === 'sales') {
+          const qa = dailyQtyByProduct[a.id] || 0;
+          const qb = dailyQtyByProduct[b.id] || 0;
+          if (qa !== qb) return qb - qa;
+        } else if (productSortMode === 'name') {
+          if (a.name !== b.name) return a.name.localeCompare(b.name); // A->Z
+        }
+        // Fallback stable
+        if (a.category !== b.category) return a.category.localeCompare(b.category);
+        if (a.name !== b.name) return a.name.localeCompare(b.name);
+        return a.id.localeCompare(b.id);
+      });
   
   const currentProducts = sortedAndFilteredProducts.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredProducts.length / CARDS_PER_PAGE);
@@ -1636,6 +1632,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 }}
               >
                 Reset
+              </Button>
+              <Button
+                variant={isEditMode ? 'outlined' : 'contained'}
+                size="small"
+                onClick={() => setIsEditMode(!isEditMode)}
+              >
+                {isEditMode ? 'Mode vente' : 'Modifier article'}
               </Button>
               {isEditMode && selectedProductsForDeletion.size > 0 && (
                 <Button
