@@ -18,6 +18,7 @@ interface SettingsPanelProps {
   // Nouvelles actions Backup
   onExportAll?: () => void;
   onImportAll?: (file: File) => void;
+  onImportTxOnly?: (file: File) => void;
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -36,6 +37,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onToggleSelectAllProducts,
   onExportAll,
   onImportAll,
+  onImportTxOnly,
 }) => {
   const gap = 2;
   const totalGapsWidth = 4;
@@ -54,6 +56,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     input.onchange = (e: any) => {
       const file = e.target?.files?.[0];
       if (file && onImportAll) onImportAll(file);
+    };
+    input.click();
+  };
+
+  const handleSelectTxOnlyFile = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = (e: any) => {
+      const file = e.target?.files?.[0];
+      if (file && onImportTxOnly) onImportTxOnly(file);
     };
     input.click();
   };
@@ -160,6 +173,26 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={handleSelectBackupFile}
       >
         Importer tout (JSON)
+      </Button>
+
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#2e7d32',
+          '&:hover': { backgroundColor: '#1b5e20' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={handleSelectTxOnlyFile}
+      >
+        Importer tickets/clôtures (JSON)
       </Button>
 
       <Button

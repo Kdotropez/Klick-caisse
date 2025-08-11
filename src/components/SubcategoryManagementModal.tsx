@@ -46,6 +46,8 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
   const [editSubcategoryName, setEditSubcategoryName] = useState('');
   const [error, setError] = useState('');
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   // Extraire toutes les sous-catégories existantes depuis les produits + registre global
   const getAllExistingSubcategories = (): string[] => {
@@ -64,20 +66,34 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
 
   // Extraire les sous-catégories pour une catégorie spécifique
   const getSubcategoriesForCategory = (categoryId: string): string[] => {
-    const category = categories.find(cat => cat.id === categoryId);
+    const category = categories.find(cat => cat.id === categoryId) as (Category & { subcategoryOrder?: string[] }) | undefined;
     if (!category) return [];
 
-    const subcategories = new Set<string>();
+    const subcatsSet = new Set<string>();
     products.forEach(product => {
       if (product.category === category.name && product.associatedCategories) {
         product.associatedCategories.forEach((subcat: string) => {
-          if (subcat && subcat.trim()) {
-            subcategories.add(subcat.trim());
-          }
+          const s = (subcat || '').trim();
+          if (s) subcatsSet.add(s);
         });
       }
     });
-    return Array.from(subcategories).sort();
+    let list = Array.from(subcatsSet);
+    const order = category.subcategoryOrder || [];
+    if (order.length > 0) {
+      const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/s$/i, '');
+      list.sort((a, b) => {
+        const ia = order.findIndex(o => norm(o) === norm(a));
+        const ib = order.findIndex(o => norm(o) === norm(b));
+        const aa = ia === -1 ? Number.MAX_SAFE_INTEGER : ia;
+        const bb = ib === -1 ? Number.MAX_SAFE_INTEGER : ib;
+        if (aa !== bb) return aa - bb;
+        return a.localeCompare(b, 'fr', { sensitivity: 'base' });
+      });
+    } else {
+      list.sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+    }
+    return list;
   };
 
   // Mettre à jour les sous-catégories quand une catégorie est sélectionnée
@@ -166,6 +182,23 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
       // Ne pas supprimer du registre global
       StorageService.saveSubcategories(getAllExistingSubcategories());
     }
+  };
+
+  // Drag and drop ordering for subcategories
+  const handleDragStart = (index: number) => () => setDragIndex(index);
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
+  const handleDrop = (targetIndex: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === targetIndex) return;
+    const updated = [...subcategories];
+    const [moved] = updated.splice(dragIndex, 1);
+    updated.splice(targetIndex, 0, moved);
+    setDragIndex(null);
+    setSubcategories(updated);
+    if (selectedCategory) {
+      onUpdateSubcategories(selectedCategory, updated);
+    }
+    StorageService.saveSubcategories(getAllExistingSubcategories());
   };
 
   const handleCategoryChange = (categoryId: string) => {
@@ -297,90 +330,58 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
               </Box>
             </Box>
 
-            {/* Liste des sous-catégories existantes */}
+            {/* Sous-catégories existantes (grille drag & drop) */}
             <Box sx={{ mb: 2 }}>
               <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 'bold' }}>
-                Sous-catégories existantes
+                Sous-catégories existantes (glisser-déposer pour réordonner)
               </Typography>
-              
               {subcategories.length === 0 ? (
                 <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
-                  <Typography variant="body2">
-                    Aucune sous-catégorie trouvée pour cette catégorie
-                  </Typography>
+                  <Typography variant="body2">Aucune sous-catégorie trouvée pour cette catégorie</Typography>
                 </Box>
               ) : (
-                <List sx={{ backgroundColor: '#fafafa', borderRadius: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, backgroundColor: '#fafafa', borderRadius: 1, p: 1 }}>
                   {subcategories.map((subcategory, index) => (
-                    <React.Fragment key={subcategory}>
-                      <ListItem>
-                        {editingSubcategory === subcategory ? (
-                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '100%' }}>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              value={editSubcategoryName}
-                              onChange={(e) => setEditSubcategoryName(e.target.value)}
-                              onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
-                            />
-                            <IconButton
-                              size="small"
-                              onClick={handleSaveEdit}
-                              sx={{ color: 'success.main' }}
-                            >
-                              <Save />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={handleCancelEdit}
-                              sx={{ color: 'error.main' }}
-                            >
-                              <Cancel />
-                            </IconButton>
-                          </Box>
-                        ) : (
-                          <>
-                            <ListItemText
-                              primary={
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Chip 
-                                    label={`${index + 1}`} 
-                                    size="small" 
-                                    sx={{ 
-                                      backgroundColor: '#1976d2', 
-                                      color: 'white',
-                                      fontWeight: 'bold'
-                                    }} 
-                                  />
-                                  <Typography variant="body1">
-                                    {subcategory}
-                                  </Typography>
-                                </Box>
-                              }
-                            />
-                            <ListItemSecondaryAction>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleEditSubcategory(subcategory)}
-                                sx={{ color: 'primary.main', mr: 1 }}
-                              >
-                                <Edit />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDeleteSubcategory(subcategory)}
-                                sx={{ color: 'error.main' }}
-                              >
-                                <Delete />
-                              </IconButton>
-                            </ListItemSecondaryAction>
-                          </>
-                        )}
-                      </ListItem>
-                      {index < subcategories.length - 1 && <Divider />}
-                    </React.Fragment>
+                    <Chip
+                      key={subcategory}
+                      label={`${index + 1}. ${subcategory}`}
+                      draggable
+                      onDragStart={handleDragStart(index)}
+                      onDragOver={(e) => { handleDragOver(e); setHoverIndex(index); }}
+                      onDragEnter={() => setHoverIndex(index)}
+                      onDragLeave={() => setHoverIndex(null)}
+                      onDrop={(e) => { handleDrop(index)(e); setHoverIndex(null); }}
+                      onDoubleClick={() => handleEditSubcategory(subcategory)}
+                      onDelete={() => handleDeleteSubcategory(subcategory)}
+                      sx={{
+                        cursor: 'grab',
+                        opacity: dragIndex === index ? 0.6 : 1,
+                        border: hoverIndex === index ? '2px dashed #1976d2' : '1px solid #ddd',
+                        backgroundColor: hoverIndex === index ? '#e3f2fd' : 'white',
+                        '&:hover': { boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }
+                      }}
+                    />
                   ))}
-                </List>
+                </Box>
+              )}
+
+              {editingSubcategory && (
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 2 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    value={editSubcategoryName}
+                    onChange={(e) => setEditSubcategoryName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                    label={`Renommer "${editingSubcategory}"`}
+                  />
+                  <IconButton size="small" onClick={handleSaveEdit} sx={{ color: 'success.main' }}>
+                    <Save />
+                  </IconButton>
+                  <IconButton size="small" onClick={handleCancelEdit} sx={{ color: 'error.main' }}>
+                    <Cancel />
+                  </IconButton>
+                </Box>
               )}
             </Box>
 

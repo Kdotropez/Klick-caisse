@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import CartPanel from './panels/CartPanel';
 import PaymentPanel from './panels/PaymentPanel';
 // import CategoriesPanelFull from './panels/CategoriesPanelFull';
@@ -143,6 +143,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [paymentMethod, setPaymentMethod] = useState('');
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
   const [todayTransactions, setTodayTransactions] = useState(() => StorageService.loadTodayTransactions());
+  const [recapDate, setRecapDate] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  });
   const [showSalesRecap, setShowSalesRecap] = useState(false);
   
   const [showPaymentRecap, setShowPaymentRecap] = useState(false);
@@ -184,6 +188,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [globalEditorIsToday, setGlobalEditorIsToday] = useState<boolean>(false);
   // Sélection multiple en mode édition
   const [selectedProductsForDeletion, setSelectedProductsForDeletion] = useState<Set<string>>(new Set());
+  // Réfs pour remettre les barres sur "Toutes"
+  const categoriesScrollRef = useRef<HTMLDivElement | null>(null);
+  const subcategoriesScrollRef = useRef<HTMLDivElement | null>(null);
 
   // Compteur quotidien par produit (toutes variations confondues)
   const dailyQtyByProduct = useMemo(() => {
@@ -475,6 +482,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setCurrentPage(1);
   }, [selectedCategory, selectedSubcategory, searchTerm]);
 
+  // Recentrer les barres sur le bouton "Toutes" quand on revient à null
+  useEffect(() => {
+    if (selectedCategory === null && categoriesScrollRef.current) {
+      categoriesScrollRef.current.scrollLeft = 0;
+    }
+  }, [selectedCategory]);
+  useEffect(() => {
+    if (selectedSubcategory === null && subcategoriesScrollRef.current) {
+      subcategoriesScrollRef.current.scrollLeft = 0;
+    }
+  }, [selectedSubcategory]);
+
   // Forcer un re-render quand les filtres changent pour éviter les problèmes de cache
   // const filterKey = `${selectedCategory}-${selectedSubcategory}-${searchTerm}-${currentPage}`;
 
@@ -751,31 +770,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     ].map(normalize).join(' ');
     const matchesSearch = tokens.length === 0 || tokens.every(t => haystack.includes(t));
     
-    // Si aucune catégorie n'est sélectionnée, afficher tous les produits
+    // Si aucune catégorie ni sous-catégorie n'est sélectionnée, afficher tous les produits
     if (!selectedCategory && !selectedSubcategory) {
       return matchesSearch;
     }
     
     // Filtrage par sous-catégorie (priorité sur la catégorie)
     if (selectedSubcategory) {
-      const target = StorageService.normalizeLabel(String(selectedSubcategory));
-      const hasSubcategory = Array.isArray(product.associatedCategories) &&
-        product.associatedCategories.some(cat => StorageService.normalizeLabel(String(cat)) === target);
-
-      if (hasSubcategory) {
-        return true && matchesSearch;
-      }
-
-      // Fallback: si la sous-catégorie vient du registre global, autoriser le match par nom/catégorie/référence
-      const hay = StorageService.normalizeLabel([
-        product.name,
-        product.category,
-        product.reference,
-        product.ean13
-      ].filter(Boolean).join(' '));
-      const targetTokens = target.split(/\s+/).filter(Boolean);
-      const matchesByText = targetTokens.every(tok => hay.includes(tok));
-      return matchesByText && matchesSearch;
+      const normalizeKey = (s: string) => StorageService.normalizeLabel(String(s)).replace(/s$/i, '');
+      const target = normalizeKey(String(selectedSubcategory));
+      const assoc = Array.isArray(product.associatedCategories) ? product.associatedCategories : [];
+      const hasSubcategory = assoc.some(cat => normalizeKey(String(cat)) === target);
+      return hasSubcategory && matchesSearch;
     }
     
     // Filtrage par catégorie par défaut
@@ -1142,14 +1148,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       return product;
     });
 
-    if (onProductsReorder) {
-      onProductsReorder(updatedProducts);
-    }
+    if (onProductsReorder) onProductsReorder(updatedProducts);
 
     // Sauvegarder automatiquement dans localStorage
     saveProductionData(updatedProducts, categories);
 
     console.log(`✅ Sous-catégories mises à jour pour ${category.name}:`, newSubcategories);
+
+    // Mettre à jour l'ordre des sous-catégories dans la catégorie (état + persistance)
+    const normalizedOrder = Array.from(new Set(newSubcategories.map(s => StorageService.sanitizeLabel(s)).filter(Boolean)));
+    const updatedCategories = categories.map(cat =>
+      cat.id === categoryId ? { ...cat, subcategoryOrder: normalizedOrder } as any : cat
+    );
+    onUpdateCategories?.(updatedCategories);
   };
 
   // Fonction pour importer un fichier CSV
@@ -1318,6 +1329,33 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     }
   };
 
+  // Import sélectif: Transactions + Clôtures uniquement (ne touche pas produits/catégories)
+  const handleImportTxOnly = async (file: File) => {
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      // Transactions du jour et clôtures seulement
+      if (json && typeof json === 'object') {
+        const tx = (json as any).transactionsByDay ?? (json as any).transactions_by_day;
+        if (tx && typeof tx === 'object') {
+          localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(tx));
+        }
+        const closures = (json as any).closures;
+        if (Array.isArray(closures)) {
+          StorageService.saveAllClosures(closures);
+        }
+        const zCounter = (json as any).zCounter ?? (json as any).z_counter;
+        if (Number.isFinite(Number(zCounter))) {
+          localStorage.setItem('klick_caisse_z_counter', String(Number(zCounter)));
+        }
+      }
+      setTodayTransactions(StorageService.loadTodayTransactions());
+      alert('Import sélectif (tickets/clôtures) terminé.');
+    } catch (e) {
+      alert('Fichier invalide ou erreur d\'import (sélectif).');
+    }
+  };
+
   // Fonction utilitaire pour les couleurs
   const getRandomColor = () => {
     const colors = [
@@ -1450,12 +1488,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           />
         );
 
-      case 'categories':
-        return (
+             case 'categories':
+         return (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {/* Ligne 1: Boutons des catégories */}
             <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider', overflow: 'hidden' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', overflowX: 'auto', overflowY: 'hidden', '&::-webkit-scrollbar': { display: 'none' } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Button
                   variant={selectedCategory === null ? 'contained' : 'outlined'}
                   onClick={() => { setSelectedCategory(null); setSelectedSubcategory(null); }}
@@ -1463,34 +1501,73 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 >
                   Toutes
                 </Button>
-                {categories.map((category) => (
-                  <Button
-                    key={category.id}
-                    variant={selectedCategory === category.id ? 'contained' : 'outlined'}
-                    onClick={() => { setSelectedCategory(category.id); setSelectedSubcategory(null); }}
-                    sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
-                  >
-                    {category.name}
-                  </Button>
-                ))}
+                <Box ref={categoriesScrollRef} sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', overflowX: 'auto', overflowY: 'hidden', '&::-webkit-scrollbar': { display: 'none' } }}>
+                  {categories.map((category) => (
+                    <Button
+                      key={category.id}
+                      variant={selectedCategory === category.id ? 'contained' : 'outlined'}
+                      onClick={() => { setSelectedCategory(category.id); setSelectedSubcategory(null); }}
+                      sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                    >
+                      {category.name}
+                    </Button>
+                  ))}
+                </Box>
               </Box>
             </Box>
 
             {/* Ligne 1bis: Sous-catégories (dynamiques) */}
             <Box sx={{ px: 1, py: 0.5, borderBottom: '1px solid #eee', backgroundColor: '#fafafa', overflow: 'hidden' }}>
               {(() => {
-                const set = new Set<string>();
+                // Construire la liste en dédupliquant sur une clé normalisée (insensible accents/casse)
                 const selectedCatName = selectedCategory ? (categories.find(c => c.id === selectedCategory)?.name || '') : '';
+                const normSelected = StorageService.normalizeLabel(selectedCatName);
+                const normToDisplay = new Map<string, string>();
                 for (const p of products) {
-                  if (selectedCatName && p.category !== selectedCatName) continue;
+                  if (selectedCatName) {
+                    const pc = StorageService.normalizeLabel(p.category || '');
+                    if (pc !== normSelected) continue;
+                  }
                   if (Array.isArray(p.associatedCategories)) {
                     const cleaned = p.associatedCategories
                       .map(sc => String(sc || '').trim())
-                      .filter(sc => sc && sc !== '\\u0000');
-                    for (const n of cleaned) set.add(n);
+                      .filter(sc => sc && sc !== '\\u0000')
+                      .filter(sc => {
+                        const norm = StorageService.normalizeLabel(sc);
+                        const alnum = norm.replace(/[^a-z0-9]/g, '');
+                        return alnum.length >= 2;
+                      });
+                    for (const n of cleaned) {
+                      const norm = StorageService.normalizeLabel(n);
+                      const keySingular = norm.replace(/s$/i, '');
+                      const key = keySingular || norm;
+                      if (!normToDisplay.has(key)) normToDisplay.set(key, n);
+                    }
                   }
                 }
-                let list = Array.from(set).sort((a,b)=>a.localeCompare(b));
+                let list = Array.from(normToDisplay.values()).sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+                // Appliquer l'ordre personnalisé si défini pour la catégorie sélectionnée
+                if (selectedCategory) {
+                  const cat = categories.find(c => c.id === selectedCategory);
+                  const order = (cat && (cat as any).subcategoryOrder) as string[] | undefined;
+                  if (order && Array.isArray(order) && order.length > 0) {
+                    const norm = (s: string) => StorageService.normalizeLabel(s).replace(/s$/i, '');
+                    list.sort((a, b) => {
+                      const ia = order.findIndex(o => norm(o) === norm(a));
+                      const ib = order.findIndex(o => norm(o) === norm(b));
+                      const aa = ia === -1 ? Number.MAX_SAFE_INTEGER : ia;
+                      const bb = ib === -1 ? Number.MAX_SAFE_INTEGER : ib;
+                      if (aa !== bb) return aa - bb;
+                      return a.localeCompare(b, 'fr', { sensitivity: 'base' });
+                    });
+                  }
+                }
+                // Si aucune catégorie n'est sélectionnée et qu'une sous-catégorie est active,
+                // n'afficher que cette sous-catégorie dans la barre (priorité à la sous-catégorie)
+                if (!selectedCategory && selectedSubcategory) {
+                  const current = String(selectedSubcategory);
+                  list = [current];
+                }
                 if (list.length === 0 && !selectedCategory) {
                   try {
                     const registry = StorageService.loadSubcategories();
@@ -1499,8 +1576,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     list = [];
                   }
                 }
+                const normSelectedSub = StorageService.normalizeLabel(String(selectedSubcategory || '')).replace(/s$/i, '');
                 return (
-                  <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center', overflowX: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                     <Button
                       size="small"
                       variant={selectedSubcategory === null ? 'contained' : 'outlined'}
@@ -1509,17 +1587,24 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     >
                       Toutes
                     </Button>
-                    {list.map(sc => (
-                      <Button
-                        key={sc}
-                        size="small"
-                        variant={selectedSubcategory === sc ? 'contained' : 'outlined'}
-                        onClick={() => setSelectedSubcategory(sc)}
-                        sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
-                      >
-                        {sc}
-                      </Button>
-                    ))}
+                    <Box ref={subcategoriesScrollRef} sx={{ display: 'flex', gap: 0.75, alignItems: 'center', overflowX: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
+                      {list.map(sc => {
+                        const norm = StorageService.normalizeLabel(sc);
+                        const singular = norm.replace(/s$/i, '');
+                        const isActive = singular === normSelectedSub;
+                        return (
+                          <Button
+                            key={sc}
+                            size="small"
+                            variant={isActive ? 'contained' : 'outlined'}
+                            onClick={() => setSelectedSubcategory(sc)}
+                            sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                          >
+                            {sc}
+                          </Button>
+                        );
+                      })}
+                    </Box>
                   </Box>
                 );
               })()}
@@ -1545,6 +1630,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   setSelectedCategory(null);
                   setSelectedSubcategory(null);
                   setCurrentPage(1);
+                  // Remettre la vue sur "Toutes"
+                  if (categoriesScrollRef.current) categoriesScrollRef.current.scrollLeft = 0;
+                  if (subcategoriesScrollRef.current) subcategoriesScrollRef.current.scrollLeft = 0;
                 }}
               >
                 Reset
@@ -1570,7 +1658,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               <Button variant="contained" size="small" onClick={handleCreateNewProduct}>➕ Nouvel article</Button>
             </Box>
           </Box>
-        );
+              );
               // fin rendu catégories délégué à CategoriesPanelFull
 
              case 'search':
@@ -1625,6 +1713,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             }}
             onExportAll={handleExportAll}
             onImportAll={handleImportAll}
+            onImportTxOnly={handleImportTxOnly}
           />
         )
 
@@ -1939,15 +2028,34 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         method={paymentRecapMethod as any}
         sort={paymentRecapSort as PaymentRecapSort}
         onChangeSort={(s) => setPaymentRecapSort(s as any)}
-        transactions={todayTransactions}
+        transactions={(() => {
+          try {
+            const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+            if (!raw) return [];
+            const map = JSON.parse(raw);
+            const list = Array.isArray(map[recapDate]) ? map[recapDate] : [];
+            return list.map((t:any)=>({ ...t, timestamp: new Date(t.timestamp) }));
+          } catch { return todayTransactions; }
+        })()}
       />
 
       {/* Modale récapitulatif ventes du jour */}
       <Dialog open={showSalesRecap} onClose={() => setShowSalesRecap(false)} maxWidth="md" fullWidth>
         <DialogTitle>Récapitulatif des ventes du jour</DialogTitle>
         <DialogContent>
+          <Box sx={{ mb: 1 }}>
+            <input type="date" value={recapDate} onChange={(e)=> setRecapDate(e.target.value)} />
+          </Box>
           {(() => {
-            const rows = computeDailyProductSales(todayTransactions);
+            const rows = computeDailyProductSales((() => {
+              try {
+                const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+                if (!raw) return [];
+                const map = JSON.parse(raw);
+                const list = Array.isArray(map[recapDate]) ? map[recapDate] : [];
+                return list.map((t:any)=>({ ...t, timestamp: new Date(t.timestamp) }));
+              } catch { return todayTransactions; }
+            })());
             if (rows.length === 0) {
               return <Typography>Aucune vente aujourd'hui.</Typography>;
             }

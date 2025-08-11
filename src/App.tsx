@@ -62,10 +62,18 @@ const App: React.FC = () => {
 
     // Nettoyer associatedCategories de tous les produits
     const cleanedProducts = products.map(p => {
-      const ac = (p.associatedCategories || [])
+      const map = new Map<string, string>();
+      (p.associatedCategories || [])
         .map(s => StorageService.sanitizeLabel(s))
-        .filter(Boolean);
-      const unique = Array.from(new Set(ac));
+        .map(s => s.trim())
+        .forEach(s => {
+          if (!s) return;
+          const norm = StorageService.normalizeLabel(s);
+          const alnum = norm.replace(/[^a-z0-9]/g, '');
+          if (alnum.length < 2) return; // écarter c, b, \u0000S, etc.
+          if (!map.has(norm)) map.set(norm, s);
+        });
+      const unique = Array.from(map.values());
       return unique.length !== (p.associatedCategories || []).length ||
         (p.associatedCategories || []).some((v, i) => v !== unique[i])
         ? { ...p, associatedCategories: unique }
@@ -81,6 +89,8 @@ const App: React.FC = () => {
     if (changed) {
       setProducts(cleanedProducts);
       saveProductionData(cleanedProducts, categories);
+      // Sauvegarder également en localStorage pour garantir cohérence runtime
+      StorageService.saveProducts(cleanedProducts);
     }
 
     localStorage.setItem(MIGRATION_FLAG, '1');

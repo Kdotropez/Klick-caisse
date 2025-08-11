@@ -140,7 +140,13 @@ export class StorageService {
       const unique = Array.from(new Set(subcategories
         // eslint-disable-next-line no-control-regex
         .map(s => this.sanitizeLabel(s))
-        .filter(Boolean)))
+        .map(s => s.trim())
+        .filter(s => {
+          if (!s) return false;
+          const norm = this.normalizeLabel(s);
+          const alnum = norm.replace(/[^a-z0-9]/g, '');
+          return alnum.length >= 2; // ignorer \u0000S, 'c', 'b', etc.
+        })))
         .sort();
       localStorage.setItem(this.SUBCATEGORIES_KEY, JSON.stringify(unique));
     } catch (error) {
@@ -157,7 +163,16 @@ export class StorageService {
       const merged = Array.from(new Set([
         ...defaultSubcategoriesRegistry,
         ...fromStorage
-      ].map((s: string) => this.sanitizeLabel(s)).filter(Boolean))).sort();
+      ]
+        .map((s: string) => this.sanitizeLabel(s))
+        .map((s: string) => s.trim())
+        .filter((s: string) => {
+          if (!s) return false;
+          const norm = this.normalizeLabel(s);
+          const alnum = norm.replace(/[^a-z0-9]/g, '');
+          return alnum.length >= 2;
+        })
+      )).sort();
       return merged;
     } catch (error) {
       console.error('Erreur lors du chargement des sous-catégories:', error);

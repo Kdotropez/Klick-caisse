@@ -29,6 +29,7 @@ export interface Category {
   name: string;
   color?: string;                // Optionnel pour compatibilité
   productOrder?: string[];       // Optionnel pour compatibilité
+  subcategoryOrder?: string[];   // Ordre personnalisé des sous-catégories pour cette catégorie
 }
 
 export interface CSVProduct {

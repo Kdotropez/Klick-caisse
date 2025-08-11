@@ -36,6 +36,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryColor, setNewCategoryColor] = useState('#757575');
   const [error, setError] = useState('');
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   // Couleurs prédéfinies pour les catégories
   const predefinedColors = [
@@ -169,6 +170,25 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
     updatedCategories.splice(newIndex, 0, movedCategory);
 
     onUpdateCategories(updatedCategories);
+  };
+
+  // Réorganisation par glisser-déposer
+  const handleDragStart = (index: number) => () => {
+    setDragIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (targetIndex: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === targetIndex) return;
+    const updated = [...categories];
+    const [moved] = updated.splice(dragIndex, 1);
+    updated.splice(targetIndex, 0, moved);
+    setDragIndex(null);
+    onUpdateCategories(updated);
   };
 
   // Fonction pour déterminer la couleur de police selon la couleur de fond
@@ -326,8 +346,13 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
                 mb: 1,
                 backgroundColor: 'background.paper',
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                opacity: dragIndex === index ? 0.6 : 1,
               }}
+              draggable
+              onDragStart={handleDragStart(index)}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop(index)}
             >
               {/* Indicateur de position */}
               <Typography 
