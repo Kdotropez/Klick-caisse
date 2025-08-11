@@ -727,12 +727,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   });
   
   const filteredProducts = uniqueProducts.filter(product => {
-    // Filtrage par recherche d'article
-        const matchesSearch = !searchTerm ||
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.ean13.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.reference.toLowerCase().includes(searchTerm.toLowerCase());
+    // Filtrage par recherche d'article (ordre libre, tokens partiels, sans accents)
+    const normalize = (s: string) => (s || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    const tokens = normalize(searchTerm).split(/\s+/).filter(Boolean);
+    const haystack = [
+      product.name,
+      product.category,
+      product.reference,
+      product.ean13,
+      ...(Array.isArray(product.associatedCategories) ? product.associatedCategories : []),
+      ...(Array.isArray(product.variations) ? product.variations.map(v => v.attributes) : [])
+    ].map(normalize).join(' ');
+    const matchesSearch = tokens.length === 0 || tokens.every(t => haystack.includes(t));
     
     // Si aucune catégorie n'est sélectionnée, afficher tous les produits
     if (!selectedCategory && !selectedSubcategory) {
@@ -1454,6 +1463,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 value={searchTerm}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  setSearchTerm('');
+                  setCategorySearchTerm('');
+                  setSubcategorySearchTerm('');
+                }}
+              >
+                Reset
+              </Button>
               {isEditMode && selectedProductsForDeletion.size > 0 && (
                 <Button
                   variant="contained"

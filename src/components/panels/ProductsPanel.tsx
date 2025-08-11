@@ -257,9 +257,13 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                   sx={{
                     fontWeight: '600',
                     fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`,
-                    lineHeight: 1.2,
+                    lineHeight: 1.1,
                     flexGrow: 1,
                     color: '#2c3e50',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
                   }}
                 >
                   {product.name}
