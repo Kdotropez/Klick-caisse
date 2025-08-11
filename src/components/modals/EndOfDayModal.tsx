@@ -29,6 +29,9 @@ const EndOfDayModal: React.FC<EndOfDayModalProps> = ({ open, onClose, transactio
     const payload = { zNumber: z, closedAt: new Date().toISOString(), transactions: txs };
     StorageService.saveClosure(payload);
     StorageService.clearTodayTransactions();
+    // Sauvegarde automatique locale + téléchargement d'un JSON complet
+    try { StorageService.addAutoBackup(); } catch {}
+    try { StorageService.downloadFullBackup(); } catch {}
     refreshToday();
     onClose();
     // eslint-disable-next-line no-alert

@@ -490,13 +490,13 @@ export class StorageService {
       // Accepte subcategories en tableau
       if (Array.isArray((data as any).subcategories)) this.saveSubcategories((data as any).subcategories);
       // Accepte deux notations pour transactions et zCounter
-      const transactionsByDay = (data as any).transactionsByDay ?? (data as any).transactions_by_day;
+      const transactionsByDay = (data as any).transactionsByDay ?? (data as any).transactions_by_day ?? (data as any).klick_caisse_transactions_by_day;
       if (transactionsByDay && typeof transactionsByDay === 'object') {
         localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(transactionsByDay));
       }
-      const closures = (data as any).closures;
+      const closures = (data as any).closures ?? (data as any).klick_caisse_closures;
       if (Array.isArray(closures)) this.saveAllClosures(closures);
-      const zCounter = (data as any).zCounter ?? (data as any).z_counter;
+      const zCounter = (data as any).zCounter ?? (data as any).z_counter ?? (data as any).klick_caisse_z_counter;
       if (Number.isFinite(Number(zCounter))) localStorage.setItem(this.Z_COUNTER_KEY, String(Number(zCounter)));
       const cashiers = (data as any).cashiers;
       if (Array.isArray(cashiers)) this.saveCashiers(cashiers);
@@ -515,7 +515,7 @@ export class StorageService {
       const list: Array<{ ts: string; data: any }> = raw ? JSON.parse(raw) : [];
       const entry = { ts: new Date().toISOString(), data };
       list.unshift(entry);
-      const LIMITED = list.slice(0, 20); // garder les 20 dernières
+      const LIMITED = list.slice(0, 10); // garder les 10 dernières
       localStorage.setItem(this.AUTO_BACKUPS_KEY, JSON.stringify(LIMITED));
     } catch (e) {
       console.error('Erreur sauvegarde auto:', e);

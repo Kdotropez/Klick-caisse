@@ -1358,15 +1358,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       const json = JSON.parse(text);
       // Transactions du jour et clôtures seulement
       if (json && typeof json === 'object') {
-        const tx = (json as any).transactionsByDay ?? (json as any).transactions_by_day;
+        const tx = (json as any).transactionsByDay ?? (json as any).transactions_by_day ?? (json as any).klick_caisse_transactions_by_day;
         if (tx && typeof tx === 'object') {
           localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(tx));
         }
-        const closures = (json as any).closures;
+        const closures = (json as any).closures ?? (json as any).klick_caisse_closures;
         if (Array.isArray(closures)) {
           StorageService.saveAllClosures(closures);
         }
-        const zCounter = (json as any).zCounter ?? (json as any).z_counter;
+        const zCounter = (json as any).zCounter ?? (json as any).z_counter ?? (json as any).klick_caisse_z_counter;
         if (Number.isFinite(Number(zCounter))) {
           localStorage.setItem('klick_caisse_z_counter', String(Number(zCounter)));
         }
