@@ -14,7 +14,6 @@ import {
 import { Close, TrendingUp, Euro } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { CartItem } from '../types/Product';
-import { StorageService } from '../services/StorageService';
 
 interface DailyReportModalProps {
   open: boolean;
@@ -40,19 +39,21 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     totalTransactions: 0,
     averageTransactionValue: 0
   });
-  const [byMethod, setByMethod] = useState<Record<string, number>>({});
 
-  // Calculer les statistiques quotidiennes (transactions du jour)
+  // Calculer les statistiques quotidiennes
   useEffect(() => {
-    const txs = StorageService.loadTodayTransactions();
-    if (txs.length > 0) {
-      const totalSales = txs.reduce((sum, t: any) => sum + (t.total || 0), 0);
-      const totalItems = txs.reduce((sum, t: any) => {
-        const items = Array.isArray(t.items) ? t.items : [];
-        return sum + items.reduce((s: number, it: any) => s + (it.quantity || 0), 0);
+    if (cartItems.length > 0) {
+      const totalSales = cartItems.reduce((sum, item) => {
+        const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+        return sum + (price * item.quantity);
       }, 0);
-      const totalTransactions = txs.length;
-      const averageTransactionValue = totalTransactions ? totalSales / totalTransactions : 0;
+
+      const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+      
+      // Pour l'instant, on considère que chaque panier = 1 transaction
+      // Plus tard, on pourra améliorer avec un vrai système de transactions
+      const totalTransactions = 1;
+      const averageTransactionValue = totalSales / totalTransactions;
 
       setDailyStats({
         totalSales,
@@ -60,33 +61,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         totalTransactions,
         averageTransactionValue
       });
-
-      const bm = txs.reduce((acc: Record<string, number>, t: any) => {
-        const m = String(t.paymentMethod || '').toLowerCase();
-        const key = m.includes('esp') || m === 'cash' ? 'Espèces' : m.includes('carte') || m === 'card' ? 'Carte' : 'SumUp';
-        acc[key] = (acc[key] || 0) + (t.total || 0);
-        return acc;
-      }, {} as Record<string, number>);
-      setByMethod(bm);
-    } else if (cartItems.length > 0) {
-      // Fallback: estimer depuis le panier courant s'il n'y a aucune transaction stockée
-      const totalSales = cartItems.reduce((sum, item) => {
-        const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-        return sum + (price * item.quantity);
-      }, 0);
-      const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-      setDailyStats({
-        totalSales,
-        totalItems,
-        totalTransactions: 1,
-        averageTransactionValue: totalSales
-      });
-      setByMethod({});
-    } else {
-      setDailyStats({ totalSales: 0, totalItems: 0, totalTransactions: 0, averageTransactionValue: 0 });
-      setByMethod({});
     }
-  }, [open, cartItems]);
+  }, [cartItems]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
@@ -218,32 +194,6 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                   📊 Résumé : {dailyStats.totalItems} articles vendus pour un total de {formatPrice(dailyStats.totalSales)}
                 </Typography>
               </Box>
-            </Box>
-          </CardContent>
-        </Card>
-
-        {/* POINT 3: Totaux par mode de règlement */}
-        <Card sx={{ mb: 3, border: '2px solid #4caf50', backgroundColor: '#f1fff4' }}>
-          <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                Point 3: Méthodes de paiement
-              </Typography>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
-              {['Espèces','Carte','SumUp'].map(k => (
-                <Card key={k} sx={{ backgroundColor: '#e8f5e9' }}>
-                  <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                      {k}
-                    </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1b5e20', fontFamily: 'monospace' }}>
-                      {formatPrice(byMethod[k] || 0)}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
             </Box>
           </CardContent>
         </Card>

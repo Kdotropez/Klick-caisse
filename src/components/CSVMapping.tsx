@@ -14,7 +14,7 @@ import {
   Alert,
   Divider,
 } from '@mui/material';
-import { CheckCircle, ArrowForward } from '@mui/icons-material';
+import { ArrowForward } from '@mui/icons-material';
 
 interface CSVMappingProps {
   headers: string[];

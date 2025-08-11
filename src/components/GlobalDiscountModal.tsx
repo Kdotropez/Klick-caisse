@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -15,12 +15,14 @@ import {
   MenuItem,
 } from '@mui/material';
 import { CartItem } from '../types/Product';
+import { StorageService } from '../services/StorageService';
 
 interface GlobalDiscountModalProps {
   open: boolean;
   onClose: () => void;
   cartItems: CartItem[];
   onApplyDiscount: (discountType: 'euro' | 'percent', value: number) => void;
+  onApplyItemDiscount?: (itemId: string, variationId: string | null, discountType: 'euro' | 'percent' | 'price', value: number) => void;
 }
 
 interface DiscountItem {
@@ -36,6 +38,7 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
   onClose,
   cartItems,
   onApplyDiscount,
+  onApplyItemDiscount,
 }) => {
   const [selectedDiscount, setSelectedDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -139,6 +142,18 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
 
   const originalTotal = calculateOriginalTotal();
 
+  // Promotions proposées (manuel): 6 easyclickchic, -1€ par article
+  const easyclickPromo = useMemo(() => {
+    const target = StorageService.normalizeLabel('easyclickchic');
+    let totalQty = 0;
+    for (const it of cartItems) {
+      const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+      const has = list.some((c) => StorageService.normalizeLabel(String(c)).includes(target));
+      if (has) totalQty += (it.quantity || 0);
+    }
+    return { eligible: totalQty >= 6, totalQty };
+  }, [cartItems]);
+
   return (
     <Dialog
       open={open}
@@ -171,6 +186,33 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
       </DialogTitle>
 
       <DialogContent sx={{ pt: 3 }}>
+        {/* Promotions proposées (appliquer manuellement) */}
+        <Paper sx={{ p: 2, mb: 2, backgroundColor: '#fffef5', border: '1px solid #ffe082' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Promotions proposées</Typography>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button
+              variant={easyclickPromo.eligible ? 'contained' : 'outlined'}
+              color={easyclickPromo.eligible ? 'warning' : 'inherit'}
+              disabled={!easyclickPromo.eligible || !onApplyItemDiscount}
+              onClick={() => {
+                if (!onApplyItemDiscount) return;
+                const target = StorageService.normalizeLabel('easyclickchic');
+                for (const it of cartItems) {
+                  const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+                  const has = list.some((c) => StorageService.normalizeLabel(String(c)).includes(target));
+                  if (has) {
+                    onApplyItemDiscount(it.product.id, it.selectedVariation?.id || null, 'euro', 1);
+                  }
+                }
+              }}
+            >
+              6 EASYCLICKCHIC → −1€ / article {easyclickPromo.eligible ? `(${easyclickPromo.totalQty})` : ''}
+            </Button>
+          </Box>
+          <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.secondary' }}>
+            Ces remises ne s'appliquent que si vous cliquez dessus; aucune application automatique.
+          </Typography>
+        </Paper>
         {!isEditMode && (
           <Typography variant="body2" sx={{ mb: 3, textAlign: 'center', color: 'text.secondary' }}>
             Sélectionnez une remise à appliquer sur l'ensemble du ticket

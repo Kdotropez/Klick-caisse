@@ -16,7 +16,7 @@ const App: React.FC = () => {
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
   const [currentCashier, setCurrentCashier] = useState<Cashier | null>(null);
   const [rootSize, setRootSize] = useState({ width: '1187px', height: '874px' });
-  const [isResizingRoot, setIsResizingRoot] = useState(false);
+  const [_isResizingRoot, setIsResizingRoot] = useState(false);
 
 
   // Charger les données de production au démarrage
@@ -28,6 +28,30 @@ const App: React.FC = () => {
     // Initialiser les caissiers
     const loadedCashiers = StorageService.initializeDefaultCashier();
     setCashiers(loadedCashiers);
+  }, []);
+
+  // Demander le stockage persistant pour protéger les données locales contre l'éviction
+  useEffect(() => {
+    const enablePersistentStorage = async () => {
+      try {
+        const nav: any = navigator as any;
+        if (nav?.storage && (nav.storage.persist || nav.storage.persisted)) {
+          const already = nav.storage.persisted ? await nav.storage.persisted() : false;
+          if (!already && nav.storage.persist) {
+            const granted = await nav.storage.persist();
+            // eslint-disable-next-line no-console
+            console.log('Persistent storage requested:', granted);
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('Persistent storage already granted:', already);
+          }
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Persistent storage request failed or unsupported', e);
+      }
+    };
+    enablePersistentStorage();
   }, []);
 
   // Migration de nettoyage sous-catégories (une seule fois)

@@ -28070,23 +28070,28 @@ export const loadProductionData = (): { products: Product[]; categories: Categor
   console.log('🔄 Chargement des données de production...');
 
   try {
-    // Essayer de charger les données depuis localStorage
-    const savedProducts = localStorage.getItem('klickCaisse_products');
-    const savedCategories = localStorage.getItem('klickCaisse_categories');
+    // 1) Essayer avec les clés unifiées (underscore), alignées avec StorageService
+    const savedProductsUS = localStorage.getItem('klick_caisse_products');
+    const savedCategoriesUS = localStorage.getItem('klick_caisse_categories');
+    if (savedProductsUS && savedCategoriesUS) {
+      const parsedProducts = JSON.parse(savedProductsUS);
+      const parsedCategories = JSON.parse(savedCategoriesUS);
+      console.log('✅ Données chargées (underscore):', { products: parsedProducts.length, categories: parsedCategories.length });
+      return { products: parsedProducts, categories: parsedCategories };
+    }
 
-    if (savedProducts && savedCategories) {
-      const parsedProducts = JSON.parse(savedProducts);
-      const parsedCategories = JSON.parse(savedCategories);
-      
-      console.log('✅ Données chargées depuis localStorage:', { 
-        products: parsedProducts.length, 
-        categories: parsedCategories.length 
-      });
-      
-      return {
-        products: parsedProducts,
-        categories: parsedCategories
-      };
+    // 2) Compatibilité arrière: anciennes clés camelCase -> migrer vers underscore
+    const savedProductsCC = localStorage.getItem('klickCaisse_products');
+    const savedCategoriesCC = localStorage.getItem('klickCaisse_categories');
+    if (savedProductsCC && savedCategoriesCC) {
+      const parsedProducts = JSON.parse(savedProductsCC);
+      const parsedCategories = JSON.parse(savedCategoriesCC);
+      console.log('✅ Données chargées (camelCase) → migration vers underscore');
+      try {
+        localStorage.setItem('klick_caisse_products', JSON.stringify(parsedProducts));
+        localStorage.setItem('klick_caisse_categories', JSON.stringify(parsedCategories));
+      } catch {}
+      return { products: parsedProducts, categories: parsedCategories };
     }
   } catch (error) {
     console.error('❌ Erreur lors du chargement depuis localStorage:', error);
@@ -28101,13 +28106,17 @@ export const loadProductionData = (): { products: Product[]; categories: Categor
 };
 
 export const saveProductionData = (newProducts: Product[], newCategories: Category[]): void => {
-  // Sauvegarder dans localStorage pour persistance
+  // Sauvegarder dans localStorage pour persistance (clés unifiées + compat)
   try {
+    // Clés unifiées (alignées avec StorageService)
+    localStorage.setItem('klick_caisse_categories', JSON.stringify(newCategories));
+    localStorage.setItem('klick_caisse_products', JSON.stringify(newProducts));
+    // Compat arrière: écrire aussi les anciennes clés pour éviter toute régression
     localStorage.setItem('klickCaisse_categories', JSON.stringify(newCategories));
     localStorage.setItem('klickCaisse_products', JSON.stringify(newProducts));
-    console.log('✅ Données sauvegardées dans localStorage:', { 
-      products: newProducts.length, 
-      categories: newCategories.length 
+    console.log('✅ Données sauvegardées (underscore + camelCase):', {
+      products: newProducts.length,
+      categories: newCategories.length,
     });
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde:', error);

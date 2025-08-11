@@ -1,42 +1,52 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import CartPanel from './panels/CartPanel';
+import PaymentPanel from './panels/PaymentPanel';
+import CategoriesPanelFull from './panels/CategoriesPanelFull';
+import SettingsPanel from './panels/SettingsPanel';
+import ImportPanel from './panels/ImportPanel';
+import StatsPanel from './panels/StatsPanel';
+import SubcategoriesPanel from './panels/SubcategoriesPanel';
+import FreePanel from './panels/FreePanel';
 import {
   Box,
   Paper,
   Typography,
-  IconButton,
+  // IconButton,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Chip,
   List,
   ListItem,
-  ListItemText,
-  Divider,
-  TextField,
+  // ListItemText,
+  // Divider,
+  // TextField,
 } from '@mui/material';
-import {
-  Add,
-  Remove,
-  ImportExport,
-  Search,
-  NavigateBefore,
-  NavigateNext,
-} from '@mui/icons-material';
+// import {
+//   Add,
+//   Remove,
+// } from '@mui/icons-material';
 import { Product, Category, CartItem, ProductVariation, Transaction } from '../types/Product';
 import { Cashier } from '../types/Cashier';
 import { saveProductionData } from '../data/productionData';
 import VariationModal from './VariationModal';
 import RecapModal from './RecapModal';
+import PaymentRecapByMethodModal, { PaymentRecapSort } from './modals/PaymentRecapByMethodModal';
 
 import { StorageService } from '../services/StorageService';
+import TransactionHistoryModal from './modals/TransactionHistoryModal';
+import GlobalTicketsModal from './modals/GlobalTicketsModal';
+import GlobalTicketEditorModal from './modals/GlobalTicketEditorModal';
+import ClosuresModal from './modals/ClosuresModal';
+import EndOfDayModal from './modals/EndOfDayModal';
 import GlobalDiscountModal from './GlobalDiscountModal';
 import ItemDiscountModal from './ItemDiscountModal';
 import CategoryManagementModal from './CategoryManagementModal';
 import DailyReportModal from './DailyReportModal';
 import ProductEditModal from './ProductEditModal';
 import SubcategoryManagementModal from './SubcategoryManagementModal';
+import ProductsPanel from './panels/ProductsPanel';
 
 
 interface Window {
@@ -154,13 +164,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [globalAmountMin, setGlobalAmountMin] = useState<string>('');
   const [globalAmountMax, setGlobalAmountMax] = useState<string>('');
   const [globalAmountExact, setGlobalAmountExact] = useState<string>('');
-  const [globalProductText, setGlobalProductText] = useState<string>('');
+  // const [globalProductText, setGlobalProductText] = useState<string>('');
   const [globalDateFrom, setGlobalDateFrom] = useState<string>(''); // yyyy-mm-dd
   const [globalDateTo, setGlobalDateTo] = useState<string>('');
   const [globalTimeFrom, setGlobalTimeFrom] = useState<string>(''); // HH:MM
   const [globalTimeTo, setGlobalTimeTo] = useState<string>('');
   const [globalSelectedIds, setGlobalSelectedIds] = useState<Set<string>>(new Set());
   const [globalOnlyToday, setGlobalOnlyToday] = useState<boolean>(false);
+  // Saisie de quantité via pavé numérique (catégories)
+  const [pendingQtyInput, setPendingQtyInput] = useState<string>('');
   // Expansion des lignes (détails des tickets)
   const [expandedDayTicketIds, setExpandedDayTicketIds] = useState<Set<string>>(new Set());
   const [expandedGlobalTicketIds, setExpandedGlobalTicketIds] = useState<Set<string>>(new Set());
@@ -202,7 +214,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return Object.values(byProduct).sort((a, b) => b.totalQty - a.totalQty);
   };
   
-  const computePaymentTotalsFromTransactions = (transactions: Transaction[]) => {
+  const computePaymentTotalsFromTransactions = useCallback((transactions: Transaction[]) => {
     let cash = 0, card = 0, sumup = 0;
     for (const tx of transactions) {
       const method = String((tx as any).paymentMethod || '').toLowerCase();
@@ -211,7 +223,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       else if (method === 'sumup') sumup += tx.total;
     }
     return { 'Espèces': cash, 'SumUp': sumup, 'Carte': card } as typeof paymentTotals;
-  };
+  }, []);
   
   // États pour les totaux par méthode de paiement
   const [paymentTotals, setPaymentTotals] = useState({
@@ -221,8 +233,45 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   });
 
   useEffect(() => {
+    // Remise auto: 6 easyclickchic → -1€/article (supprimable per-ligne via la croix)
+    try {
+      const target = StorageService.normalizeLabel('easyclickchic');
+      let totalQty = 0;
+      const byKey: Record<string, number> = {};
+      for (const it of cartItems) {
+        const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+        const has = list.some((c) => StorageService.normalizeLabel(String(c)).includes(target));
+        if (has) {
+          totalQty += (it.quantity || 0);
+          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+          byKey[key] = (byKey[key] || 0) + (it.quantity || 0);
+        }
+      }
+      const next = { ...itemDiscounts };
+      if (totalQty >= 6) {
+        // Appliquer -1€ par article aux lignes concernées
+        for (const key of Object.keys(byKey)) {
+          next[key] = { type: 'euro', value: 1 };
+        }
+      } else {
+        // En dessous du seuil, retirer la remise auto (laisser autres remises intactes)
+        for (const key of Object.keys(byKey)) {
+          if (next[key] && next[key].type === 'euro' && next[key].value === 1) {
+            delete next[key];
+          }
+        }
+      }
+      // Mettre à jour si changement
+      const changed = Object.keys(next).length !== Object.keys(itemDiscounts).length ||
+        Object.keys(next).some(k => JSON.stringify(next[k]) !== JSON.stringify((itemDiscounts as any)[k]));
+      if (changed) setItemDiscounts(next);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartItems]);
+
+  useEffect(() => {
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
-  }, [todayTransactions]);
+  }, [todayTransactions, computePaymentTotalsFromTransactions]);
 
   // Si le ticket sélectionné n'existe plus (ex.: vidage), réinitialiser la sélection
   // Nettoyage d'anciens états (modale édition supprimée)
@@ -232,16 +281,32 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [importMessage, setImportMessage] = useState('');
   
   // Force le re-rendu quand les catégories changent
-  const [categoriesVersion, setCategoriesVersion] = useState(0);
-  useEffect(() => {
-    setCategoriesVersion(prev => prev + 1);
-    console.log('🔄 Version des catégories mise à jour:', categoriesVersion + 1);
-  }, [categories]);
+  // categoriesVersion supprimé (non utilisé)
+
+  // Fonction pour gérer le scan de code-barre (déplacée au-dessus de l'effet qui l'utilise)
+  const handleBarcodeScan = useCallback((barcode: string) => {
+    if (isEditMode) {
+      setSearchTerm(barcode);
+      return;
+    }
+    const scannedProduct = products.find(p => p.ean13 === barcode || p.reference === barcode);
+    if (scannedProduct) {
+      if (scannedProduct.variations && scannedProduct.variations.length > 0) {
+        setSelectedProduct(scannedProduct);
+        setVariationModalOpen(true);
+      } else {
+        onProductClick(scannedProduct);
+      }
+      setTimeout(() => setSearchTerm(''), 100);
+    } else {
+      setSearchTerm(barcode);
+    }
+  }, [products, isEditMode, onProductClick]);
   
   // Écouteur global pour les codes-barres
   useEffect(() => {
     let barcodeBuffer = '';
-    let barcodeTimeout: NodeJS.Timeout;
+    let barcodeTimeout: ReturnType<typeof setTimeout>;
     
     const handleKeyPress = (e: KeyboardEvent) => {
       // Ignorer si on est dans un champ de saisie
@@ -274,6 +339,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     };
     
     // Ajouter l'écouteur global
+    // keypress peut être verbeux; éviter la capture si déjà saisi dans inputs
     document.addEventListener('keypress', handleKeyPress);
     
     // Nettoyer l'écouteur
@@ -281,7 +347,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       document.removeEventListener('keypress', handleKeyPress);
       clearTimeout(barcodeTimeout);
     };
-  }, [products, isEditMode, cartItems]); // Dépendances pour handleBarcodeScan
+  }, [products, isEditMode, cartItems, handleBarcodeScan]);
 
 
 
@@ -410,7 +476,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   }, [selectedCategory, selectedSubcategory, searchTerm]);
 
   // Forcer un re-render quand les filtres changent pour éviter les problèmes de cache
-  const filterKey = `${selectedCategory}-${selectedSubcategory}-${searchTerm}-${currentPage}`;
+  // const filterKey = `${selectedCategory}-${selectedSubcategory}-${searchTerm}-${currentPage}`;
 
 
   // Système de drag and drop pour réorganiser les produits
@@ -434,10 +500,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return Math.max(1.0, newScaleFactor); // Minimum 1.0x pour garder la taille normale
   };
 
-  // Détection d'appareil tactile
-  const detectTouchDevice = () => {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  };
+  // Détection d'appareil tactile (non utilisée)
 
   // Fonctions de drag and drop
   const handleDragStart = (e: React.DragEvent, product: Product) => {
@@ -519,7 +582,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       return;
     }
 
-    // Calculer le total en tenant compte des remises (individuelles + globale)
+    // Calculer le total avec toutes remises (individuelles + globale)
     const total = getTotalWithGlobalDiscount();
 
     // Accumuler le total pour cette méthode de paiement
@@ -552,9 +615,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     // Mettre à jour les compteurs de ventes et vider le panier
     onCheckout();
-
-    // Réinitialiser les filtres après validation du paiement
-    resetFilters();
 
     console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€ - Compteurs de ventes mis à jour`);
   };
@@ -644,7 +704,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const CARDS_PER_PAGE = 25; // 5×5 produits au lieu de 5×6
   
   // Debug: Afficher les informations de filtrage
-  console.log('🔍 Debug Filtrage:', {
+  if (process.env.NODE_ENV === 'development' && false) console.log('🔍 Debug Filtrage:', {
     selectedCategory,
     selectedSubcategory,
     searchTerm,
@@ -660,31 +720,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return acc;
   }, [] as Product[]);
   
-  console.log('🔍 Debug Déduplication:', {
+  if (process.env.NODE_ENV === 'development' && false) console.log('🔍 Debug Déduplication:', {
     originalCount: products.length,
     uniqueCount: uniqueProducts.length,
     duplicates: products.length - uniqueProducts.length
   });
   
   const filteredProducts = uniqueProducts.filter(product => {
-    // Filtrage par recherche d'article (multi-mots, insensible aux accents/casse, ordre libre)
-    const matchesSearch = (() => {
-      const raw = String(searchTerm || '').trim();
-      if (!raw) return true;
-      const tokens = StorageService
-        .normalizeLabel(raw)
-        .split(/\s+/)
-        .filter(Boolean);
-      if (tokens.length === 0) return true;
-      const haystack = StorageService.normalizeLabel([
-        product.name,
-        product.category,
-        product.ean13 || '',
-        product.reference || '',
-        Array.isArray(product.associatedCategories) ? product.associatedCategories.join(' ') : ''
-      ].join(' '));
-      return tokens.every(token => haystack.includes(token));
-    })();
+    // Filtrage par recherche d'article
+        const matchesSearch = !searchTerm ||
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.ean13.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.reference.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Si aucune catégorie n'est sélectionnée, afficher tous les produits
     if (!selectedCategory && !selectedSubcategory) {
@@ -706,7 +754,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       
       // Debug: Afficher les détails de la comparaison
       if (product.name.includes('tee shirt') || product.name.includes('vetement')) {
-        console.log('🔍 Debug Produit:', {
+        if (process.env.NODE_ENV === 'development' && false) console.log('🔍 Debug Produit:', {
           productName: product.name,
           productCategory: product.category,
           selectedCategory,
@@ -722,7 +770,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return matchesSearch;
   });
   
-  console.log('🔍 Debug Résultat:', {
+  if (process.env.NODE_ENV === 'development' && false) console.log('🔍 Debug Résultat:', {
     filteredCount: filteredProducts.length,
     firstFewProducts: filteredProducts.slice(0, 3).map(p => ({ name: p.name, category: p.category }))
   });
@@ -749,7 +797,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const totalPages = Math.ceil(filteredProducts.length / CARDS_PER_PAGE);
   
   // Debug: Vérifier les produits actuels
-  console.log('🔍 Debug CurrentProducts:', {
+  if (process.env.NODE_ENV === 'development' && false) console.log('🔍 Debug CurrentProducts:', {
     startIndex,
     endIndex,
     currentProductsCount: currentProducts.length,
@@ -762,16 +810,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       zIndex: w.id === windowId ? Math.max(...prev.map(w => w.zIndex)) + 1 : w.zIndex
     })));
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleMouseDown = (e: React.MouseEvent<HTMLElement>, windowId: string) => {
-    // Désactive le déplacement si verrouillé
     const win = windows.find(w => w.id === windowId);
     if (!win) return;
-
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setDragOffset({
       x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      y: e.clientY - rect.top,
     });
     setDraggedWindow(windowId);
     bringToFront(windowId);
@@ -848,22 +894,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setResizingWindow(null);
     setResizeDirection('');
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleResizeStart = (
     e: React.MouseEvent<HTMLElement>,
     windowId: string,
     direction: string
   ) => {
-    // Désactive le redimensionnement si verrouillé
     e.stopPropagation();
     const win = windows.find(w => w.id === windowId);
     if (!win) return;
-
     setResizeStart({
       x: e.clientX,
       y: e.clientY,
       width: win.width,
-      height: win.height
+      height: win.height,
     });
     setResizingWindow(windowId);
     setResizeDirection(direction);
@@ -871,33 +915,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   useEffect(() => {
-    if (draggedWindow || resizingWindow) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [draggedWindow, dragOffset, resizingWindow, resizeDirection, resizeStart]);
+    if (!draggedWindow && !resizingWindow) return;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draggedWindow, resizingWindow]);
 
   // Mettre à jour les dimensions de l'écran quand la fenêtre change de taille
   useEffect(() => {
     const handleResize = () => {
       const newDimensions = {
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       };
+      if (
+        newDimensions.width === screenDimensions.width &&
+        newDimensions.height === screenDimensions.height
+      ) {
+        return;
+      }
       setScreenDimensions(newDimensions);
       
-      // Recalculer le facteur d'échelle
       const newScaleFactor = calculateScaleFactor();
+      if (newScaleFactor !== scaleFactor) {
       setScaleFactor(newScaleFactor);
-      
-      // Détecter l'appareil tactile
-  
-      
-      console.log(`Écran: ${newDimensions.width}x${newDimensions.height}, Scale: ${newScaleFactor.toFixed(2)}, Touch: ${detectTouchDevice()}`);
+      }
+      // logs désactivés
     };
 
     // Initialisation
@@ -905,82 +952,32 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [screenDimensions.width, screenDimensions.height, scaleFactor]);
 
-
-
-  // Fonction pour gérer le scan de code-barre
-  const handleBarcodeScan = (barcode: string) => {
-    console.log(`🔍 Scan détecté: ${barcode}`);
-    console.log(`📦 Nombre de produits disponibles: ${products.length}`);
-    console.log(`🎯 Mode actuel: ${isEditMode ? 'Édition' : 'Vente'}`);
-    
-    // En mode édition, ne pas traiter le scan comme un ajout au panier
-    if (isEditMode) {
-      console.log(`⚠️ Mode édition actif - scan ignoré pour éviter le basculement de mode`);
-      setSearchTerm(barcode);
-      return;
-    }
-    
-    // Recherche plus détaillée du produit
-    console.log(`🔍 Recherche du produit avec EAN: ${barcode}`);
-    
-    // Afficher tous les EAN disponibles pour debug
-    console.log(`📋 EAN disponibles dans la base:`);
-    products.forEach((product, index) => {
-      if (index < 10) { // Afficher les 10 premiers pour debug
-        console.log(`  ${index}: "${product.name}" - EAN: "${product.ean13}" - Ref: "${product.reference}"`);
-      }
-    });
-    
-    const scannedProduct = products.find(product => {
-      const eanMatch = product.ean13 === barcode;
-      const refMatch = product.reference === barcode;
-      console.log(`🔍 Vérification "${product.name}": EAN="${product.ean13}" (${eanMatch}) | Ref="${product.reference}" (${refMatch})`);
-      return eanMatch || refMatch;
-    });
-    
-    if (scannedProduct) {
-      console.log(`✅ Produit trouvé: ${scannedProduct.name}`);
-      console.log(`💰 Prix: ${scannedProduct.finalPrice}€`);
-      console.log(`📋 Déclinaisons: ${scannedProduct.variations ? scannedProduct.variations.length : 0}`);
-      console.log(`🆔 ID: ${scannedProduct.id}`);
-      
-      if (scannedProduct.variations && scannedProduct.variations.length > 0) {
-        console.log(`🔄 Ouverture modale déclinaisons...`);
-        // Ouvrir la modale de déclinaisons
-        setSelectedProduct(scannedProduct);
-        setVariationModalOpen(true);
-      } else {
-        console.log(`🛒 Ajout direct au panier...`);
-        console.log(`📞 Appel de onProductClick avec:`, scannedProduct);
-        // Ajouter directement au panier
-        onProductClick(scannedProduct);
-        console.log(`✅ Produit ajouté au panier!`);
-        
-        // Vérifier si le produit a été ajouté
-        setTimeout(() => {
-          console.log(`🔍 Vérification panier après ajout - Nombre d'articles: ${cartItems.length}`);
-          cartItems.forEach((item, index) => {
-            console.log(`  ${index}: ${item.product.name} - Qté: ${item.quantity}`);
-          });
-        }, 200);
-      }
-      
-      // Vider le champ de recherche après scan réussi
-      setTimeout(() => {
-        setSearchTerm('');
-      }, 100);
-    } else {
-      console.log(`❌ Produit non trouvé: ${barcode}`);
-      console.log(`🔍 Aucun produit avec cet EAN ou référence dans la base`);
-      // Afficher dans la recherche pour debug
-      setSearchTerm(barcode);
-    }
-  };
-
+  
+  
   // Fonctions de gestion des déclinaisons
   const handleProductClick = (product: Product) => {
+    // Appliquer la quantité saisie si présente
+    if (pendingQtyInput && /^\d+$/.test(pendingQtyInput)) {
+      const qty = Math.max(1, parseInt(pendingQtyInput, 10));
+      setPendingQtyInput('');
+      if (product.variations.length > 0) {
+        setSelectedProduct(product);
+        setVariationModalOpen(true);
+      } else {
+        // Chercher une ligne existante (sans variation)
+        const existing = cartItems.find(item => item.product.id === product.id && !item.selectedVariation);
+        if (existing) {
+          onUpdateQuantity(product.id, null, existing.quantity + qty);
+    } else {
+          // Créer la ligne puis la fixer à qty
+          onProductClick(product);
+          setTimeout(() => onUpdateQuantity(product.id, null, qty), 0);
+        }
+      }
+      return;
+    }
     if (product.variations.length > 0) {
       // Ouvrir la modale de déclinaisons
       setSelectedProduct(product);
@@ -1117,6 +1114,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       }
 
       // Analyser les en-têtes
+      // eslint-disable-next-line no-control-regex
       const headers = lines[0].split('\t').map(h => h.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
       
       // Mapping des colonnes
@@ -1147,17 +1145,24 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         if (values.length < Math.max(...Object.values(mapping).filter(v => v !== -1)) + 1) continue;
 
         try {
+          // eslint-disable-next-line no-control-regex
           const id = (values[mapping.id] || `prod_${i}`).replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          // eslint-disable-next-line no-control-regex
           const name = (values[mapping.name] || 'Produit sans nom').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          // eslint-disable-next-line no-control-regex
           const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           const finalPrice = parseFloat(values[mapping.finalPrice]) || 0;
+          // eslint-disable-next-line no-control-regex
           const ean13 = (values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          // eslint-disable-next-line no-control-regex
           const reference = (values[mapping.reference] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           
           // Traiter les catégories associées
+          // eslint-disable-next-line no-control-regex
           const associatedCategoriesStr = (values[mapping.associatedCategories] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           const associatedCategories = associatedCategoriesStr
             .split(',')
+            // eslint-disable-next-line no-control-regex
             .map(cat => cat.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''))
             .filter(cat => cat && cat.length > 0);
 
@@ -1234,6 +1239,30 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     event.target.value = '';
   };
 
+  // Backup: exporter tout en JSON
+  const handleExportAll = () => {
+    const data = StorageService.exportFullBackup();
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.download = `klick-caisse-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
+  const handleImportAll = async (file: File) => {
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      StorageService.importFullBackup(json);
+      setTodayTransactions(StorageService.loadTodayTransactions());
+      alert('Import terminé. Rechargez la page si nécessaire.');
+    } catch (e) {
+      alert('Fichier invalide ou erreur d\'import.');
+    }
+  };
+
   // Fonction utilitaire pour les couleurs
   const getRandomColor = () => {
     const colors = [
@@ -1260,18 +1289,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       default:
         return originalPrice;
     }
-  };
-
-  // Réinitialiser les filtres de recherche/catégories
-  const resetFilters = () => {
-    setSearchTerm('');
-    setCategorySearchTerm('');
-    setSubcategorySearchTerm('');
-    setSelectedCategory(null);
-    setSelectedSubcategory(null);
-    setProductSortMode('sales');
-    setCurrentPage(1);
-    console.log('🔄 Reset des recherches effectué');
   };
 
   const getTotalWithGlobalDiscount = () => {
@@ -1322,10 +1339,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
 
 
-  const renderResizeHandles = (window: Window) => {
-    // Poignées de redimensionnement temporairement désactivées pour libérer de l'espace
-    return null;
-  };
+  // Poignées de redimensionnement désactivées (fonction non utilisée)
 
   const renderWindowContent = (window: Window) => {
     if (window.isMinimized) {
@@ -1339,2214 +1353,164 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     switch (window.type) {
       case 'products':
         return (
-          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            
-
-            
-                         {/* Grille produits */}
-            {/* Calculer les dimensions dynamiques des cartes pour occuper le maximum d'espace */}
-            {(() => {
-              const windowWidth = window.width;
-              const windowHeight = window.height;
-              const headerHeight = 82;
-              
-              // Calculer les dimensions disponibles pour la grille selon votre logique exacte
-              // Fenêtre 1 fait 722x466 (déjà réduite de 10%)
-              // 4 gaps de 1px = 4, 2 gaps de chaque extrémité = 2, total gaps = 6
-              // 5 bordures de 1px = 5, total bordures = 5
-              // Total à soustraire = 6 + 5 = 11
-              // Largeur disponible = 722 - 11 = 711
-              // Largeur par carte = 711 / 5 = 142.2
-              
-              const totalGapsWidth = 6; // 4 gaps entre colonnes + 2 gaps aux extrémités
-              const totalBordersWidth = 5; // 5 cartes × 1px de bordure chacune
-              const totalWidthToSubtract = totalGapsWidth + totalBordersWidth; // 11px
-              
-              const totalGapsHeight = 6; // 4 gaps entre lignes + 2 gaps aux extrémités
-              const totalBordersHeight = 5; // 5 cartes × 1px de bordure chacune
-              const totalHeightToSubtract = totalGapsHeight + totalBordersHeight; // 11px
-              
-              const availableWidth = windowWidth - totalWidthToSubtract;
-              const availableHeight = windowHeight - headerHeight - totalHeightToSubtract;
-              
-              const cardWidth = Math.floor(availableWidth / 5);
-              // Calcul optimisé pour utiliser au maximum l'espace vertical disponible
-              // Fenêtre: 466px de hauteur totale
-              // Header: 82px
-              // Hauteur disponible pour la grille: 466 - 82 = 384px
-              // Pour 5 cartes de 91px: 5 × 91 = 455px
-              // Gaps et bordures: 6 + 5 = 11px
-              // Total nécessaire: 455 + 11 = 466px (parfait!)
-              // Donc on peut avoir exactement 91px par carte
-              const cardHeight = 91;
-              
-              // Logs de débogage pour vérifier les calculs
-              console.log('🔍 DEBUG - Calculs des cartes:', {
-                windowWidth,
-                windowHeight,
-                headerHeight,
-                totalWidthToSubtract,
-                totalHeightToSubtract,
-                availableWidth,
-                availableHeight,
-                cardWidth,
-                cardHeight,
-                expectedCardWidth: 142,
-                expectedCardHeight: 91,
-                totalHeightNeeded: cardHeight * 5 + totalHeightToSubtract
-              });
-              
-            return (
-              <Box 
-                  key={filterKey}
-                  sx={{ 
-                    flexGrow: 1, 
-                    display: 'grid', 
-                    gridTemplateColumns: `repeat(5, ${cardWidth}px)`,
-                    gridTemplateRows: `repeat(5, ${cardHeight}px)`,
-                    gap: '1px',
-                    p: '1px',
-                    overflow: 'hidden',
-                    minHeight: 0,
-                    width: '100%',
-                    height: '466px', // Hauteur fixe pour utiliser toute la hauteur de la fenêtre
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    boxSizing: 'border-box'
-                  }}>
-
-
-
-                  
-                  {/* Rendu de la grille 5x5 avec navigation intégrée */}
-                  {Array.from({ length: 25 }, (_, index) => {
-                    // Calculer un facteur d'échelle adapté aux dimensions des cartes
-                    const cardScaleFactor = Math.min(cardWidth / 150, cardHeight / 120); // Basé sur les dimensions originales
-                 const position = index + 1;
-                 
-                 // Positions des boutons de navigation - TOUJOURS fixes
-                 const isPrevButton = position === 21;
-                 const isNextButton = position === 25;
-                 
-                 // Rendu des boutons de navigation - TOUJOURS aux mêmes positions
-                 if (isPrevButton) {
-                   return (
-                     <Button
-                       key="prev-button"
-                       variant="contained"
-                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                       disabled={currentPage === 1}
-                       sx={{
-                         width: `${cardWidth}px`,
-                         height: `${cardHeight}px`,
-                         display: 'flex',
-                         flexDirection: 'column',
-                         justifyContent: 'center',
-                         alignItems: 'center',
-                         backgroundColor: currentPage === 1 ? '#ccc' : '#2196f3',
-                         color: 'white',
-                         borderRadius: '8px',
-                         position: 'relative',
-                         minWidth: `${cardWidth}px`,
-                         minHeight: `${cardHeight}px`,
-                         maxWidth: `${cardWidth}px`,
-                         maxHeight: `${cardHeight}px`,
-                         boxSizing: 'border-box',
-                         p: '2px',
-                         border: '1px solid #ccc',
-                         boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                         flexShrink: 0,
-                         flexGrow: 0,
-                         overflow: 'hidden',
-
-                         '&:hover': {
-                           backgroundColor: currentPage === 1 ? '#ccc' : '#1976d2'
-                         },
-                         '&:disabled': {
-                           backgroundColor: '#ccc',
-                           color: '#666',
-                           transform: 'none',
-                           boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                         }
-                       }}
-                     >
-                       <NavigateBefore sx={{ fontSize: '2rem', mb: 1 }} />
-                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                         Précédent
-                       </Typography>
-                     </Button>
-                   );
-                 }
-                 
-                 if (isNextButton) {
-                   return (
-                     <Button
-                       key="next-button"
-                       variant="contained"
-                       onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                       disabled={currentPage === totalPages}
-                       sx={{
-                         width: `${cardWidth}px`,
-                         height: `${cardHeight}px`,
-                         display: 'flex',
-                         flexDirection: 'column',
-                         justifyContent: 'center',
-                         alignItems: 'center',
-                         backgroundColor: currentPage === totalPages ? '#ccc' : '#2196f3',
-                         color: 'white',
-                         borderRadius: '8px',
-                         position: 'relative',
-                         minWidth: `${cardWidth}px`,
-                         minHeight: `${cardHeight}px`,
-                         maxWidth: `${cardWidth}px`,
-                         maxHeight: `${cardHeight}px`,
-                         boxSizing: 'border-box',
-                         p: '2px',
-                         border: '1px solid #ccc',
-                         boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                         flexShrink: 0,
-                         flexGrow: 0,
-                         overflow: 'hidden',
-
-                         '&:hover': {
-                           backgroundColor: currentPage === totalPages ? '#ccc' : '#1976d2'
-                         },
-                         '&:disabled': {
-                           backgroundColor: '#ccc',
-                           color: '#666',
-                           transform: 'none',
-                           boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                         }
-                       }}
-                     >
-                       <NavigateNext sx={{ fontSize: '2rem', mb: 1 }} />
-                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                         Suivant
-                       </Typography>
-                     </Button>
-                   );
-                 }
-                 
-                                                     // Position du produit dans la grille (en excluant les boutons de navigation)
-                  let productIndex = index;
-                  if (index > 20) productIndex = index - 1; // Après le bouton précédent
-                  if (index > 24) productIndex = index - 2; // Après le bouton suivant
-                  
-                  // Vérification supplémentaire : ne jamais afficher de produit aux positions des boutons
-                  if (position === 21 || position === 25) {
-                    return null; // Cette position est réservée aux boutons
-                  }
-                  
-                  const product = currentProducts[productIndex];
-                 
-                 // Si pas de produit pour cette position, afficher une case vide (sauf aux positions des boutons)
-                 if (!product) {
-                   return (
-                     <Box
-                       key={`empty-${index}`}
-                       sx={{
-                         width: `${cardWidth}px`,
-                         height: `${cardHeight}px`,
-                         border: '1px dashed #ccc',
-                         borderRadius: '8px',
-                         display: 'flex',
-                         alignItems: 'center',
-                         justifyContent: 'center',
-                         backgroundColor: '#f9f9f9',
-                         boxSizing: 'border-box',
-                         overflow: 'hidden'
-                       }}
-                     />
-                   );
-                 }
-                 
-                                   // Rendu normal du produit
-                  const categoryColor = getCategoryColor(product.category);
-                  
-                  return (
-                                         <Paper
-                       key={product.id}
-                       draggable
-                       sx={{
-                         width: `${cardWidth}px`,
-                         height: `${cardHeight}px`,
-                         p: '2px',
-                         cursor: 'grab',
-                         transition: 'all 0.2s',
-                         display: 'flex',
-                         flexDirection: 'column',
-                         justifyContent: 'space-between',
-                         minHeight: 0,
-                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}66 0%, ${categoryColor}33 40%, ${categoryColor}14 70%, #ffffff 90%, #ffffff 100%)`,
-                          border: `1px solid ${categoryColor}66`,
-                         borderRadius: `8px`,
-                         boxShadow: `0 1px 2px rgba(0,0,0,0.1)`,
-                         color: '#2c3e50',
-                         fontWeight: '600',
-                         boxSizing: 'border-box',
-
-                       ...(isEditMode && selectedProductsForDeletion.has(product.id) && {
-                         border: '3px solid #f44336',
-                         backgroundColor: '#ffebee',
-                         boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(244, 67, 54, 0.3)`
-                       }),
-                       ...(dragOverProduct?.id === product.id && {
-                         transform: 'scale(1.05)',
-                          boxShadow: `0 ${8 * cardScaleFactor}px ${25 * cardScaleFactor}px rgba(0,0,0,0.25), 0 ${3 * cardScaleFactor}px ${8 * cardScaleFactor}px ${categoryColor}40`,
-                          border: `${3 * cardScaleFactor}px solid ${categoryColor}66`,
-                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}66 0%, ${categoryColor}33 50%, ${categoryColor}14 80%, #ffffff 100%)`
-                       }),
-                       '&:hover': { 
-                         transform: 'translateY(-1px)', 
-                          boxShadow: `0 3px 6px rgba(0,0,0,0.12)`,
-                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}80 0%, ${categoryColor}40 45%, ${categoryColor}1A 80%, #ffffff 100%)`,
-                          border: `1px solid ${categoryColor}66`,
-                         cursor: 'grab'
-                       },
-                       '&:active': { 
-                         transform: 'translateY(0px) scale(0.98)',
-                          boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(0,0,0,0.2), 0 ${1 * cardScaleFactor}px ${2 * cardScaleFactor}px ${categoryColor}26`,
-                          background: `radial-gradient(circle at 50% 50%, ${categoryColor}80 0%, ${categoryColor}40 50%, ${categoryColor}1A 85%, #ffffff 100%)`,
-                         cursor: 'grabbing'
-                       }
-                     }}
-                     onDragStart={(e) => handleDragStart(e, product)}
-                     onDragOver={(e) => handleDragOver(e, product)}
-                     onDragLeave={handleDragLeave}
-                     onDrop={(e) => handleDrop(e, product)}
-                     onDragEnd={handleDragEnd}
-                             onClick={(e) => {
-            if (isEditMode) {
-                // Mode édition : ouvrir la modale de modification
-                e.stopPropagation();
-                setSelectedProductForEdit(product);
-                setShowProductEditModal(true);
-            } else {
-                // Mode vente : ajouter au panier
-                handleProductClick(product);
-            }
-        }}
-                     
-                   >
-                     <Box sx={{ position: 'relative', flexGrow: 1 }}>
-                       {isEditMode && (
-                         <Box sx={{
-                           position: 'absolute',
-                           top: -5,
-                           left: -5,
-                           width: 20,
-                           height: 20,
-                           backgroundColor: selectedProductsForDeletion.has(product.id) ? '#f44336' : '#fff',
-                           borderRadius: '50%',
-                           display: 'flex',
-                           alignItems: 'center',
-                           justifyContent: 'center',
-                           color: selectedProductsForDeletion.has(product.id) ? 'white' : '#ccc',
-                           fontSize: '12px',
-                           fontWeight: 'bold',
-                           zIndex: 10,
-                           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                           border: '2px solid #ccc',
-                           cursor: 'pointer'
-                         }}
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           setSelectedProductsForDeletion(prev => {
-                             const next = new Set(prev);
-                             if (next.has(product.id)) {
-                               next.delete(product.id);
-                             } else {
-                               next.add(product.id);
-                             }
-                             return next;
-                           });
-                         }}>
-                           {selectedProductsForDeletion.has(product.id) ? '✓' : ''}
-                         </Box>
-                       )}
-                        <Typography variant="body2" sx={{ 
-                          fontWeight: '600', 
-                          fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`, 
-                          lineHeight: 1.2, 
-                          flexGrow: 1, 
-                          color: '#2c3e50',
-                          textAlign: 'center',
-                          width: '100%'
-                        }}>
-                          {product.name}
-                        </Typography>
-                     </Box>
-                     <Typography variant="h6" sx={{ 
-                       fontWeight: 'bold', 
-                       fontSize: `${Math.max(1, 1.1 * cardScaleFactor)}rem`, 
-                       textAlign: 'center', 
-                       color: categoryColor, 
-                       letterSpacing: `${0.5 * cardScaleFactor}px` 
-                     }}>
-                       {product.finalPrice.toFixed(2)} €
-                     </Typography>
-                     <Box sx={{ 
-                       display: 'flex', 
-                       justifyContent: 'space-between', 
-                       mt: 0.25 * cardScaleFactor, 
-                       gap: 0.25 * cardScaleFactor 
-                     }}>
-                        <Chip
-                          label={(dailyQtyByProduct[product.id] || 0)}
-                          size="small"
-                          sx={{
-                            fontSize: `${Math.max(0.8, 0.9 * cardScaleFactor)}rem`,
-                            height: `${Math.max(20, 22 * cardScaleFactor)}px`,
-                            backgroundColor: '#ffffff',
-                            color: '#111',
-                            fontWeight: 800,
-                            border: '1px solid #dddddd',
-                            borderRadius: `${Math.max(10, 10 * cardScaleFactor)}px`,
-                            alignSelf: 'flex-end',
-                            boxShadow: `0 ${1 * cardScaleFactor}px ${3 * cardScaleFactor}px rgba(0,0,0,0.15)`
-                          }}
-                        />
-                       {product.variations.length > 0 && (
-                         <Chip 
-                           label={`${product.variations.length} var.`} 
-                           size="small" 
-                            sx={{ 
-                              fontSize: `${Math.max(0.6, 0.7 * cardScaleFactor)}rem`, 
-                              height: `${Math.max(20, 22 * cardScaleFactor)}px`, 
-                              backgroundColor: '#95a5a6', 
-                              color: 'white', 
-                              fontWeight: '600', 
-                              boxShadow: `0 ${1 * cardScaleFactor}px ${3 * cardScaleFactor}px rgba(0,0,0,0.2)` 
-                            }} 
-                          />
-                        )}
-                    </Box>
-                  </Paper>
-                );
-              })}
-            </Box>
-          );
-        })()}
-        </Box>
+          <ProductsPanel
+            width={window.width}
+            height={window.height}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+            currentProducts={currentProducts}
+            getCategoryColor={getCategoryColor}
+            dailyQtyByProduct={dailyQtyByProduct}
+            isEditMode={isEditMode}
+            selectedProductsForDeletion={selectedProductsForDeletion}
+            setSelectedProductsForDeletion={(next) => setSelectedProductsForDeletion(next)}
+            dragOverProduct={dragOverProduct}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onDragEnd={handleDragEnd}
+            onProductClick={handleProductClick}
+            onEditProduct={(p) => { setSelectedProductForEdit(p); setShowProductEditModal(true); }}
+          />
         );
 
       case 'cart':
         return (
-          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
-              <Typography variant="h6" align="center" sx={{ fontWeight: 'bold' }}>
-                TICKET DE CAISSE
-              </Typography>
-              <Typography variant="caption" align="center" display="block">
-                {new Date().toLocaleDateString('fr-FR')} - {new Date().toLocaleTimeString('fr-FR')}
-              </Typography>
-            </Box>
-            
-            <List dense sx={{ flexGrow: 1, overflow: 'auto', p: 0.5 }}>
-              {cartItems.map((item, index) => {
-                const variationId = item.selectedVariation?.id || null;
-                const discountKey = `${item.product.id}-${variationId || 'main'}`;
-                const discount = itemDiscounts[discountKey];
-                const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                const finalPrice = getItemFinalPrice(item);
-                const originalTotal = originalPrice * item.quantity;
-                const finalTotal = finalPrice * item.quantity;
-                
-                return (
-                  <ListItem 
-                    key={`${item.product.id}-${variationId || 'main'}`} 
-                    sx={{
-                      py: 0.5,
-                      cursor: 'pointer',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 1,
-                      mb: 0.5,
-                      backgroundColor: '#fafafa'
-                    }}
-                    onClick={() => openDiscountModal(item)}
-                  >
-                    <ListItemText
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {item.product.name}
-                            {item.selectedVariation && (
-                              <Typography 
-                                component="span" 
-                                variant="body2" 
-                                sx={{ 
-                                  color: '#2196f3', 
-                                  fontWeight: 'normal',
-                                  ml: 0.5,
-                                  fontStyle: 'italic'
-                                }}
-                              >
-                                ({item.selectedVariation.attributes})
-                              </Typography>
-                            )}
-                          </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRemoveItem(item.product.id, variationId);
-                            }}
-                            sx={{ color: '#f44336', p: 0.5 }}
-                          >
-                            ✕
-                          </IconButton>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#666', ml: 'auto' }}>
-                            {originalPrice.toFixed(2)} €
-                          </Typography>
-                        </Box>
-                      }
-                      secondary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                          <IconButton 
-                            size="small" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onUpdateQuantity(item.product.id, variationId, item.quantity - 1);
-                            }}
-                          >
-                            <Remove fontSize="small" />
-                          </IconButton>
-                          <Chip label={item.quantity} size="small" />
-                          <IconButton 
-                            size="small" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onUpdateQuantity(item.product.id, variationId, item.quantity + 1);
-                            }}
-                          >
-                            <Add fontSize="small" />
-                          </IconButton>
-                          
-                          {/* Affichage des remises individuelles */}
-                          {discount && (() => {
-                            const discountAmountPerUnit = originalPrice - finalPrice;
-                            const discountAmountTotal = discountAmountPerUnit * item.quantity;
-                            const discountPercent = ((discountAmountPerUnit / originalPrice) * 100);
-
-                            return (
-                              <Box sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                ml: 1,
-                                alignItems: 'center'
-                              }}>
-                                <Box sx={{
-                                  display: 'flex',
-                                  gap: 0.5,
-                                  backgroundColor: '#ff9800',
-                                  color: 'black',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  fontSize: '0.9rem',
-                                  fontWeight: 'bold'
-                                }}>
-                                  <span>-{discountAmountTotal.toFixed(2)}€</span>
-                                  <span>(-{discountPercent.toFixed(1)}%)</span>
-                                </Box>
-                                <Box sx={{
-                                  backgroundColor: '#000',
-                                  color: 'white',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  fontSize: '0.9rem',
-                                  fontWeight: 'bold',
-                                  ml: 1,
-                                  textDecoration: 'line-through'
-                                }}>
-                                  {originalTotal.toFixed(2)} €
-                                </Box>
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const newItemDiscounts = { ...itemDiscounts };
-                                    delete newItemDiscounts[discountKey];
-                                    setItemDiscounts(newItemDiscounts);
-                                  }}
-                                  sx={{
-                                    color: '#ff0000',
-                                    fontSize: '0.8rem',
-                                    ml: 0.5,
-                                    p: 0.5,
-                                    minWidth: 'auto',
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(255, 0, 0, 0.1)'
-                                    }
-                                  }}
-                                >
-                                  ✕
-                                </IconButton>
-                              </Box>
-                            );
-                          })()}
-                          
-                          {/* Prix total (toujours affiché) */}
-                          <Box sx={{
-                            backgroundColor: '#2196F3',
-                            color: 'white',
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: 1,
-                            fontSize: '0.9rem',
-                            fontWeight: 'bold',
-                            ml: 'auto'
-                          }}>
-                            {finalTotal.toFixed(2)} €
-                          </Box>
-                        </Box>
-                      }
-                    />
-                  </ListItem>
-                );
-              })}
-            </List>
-            
-            <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
-              {/* Sous-total */}
-              <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5 }}>
-                Sous-total: {cartItems.reduce((sum, item) => {
-                  const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                  return sum + (originalPrice * item.quantity);
-                }, 0).toFixed(2)} €
-              </Typography>
-
-              {/* Montant total de toutes les remises */}
-              {(() => {
-                // Calculer les remises individuelles
-                const individualDiscounts = cartItems.reduce((sum, item) => {
-                  const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                  const originalTotal = originalPrice * item.quantity;
-                  const finalPrice = getItemFinalPrice(item);
-                  const finalTotal = finalPrice * item.quantity;
-                  
-                  return sum + (originalTotal - finalTotal);
-                }, 0);
-
-                // Calculer la remise globale
-                let globalDiscountAmount = 0;
-                if (globalDiscount) {
-                  // Total des produits sans remise individuelle
-                  const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
-                    const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-                    const hasIndividualDiscount = itemDiscounts[discountKey];
-                    
-                    if (!hasIndividualDiscount) {
-                      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                      return sum + (originalPrice * item.quantity);
-                    }
-                    return sum;
-                  }, 0);
-
-                  // Appliquer la remise globale sur le total
-                  if (globalDiscount.type === 'euro') {
-                    globalDiscountAmount = Math.min(totalWithoutIndividualDiscount, globalDiscount.value);
-                  } else {
-                    globalDiscountAmount = totalWithoutIndividualDiscount * (globalDiscount.value / 100);
-                  }
-                }
-
-                const totalDiscounts = individualDiscounts + globalDiscountAmount;
-                
-                return (
-                  <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5, color: '#f44336', fontWeight: 'bold' }}>
-                    Total remises: -{totalDiscounts.toFixed(2)} €
-                  </Typography>
-                );
-              })()}
-
-              {/* Total final */}
-              <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'right' }}>
-                TOTAL: {getTotalWithGlobalDiscount().toFixed(2)} €
-              </Typography>
-              
-              {/* Boutons du pied de page */}
-              <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => setShowRecapModal(true)}
-                  sx={{ 
-                    backgroundColor: '#1976d2',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  📋 Recap
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={openGlobalDiscountModal}
-                  sx={{ 
-                    backgroundColor: '#ff9800',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  💰 Remise
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => {
-                    // Effacer tous les articles du panier
-                    cartItems.forEach(item => {
-                      const variationId = item.selectedVariation?.id || null;
-                      onRemoveItem(item.product.id, variationId);
-                    });
-                    // Effacer toutes les remises individuelles
-                    setItemDiscounts({});
-                    // Effacer la remise globale
-                    setGlobalDiscount(null);
-                  }}
-                  sx={{ 
-                    backgroundColor: '#f44336',
-                    flex: 1,
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  🔄 Reset
-                </Button>
-              </Box>
-            </Box>
-          </Box>
+          <CartPanel
+            cartItems={cartItems}
+            itemDiscounts={itemDiscounts as any}
+            globalDiscount={globalDiscount as any}
+            getItemFinalPrice={getItemFinalPrice}
+            getTotalWithGlobalDiscount={getTotalWithGlobalDiscount}
+            onUpdateQuantity={onUpdateQuantity}
+            onRemoveItem={onRemoveItem}
+            onOpenDiscountModal={openDiscountModal}
+            onOpenRecap={() => setShowRecapModal(true)}
+            onOpenGlobalDiscount={openGlobalDiscountModal}
+            onResetCartAndDiscounts={() => { setItemDiscounts({}); setGlobalDiscount(null); cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); }}
+            onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
+          />
         );
 
              case 'categories':
          return (
-           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                           {/* Ligne 1: Boutons des catégories */}
-              <Box sx={{ 
-                p: 1,
-                borderBottom: 1,
-                borderColor: 'divider',
-                overflow: 'hidden'
-              }}>
-                <Box sx={{ 
-                  display: 'flex',
-                  flexDirection: 'row',
-                  gap: 1,
-                  alignItems: 'flex-start',
-                  overflowX: 'auto',
-                  overflowY: 'hidden',
-                  scrollbarWidth: 'none', // Firefox
-                  msOverflowStyle: 'none', // IE/Edge
-                  '&::-webkit-scrollbar': { // Chrome/Safari
-                    display: 'none'
-                  },
-                  // Support tactile et souris
-                  cursor: 'grab',
-                  '&:active': {
-                    cursor: 'grabbing'
-                  },
-                  // Amélioration du défilement tactile
-                  WebkitOverflowScrolling: 'touch',
-                  scrollBehavior: 'smooth'
-                }}>
-                                     <Button
-                     variant={selectedCategory === null ? "contained" : "outlined"}
-                     onClick={() => {
-                       setSelectedCategory(null);
-                       setSelectedSubcategory(null);
-                     }}
-                     sx={{ 
-                       textTransform: 'none',
-                       whiteSpace: 'nowrap',
-                       minWidth: 'fit-content',
-                       flexShrink: 0,
-                       backgroundColor: selectedCategory === null ? '#2E86AB' : 'transparent',
-                       color: selectedCategory === null ? 'white' : '#2E86AB',
-                       borderColor: '#2E86AB',
-                       '&:hover': {
-                         backgroundColor: selectedCategory === null ? '#1B5E7A' : 'rgba(46, 134, 171, 0.1)'
-                       }
-                     }}
-                   >
-                     Toutes
-                   </Button>
-                   {categories
-                     .filter(category => 
-                       !categorySearchTerm || 
-                       category.name.toLowerCase().includes(categorySearchTerm.toLowerCase())
-                     )
-                     .map((category) => {
-                     const categoryColor = getCategoryColor(category.id);
-                     return (
-                       <Button
-                         key={category.id}
-                         variant={selectedCategory === category.id ? "contained" : "outlined"}
-                         onClick={() => {
-                           setSelectedCategory(category.id);
-                           setSelectedSubcategory(null);
-                         }}
-                         sx={{ 
-                           textTransform: 'none',
-                           whiteSpace: 'nowrap',
-                           minWidth: 'fit-content',
-                           flexShrink: 0,
-                           backgroundColor: selectedCategory === category.id ? categoryColor : 'transparent',
-                           color: selectedCategory === category.id ? 'white' : categoryColor,
-                           borderColor: categoryColor,
-                           fontWeight: 'bold',
-                           '&:hover': {
-                             backgroundColor: selectedCategory === category.id ? 
-                               `${categoryColor}dd` : 
-                               `${categoryColor}15`,
-                             transform: 'translateY(-1px)',
-                             boxShadow: `0 2px 8px ${categoryColor}40`
-                           },
-                           '&:active': {
-                             transform: 'scale(0.98)'
-                           }
-                         }}
-                       >
-                         {category.name}
-                       </Button>
-                     );
-                   })}
-                </Box>
-              </Box>
-             
-                           {/* Ligne 2: Recherches */}
-              <Box sx={{ 
-                p: 1,
-                display: 'flex',
-                flexDirection: 'row',
-                gap: 1,
-                alignItems: 'center'
-              }}>
-                 {/* Recherche des articles */}
-                 <TextField
-                   size="small"
-                   placeholder="Article (ou scanner code-barres)"
-                   variant="outlined"
-                   sx={{ 
-                     flex: 1,
-                     '& .MuiOutlinedInput-root': {
-                       borderColor: '#2196f3',
-                       backgroundColor: '#e3f2fd',
-                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#1976d2'
-                       },
-                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#2196f3'
-                       },
-                       '&:hover': {
-                         backgroundColor: '#bbdefb'
-                       },
-                       '&.Mui-focused': {
-                         backgroundColor: '#90caf9'
-                       }
-                     }
-                   }}
-                   value={searchTerm}
-                   onChange={(e) => {
-                     const value = e.target.value;
-                     setSearchTerm(value);
-                     
-                     // Si c'est un code-barre (13 chiffres), utiliser handleBarcodeScan
-                     if (value.length === 13 && /^\d{13}$/.test(value)) {
-                       // Empêcher la propagation d'événements qui pourraient basculer le mode
-                       e.stopPropagation();
-                       console.log(`🎯 Détection code-barre dans le champ de recherche: ${value}`);
-                       handleBarcodeScan(value);
-                     }
-                   }}
-                   onKeyPress={(e) => {
-                     // Détecter aussi les codes-barres qui arrivent par événement keypress
-                     const target = e.currentTarget as HTMLInputElement;
-                     const value = target.value + e.key;
-                     if (value.length === 13 && /^\d{13}$/.test(value)) {
-                       console.log(`🎯 Détection code-barre par keypress: ${value}`);
-                       e.preventDefault();
-                       e.stopPropagation();
-                       handleBarcodeScan(value);
-                     }
-                   }}
-                   onKeyDown={(e) => {
-                     // Empêcher les touches de déclencher d'autres actions pendant le scan
-                     const target = e.target as HTMLInputElement;
-                     if (target.value.length === 13 && /^\d{13}$/.test(target.value)) {
-                       e.stopPropagation();
-                     }
-                   }}
-                   InputProps={{
-                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#2196f3' }} />
-                   }}
-                 />
-                 
-                 {/* Recherche des catégories */}
-                 <TextField
-                   size="small"
-                   placeholder="Catégorie"
-                   variant="outlined"
-                   value={categorySearchTerm}
-                   onChange={(e) => setCategorySearchTerm(e.target.value)}
-                   sx={{ 
-                     flex: 1,
-                     '& .MuiOutlinedInput-root': {
-                       borderColor: '#ff9800',
-                       backgroundColor: '#fff3e0',
-                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#f57c00'
-                       },
-                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#ff9800'
-                       },
-                       '&:hover': {
-                         backgroundColor: '#ffe0b2'
-                       },
-                       '&.Mui-focused': {
-                         backgroundColor: '#ffcc80'
-                       }
-                     }
-                   }}
-                   InputProps={{
-                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#ff9800' }} />
-                   }}
-                 />
-                 
-                 {/* Recherche des sous-catégories */}
-                 <TextField
-                   size="small"
-                   placeholder="Sous-catégorie"
-                   variant="outlined"
-                   value={subcategorySearchTerm}
-                   onChange={(e) => setSubcategorySearchTerm(e.target.value)}
-                   sx={{ 
-                     flex: 1,
-                     '& .MuiOutlinedInput-root': {
-                       borderColor: '#9c27b0',
-                       backgroundColor: '#f3e5f5',
-                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#7b1fa2'
-                       },
-                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                         borderColor: '#9c27b0'
-                       },
-                       '&:hover': {
-                         backgroundColor: '#e1bee7'
-                       },
-                       '&.Mui-focused': {
-                         backgroundColor: '#ce93d8'
-                       }
-                     }
-                   }}
-                   InputProps={{
-                     startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: '#9c27b0' }} />
-                   }}
-                 />
-                 
-                 {/* Boutons de tri déplacés plus bas dans la section sous-catégories */}
-                 {/* Bouton de suppression en mode édition */}
-                 {isEditMode && selectedProductsForDeletion.size > 0 && (
-                   <Button
-                     variant="contained"
-                     color="error"
-                     size="small"
-                     onClick={() => {
-                       // eslint-disable-next-line no-restricted-globals
-                       if (confirm(`Supprimer ${selectedProductsForDeletion.size} article(s) sélectionné(s) ?`)) {
-                         const selectedIds = Array.from(selectedProductsForDeletion);
-                         const updatedProducts = products.filter(p => !selectedIds.includes(p.id));
-                         onProductsReorder?.(updatedProducts);
-                         setSelectedProductsForDeletion(new Set());
-                         console.log(`🗑️ ${selectedIds.length} articles supprimés`);
-                       }
-                     }}
-                     sx={{
-                       backgroundColor: '#f44336',
-                       '&:hover': { backgroundColor: '#d32f2f' },
-                       fontSize: '0.7rem',
-                       px: 1.5
-                     }}
-                   >
-                     🗑️ Supprimer ({selectedProductsForDeletion.size})
-                   </Button>
-                 )}
-                 {/* Bouton Reset déplacé plus bas dans la section sous-catégories */}
-              </Box>
-              
-              {/* Onglets des sous-catégories */}
-              <Box sx={{ 
-                p: 0.5,
-                borderTop: '1px solid #e0e0e0',
-                backgroundColor: '#f9f9f9'
-              }}>
-                {/* Boutons de tri et reset déplacés sous la barre des sous-catégories */}
-                <Box sx={{ 
-                  display: 'flex',
-                  flexDirection: 'row',
-                  gap: 0.5,
-                  alignItems: 'flex-start',
-                  overflowX: 'auto',
-                  overflowY: 'hidden',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  '&::-webkit-scrollbar': {
-                    display: 'none'
-                  },
-                  cursor: 'grab',
-                  '&:active': {
-                    cursor: 'grabbing'
-                  },
-                  WebkitOverflowScrolling: 'touch',
-                  scrollBehavior: 'smooth'
-                }}>
-                  <Button
-                    variant={selectedSubcategory === null ? "contained" : "outlined"}
-                    onClick={() => {
-                      setSelectedSubcategory(null);
-                    }}
-                    sx={{ 
-                      textTransform: 'none',
-                      whiteSpace: 'nowrap',
-                      minWidth: 'fit-content',
-                      flexShrink: 0,
-                      backgroundColor: selectedSubcategory === null ? '#9c27b0' : 'transparent',
-                      color: selectedSubcategory === null ? 'white' : '#9c27b0',
-                      borderColor: '#9c27b0',
-                      fontSize: '0.7rem',
-                      py: 0.5,
-                      px: 1,
-                      '&:hover': {
-                        backgroundColor: selectedSubcategory === null ? '#7b1fa2' : 'rgba(156, 39, 176, 0.1)'
-                      }
-                    }}
-                  >
-                    Toutes
-                  </Button>
-                  {/* Sous-catégories extraites des catégories associées de la catégorie sélectionnée */}
-                  {(() => {
-                    // Debug: Vérifier les données
-                    console.log('Debug - selectedCategory:', selectedCategory);
-                    console.log('Debug - total products:', products.length);
-                    console.log('Debug - products with associatedCategories:', products.filter(p => p.associatedCategories && p.associatedCategories.length > 0).length);
-                    console.log('Debug - sample product with associatedCategories:', products.find(p => p.associatedCategories && p.associatedCategories.length > 0));
-                    
-                    // Extraire les sous-catégories uniquement des produits de la catégorie sélectionnée
-                    const categorySubcategories = new Set<string>();
-                    
-                    if (selectedCategory) {
-                      // Si une catégorie est sélectionnée, filtrer les produits de cette catégorie
-                      // selectedCategory contient l'ID de la catégorie, il faut trouver le nom
-                      const selectedCategoryObj = categories.find(cat => cat.id === selectedCategory);
-                      const selectedCategoryName = selectedCategoryObj ? selectedCategoryObj.name : null;
-                      
-                      console.log('Debug - selectedCategory ID:', selectedCategory);
-                      console.log('Debug - selectedCategory name:', selectedCategoryName);
-                      
-                      const filteredProducts = selectedCategoryName ? 
-                        products.filter(product => product.category === selectedCategoryName) : 
-                        [];
-                      console.log('Debug - filteredProducts for category:', selectedCategoryName, filteredProducts.length);
-                      
-                      filteredProducts.forEach(product => {
-                        if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
-                          product.associatedCategories.forEach(cat => {
-                            if (cat && cat.trim()) {
-                              categorySubcategories.add(cat.trim());
-                            }
-                          });
-                        }
-                      });
-                    } else {
-                      // Si aucune catégorie n'est sélectionnée, afficher toutes les sous-catégories
-                      products.forEach(product => {
-                        if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
-                          product.associatedCategories.forEach(cat => {
-                            if (cat && cat.trim()) {
-                              categorySubcategories.add(cat.trim());
-                            }
-                          });
-                        }
-                      });
-                    }
-                    
-                    console.log('Debug - categorySubcategories found:', Array.from(categorySubcategories));
-                    
-                    // Si aucune sous-catégorie n'est trouvée, afficher des exemples temporaires
-                    const subcategoriesToShow = Array.from(categorySubcategories).length > 0 ? 
-                      Array.from(categorySubcategories) : 
-                      ['Sous-catégorie 1', 'Sous-catégorie 2', 'Sous-catégorie 3'];
-                    
-                    return subcategoriesToShow
-                      .filter(subcat => 
-                        !subcategorySearchTerm || 
-                        subcat.toLowerCase().includes(subcategorySearchTerm.toLowerCase())
-                      )
-                      .map((subcategory, index) => (
-                      <Button
-                        key={index}
-                        variant={selectedSubcategory === subcategory ? "contained" : "outlined"}
-                        onClick={() => {
-                          setSelectedSubcategory(subcategory);
-                        }}
-                        sx={{ 
-                          textTransform: 'none',
-                          whiteSpace: 'nowrap',
-                          minWidth: 'fit-content',
-                          flexShrink: 0,
-                          backgroundColor: selectedSubcategory === subcategory ? '#9c27b0' : 'transparent',
-                          color: selectedSubcategory === subcategory ? 'white' : '#9c27b0',
-                          borderColor: '#9c27b0',
-                          fontWeight: 'bold',
-                          fontSize: '0.7rem',
-                          py: 0.5,
-                          px: 1,
-                          '&:hover': {
-                            backgroundColor: selectedSubcategory === subcategory ? 
-                              '#7b1fa2' : 
-                              'rgba(156, 39, 176, 0.1)',
-                            transform: 'translateY(-1px)',
-                            boxShadow: '0 2px 8px rgba(156, 39, 176, 0.4)'
-                          },
-                          '&:active': {
-                            transform: 'scale(0.98)'
-                          }
-                        }}
-                      >
-                        {subcategory}
-                      </Button>
-                    ));
-                  })()}
-                </Box>
-                {/* Ligne d'actions: tri et reset — sous la barre des sous-catégories */}
-                <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setProductSortMode('sales')}
-                    sx={{
-                      minWidth: 'auto',
-                      px: 1.5,
-                      backgroundColor: productSortMode==='sales' ? '#4caf50' : 'transparent',
-                      color: productSortMode==='sales' ? 'white' : '#4caf50',
-                      borderColor: '#4caf50',
-                      fontSize: '0.7rem',
-                      '&:hover': {
-                        backgroundColor: productSortMode==='sales' ? '#45a049' : '#e8f5e8',
-                        borderColor: '#45a049'
-                      }
-                    }}
-                  >
-                    📊 Tri ventes
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setProductSortMode('name')}
-                    sx={{
-                      minWidth: 'auto',
-                      px: 1.5,
-                      backgroundColor: productSortMode==='name' ? '#2196f3' : 'transparent',
-                      color: productSortMode==='name' ? 'white' : '#2196f3',
-                      borderColor: '#2196f3',
-                      fontSize: '0.7rem',
-                      '&:hover': {
-                        backgroundColor: productSortMode==='name' ? '#1976d2' : '#e3f2fd',
-                        borderColor: '#1976d2'
-                      }
-                    }}
-                  >
-                    🔤 Tri nom
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={resetFilters}
-                    sx={{
-                      minWidth: 'auto',
-                      px: 1.5,
-                      backgroundColor: 'transparent',
-                      color: '#666',
-                      borderColor: '#666',
-                      fontSize: '0.7rem',
-                      '&:hover': {
-                        backgroundColor: '#f5f5f5',
-                        borderColor: '#333',
-                        color: '#333'
-                      }
-                    }}
-                  >
-                    🔄 Reset
-                  </Button>
-                </Box>
-              </Box>
-           </Box>
-         );
+                 <CategoriesPanelFull
+                   categories={categories}
+                   products={products}
+                   selectedCategory={selectedCategory}
+                   setSelectedCategory={setSelectedCategory}
+                   selectedSubcategory={selectedSubcategory}
+                   setSelectedSubcategory={setSelectedSubcategory}
+                   searchTerm={searchTerm}
+                   setSearchTerm={setSearchTerm}
+                   categorySearchTerm={categorySearchTerm}
+                   setCategorySearchTerm={setCategorySearchTerm}
+                   subcategorySearchTerm={subcategorySearchTerm}
+                   setSubcategorySearchTerm={setSubcategorySearchTerm}
+                   productSortMode={productSortMode}
+                   setProductSortMode={setProductSortMode}
+                   pendingQtyInput={pendingQtyInput}
+                   setPendingQtyInput={setPendingQtyInput}
+                  getCategoryColor={getCategoryColor}
+                  onResetFilters={() => { setSearchTerm(''); setCategorySearchTerm(''); setSubcategorySearchTerm(''); setSelectedCategory(null); setSelectedSubcategory(null); setProductSortMode('sales'); setCurrentPage(1); }}
+                />
+              );
+              // fin rendu catégories délégué à CategoriesPanelFull
 
              case 'search':
-         const totalAmount = getTotalWithGlobalDiscount();
-         
          return (
-           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-             <Box sx={{ p: 0.5, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-               {/* Boutons de mode de règlement côte à côte */}
-               <Box sx={{ display: 'flex', gap: 0.5, flex: 1 }}>
-                 {/* Bouton Espèces - 1/3 de la largeur */}
-                  <Button
-                   variant="contained"
-                   sx={{ 
-                     flex: 1,
-                     py: 1, 
-                     fontSize: '1.1rem', 
-                     fontWeight: 'bold', 
-                     minHeight: '60px',
-                     backgroundColor: '#2e7d32',
-                     '&:hover': { backgroundColor: '#1b5e20' },
-                     '&:disabled': { backgroundColor: '#ccc' },
-                     display: 'flex',
-                     flexDirection: 'column',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     textAlign: 'center'
-                   }}
-                    onClick={() => handleDirectPayment('Espèces')}
-                   disabled={cartItems.length === 0}
-                 >
-                    <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>ESPÈCES</Box>
-                   <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>
-                     {totalAmount.toFixed(2)} €
-                   </Box>
-                 </Button>
-                 
-                 {/* Bouton SumUp - 1/3 de la largeur */}
-                  <Button
-                   variant="contained"
-                   sx={{ 
-                     flex: 1,
-                     py: 1, 
-                     fontSize: '1.1rem', 
-                     fontWeight: 'bold', 
-                     minHeight: '60px',
-                     backgroundColor: '#1976d2',
-                     '&:hover': { backgroundColor: '#1565c0' },
-                     '&:disabled': { backgroundColor: '#ccc' },
-                     display: 'flex',
-                     flexDirection: 'column',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     textAlign: 'center'
-                   }}
-                   onClick={() => handleDirectPayment('SumUp')}
-                   disabled={cartItems.length === 0}
-                 >
-                    <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>SumUp</Box>
-                   <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>
-                     {totalAmount.toFixed(2)} €
-                   </Box>
-                 </Button>
-                 
-                 {/* Bouton Carte - 1/3 de la largeur */}
-                  <Button
-                   variant="contained"
-                   sx={{ 
-                     flex: 1,
-                     py: 1, 
-                     fontSize: '1.1rem', 
-                     fontWeight: 'bold', 
-                     minHeight: '60px',
-                     backgroundColor: '#ff9800',
-                     '&:hover': { backgroundColor: '#f57c00' },
-                     '&:disabled': { backgroundColor: '#ccc' },
-                     display: 'flex',
-                     flexDirection: 'column',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     textAlign: 'center'
-                   }}
-                   onClick={() => handleDirectPayment('Carte')}
-                   disabled={cartItems.length === 0}
-                 >
-                    <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>Carte</Box>
-                   <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>
-                     {totalAmount.toFixed(2)} €
-                   </Box>
-                 </Button>
-               </Box>
-               
-               {/* Séparateur */}
-               <Divider sx={{ my: 0.5 }} />
-               
-               {/* Boutons de total */}
-               <Box sx={{ display: 'flex', gap: 0.5 }}>
-                 {/* Total Espèces */}
-                  <Button
-                   variant="outlined"
-                   sx={{ 
-                     flex: 1,
-                     py: 0.5, 
-                     fontSize: '1.1rem', 
-                     fontWeight: 800, 
-                     minHeight: '35px',
-                     borderColor: '#2e7d32',
-                     color: '#2e7d32',
-                     '&:hover': { 
-                       borderColor: '#1b5e20',
-                       backgroundColor: '#e8f5e8'
-                     }
-                   }}
-                    onClick={() => { setPaymentRecapMethod('cash'); setShowPaymentRecap(true); }}
-                 >
-                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul espèces</Typography>
-                      <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>
-                        {paymentTotals['Espèces'].toFixed(2)} €
-                      </Typography>
-                    </Box>
-                 </Button>
-                 
-                 {/* Total SumUp */}
-                  <Button
-                   variant="outlined"
-                   sx={{ 
-                     flex: 1,
-                     py: 0.5, 
-                     fontSize: '1.1rem', 
-                     fontWeight: 800, 
-                     minHeight: '35px',
-                     borderColor: '#1976d2',
-                     color: '#1976d2',
-                     '&:hover': { 
-                       borderColor: '#1565c0',
-                       backgroundColor: '#e3f2fd'
-                     }
-                   }}
-                    onClick={() => { setPaymentRecapMethod('sumup'); setShowPaymentRecap(true); }}
-                 >
-                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul SumUp</Typography>
-                      <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>
-                        {paymentTotals['SumUp'].toFixed(2)} €
-                      </Typography>
-                    </Box>
-                 </Button>
-                 
-                 {/* Total Carte */}
-                  <Button
-                   variant="outlined"
-                   sx={{ 
-                     flex: 1,
-                     py: 0.5, 
-                     fontSize: '1.1rem', 
-                     fontWeight: 800, 
-                     minHeight: '35px',
-                     borderColor: '#ff9800',
-                     color: '#ff9800',
-                     '&:hover': { 
-                       borderColor: '#f57c00',
-                       backgroundColor: '#fff3e0'
-                     }
-                   }}
-                    onClick={() => { setPaymentRecapMethod('card'); setShowPaymentRecap(true); }}
-                 >
-                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul carte</Typography>
-                      <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>
-                        {paymentTotals['Carte'].toFixed(2)} €
-                      </Typography>
-                    </Box>
-                 </Button>
-               </Box>
-             </Box>
-           </Box>
+          <PaymentPanel
+            cartItems={cartItems}
+            totalAmount={getTotalWithGlobalDiscount()}
+            paymentTotals={paymentTotals as any}
+            onPayCash={() => handleDirectPayment('Espèces')}
+            onPaySumUp={() => handleDirectPayment('SumUp')}
+            onPayCard={() => handleDirectPayment('Carte')}
+            onOpenCashRecap={() => { setPaymentRecapMethod('cash'); setShowPaymentRecap(true); }}
+            onOpenSumUpRecap={() => { setPaymentRecapMethod('sumup'); setShowPaymentRecap(true); }}
+            onOpenCardRecap={() => { setPaymentRecapMethod('card'); setShowPaymentRecap(true); }}
+          />
          );
 
-                           case 'settings':
-          return (() => {
-            // Calcul des dimensions des boutons pour la fenêtre 5 (361x170)
-            const windowWidth = window.width; // 361px
-            const windowHeight = window.height; // 170px
-            const padding = 4; // 0.5 * 8px = 4px de padding
-            const gap = 2; // 0.25 * 8px = 2px de gap
-            
-            // Calcul pour 4 lignes de 3 boutons
-            const totalGapsWidth = 4; // 2 gaps entre colonnes + 2 gaps aux extrémités
-            const totalGapsHeight = 6; // 3 gaps entre lignes + 2 gaps aux extrémités
-            const totalPaddingWidth = 8; // 2 * 4px de padding
-            const totalPaddingHeight = 8; // 2 * 4px de padding
-            
-            const availableWidth = windowWidth - totalGapsWidth - totalPaddingWidth; // 361 - 4 - 8 = 349
-            const availableHeight = windowHeight - totalGapsHeight - totalPaddingHeight; // 170 - 6 - 8 = 156
-            
-            const buttonWidth = Math.floor(availableWidth / 3); // Math.floor(349 / 3) = 116
-            const buttonHeight = Math.floor(availableHeight / 4); // Math.floor(156 / 4) = 39
-            
-            console.log('🔍 DEBUG - Calculs des boutons fenêtre 5:', {
-              windowWidth,
-              windowHeight,
-              padding,
-              gap,
-              totalGapsWidth,
-              totalGapsHeight,
-              totalPaddingWidth,
-              totalPaddingHeight,
-              availableWidth,
-              availableHeight,
-              buttonWidth,
-              buttonHeight,
-              expectedButtonWidth: 116,
-              expectedButtonHeight: 39
-            });
-            
-            return (
-              <Box sx={{ 
-                height: '100%', 
-                display: 'grid', 
-                gridTemplateColumns: `repeat(3, ${buttonWidth}px)`,
-                gridTemplateRows: `repeat(4, ${buttonHeight}px)`,
-                gap: `${gap}px`,
-                p: 0.5,
-                boxSizing: 'border-box',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}>
-                <input
-                  type="file"
-                  accept=".csv"
-                  style={{ display: 'none' }}
-                  id="csv-import-settings"
-                  onChange={handleImportCSV}
-                />
-                <label htmlFor="csv-import-settings" style={{ width: '100%', height: '100%', display: 'block' }}>
-                  <Button
-                    variant="contained"
-                    component="span"
-                    disabled={importStatus === 'importing'}
-                    sx={{ 
-                      width: '100%',
-                      height: '100%',
-                                          fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: importStatus === 'importing' ? '#ccc' : '#ff5722',
-                    '&:hover': { backgroundColor: importStatus === 'importing' ? '#ccc' : '#e64a19' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                    }}
-                  >
-                    {importStatus === 'importing' ? 'Import...' : 'Import CSV'}
-                  </Button>
-                </label>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#795548',
-                    '&:hover': { backgroundColor: '#5d4037' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Bouton libre')}
-                >
-                  Libre
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#455a64' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Vide 3')}
-                >
-                  Vide 3
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff4081',
-                    '&:hover': { backgroundColor: '#e91e63' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Vide 4')}
-                >
-                  Vide 4
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#3f51b5',
-                    '&:hover': { backgroundColor: '#303f9f' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Vide 5')}
-                >
-                  Vide 5
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Vide 6')}
-                >
-                  Vide 6
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#ff9800',
-                    '&:hover': { backgroundColor: '#f57c00' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Vide 7')}
-                >
-                  Vide 7
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Vide 8')}
-                >
-                  Vide 8
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#00bcd4',
-                    '&:hover': { backgroundColor: '#0097a7' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => console.log('Vide 9')}
-                >
-                  Vide 9
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#009688',
-                    '&:hover': { backgroundColor: '#00796b' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => setShowCategoryManagementModal(true)}
-                >
-                  Gestion Catégories
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#673ab7',
-                    '&:hover': { backgroundColor: '#5e35b1' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => setShowSubcategoryManagementModal(true)}
-                >
-                  Gestion Sous-catégories
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.5rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: isEditMode ? '#f44336' : '#ff9800',
-                    '&:hover': { backgroundColor: isEditMode ? '#d32f2f' : '#f57c00' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.0,
-                    padding: '1px'
-                  }}
-                  onClick={() => {
-                    // Basculer entre le mode vente et le mode édition
-                    const newEditMode = !isEditMode;
-                    setIsEditMode(newEditMode);
-                    setShowEditModeNotification(newEditMode);
-                    
-                    if (newEditMode) {
-                      console.log('🖊️ Mode édition activé - Cliquez sur un article pour le sélectionner, double-clic pour modifier');
-                      setSelectedProductsForDeletion(new Set());
-                    } else {
-                      console.log('💰 Mode vente activé - Cliquez sur un article pour l\'ajouter au panier');
-                      setSelectedProductsForDeletion(new Set());
-                    }
-                  }}
-                >
-                  {isEditMode ? 'Mode Vente' : 'Modifier Article'}
-                </Button>
-                {isEditMode && (
-                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                    {selectedProductsForDeletion.size > 0 && (
-                      <Button
-                        variant="contained"
-                        color="error"
-                        size="small"
-                        onClick={() => {
-                          // eslint-disable-next-line no-restricted-globals
-                          if (confirm(`Supprimer ${selectedProductsForDeletion.size} article(s) sélectionné(s) ?`)) {
-                            const selectedIds = Array.from(selectedProductsForDeletion);
-                            const updatedProducts = products.filter(p => !selectedIds.includes(p.id));
-                            onProductsReorder?.(updatedProducts);
-                            setSelectedProductsForDeletion(new Set());
-                            console.log(`🗑️ ${selectedIds.length} articles supprimés`);
-                          }
-                        }}
-                        sx={{
-                          backgroundColor: '#f44336',
-                          '&:hover': { backgroundColor: '#d32f2f' },
-                          fontSize: '0.7rem',
-                          px: 1
-                        }}
-                      >
-                        🗑️ Supprimer ({selectedProductsForDeletion.size})
-                      </Button>
-                    )}
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => {
-                        if (selectedProductsForDeletion.size === products.length) {
-                          setSelectedProductsForDeletion(new Set());
-                        } else {
-                          setSelectedProductsForDeletion(new Set(products.map(p => p.id)));
-                        }
-                      }}
-                      sx={{
-                        fontSize: '0.7rem',
-                        px: 1
-                      }}
-                    >
-                      {selectedProductsForDeletion.size === products.length ? '☐ Tout désélectionner' : '☑️ Tout sélectionner'}
-                    </Button>
-                  </Box>
-                )}
-              </Box>
-            );
-          })()
+      case 'settings':
+        return (
+          <SettingsPanel
+            width={window.width}
+            height={window.height}
+            getScaledFontSize={getScaledFontSize}
+            importStatus={importStatus}
+            onImportCSV={handleImportCSV}
+            onOpenCategoryManagement={() => setShowCategoryManagementModal(true)}
+            onOpenSubcategoryManagement={() => setShowSubcategoryManagementModal(true)}
+            isEditMode={isEditMode}
+            onToggleEditMode={() => {
+              const newEditMode = !isEditMode;
+              setIsEditMode(newEditMode);
+              setShowEditModeNotification(newEditMode);
+              setSelectedProductsForDeletion(new Set());
+            }}
+            selectedProductsForDeletionSize={selectedProductsForDeletion.size}
+            areAllProductsSelected={selectedProductsForDeletion.size === products.length}
+            onDeleteSelectedProducts={() => {
+              // eslint-disable-next-line no-restricted-globals
+              if (confirm(`Supprimer ${selectedProductsForDeletion.size} article(s) sélectionné(s) ?`)) {
+                const selectedIds = Array.from(selectedProductsForDeletion);
+                const updatedProducts = products.filter(p => !selectedIds.includes(p.id));
+                onProductsReorder?.(updatedProducts);
+                setSelectedProductsForDeletion(new Set());
+              }
+            }}
+            onToggleSelectAllProducts={() => {
+              if (selectedProductsForDeletion.size === products.length) {
+                setSelectedProductsForDeletion(new Set());
+              } else {
+                setSelectedProductsForDeletion(new Set(products.map(p => p.id)));
+              }
+            }}
+            onExportAll={handleExportAll}
+            onImportAll={handleImportAll}
+          />
+        )
 
-                           case 'import':
-          return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
-                Gestion Données
-              </Typography>
-              <Box sx={{ p: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography variant="body2" align="center" sx={{ mb: 1 }}>
-                  {products.length} produits chargés
-                </Typography>
-                <Typography variant="body2" align="center" sx={{ mb: 2 }}>
-                  {categories.length} catégories
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <input
-                    type="file"
-                    accept=".csv"
-                    style={{ display: 'none' }}
-                    id="csv-import-input"
-                    onChange={handleImportCSV}
-                  />
-                  <label htmlFor="csv-import-input">
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={<ImportExport />}
-                      component="span"
-                      disabled={importStatus === 'importing'}
-                      sx={{
-                        width: '100%',
-                        backgroundColor: importStatus === 'importing' ? '#f5f5f5' : 'transparent'
-                      }}
-                    >
-                      {importStatus === 'importing' ? 'Import en cours...' : 'Importer CSV'}
-                    </Button>
-                  </label>
-                  
-                  {/* Affichage du statut */}
-                  {importStatus !== 'idle' && (
-                    <Typography 
-                      variant="caption" 
-                      sx={{ 
-                        textAlign: 'center',
-                        color: importStatus === 'success' ? 'success.main' : 
-                               importStatus === 'error' ? 'error.main' : 'info.main',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {importMessage}
-                    </Typography>
-                  )}
-                </Box>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => {
-                    // TODO: Exporter les données
-                    alert('Fonctionnalité d\'export à implémenter');
-                  }}
-                >
-                  Exporter Données
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                                    onClick={() => {
-                     // TODO: Réinitialiser aux données par défaut
-                     // eslint-disable-next-line no-restricted-globals
-                     if (confirm('Réinitialiser aux données par défaut ?')) {
-                       // Réinitialiser les données
-                     }
-                   }}
-                >
-                  Réinitialiser
-                </Button>
-              </Box>
-            </Box>
-          );
+      case 'import':
+        return (
+          <ImportPanel
+            productsCount={products.length}
+            categoriesCount={categories.length}
+            importStatus={importStatus as any}
+            importMessage={importMessage}
+            onImportCSV={handleImportCSV}
+          />
+        );
 
         case 'stats':
-          return (() => {
-            // Mise à l'échelle dynamique 2 colonnes x 3 lignes
-            const windowWidth = window.width;
-            const windowHeight = window.height;
-            const padding = 4; // 0.5 * 8px
-            const gap = 2; // 0.25 * 8px
-            const cols = 2;
-            const rows = 3;
-            const totalGapsWidth = (cols - 1) * gap + 2 * gap;
-            const totalGapsHeight = (rows - 1) * gap + 2 * gap;
-            const totalPaddingWidth = 2 * padding;
-            const totalPaddingHeight = 2 * padding;
-            const usableWidth = Math.max(0, windowWidth - totalGapsWidth - totalPaddingWidth);
-            const usableHeight = Math.max(0, windowHeight - totalGapsHeight - totalPaddingHeight);
-            const cellWidth = usableWidth / cols;
-            const cellHeight = usableHeight / rows;
-            const buttonSize = Math.min(cellWidth, cellHeight);
-            const fontPx = Math.max(11, Math.floor(buttonSize * 0.18));
-            const buttonFont = `${(fontPx / 16).toFixed(2)}rem`;
-            const commonButtonSx = {
-              flex: 1,
-              height: '100%',
-              fontSize: buttonFont,
-              fontWeight: 'bold',
-              color: '#fff',
-              textTransform: 'none' as const,
-              lineHeight: 1.2,
-              padding: '4px',
-              overflow: 'hidden',
-              whiteSpace: 'normal' as const,
-              wordBreak: 'break-word' as const,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center' as const,
-            };
-            return (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 0.5, gap: 0.25 }}>
-              {/* Grille 2x3 pour les 6 boutons de fonction */}
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#2196f3',
-                    '&:hover': { backgroundColor: '#1976d2' },
-                  }}
-                  onClick={() => setShowDailyReportModal(true)}
-                >
-                  Rapport
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' },
-                  }}
-                  onClick={() => openGlobalDiscountModal()}
-                >
-                  Remise
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#607d8b',
-                    '&:hover': { backgroundColor: '#546e7a' },
-                  }}
-                  onClick={() => setShowSalesRecap(true)}
-                >
-                  Récap ventes
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#9e9e9e',
-                    '&:hover': { backgroundColor: '#757575' },
-                  }}
-                  onClick={() => { setGlobalOnlyToday(false); setShowGlobalTickets(true); }}
-                >
-                  Tickets globaux
-                </Button>
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' },
-                  }}
-                  onClick={() => { setClosures(StorageService.loadClosures()); setSelectedClosureIdx(null); setShowClosures(true); }}
-                >
-                  Historique clôture
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    ...commonButtonSx,
-                    backgroundColor: '#9e9e9e',
-                    '&:hover': { backgroundColor: '#757575' },
-                  }}
-                  onClick={() => setShowEndOfDay(true)}
-                >
-                  Fin de journée
-                </Button>
-              </Box>
-            </Box>
-            );
-          })();
-
-        case 'subcategories':
           return (
-            <Box sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              backgroundColor: '#ff5722',
-              border: '3px solid #d84315',
-              borderRadius: '8px',
-              p: 1,
-              boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
-            }}>
-              <Typography variant="h6" sx={{ 
-                textAlign: 'center', 
-                fontWeight: 'bold', 
-                color: '#e65100',
-                mb: 1,
-                fontSize: '0.9rem'
-              }}>
-                Sous-Catégories
-              </Typography>
-              <Box sx={{ 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: 0.5, 
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}>
-                <Chip 
-                  label="Sous-cat 1" 
-                  sx={{ 
-                    backgroundColor: '#ff9800', 
-                    color: 'white',
-                    fontSize: '0.7rem'
-                  }} 
-                />
-                <Chip 
-                  label="Sous-cat 2" 
-                  sx={{ 
-                    backgroundColor: '#ff9800', 
-                    color: 'white',
-                    fontSize: '0.7rem'
-                  }} 
-                />
-                <Chip 
-                  label="Sous-cat 3" 
-                  sx={{ 
-                    backgroundColor: '#ff9800', 
-                    color: 'white',
-                    fontSize: '0.7rem'
-                  }} 
-                />
-              </Box>
-            </Box>
+            <StatsPanel
+              width={window.width}
+              height={window.height}
+              onOpenDailyReport={() => setShowDailyReportModal(true)}
+              onOpenGlobalDiscount={() => openGlobalDiscountModal()}
+              onOpenSalesRecap={() => setShowSalesRecap(true)}
+              onOpenGlobalTickets={() => { setGlobalOnlyToday(false); setShowGlobalTickets(true); }}
+              onOpenClosures={() => { setClosures(StorageService.loadClosures()); setSelectedClosureIdx(null); setShowClosures(true); }}
+              onOpenEndOfDay={() => setShowEndOfDay(true)}
+            />
           );
 
+        case 'subcategories':
+          return (<SubcategoriesPanel />);
+
         case 'free':
-          return (() => {
-            // Calcul des dimensions des boutons pour la fenêtre 6 (361x170)
-            const windowWidth = window.width; // 361px
-            const windowHeight = window.height; // 170px
-            const padding = 4; // 0.5 * 8px = 4px de padding
-            const gap = 2; // 0.25 * 8px = 2px de gap
-            
-            // Calcul pour 4 lignes de 3 boutons (12 boutons total)
-            const totalGapsWidth = 4; // 2 gaps entre colonnes + 2 gaps aux extrémités
-            const totalGapsHeight = 6; // 3 gaps entre lignes + 2 gaps aux extrémités
-            const totalPaddingWidth = 8; // 2 * 4px de padding
-            const totalPaddingHeight = 8; // 2 * 4px de padding
-            
-            const availableWidth = windowWidth - totalGapsWidth - totalPaddingWidth; // 361 - 4 - 8 = 349
-            const availableHeight = windowHeight - totalGapsHeight - totalPaddingHeight; // 170 - 6 - 8 = 156
-            
-            const buttonWidth = Math.floor(availableWidth / 3); // Math.floor(349 / 3) = 116
-            const buttonHeight = Math.floor(availableHeight / 4); // Math.floor(156 / 4) = 39
-            
-            console.log('🔍 DEBUG - Calculs des boutons fenêtre 6:', {
-              windowWidth,
-              windowHeight,
-              padding,
-              gap,
-              totalGapsWidth,
-              totalGapsHeight,
-              totalPaddingWidth,
-              totalPaddingHeight,
-              availableWidth,
-              availableHeight,
-              buttonWidth,
-              buttonHeight,
-              expectedButtonWidth: 116,
-              expectedButtonHeight: 39
-            });
-            
-            return (
-              <Box sx={{ 
-                height: '100%', 
-                display: 'grid', 
-                gridTemplateColumns: `repeat(3, ${buttonWidth}px)`,
-                gridTemplateRows: `repeat(4, ${buttonHeight}px)`,
-                gap: `${gap}px`,
-                p: 0.5,
-                boxSizing: 'border-box',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: window.id === 'window8' ? '#e8f5e8' : 'transparent',
-                border: window.id === 'window8' ? '2px solid #4caf50' : 'none',
-                borderRadius: window.id === 'window8' ? '8px' : '0px'
-              }}>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#f44336',
-                    '&:hover': { backgroundColor: '#d32f2f' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 1')}
-                >
-                  Libre 1
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#e91e63',
-                    '&:hover': { backgroundColor: '#c2185b' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 2')}
-                >
-                  Libre 2
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#9c27b0',
-                    '&:hover': { backgroundColor: '#7b1fa2' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 3')}
-                >
-                  Libre 3
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#673ab7',
-                    '&:hover': { backgroundColor: '#512da8' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 4')}
-                >
-                  Libre 4
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#3f51b5',
-                    '&:hover': { backgroundColor: '#303f9f' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 5')}
-                >
-                  Libre 5
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#2196f3',
-                    '&:hover': { backgroundColor: '#1976d2' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 6')}
-                >
-                  Libre 6
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#03a9f4',
-                    '&:hover': { backgroundColor: '#0288d1' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 7')}
-                >
-                  Libre 7
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#00bcd4',
-                    '&:hover': { backgroundColor: '#0097a7' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 8')}
-                >
-                  Libre 8
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#009688',
-                    '&:hover': { backgroundColor: '#00796b' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 9')}
-                >
-                  Libre 9
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#4caf50',
-                    '&:hover': { backgroundColor: '#388e3c' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 10')}
-                >
-                  Libre 10
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#8bc34a',
-                    '&:hover': { backgroundColor: '#689f38' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 11')}
-                >
-                  Libre 11
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ 
-                    width: '100%',
-                    height: '100%',
-                    fontSize: getScaledFontSize('0.65rem'), 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#cddc39',
-                    '&:hover': { backgroundColor: '#afb42b' },
-                    boxSizing: 'border-box',
-                    overflow: 'hidden',
-                    textTransform: 'none',
-                    lineHeight: 1.1,
-                    padding: '2px'
-                  }}
-                  onClick={() => console.log('Libre 12')}
-                >
-                  Libre 12
-                </Button>
-              </Box>
-            );
-          })();
+          return (
+            <FreePanel
+              width={window.width}
+              height={window.height}
+              getScaledFontSize={getScaledFontSize}
+              highlight={window.id === 'window8'}
+            />
+          );
 
 
 
@@ -3706,6 +1670,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          onClose={() => setShowGlobalDiscountModal(false)}
          cartItems={cartItems}
          onApplyDiscount={applyGlobalDiscount}
+        onApplyItemDiscount={applyItemDiscount}
        />
 
        {/* Modale de gestion des catégories */}
@@ -3724,645 +1689,104 @@ const WindowManager: React.FC<WindowManagerProps> = ({
        />
 
       {/* Modale historique des transactions du jour */}
-      <Dialog open={showTransactionHistory} onClose={() => setShowTransactionHistory(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Tickets de la journée</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.5, mb: 1 }}>
-            <Button size="small" variant={filterPayment==='all'?'contained':'outlined'} onClick={() => setFilterPayment('all')}>Tous</Button>
-            <Button size="small" variant={filterPayment==='cash'?'contained':'outlined'} onClick={() => setFilterPayment('cash')}>Espèces</Button>
-            <Button size="small" variant={filterPayment==='card'?'contained':'outlined'} onClick={() => setFilterPayment('card')}>Carte</Button>
-            <Button size="small" variant={filterPayment==='sumup'?'contained':'outlined'} onClick={() => setFilterPayment('sumup')}>SumUp</Button>
-          </Box>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, mb: 1 }}>
-            <TextField size="small" label="Montant min" value={filterAmountMin} onChange={(e) => setFilterAmountMin(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
-            <TextField size="small" label="Montant max" value={filterAmountMax} onChange={(e) => setFilterAmountMax(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
-            <TextField size="small" label="Montant exact" value={filterAmountExact} onChange={(e) => setFilterAmountExact(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
-          </Box>
-          <TextField size="small" fullWidth label="Contient article" value={filterProductText} onChange={(e) => setFilterProductText(e.target.value)} sx={{ mb: 1 }} />
-
-          <List dense>
-            {todayTransactions
-              .filter(t => {
-                const m = String((t as any).paymentMethod || '').toLowerCase();
-                if (filterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
-                if (filterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
-                if (filterPayment === 'sumup' && m!=='sumup') return false;
-                const amount = t.total || 0;
-                const min = parseFloat(filterAmountMin || 'NaN');
-                const max = parseFloat(filterAmountMax || 'NaN');
-                const exact = parseFloat(filterAmountExact || 'NaN');
-                if (!Number.isNaN(exact) && Math.abs(amount - exact) > 0.009) return false;
-                if (!Number.isNaN(min) && amount < min) return false;
-                if (!Number.isNaN(max) && amount > max) return false;
-                if (filterProductText.trim()) {
-                  const needle = StorageService.normalizeLabel(filterProductText);
-                  const items = Array.isArray(t.items) ? t.items : [];
-                  const has = items.some(it => StorageService.normalizeLabel(it.product.name).includes(needle));
-                  if (!has) return false;
-                }
-                return true;
-              })
-              .map(t => {
-                const firstName = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
-                const qty = Array.isArray(t.items) ? t.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
-                const toggleSelect = (tid: string) => {
-                  setDaySelectedIds(prev => {
-                    const next = new Set(prev);
-                    if (next.has(tid)) next.delete(tid); else next.add(tid);
-                    return next;
-                  });
-                };
-                return (
-                  <ListItem key={t.id} sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1 }}>
-                    <Box sx={{
-                      display: 'grid',
-                      gridTemplateColumns: '26px 84px 120px 110px 86px auto auto',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      width: '100%'
-                    }}>
-                      <input type="checkbox" checked={daySelectedIds.has(String(t.id))} onChange={() => toggleSelect(String(t.id))} />
-                      <Typography noWrap variant="caption" onClick={() => setExpandedDayTicketIds(prev => { const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next; })} sx={{ fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer' }}>#{t.id.slice(-6)}</Typography>
-                      <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp as any).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} {new Date(t.timestamp as any).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</Typography>
-                      <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>{`${qty} article${qty>1?'s':''}`}</Typography>
-                      <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
-                      <Button size="small" variant="outlined" sx={{ minWidth: 64, px: 1 }} onClick={() => console.log('Libre')}>Modif</Button>
-                      <Button size="small" color="error" sx={{ minWidth: 64, px: 1 }} onClick={() => {
-                        if (!window.confirm('Inverser les ventes de ce ticket (retour) ?')) return;
-                        const inverse = {
-                          ...t,
-                          id: `${t.id}-R`,
-                          total: -Math.abs(t.total||0),
-                          items: (Array.isArray(t.items)?t.items:[]).map(it => ({ ...it, quantity: -Math.abs(it.quantity||0) })),
-                          timestamp: new Date(),
-                        } as any;
-                        StorageService.addDailyTransaction(inverse);
-                        setTodayTransactions(StorageService.loadTodayTransactions());
-                      }}>Inv</Button>
-                    </Box>
-                    {expandedDayTicketIds.has(String(t.id)) && (
-                      <Box sx={{ mt: 0.5, ml: 1 }}>
-                        {(Array.isArray(t.items)?t.items:[]).map((it:any) => (
-                          <Box key={it.product.id} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, pl: 1 }}>
-                            <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
-                            <Typography variant="caption">x</Typography>
-                            <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
-                            <Typography variant="caption" sx={{ minWidth: 90, textAlign: 'right', fontFamily: 'monospace' }}>{(it.quantity * (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice)).toFixed(2)} €</Typography>
-                          </Box>
-                        ))}
-                      </Box>
-                    )}
-                  </ListItem>
-                );
-              })}
-            {todayTransactions.filter(t => {
-              const m = String((t as any).paymentMethod || '').toLowerCase();
-              if (filterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
-              if (filterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
-              if (filterPayment === 'sumup' && m!=='sumup') return false;
-              const amount = t.total || 0;
-              const min = parseFloat(filterAmountMin || 'NaN');
-              const max = parseFloat(filterAmountMax || 'NaN');
-              if (!Number.isNaN(min) && amount < min) return false;
-              if (!Number.isNaN(max) && amount > max) return false;
-              if (filterProductText.trim()) {
-                const needle = filterProductText.toLowerCase();
-                const items = Array.isArray(t.items) ? t.items : [];
-                const has = items.some(it => it.product.name.toLowerCase().includes(needle));
-                if (!has) return false;
-              }
-              return true;
-            }).length === 0 && (
-              <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>Aucun ticket pour ces filtres</Box>
-            )}
-          </List>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { setShowTransactionHistory(false); setDaySelectedIds(new Set()); }}>Fermer</Button>
-          <Button color="error" variant="contained" disabled={daySelectedIds.size===0} onClick={() => {
-            const now = new Date();
-            const expected = `${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}`; // jjmm
-            const code = prompt('code ?');
-            if (code !== expected) return;
-            Array.from(daySelectedIds).forEach((tid) => {
-              try { StorageService.deleteDailyTransaction(String(tid)); } catch {}
-            });
-            setTodayTransactions(StorageService.loadTodayTransactions());
-            setDaySelectedIds(new Set());
-            alert('Tickets du jour supprimés.');
-          }}>Supprimer sélection</Button>
-          <Button color="error" onClick={() => { StorageService.clearTodayTransactions(); setTodayTransactions([]); setDaySelectedIds(new Set()); }}>Vider</Button>
-        </DialogActions>
-      </Dialog>
+      <TransactionHistoryModal
+        open={showTransactionHistory}
+        onClose={() => setShowTransactionHistory(false)}
+        transactions={todayTransactions}
+        filterPayment={filterPayment as any}
+        setFilterPayment={(v:any) => setFilterPayment(v)}
+        filterAmountMin={filterAmountMin}
+        setFilterAmountMin={setFilterAmountMin}
+        filterAmountMax={filterAmountMax}
+        setFilterAmountMax={setFilterAmountMax}
+        filterAmountExact={filterAmountExact}
+        setFilterAmountExact={setFilterAmountExact}
+        filterProductText={filterProductText}
+        setFilterProductText={setFilterProductText}
+        daySelectedIds={daySelectedIds}
+        setDaySelectedIds={(updater:any) => setDaySelectedIds(prev => updater(prev))}
+        expandedDayTicketIds={expandedDayTicketIds}
+        setExpandedDayTicketIds={(updater:any) => setExpandedDayTicketIds(prev => updater(prev))}
+        setTransactions={setTodayTransactions as any}
+      />
 
       {/* Modale tickets globaux (toutes clôtures cumulées) */}
-      <Dialog open={showGlobalTickets} onClose={() => setShowGlobalTickets(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Tickets globaux</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 0.5, mb: 1 }}>
-            <Button size="small" variant={globalFilterPayment==='all'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('all')}>Tous</Button>
-            <Button size="small" variant={globalFilterPayment==='cash'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('cash')}>Espèces</Button>
-            <Button size="small" variant={globalFilterPayment==='card'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('card')}>Carte</Button>
-            <Button size="small" variant={globalFilterPayment==='sumup'?'contained':'outlined'} onClick={() => setGlobalFilterPayment('sumup')}>SumUp</Button>
-            <Button size="small" variant={globalOnlyToday?'contained':'outlined'} onClick={() => setGlobalOnlyToday(v=>!v)}>Aujourd'hui</Button>
-          </Box>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, mb: 1 }}>
-            <TextField size="small" label="Montant min" value={globalAmountMin} onChange={(e) => setGlobalAmountMin(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
-            <TextField size="small" label="Montant max" value={globalAmountMax} onChange={(e) => setGlobalAmountMax(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
-            <TextField size="small" label="Montant exact" value={globalAmountExact} onChange={(e) => setGlobalAmountExact(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
-          </Box>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.5, mb: 1 }}>
-            <TextField size="small" type="date" label="Date de" value={globalDateFrom} onChange={(e) => setGlobalDateFrom(e.target.value)} InputLabelProps={{ shrink: true }} />
-            <TextField size="small" type="date" label="Date à" value={globalDateTo} onChange={(e) => setGlobalDateTo(e.target.value)} InputLabelProps={{ shrink: true }} />
-            <TextField size="small" type="time" label="Heure de" value={globalTimeFrom} onChange={(e) => setGlobalTimeFrom(e.target.value)} InputLabelProps={{ shrink: true }} />
-            <TextField size="small" type="time" label="Heure à" value={globalTimeTo} onChange={(e) => setGlobalTimeTo(e.target.value)} InputLabelProps={{ shrink: true }} />
-          </Box>
-          <TextField size="small" fullWidth label="Contient article" value={globalProductText} onChange={(e) => setGlobalProductText(e.target.value)} sx={{ mb: 1 }} />
-
-          {(() => {
-            // Aplatir toutes les transactions de toutes clôtures + inclure celles du jour
-            const allClosures = StorageService.loadClosures();
-            const allTx: any[] = [];
-            for (const c of allClosures) {
-              const txs = Array.isArray(c.transactions) ? c.transactions : [];
-              for (const t of txs) allTx.push(t);
-            }
-            // Ajouter les tickets du jour
-            const todayTxs = StorageService.loadTodayTransactions();
-            for (const t of todayTxs) allTx.push(t);
-            // Si "Aujourd'hui" est activé, borner la date au jour courant
-            if (globalOnlyToday) {
-              const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-              const todayEnd = new Date(); todayEnd.setHours(23,59,59,999);
-              const onlyToday = allTx.filter((t: any) => {
-                const ts = new Date(t.timestamp);
-                return ts >= todayStart && ts <= todayEnd;
-              });
-              // Filtrer sur place
-              allTx.length = 0; onlyToday.forEach(x => allTx.push(x));
-            }
-            const filtered = allTx.filter((t: any) => {
-              const m = String(t.paymentMethod || '').toLowerCase();
-              if (globalFilterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
-              if (globalFilterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
-              if (globalFilterPayment === 'sumup' && m!=='sumup') return false;
-              const amount = t.total || 0;
-              const min = parseFloat(globalAmountMin || 'NaN');
-              const max = parseFloat(globalAmountMax || 'NaN');
-              const exact = parseFloat(globalAmountExact || 'NaN');
-              if (!Number.isNaN(exact) && Math.abs(amount - exact) > 0.009) return false;
-              if (!Number.isNaN(min) && amount < min) return false;
-              if (!Number.isNaN(max) && amount > max) return false;
-              if (globalProductText.trim()) {
-                const needle = StorageService.normalizeLabel(globalProductText);
-                const items = Array.isArray(t.items) ? t.items : [];
-                if (!items.some((it: any) => StorageService.normalizeLabel(it.product.name).includes(needle))) return false;
-              }
-              const ts = new Date(t.timestamp);
-              if (globalDateFrom) {
-                const dfrom = new Date(globalDateFrom + 'T00:00:00');
-                if (ts < dfrom) return false;
-              }
-              if (globalDateTo) {
-                const dto = new Date(globalDateTo + 'T23:59:59');
-                if (ts > dto) return false;
-              }
-              if (globalTimeFrom) {
-                const [h,m] = globalTimeFrom.split(':').map(Number);
-                const tf = new Date(ts); tf.setHours(h||0, m||0, 0, 0);
-                if (ts < tf) return false;
-              }
-              if (globalTimeTo) {
-                const [h,m] = globalTimeTo.split(':').map(Number);
-                const tt = new Date(ts); tt.setHours(h||23, m||59, 59, 999);
-                if (ts > tt) return false;
-              }
-              return true;
-            });
-
-            // Trier par date décroissante (plus récent en premier)
-            const sortedByDateDesc = [...filtered].sort((a: any, b: any) => {
-              const ta = new Date(a.timestamp).getTime();
-              const tb = new Date(b.timestamp).getTime();
-              return tb - ta;
-            });
-
-            const toggleSelect = (tid: string) => {
-              setGlobalSelectedIds(prev => {
-                const next = new Set(prev);
-                if (next.has(tid)) next.delete(tid); else next.add(tid);
-                return next;
-              });
-            };
-
-
-            return (
-              <List dense>
-                {sortedByDateDesc.map((t: any) => {
-                  const qty = Array.isArray(t.items) ? t.items.reduce((s: number, it: any) => s + (it.quantity || 0), 0) : 0;
-                  const name = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
-                  const isEx = expandedGlobalTicketIds.has(String(t.id));
-                  return (
-                    <ListItem key={`${t.id}-${t.timestamp}`} sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1 }}>
-                      <Box sx={{ display: 'grid', gridTemplateColumns: '26px 84px 120px 110px 86px', alignItems: 'center', gap: 0.5, width: '100%' }}>
-                        <input type="checkbox" checked={globalSelectedIds.has(String(t.id))} onChange={() => toggleSelect(String(t.id))} />
-                        <Typography noWrap variant="caption" onClick={() => setExpandedGlobalTicketIds(prev=>{const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next;})} sx={{ fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer' }}>#{String(t.id).slice(-6)}</Typography>
-                        <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} {new Date(t.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</Typography>
-                        <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>{`${qty} article${qty>1?'s':''}`}</Typography>
-                        <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
-                      </Box>
-                      {isEx && (
-                        <Box sx={{ mt: 0.5, ml: 1 }}>
-                          {(Array.isArray(t.items)?t.items:[]).map((it:any) => (
-                            <Box key={it.product.id} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, pl: 1 }}>
-                              <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
-                              <Typography variant="caption">x</Typography>
-                              <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
-                              <Typography variant="caption" sx={{ minWidth: 90, textAlign: 'right', fontFamily: 'monospace' }}>{(it.quantity * (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice)).toFixed(2)} €</Typography>
-                            </Box>
-                          ))}
-                        </Box>
-                      )}
-                    </ListItem>
-                  );
-                })}
-                {sortedByDateDesc.length === 0 && (
-                  <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>Aucun ticket pour ces filtres</Box>
-                )}
-              </List>
-            );
-          })()}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowGlobalTickets(false)}>Fermer</Button>
-          <Button disabled={globalSelectedIds.size!==1} onClick={() => {
-            const [tid] = Array.from(globalSelectedIds);
-            // rechercher dans jour puis archives
-            const todays = StorageService.loadTodayTransactions();
-            let tx: any = todays.find(t => String(t.id) === String(tid));
-            let isToday = !!tx;
-            if (!tx) {
-              const closures = StorageService.loadClosures();
-              outer: for (const c of closures) {
-                const arr = Array.isArray(c.transactions) ? c.transactions : [];
-                const found = arr.find((t: any) => String(t.id) === String(tid));
-                if (found) { tx = found; break outer; }
-              }
-            }
-            if (!tx) return;
-            const draft = { ...tx, items: (Array.isArray(tx.items)?tx.items:[]).map((it:any)=>({ ...it })) };
-            setGlobalEditorDraft(draft);
-            setGlobalEditorIsToday(!!isToday);
-            setShowGlobalEditor(true);
-          }}>Modifier</Button>
-          <Button disabled={globalSelectedIds.size!==1} onClick={() => {
-            const [tid] = Array.from(globalSelectedIds);
-            const todays = StorageService.loadTodayTransactions();
-            let tx: any = todays.find(t => String(t.id) === String(tid));
-            if (!tx) {
-              const closures = StorageService.loadClosures();
-              outer: for (const c of closures) {
-                const arr = Array.isArray(c.transactions) ? c.transactions : [];
-                const found = arr.find((t: any) => String(t.id) === String(tid));
-                if (found) { tx = found; break outer; }
-              }
-            }
-            if (!tx) return;
-            if (!window.confirm('Inverser les ventes de ce ticket (retour) ?')) return;
-            const inverse: any = {
-              ...tx,
-              id: `${tx.id}-R-${Date.now().toString().slice(-4)}`,
-              total: -Math.abs(tx.total||0),
-              items: (Array.isArray(tx.items)?tx.items:[]).map((it:any) => ({ ...it, quantity: -Math.abs(it.quantity||0) })),
-              timestamp: new Date(),
-            };
-            StorageService.addDailyTransaction(inverse);
-            setTodayTransactions(StorageService.loadTodayTransactions());
-            alert('Ticket inversé et ajouté aux tickets du jour.');
-          }}>Inverser</Button>
-          <Button color="error" variant="contained" disabled={globalSelectedIds.size===0} onClick={() => {
-            const now = new Date();
-            const expected = `${String(now.getDate()).padStart(2,'0')}${String(now.getMonth()+1).padStart(2,'0')}`; // jjmm
-            const code = prompt('code ?');
-            if (code !== expected) return;
+      <GlobalTicketsModal
+        open={showGlobalTickets}
+        onClose={() => setShowGlobalTickets(false)}
+        onlyToday={globalOnlyToday}
+        setOnlyToday={(v:boolean)=>setGlobalOnlyToday(v)}
+        filterPayment={globalFilterPayment as any}
+        setFilterPayment={(v:any)=>setGlobalFilterPayment(v)}
+        amountMin={globalAmountMin}
+        setAmountMin={setGlobalAmountMin}
+        amountMax={globalAmountMax}
+        setAmountMax={setGlobalAmountMax}
+        amountExact={globalAmountExact}
+        setAmountExact={setGlobalAmountExact}
+        dateFrom={globalDateFrom}
+        setDateFrom={setGlobalDateFrom}
+        dateTo={globalDateTo}
+        setDateTo={setGlobalDateTo}
+        timeFrom={globalTimeFrom}
+        setTimeFrom={setGlobalTimeFrom}
+        timeTo={globalTimeTo}
+        setTimeTo={setGlobalTimeTo}
+        selectedIds={globalSelectedIds}
+        setSelectedIds={(updater:any)=>setGlobalSelectedIds(prev=>updater(prev))}
+        expandedIds={expandedGlobalTicketIds}
+        setExpandedIds={(updater:any)=>setExpandedGlobalTicketIds(prev=>updater(prev))}
+        onOpenEditor={(tid:string)=>{
+          const todays = StorageService.loadTodayTransactions();
+          let tx: any = todays.find(t => String(t.id) === String(tid));
+          let isToday = !!tx;
+          if (!tx) {
             const closures = StorageService.loadClosures();
-            const selected = new Set(globalSelectedIds);
-            // 1) Nettoyer les archives
-            const updated = closures.map(c => {
-              const txs = Array.isArray(c.transactions) ? c.transactions : [];
-              const keep = txs.filter((t: any) => !selected.has(String(t.id)));
-              return { ...c, transactions: keep };
-            });
-            StorageService.saveAllClosures(updated);
-            // 2) Supprimer aussi des tickets du jour
-            Array.from(selected).forEach((tid) => {
-              try { StorageService.deleteDailyTransaction(String(tid)); } catch {}
-            });
-            setTodayTransactions(StorageService.loadTodayTransactions());
-            setGlobalSelectedIds(new Set());
-            alert('Tickets supprimés définitivement.');
-          }}>Supprimer sélection</Button>
-        </DialogActions>
-      </Dialog>
+            for (const c of closures) {
+              const arr = Array.isArray(c.transactions) ? c.transactions : [];
+              const found = arr.find((t: any) => String(t.id) === String(tid));
+              if (found) { tx = found; break; }
+            }
+          }
+          if (!tx) return;
+          const draft = { ...tx, items: (Array.isArray(tx.items)?tx.items:[]).map((it:any)=>({ ...it })) };
+          setGlobalEditorDraft(draft);
+          setGlobalEditorIsToday(!!isToday);
+          setShowGlobalEditor(true);
+        }}
+        refreshTodayTransactions={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+      />
+      {/* La modale inline précédente a été remplacée par GlobalTicketsModal */}
 
       {/* Éditeur d'un ticket depuis Tickets globaux */}
-      <Dialog open={showGlobalEditor} onClose={() => setShowGlobalEditor(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Modifier ticket</DialogTitle>
-        <DialogContent>
-          {globalEditorDraft && (
-            <>
-              {/* Sélection du mode de règlement */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Mode de règlement:</Typography>
-                {['Espèces','Carte','SumUp'].map((m) => (
-                  <Button
-                    key={m}
-                    size="small"
-                    variant={(String(globalEditorDraft.paymentMethod||'').toLowerCase().includes('esp') && m==='Espèces') ||
-                            (String(globalEditorDraft.paymentMethod||'').toLowerCase().includes('carte') && m==='Carte') ||
-                            (String(globalEditorDraft.paymentMethod||'').toLowerCase()==='sumup' && m==='SumUp')
-                            ? 'contained' : 'outlined'}
-                    onClick={() => setGlobalEditorDraft((prev:any) => ({ ...prev, paymentMethod: m }))}
-                  >
-                    {m}
-                  </Button>
-                ))}
-              </Box>
-
-              <List dense>
-              {globalEditorDraft.items.map((it: any, idx: number) => {
-                const unitPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
-                return (
-                  <ListItem key={it.product.id + '-' + idx} sx={{ py: 0.25 }}
-                    secondaryAction={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <IconButton size="small" onClick={() => setGlobalEditorDraft((prev: any) => {
-                          const d = { ...prev, items: prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: Math.max(0, (x.quantity||0)-1) } : x) };
-                          return d;
-                        })}><Remove fontSize="small" /></IconButton>
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace', minWidth: 20, textAlign: 'center' }}>{it.quantity}</Typography>
-                        <IconButton size="small" onClick={() => setGlobalEditorDraft((prev: any) => {
-                          const d = { ...prev, items: prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: (x.quantity||0)+1 } : x) };
-                          return d;
-                        })}><Add fontSize="small" /></IconButton>
-                        <IconButton size="small" color="error" onClick={() => setGlobalEditorDraft((prev:any) => {
-                          const d = { ...prev, items: prev.items.filter((_:any,i:number)=> i!==idx) };
-                          return d;
-                        })}>✕</IconButton>
-                      </Box>
-                    }
-                  >
-                    <ListItemText
-                      primary={it.product.name}
-                      secondary={`${it.quantity} x ${unitPrice.toFixed(2)} € = ${(it.quantity*unitPrice).toFixed(2)} €`}
-                    />
-                  </ListItem>
-                );
-              })}
-              {globalEditorDraft.items.length===0 && (
-                <ListItem><ListItemText primary="Ticket vide" /></ListItem>
-              )}
-            </List>
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowGlobalEditor(false)}>Annuler</Button>
-          <Button variant="contained" onClick={() => {
-            if (!globalEditorDraft) return;
-            const total = (globalEditorDraft.items || []).reduce((s:number, it:any) => {
-              const up = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
-              return s + (up * (it.quantity||0));
-            }, 0);
-            const updated = { ...globalEditorDraft, total };
-            if (globalEditorIsToday) {
-              StorageService.updateDailyTransaction(updated);
-              setTodayTransactions(StorageService.loadTodayTransactions());
-            } else {
-              const closures = StorageService.loadClosures();
-              const newClosures = closures.map(c => {
-                const arr = Array.isArray(c.transactions) ? c.transactions : [];
-                const idx = arr.findIndex((t:any) => t.id === updated.id);
-                if (idx >= 0) {
-                  const copy = [...arr];
-                  copy[idx] = updated;
-                  return { ...c, transactions: copy };
-                }
-                return c;
-              });
-              StorageService.saveAllClosures(newClosures);
-            }
-            setShowGlobalEditor(false);
-            // Vider la sélection dans la liste des tickets globaux après modification
-            setGlobalSelectedIds(new Set());
-          }}>Enregistrer</Button>
-        </DialogActions>
-      </Dialog>
+      <GlobalTicketEditorModal
+        open={showGlobalEditor}
+        onClose={() => setShowGlobalEditor(false)}
+        isToday={globalEditorIsToday}
+        draft={globalEditorDraft}
+        setDraft={(updater:any)=>setGlobalEditorDraft((prev:any)=>updater(prev))}
+        refreshToday={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+      />
 
       {/* Modale des clôtures (archives) */}
-      <Dialog open={showClosures} onClose={() => setShowClosures(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Clôtures archivées</DialogTitle>
-        <DialogContent>
-          {closures.length === 0 ? (
-            <Typography>Aucune clôture enregistrée.</Typography>
-          ) : (
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Box sx={{ width: 260 }}>
-                <List dense>
-                  {closures.map((c, idx) => (
-                    <ListItem key={idx} button selected={selectedClosureIdx===idx} onClick={() => setSelectedClosureIdx(idx)}>
-                      <ListItemText
-                        primary={`Clôture Z${c.zNumber || '?'} — ${new Date(c.closedAt).toLocaleDateString('fr-FR')}`}
-                        secondary={new Date(c.closedAt).toLocaleTimeString('fr-FR')}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                {selectedClosureIdx === null ? (
-                  <Typography variant="body2">Sélectionnez une clôture pour la visualiser.</Typography>
-                ) : (() => {
-                  const c = closures[selectedClosureIdx];
-                  const txs = c.transactions || [];
-                  const totalCA = txs.reduce((s: number, t: any) => s + (t.total || 0), 0);
-                  const byMethod = txs.reduce((acc: Record<string, number>, t: any) => {
-                    const m = String(t.paymentMethod || '').toLowerCase();
-                    const key = m.includes('esp') || m==='cash' ? 'Espèces' : m.includes('carte') || m==='card' ? 'Carte' : 'SumUp';
-                    acc[key] = (acc[key] || 0) + (t.total || 0);
-                    return acc;
-                  }, {} as Record<string, number>);
-                  const rows = computeDailyProductSales(txs).slice(0, 10);
-                  return (
-                    <Box>
-                      <Typography variant="h6" sx={{ mb: 1 }}>Clôture Z{c.zNumber}</Typography>
-                      <Typography variant="body2" sx={{ mb: 1 }}>Clôturée le {new Date(c.closedAt).toLocaleString('fr-FR')}</Typography>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="subtitle1">Total CA</Typography>
-                        <Typography variant="subtitle1">{totalCA.toFixed(2)} €</Typography>
-                      </Box>
-                      <Divider sx={{ my: 1 }} />
-                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Totaux par mode de règlement</Typography>
-                      <List dense>
-                        {['Espèces','Carte','SumUp'].map(k => (
-                          <ListItem key={k} sx={{ py: 0.25 }}>
-                            <ListItemText primary={k} />
-                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{(byMethod[k]||0).toFixed(2)} €</Typography>
-                          </ListItem>
-                        ))}
-                      </List>
-                      <Divider sx={{ my: 1 }} />
-                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Top 10 articles</Typography>
-                      <List dense>
-                        {rows.map(({ product, totalQty, totalAmount }) => (
-                          <ListItem key={product.id} sx={{ py: 0.25 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
-                              <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                {product.name}
-                              </Typography>
-                              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                {`Qté: ${totalQty} • CA: ${totalAmount.toFixed(2)} €`}
-                              </Typography>
-                            </Box>
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Box>
-                  );
-                })()}
-              </Box>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowClosures(false)}>Fermer</Button>
-        </DialogActions>
-      </Dialog>
+      <ClosuresModal
+        open={showClosures}
+        onClose={() => setShowClosures(false)}
+        closures={closures}
+        selectedIdx={selectedClosureIdx}
+        setSelectedIdx={setSelectedClosureIdx}
+        computeDailyProductSales={computeDailyProductSales}
+      />
 
       {/* Modale récap par mode de règlement */}
-      <Dialog open={showPaymentRecap} onClose={() => setShowPaymentRecap(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {paymentRecapMethod === 'cash' ? 'Tickets Espèces' : paymentRecapMethod === 'card' ? 'Tickets Carte' : 'Tickets SumUp'}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', gap: 0.5, mb: 1, flexWrap: 'wrap' }}>
-            {/* Tri dans la modale: par quantité, montant, nom, famille, sous-famille */}
-            <Button size="small" variant={paymentRecapSort==='qty'?'contained':'outlined'} onClick={() => setPaymentRecapSort('qty')}>Tri quantité</Button>
-            <Button size="small" variant={paymentRecapSort==='amount'?'contained':'outlined'} onClick={() => setPaymentRecapSort('amount')}>Tri montant</Button>
-            <Button size="small" variant={paymentRecapSort==='name'?'contained':'outlined'} onClick={() => setPaymentRecapSort('name')}>Tri nom</Button>
-            <Button size="small" variant={paymentRecapSort==='category'?'contained':'outlined'} onClick={() => setPaymentRecapSort('category')}>Tri famille</Button>
-            <Button size="small" variant={paymentRecapSort==='subcategory'?'contained':'outlined'} onClick={() => setPaymentRecapSort('subcategory')}>Tri sous-famille</Button>
-          </Box>
-          {(() => {
-            const filtered = todayTransactions.filter(t => {
-              const m = String((t as any).paymentMethod || '').toLowerCase();
-              if (paymentRecapMethod === 'cash') return m === 'cash' || m.includes('esp');
-              if (paymentRecapMethod === 'card') return m === 'card' || m.includes('carte');
-              if (paymentRecapMethod === 'sumup') return m === 'sumup';
-              return true;
-            });
-            const sorted = [...filtered].sort((a, b) => {
-              if (paymentRecapSort === 'qty') {
-                const qa = Array.isArray(a.items) ? a.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
-                const qb = Array.isArray(b.items) ? b.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
-                if (qa !== qb) return qb - qa;
-              } else if (paymentRecapSort === 'amount') {
-                if (a.total !== b.total) return b.total - a.total;
-              } else if (paymentRecapSort === 'name') {
-                const an = Array.isArray(a.items) && a.items.length > 0 ? a.items[0].product.name : '';
-                const bn = Array.isArray(b.items) && b.items.length > 0 ? b.items[0].product.name : '';
-                if (an !== bn) return an.localeCompare(bn);
-              } else if (paymentRecapSort === 'category') {
-                const ac = Array.isArray(a.items) && a.items.length > 0 ? a.items[0].product.category : '';
-                const bc = Array.isArray(b.items) && b.items.length > 0 ? b.items[0].product.category : '';
-                if (ac !== bc) return ac.localeCompare(bc);
-              } else if (paymentRecapSort === 'subcategory') {
-                const asub = Array.isArray(a.items) && a.items.length > 0 ? ((a.items[0].product.associatedCategories && a.items[0].product.associatedCategories[0]) || '') : '';
-                const bsub = Array.isArray(b.items) && b.items.length > 0 ? ((b.items[0].product.associatedCategories && b.items[0].product.associatedCategories[0]) || '') : '';
-                if (asub !== bsub) return asub.localeCompare(bsub);
-              }
-              return String(a.id).localeCompare(String(b.id));
-            });
-            const totalAmount = filtered.reduce((s, t) => s + (t.total || 0), 0);
-            return (
-              <>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
-                    Total: {totalAmount.toFixed(2)} €
-                  </Typography>
-                </Box>
-                {paymentRecapSort !== 'category' ? (
-                  <List dense>
-                    {sorted.map(t => {
-                      const firstName = Array.isArray(t.items) && t.items.length > 0 ? t.items[0].product.name : '(vide)';
-                      const qty = Array.isArray(t.items) ? t.items.reduce((s, it) => s + (it.quantity || 0), 0) : 0;
-                      return (
-                        <ListItem key={t.id} sx={{ py: 0.25, borderBottom: '1px solid #eee' }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
-                            <Typography variant="body2" sx={{ width: 48, textAlign: 'right', fontFamily: 'monospace' }}>
-                              {qty}
-                            </Typography>
-                            <Typography variant="body2" sx={{ px: 0.5 }}>x</Typography>
-                            <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {firstName}
-                            </Typography>
-                            <Typography variant="body2" sx={{ width: 110, textAlign: 'right', fontFamily: 'monospace' }}>
-                              {t.total.toFixed(2)} €
-                            </Typography>
-                          </Box>
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                ) : (
-                  <List dense>
-                    {(() => {
-                      const categoryMap = new Map<string, Map<string, { name: string; qty: number; amount: number }>>();
-                      for (const tx of filtered) {
-                        const items = Array.isArray(tx.items) ? tx.items : [];
-                        for (const it of items) {
-                          const cat = it.product.category || '';
-                          const key = it.product.id;
-                          const amount = (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * (it.quantity || 0);
-                          if (!categoryMap.has(cat)) categoryMap.set(cat, new Map());
-                          const prodMap = categoryMap.get(cat)!;
-                          const prev = prodMap.get(key) || { name: it.product.name, qty: 0, amount: 0 };
-                          prev.qty += (it.quantity || 0);
-                          prev.amount += amount;
-                          prodMap.set(key, prev);
-                        }
-                      }
-                      const categories = Array.from(categoryMap.keys()).sort((a, b) => a.localeCompare(b));
-                      return categories.map(cat => {
-                        const prodMap = categoryMap.get(cat)!;
-                        const lines = Array.from(prodMap.values()).sort((a, b) => b.qty - a.qty);
-                        return (
-                          <Box key={cat} sx={{ mb: 1 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2', mb: 0.5 }}>Famille {cat}:</Typography>
-                            {lines.map(line => (
-                              <ListItem key={cat + '::' + line.name} sx={{ py: 0.25, borderBottom: '1px dashed #eee' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
-                                  <Typography variant="body2" sx={{ width: 48, textAlign: 'right', fontFamily: 'monospace' }}>{line.qty}</Typography>
-                                  <Typography variant="body2" sx={{ px: 0.5 }}>x</Typography>
-                                  <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{line.name}</Typography>
-                                  <Typography variant="body2" sx={{ width: 110, textAlign: 'right', fontFamily: 'monospace' }}>{line.amount.toFixed(2)} €</Typography>
-                                </Box>
-                              </ListItem>
-                            ))}
-                          </Box>
-                        );
-                      });
-                    })()}
-                  </List>
-                )}
-              </>
-            );
-          })()}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowPaymentRecap(false)}>Fermer</Button>
-        </DialogActions>
-      </Dialog>
+      <PaymentRecapByMethodModal
+        open={showPaymentRecap}
+        onClose={() => setShowPaymentRecap(false)}
+        method={paymentRecapMethod as any}
+        sort={paymentRecapSort as PaymentRecapSort}
+        onChangeSort={(s) => setPaymentRecapSort(s as any)}
+        transactions={todayTransactions}
+      />
 
       {/* Modale récapitulatif ventes du jour */}
       <Dialog open={showSalesRecap} onClose={() => setShowSalesRecap(false)} maxWidth="md" fullWidth>
@@ -4412,74 +1836,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       </Dialog>
 
       {/* Modale fin de journée / Clôture */}
-      <Dialog open={showEndOfDay} onClose={() => setShowEndOfDay(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Clôture de la journée</DialogTitle>
-        <DialogContent>
-          {(() => {
-            const txs = todayTransactions;
-            const totalCA = txs.reduce((s, t) => s + (t.total || 0), 0);
-            const byMethod = txs.reduce((acc: Record<string, number>, t) => {
-              const m = String((t as any).paymentMethod || '').toLowerCase();
-              const key = m.includes('esp') || m==='cash' ? 'Espèces' : m.includes('carte') || m==='card' ? 'Carte' : 'SumUp';
-              acc[key] = (acc[key] || 0) + (t.total || 0);
-              return acc;
-            }, {} as Record<string, number>);
-            const rows = computeDailyProductSales(txs).slice(0, 10);
-            return (
-              <Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>Heure de clôture: {new Date().toLocaleString('fr-FR')}</Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="h6">Total CA</Typography>
-                  <Typography variant="h6">{totalCA.toFixed(2)} €</Typography>
-                </Box>
-                <Divider sx={{ my: 1 }} />
-                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Totaux par mode de règlement</Typography>
-                <List dense>
-                  {['Espèces','Carte','SumUp'].map(k => (
-                    <ListItem key={k} sx={{ py: 0.25 }}>
-                      <ListItemText primary={k} />
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{(byMethod[k]||0).toFixed(2)} €</Typography>
-                    </ListItem>
-                  ))}
-                </List>
-                <Divider sx={{ my: 1 }} />
-                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Top 10 articles</Typography>
-                <List dense>
-                  {rows.map(({ product, totalQty, totalAmount }) => (
-                    <ListItem key={product.id} sx={{ py: 0.25 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
-                        <Typography variant="body2" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {product.name}
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {`Qté: ${totalQty} • CA: ${totalAmount.toFixed(2)} €`}
-                        </Typography>
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            );
-          })()}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowEndOfDay(false)}>Annuler</Button>
-          <Button color="error" onClick={() => {
-            if (!window.confirm('Valider la clôture de la journée ? Cette action archivera et remettra à zéro.')) return;
-            const z = StorageService.incrementZNumber();
-            const payload = {
-              zNumber: z,
-              closedAt: new Date().toISOString(),
-              transactions: todayTransactions,
-            };
-            StorageService.saveClosure(payload);
-            StorageService.clearTodayTransactions();
-            setTodayTransactions([]);
-            setShowEndOfDay(false);
-            alert(`Clôture effectuée. Z${z} enregistré.`);
-          }}>Valider la clôture</Button>
-        </DialogActions>
-      </Dialog>
+      <EndOfDayModal
+        open={showEndOfDay}
+        onClose={() => setShowEndOfDay(false)}
+        transactions={todayTransactions}
+        computeDailyProductSales={computeDailyProductSales}
+        refreshToday={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+      />
 
       {/* Modale d'édition de ticket supprimée (remplacée par l'édition via Tickets jour) */}
 

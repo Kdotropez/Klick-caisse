@@ -89,7 +89,7 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
     } else {
       setSubcategories([]);
     }
-  }, [selectedCategory, products]);
+  }, [selectedCategory, products, categories]);
 
   const handleAddSubcategory = () => {
     if (!selectedCategory) {
