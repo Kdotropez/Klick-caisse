@@ -60,7 +60,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   const cardHeight = 91; // conservé
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <Box
         sx={{
           flexGrow: 1,
@@ -278,7 +278,15 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                 {product.finalPrice.toFixed(2)} €
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.25 * cardScaleFactor, gap: 0.25 * cardScaleFactor }}>
-                <Typography variant="caption" sx={{ fontSize: `${Math.max(0.6, 0.7 * cardScaleFactor)}rem`, color: '#666', fontWeight: '500', alignSelf: 'flex-end' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: `${Math.max(0.85, 0.95 * cardScaleFactor)}rem`,
+                    color: '#1a237e',
+                    fontWeight: '700',
+                    alignSelf: 'flex-end'
+                  }}
+                >
                   {dailyQtyByProduct[product.id] || 0}
                 </Typography>
                 {product.variations.length > 0 && (

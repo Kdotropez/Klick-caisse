@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import CartPanel from './panels/CartPanel';
 import PaymentPanel from './panels/PaymentPanel';
-import CategoriesPanelFull from './panels/CategoriesPanelFull';
+// import CategoriesPanelFull from './panels/CategoriesPanelFull';
 import SettingsPanel from './panels/SettingsPanel';
 import ImportPanel from './panels/ImportPanel';
 import StatsPanel from './panels/StatsPanel';
@@ -21,7 +21,7 @@ import {
   ListItem,
   // ListItemText,
   // Divider,
-  // TextField,
+  TextField,
 } from '@mui/material';
 // import {
 //   Add,
@@ -1043,10 +1043,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const handleSaveProduct = (updatedProduct: Product) => {
-    // Mettre à jour le produit dans la liste
-    const updatedProducts = products.map(p => 
-      p.id === updatedProduct.id ? updatedProduct : p
-    );
+    // Insérer ou mettre à jour le produit dans la liste
+    const exists = products.some(p => p.id === updatedProduct.id);
+    const updatedProducts = exists
+      ? products.map(p => (p.id === updatedProduct.id ? updatedProduct : p))
+      : [updatedProduct, ...products];
     
     if (onProductsReorder) {
       onProductsReorder(updatedProducts);
@@ -1056,6 +1057,29 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     saveProductionData(updatedProducts, categories);
     
     console.log('✅ Article modifié et sauvegardé avec succès:', updatedProduct.name);
+  };
+
+  const handleCreateNewProduct = () => {
+    const selectedCategoryName = selectedCategory
+      ? (categories.find(c => c.id === selectedCategory)?.name || '')
+      : '';
+    const newProduct: Product = {
+      id: `prod_${Date.now()}`,
+      name: '',
+      reference: '',
+      ean13: '',
+      category: selectedCategoryName,
+      associatedCategories: [],
+      wholesalePrice: 0,
+      finalPrice: 0,
+      crossedPrice: 0,
+      salesCount: 0,
+      position: 0,
+      remisable: true,
+      variations: []
+    };
+    setSelectedProductForEdit(newProduct);
+    setShowProductEditModal(true);
   };
 
   const handleDeleteProduct = (productId: string) => {
@@ -1394,29 +1418,64 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           />
         );
 
-             case 'categories':
-         return (
-                 <CategoriesPanelFull
-                   categories={categories}
-                   products={products}
-                   selectedCategory={selectedCategory}
-                   setSelectedCategory={setSelectedCategory}
-                   selectedSubcategory={selectedSubcategory}
-                   setSelectedSubcategory={setSelectedSubcategory}
-                   searchTerm={searchTerm}
-                   setSearchTerm={setSearchTerm}
-                   categorySearchTerm={categorySearchTerm}
-                   setCategorySearchTerm={setCategorySearchTerm}
-                   subcategorySearchTerm={subcategorySearchTerm}
-                   setSubcategorySearchTerm={setSubcategorySearchTerm}
-                   productSortMode={productSortMode}
-                   setProductSortMode={setProductSortMode}
-                   pendingQtyInput={pendingQtyInput}
-                   setPendingQtyInput={setPendingQtyInput}
-                  getCategoryColor={getCategoryColor}
-                  onResetFilters={() => { setSearchTerm(''); setCategorySearchTerm(''); setSubcategorySearchTerm(''); setSelectedCategory(null); setSelectedSubcategory(null); setProductSortMode('sales'); setCurrentPage(1); }}
-                />
-              );
+      case 'categories':
+        return (
+          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* Ligne 1: Boutons des catégories */}
+            <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider', overflow: 'hidden' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', overflowX: 'auto', overflowY: 'hidden', '&::-webkit-scrollbar': { display: 'none' } }}>
+                <Button
+                  variant={selectedCategory === null ? 'contained' : 'outlined'}
+                  onClick={() => setSelectedCategory(null)}
+                  sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                >
+                  Toutes
+                </Button>
+                {categories.map((category) => (
+                  <Button
+                    key={category.id}
+                    variant={selectedCategory === category.id ? 'contained' : 'outlined'}
+                    onClick={() => setSelectedCategory(category.id)}
+                    sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                  >
+                    {category.name}
+                  </Button>
+                ))}
+              </Box>
+            </Box>
+
+            {/* Ligne 2: Recherche + création + suppression séléction */}
+            <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center' }}>
+              <TextField
+                size="small"
+                placeholder="Rechercher article..."
+                variant="outlined"
+                sx={{ flex: 1 }}
+                value={searchTerm}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              />
+              {isEditMode && selectedProductsForDeletion.size > 0 && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    const ids = Array.from(selectedProductsForDeletion);
+                    if (ids.length === 0) return;
+                    // eslint-disable-next-line no-restricted-globals
+                    if (!confirm(`Supprimer ${ids.length} article(s) sélectionné(s) ?`)) return;
+                    const updatedProducts = products.filter(p => !ids.includes(p.id));
+                    onProductsReorder?.(updatedProducts);
+                    setSelectedProductsForDeletion(new Set());
+                  }}
+                >
+                  Supprimer ({selectedProductsForDeletion.size})
+                </Button>
+              )}
+              <Button variant="contained" size="small" onClick={handleCreateNewProduct}>➕ Nouvel article</Button>
+            </Box>
+          </Box>
+        );
               // fin rendu catégories délégué à CategoriesPanelFull
 
              case 'search':
@@ -1595,9 +1654,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               cursor: isLayoutLocked ? 'default' : 'move',
               // Couleurs professionnelles distinctes pour chaque fenêtre
               ...(window.id === 'categories' && {
-                borderColor: '#1976d2',
-                backgroundColor: '#f3f8ff',
-                '& .MuiTypography-h6': { color: '#1976d2' }
+                border: 'none',
+                boxShadow: 0,
+                backgroundColor: 'transparent'
               }),
               ...(window.id === 'products' && {
                 borderColor: '#2e7d32',

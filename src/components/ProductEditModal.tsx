@@ -220,7 +220,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
                 label="Catégorie"
               >
                 {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
+                  <MenuItem key={category.id} value={category.name}>
                     {category.name}
                   </MenuItem>
                 ))}

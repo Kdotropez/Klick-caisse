@@ -114,20 +114,23 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
               
               return (
                 <React.Fragment key={`${item.product.id}-${item.selectedVariation?.id || 'main'}`}>
-                  <ListItem sx={{ py: 1.5 }}>
+                  <ListItem sx={{ py: 1 }}>
                     <ListItemText
                       primary={
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <Typography variant="body1" sx={{ fontWeight: '600', flex: 1 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, flex: 1 }}>
                             {item.product.name}
                           </Typography>
-                          <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                          <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                            × {item.quantity}
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2', whiteSpace: 'nowrap' }}>
                             {totalPrice.toFixed(2)} €
                           </Typography>
                         </Box>
                       }
                       secondary={
-                        <Box sx={{ mt: 1 }}>
+                        <Box sx={{ mt: 0.5 }}>
                           {item.selectedVariation && (
                             <Chip 
                               label={item.selectedVariation.attributes} 
@@ -137,14 +140,7 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
                               sx={{ mr: 1, mb: 1 }}
                             />
                           )}
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              Quantité: {item.quantity}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Prix unitaire: {price.toFixed(2)} €
-                            </Typography>
-                          </Box>
+                          {/* Prix unitaire supprimé */}
                         </Box>
                       }
                     />
