@@ -1446,6 +1446,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onOpenGlobalDiscount={openGlobalDiscountModal}
             onResetCartAndDiscounts={() => { setItemDiscounts({}); setGlobalDiscount(null); cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); }}
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
+            onClearGlobalDiscount={() => setGlobalDiscount(null)}
           />
         );
 

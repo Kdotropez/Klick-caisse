@@ -32,6 +32,7 @@ interface CartPanelProps {
   onOpenGlobalDiscount: () => void;
   onResetCartAndDiscounts: () => void;
   onRemoveItemDiscount: (discountKey: string) => void;
+  onClearGlobalDiscount: () => void;
 }
 
 const CartPanel: React.FC<CartPanelProps> = ({
@@ -47,6 +48,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
   onOpenGlobalDiscount,
   onResetCartAndDiscounts,
   onRemoveItemDiscount,
+  onClearGlobalDiscount,
 }) => {
   const total = getTotalWithGlobalDiscount();
 
@@ -260,9 +262,16 @@ const CartPanel: React.FC<CartPanelProps> = ({
 
           const totalDiscounts = individualDiscounts + globalDiscountAmount;
           return (
-            <Typography variant="body1" sx={{ textAlign: 'right', mb: 0.5, color: '#f44336', fontWeight: 'bold' }}>
-              Total remises: -{totalDiscounts.toFixed(2)} €
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1, mb: 0.5 }}>
+              <Typography variant="body1" sx={{ color: '#f44336', fontWeight: 'bold' }}>
+                Total remises: -{totalDiscounts.toFixed(2)} €
+              </Typography>
+              {globalDiscount && (
+                <IconButton size="small" onClick={onClearGlobalDiscount} sx={{ color: '#f44336' }} title="Annuler la remise principale">
+                  ✕
+                </IconButton>
+              )}
+            </Box>
           );
         })()}
 
