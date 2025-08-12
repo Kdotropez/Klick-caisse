@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Divider, Typography } from '@mui/material';
 import { CartItem } from '../../types/Product';
+import { formatEuro } from '../../utils/currency';
 
 interface PaymentPanelProps {
   cartItems: CartItem[];
@@ -37,7 +38,7 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
             disabled={cartItems.length === 0}
           >
             <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>ESPÈCES</Box>
-            <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>{totalAmount.toFixed(2)} €</Box>
+            <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>{formatEuro(totalAmount)}</Box>
           </Button>
           <Button
             variant="contained"
@@ -46,7 +47,7 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
             disabled={cartItems.length === 0}
           >
             <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>SumUp</Box>
-            <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>{totalAmount.toFixed(2)} €</Box>
+            <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>{formatEuro(totalAmount)}</Box>
           </Button>
           <Button
             variant="contained"
@@ -55,7 +56,7 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
             disabled={cartItems.length === 0}
           >
             <Box sx={{ fontSize: '1rem', fontWeight: 'bold', lineHeight: 1.2 }}>Carte</Box>
-            <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>{totalAmount.toFixed(2)} €</Box>
+            <Box sx={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1.2 }}>{formatEuro(totalAmount)}</Box>
           </Button>
         </Box>
 
@@ -70,7 +71,7 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
           >
             <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
               <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul espèces</Typography>
-              <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{paymentTotals['Espèces'].toFixed(2)} €</Typography>
+              <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{formatEuro(paymentTotals['Espèces'])}</Typography>
             </Box>
           </Button>
           <Button
@@ -80,7 +81,7 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
           >
             <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
               <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul SumUp</Typography>
-              <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{paymentTotals['SumUp'].toFixed(2)} €</Typography>
+              <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{formatEuro(paymentTotals['SumUp'])}</Typography>
             </Box>
           </Button>
           <Button
@@ -90,7 +91,7 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
           >
             <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
               <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul carte</Typography>
-              <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{paymentTotals['Carte'].toFixed(2)} €</Typography>
+              <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{formatEuro(paymentTotals['Carte'])}</Typography>
             </Box>
           </Button>
         </Box>

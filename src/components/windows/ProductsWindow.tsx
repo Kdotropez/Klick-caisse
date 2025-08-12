@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Typography, Paper, Chip } from '@mui/material';
 import { Product } from '../../types/Product';
+import { formatEuro } from '../../utils/currency';
 
 interface ProductsWindowProps {
   products: Product[];
@@ -68,7 +69,7 @@ const ProductsWindow: React.FC<ProductsWindowProps> = ({
               {product.name}
             </Typography>
             <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-              {product.finalPrice.toFixed(2)} €
+              {formatEuro(product.finalPrice)}
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
               <Chip label={`${product.salesCount || 0}`} size="small" />

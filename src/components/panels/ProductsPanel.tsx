@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button, Chip, Paper, Typography, IconButton } from '@mui/material';
 import { Product } from '../../types/Product';
 import { NavigateBefore, NavigateNext, Edit as EditIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
+import { formatEuro } from '../../utils/currency';
 
 interface ProductsPanelProps {
   width: number;
@@ -303,7 +304,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                   letterSpacing: `${0.5 * cardScaleFactor}px`,
                 }}
               >
-                {product.finalPrice.toFixed(2)} €
+                {formatEuro(product.finalPrice)}
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.25 * cardScaleFactor, gap: 0.25 * cardScaleFactor }}>
                 <Typography
