@@ -174,7 +174,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 minHeight: 0,
-                background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}80 30%, ${categoryColor}40 70%, white 100%)`,
+                background: `linear-gradient(135deg, ${categoryColor}60 0%, ${categoryColor}30 30%, ${categoryColor}10 70%, white 100%)`,
                 border: `1px solid ${categoryColor}`,
                 borderRadius: `12px`,
                 boxShadow: `0 2px 8px rgba(0,0,0,0.08)`,
@@ -195,14 +195,14 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                 '&:hover': {
                   transform: 'translateY(-1px)',
                   boxShadow: `0 3px 6px rgba(0,0,0,0.15)`,
-                  background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}90 25%, ${categoryColor}50 65%, white 100%)`,
+                  background: `linear-gradient(135deg, ${categoryColor}50 0%, ${categoryColor}40 25%, ${categoryColor}20 65%, white 100%)`,
                   border: `1px solid ${categoryColor}`,
                   cursor: isEditMode ? 'pointer' : 'grab',
                 },
                 '&:active': {
                   transform: 'translateY(0px) scale(0.98)',
                   boxShadow: `0 ${2 * cardScaleFactor}px ${6 * cardScaleFactor}px rgba(0,0,0,0.25), 0 ${1 * cardScaleFactor}px ${2 * cardScaleFactor}px ${categoryColor}30`,
-                  background: `linear-gradient(135deg, ${categoryColor}80 0%, ${categoryColor}60 40%, ${categoryColor}30 80%, white 100%)`,
+                  background: `linear-gradient(135deg, ${categoryColor}40 0%, ${categoryColor}30 40%, ${categoryColor}10 80%, white 100%)`,
                   cursor: isEditMode ? 'pointer' : 'grabbing',
                 },
               }}
