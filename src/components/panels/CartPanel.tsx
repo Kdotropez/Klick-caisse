@@ -33,6 +33,7 @@ interface CartPanelProps {
   onResetCartAndDiscounts: () => void;
   onRemoveItemDiscount: (discountKey: string) => void;
   onClearGlobalDiscount: () => void;
+  promoBanner?: React.ReactNode;
 }
 
 const CartPanel: React.FC<CartPanelProps> = ({
@@ -49,6 +50,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
   onResetCartAndDiscounts,
   onRemoveItemDiscount,
   onClearGlobalDiscount,
+  promoBanner,
 }) => {
   const total = getTotalWithGlobalDiscount();
 
@@ -62,6 +64,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
         overflow: 'hidden',
       }}
     >
+      {promoBanner}
       <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
         <Typography variant="h6" align="center" sx={{ fontWeight: 'bold' }}>
           TICKET DE CAISSE

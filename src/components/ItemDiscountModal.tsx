@@ -30,28 +30,49 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
   item,
   onApplyDiscount,
 }) => {
+  const [mode, setMode] = useState<'unit' | 'total'>('unit');
   const [discountType, setDiscountType] = useState<'euro' | 'percent' | 'price'>('percent');
-  const [discountValue, setDiscountValue] = useState<number>(0);
-  const [newPrice, setNewPrice] = useState<number>(0);
+  const [discountValue, setDiscountValue] = useState<number>(0); // euro ou percent selon type
+  const [newUnitPrice, setNewUnitPrice] = useState<number>(0);
+  const [newTotal, setNewTotal] = useState<number>(0);
 
   const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
   const originalTotal = originalPrice * item.quantity;
 
-  const calculateDiscountedPrice = () => {
+  const calculateDiscountedUnitPrice = () => {
+    if (mode === 'unit') {
+      switch (discountType) {
+        case 'euro':
+          return Math.max(0, originalPrice - discountValue);
+        case 'percent':
+          return originalPrice * (1 - discountValue / 100);
+        case 'price':
+          return newUnitPrice;
+        default:
+          return originalPrice;
+      }
+    }
+    // mode total
     switch (discountType) {
-      case 'euro':
-        return Math.max(0, originalPrice - discountValue);
-      case 'percent':
-        return originalPrice * (1 - discountValue / 100);
-      case 'price':
-        return newPrice;
+      case 'euro': {
+        const totalAfter = Math.max(0, originalTotal - discountValue);
+        return totalAfter / Math.max(1, item.quantity);
+      }
+      case 'percent': {
+        const totalAfter = originalTotal * (1 - discountValue / 100);
+        return totalAfter / Math.max(1, item.quantity);
+      }
+      case 'price': {
+        const totalAfter = Math.max(0, newTotal);
+        return totalAfter / Math.max(1, item.quantity);
+      }
       default:
         return originalPrice;
     }
   };
 
   const calculateDiscountedTotal = () => {
-    const discountedPrice = calculateDiscountedPrice();
+    const discountedPrice = calculateDiscountedUnitPrice();
     return discountedPrice * item.quantity;
   };
 
@@ -60,41 +81,61 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
   };
 
   const handleApply = () => {
-    let finalValue = 0;
-    
-    switch (discountType) {
-      case 'euro':
-        finalValue = discountValue;
-        break;
-      case 'percent':
-        finalValue = discountValue;
-        break;
-      case 'price':
-        finalValue = newPrice;
-        break;
+    // Convertit les remises "total" en équivalents par unité pour le stockage
+    if (mode === 'total') {
+      if (discountType === 'euro') {
+        const perUnit = discountValue / Math.max(1, item.quantity);
+        onApplyDiscount(item.product.id, item.selectedVariation?.id || null, 'euro', perUnit);
+      } else if (discountType === 'percent') {
+        onApplyDiscount(item.product.id, item.selectedVariation?.id || null, 'percent', discountValue);
+      } else if (discountType === 'price') {
+        const perUnitPrice = Math.max(0, newTotal) / Math.max(1, item.quantity);
+        onApplyDiscount(item.product.id, item.selectedVariation?.id || null, 'price', perUnitPrice);
+      }
+      onClose();
+      return;
     }
-
-    onApplyDiscount(item.product.id, item.selectedVariation?.id || null, discountType, finalValue);
+    // mode unité (inchangé)
+    if (discountType === 'price') {
+      onApplyDiscount(item.product.id, item.selectedVariation?.id || null, 'price', newUnitPrice);
+    } else {
+      onApplyDiscount(item.product.id, item.selectedVariation?.id || null, discountType, discountValue);
+    }
     onClose();
   };
 
   const handleClose = () => {
+    setMode('unit');
     setDiscountType('percent');
     setDiscountValue(0);
-    setNewPrice(0);
+    setNewUnitPrice(0);
+    setNewTotal(0);
     onClose();
   };
 
   const isApplyDisabled = () => {
-    switch (discountType) {
-      case 'euro':
-        return discountValue <= 0 || discountValue >= originalPrice;
-      case 'percent':
-        return discountValue <= 0 || discountValue >= 100;
-      case 'price':
-        return newPrice <= 0;
-      default:
-        return true;
+    if (mode === 'unit') {
+      switch (discountType) {
+        case 'euro':
+          return discountValue <= 0 || discountValue >= originalPrice;
+        case 'percent':
+          return discountValue <= 0 || discountValue >= 100;
+        case 'price':
+          return newUnitPrice <= 0;
+        default:
+          return true;
+      }
+    } else {
+      switch (discountType) {
+        case 'euro':
+          return discountValue <= 0 || discountValue >= originalTotal;
+        case 'percent':
+          return discountValue <= 0 || discountValue >= 100;
+        case 'price':
+          return newTotal <= 0;
+        default:
+          return true;
+      }
     }
   };
 
@@ -115,6 +156,11 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
       </DialogTitle>
 
       <DialogContent sx={{ pt: 3 }}>
+        {/* Mode d'application */}
+        <Box sx={{ display: 'flex', gap: 1, mb: 2, justifyContent: 'center' }}>
+          <Button variant={mode==='unit'?'contained':'outlined'} onClick={() => setMode('unit')}>Par unité</Button>
+          <Button variant={mode==='total'?'contained':'outlined'} onClick={() => setMode('total')}>Par total</Button>
+        </Box>
         {/* Informations de l'article */}
         <Paper sx={{ p: 2, mb: 3, backgroundColor: '#f5f5f5' }}>
           <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
@@ -140,8 +186,8 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
             label="Type de modification"
           >
             <MenuItem value="percent">Remise en pourcentage (%)</MenuItem>
-            <MenuItem value="euro">Remise en euros (€)</MenuItem>
-            <MenuItem value="price">Modifier le prix unitaire</MenuItem>
+            <MenuItem value="euro">Remise en euros {mode==='unit' ? '(par unité)' : '(sur total)'} </MenuItem>
+            <MenuItem value="price">{mode==='unit' ? 'Nouveau prix unitaire' : 'Nouveau total'}</MenuItem>
           </Select>
         </FormControl>
 
@@ -162,31 +208,44 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
         {discountType === 'euro' && (
           <TextField
             fullWidth
-            label="Montant de la remise (€)"
+            label={`Montant de la remise (€) ${mode==='unit' ? '(par unité)' : '(sur total)'}`}
             type="number"
             value={discountValue}
             onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
-            inputProps={{ min: 0, max: originalPrice, step: 0.01 }}
+            inputProps={{ min: 0, max: mode==='unit' ? originalPrice : originalTotal, step: 0.01 }}
             sx={{ mb: 3 }}
-            helperText={`Montant maximum: ${originalPrice.toFixed(2)} €`}
+            helperText={`Montant maximum: ${(mode==='unit'?originalPrice:originalTotal).toFixed(2)} €`}
           />
         )}
 
-        {discountType === 'price' && (
+        {discountType === 'price' && mode==='unit' && (
           <TextField
             fullWidth
             label="Nouveau prix unitaire (€)"
             type="number"
-            value={newPrice}
-            onChange={(e) => setNewPrice(parseFloat(e.target.value) || 0)}
+            value={newUnitPrice}
+            onChange={(e) => setNewUnitPrice(parseFloat(e.target.value) || 0)}
             inputProps={{ min: 0, step: 0.01 }}
             sx={{ mb: 3 }}
             helperText="Entrez le nouveau prix unitaire"
           />
         )}
 
+        {discountType === 'price' && mode==='total' && (
+          <TextField
+            fullWidth
+            label="Nouveau total (€)"
+            type="number"
+            value={newTotal}
+            onChange={(e) => setNewTotal(parseFloat(e.target.value) || 0)}
+            inputProps={{ min: 0, step: 0.01 }}
+            sx={{ mb: 3 }}
+            helperText="Entrez le nouveau total pour cette ligne"
+          />
+        )}
+
         {/* Résumé de la modification */}
-        {(discountValue > 0 || (discountType === 'price' && newPrice > 0)) && (
+        {(discountValue > 0 || (discountType === 'price' && ((mode==='unit' && newUnitPrice > 0) || (mode==='total' && newTotal > 0)))) && (
           <Paper sx={{ p: 2, backgroundColor: '#e8f5e8', mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'center' }}>
               Résumé de la modification
@@ -202,7 +261,7 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography>Nouveau prix unitaire :</Typography>
               <Typography sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                {calculateDiscountedPrice().toFixed(2)} €
+                {calculateDiscountedUnitPrice().toFixed(2)} €
               </Typography>
             </Box>
             

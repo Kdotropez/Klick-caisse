@@ -30,6 +30,8 @@ import {
 import { Product, Category, CartItem, ProductVariation, Transaction } from '../types/Product';
 import { Cashier } from '../types/Cashier';
 import { saveProductionData } from '../data/productionData';
+import { formatEuro } from '../utils/currency';
+import { parsePrice } from '../utils/number';
 import VariationModal from './VariationModal';
 import RecapModal from './RecapModal';
 import PaymentRecapByMethodModal, { PaymentRecapSort } from './modals/PaymentRecapByMethodModal';
@@ -117,6 +119,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Assure une taille minimale visible
     const safe = Math.max(scaled, 0.7);
     return `${safe}${unit || 'rem'}`;
+  };
+
+  // Normaliser les décimaux pour rendre équivalents 8,5 / 8.5 / 8.50 → 8.50
+  const normalizeDecimals = (s: string): string => {
+    if (!s) return s;
+    // Remplacer virgule par point et compléter à 2 décimales si une seule est fournie
+    return s
+      .replace(/,/g, '.')
+      .replace(/(\d+)[.](\d)(?!\d)/g, '$1.$20');
   };
 
   // États pour la modale de déclinaisons
@@ -239,6 +250,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     'Carte': 0
   });
 
+  // Promo verres à 6.50€: seuil 6 unités => -3.85% (arrondi total après)
+  const [glassPromoOffered, setGlassPromoOffered] = useState(false);
+  const [glassPromoApplied, setGlassPromoApplied] = useState(false);
+
   useEffect(() => {
     // Remise auto: 6 easyclickchic → -1€/article (supprimable per-ligne via la croix)
     try {
@@ -279,6 +294,59 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   useEffect(() => {
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
   }, [todayTransactions, computePaymentTotalsFromTransactions]);
+
+  // Détecter éligibilité de la promo
+  useEffect(() => {
+    const target = StorageService.normalizeLabel('verres a 6.50 €');
+    let qty = 0;
+    for (const it of cartItems) {
+      const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+      const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+      if (has) qty += (it.quantity || 0);
+    }
+    const eligible = qty >= 6;
+    setGlassPromoOffered(eligible);
+    if (!eligible && glassPromoApplied) {
+      // retirer remises -3.85% sur ces lignes
+      const next = { ...itemDiscounts } as any;
+      for (const it of cartItems) {
+        const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+        const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+        if (!has) continue;
+        delete next[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
+      }
+      setItemDiscounts(next);
+      setGlassPromoApplied(false);
+    }
+  }, [cartItems]);
+
+  const applyGlassPromo = () => {
+    const target = StorageService.normalizeLabel('verres a 6.50 €');
+    const percent = 3.85;
+    const next = { ...itemDiscounts } as any;
+    for (const it of cartItems) {
+      const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+      const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+      if (!has) continue;
+      const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+      next[key] = { type: 'percent', value: percent };
+    }
+    setItemDiscounts(next);
+    setGlassPromoApplied(true);
+  };
+
+  const refuseGlassPromo = () => {
+    const target = StorageService.normalizeLabel('verres a 6.50 €');
+    const next = { ...itemDiscounts } as any;
+    for (const it of cartItems) {
+      const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+      const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+      if (!has) continue;
+      delete next[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
+    }
+    setItemDiscounts(next);
+    setGlassPromoApplied(false);
+  };
 
   // Si le ticket sélectionné n'existe plus (ex.: vidage), réinitialiser la sélection
   // Nettoyage d'anciens états (modale édition supprimée)
@@ -795,13 +863,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       return matchesSearch;
     }
     
-    // Filtrage par sous-catégorie (priorité sur la catégorie)
+    // Filtrage par sous-catégorie (priorité sur la catégorie) —
+    // si une catégorie est sélectionnée, on impose aussi la catégorie (intersection)
     if (selectedSubcategory) {
-      const normalizeKey = (s: string) => StorageService.normalizeLabel(String(s)).replace(/s$/i, '');
+      const normalizeKey = (s: string) => normalizeDecimals(StorageService.normalizeLabel(String(s)).replace(/s$/i, ''));
       const target = normalizeKey(String(selectedSubcategory));
       const assoc = Array.isArray(product.associatedCategories) ? product.associatedCategories : [];
-      const hasSubcategory = assoc.some(cat => normalizeKey(String(cat)) === target);
-      return hasSubcategory && matchesSearch;
+      let hasSubcategory = assoc.some(cat => normalizeKey(String(cat)) === target);
+
+      // Fallback intelligent pour les VERRES: si pas de tag, déduire par prix
+      if (!hasSubcategory) {
+        const pc = StorageService.normalizeLabel(product.category || '');
+        if (pc === 'verre') {
+          const match = target.match(/(\d+(?:[.]\d+)?)/);
+          if (match) {
+            const targetPrice = parseFloat(match[1]);
+            const equals = (a: number, b: number) => Math.abs(a - b) < 0.001;
+            const baseMatch = Number.isFinite(product.finalPrice) && equals(product.finalPrice, targetPrice);
+            const varMatch = Array.isArray(product.variations) && product.variations.some(v => Number.isFinite(v.finalPrice) && equals(v.finalPrice, targetPrice));
+            if (baseMatch || varMatch) hasSubcategory = true;
+          }
+        }
+      }
+
+      if (!hasSubcategory) return false;
+      if (selectedCategory) {
+        const cat = categories.find(cat => cat.name === product.category);
+        const matchesCategory = !!cat && cat.id === selectedCategory;
+        return matchesCategory && matchesSearch;
+      }
+      return matchesSearch;
     }
     
     // Filtrage par catégorie par défaut
@@ -839,18 +930,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const sortedAndFilteredProducts = isEditMode
     ? filteredProducts
     : [...filteredProducts].sort((a, b) => {
-        if (productSortMode === 'sales') {
-          const qa = dailyQtyByProduct[a.id] || 0;
-          const qb = dailyQtyByProduct[b.id] || 0;
-          if (qa !== qb) return qb - qa;
-        } else if (productSortMode === 'name') {
-          if (a.name !== b.name) return a.name.localeCompare(b.name); // A->Z
-        }
-        // Fallback stable
-        if (a.category !== b.category) return a.category.localeCompare(b.category);
-        if (a.name !== b.name) return a.name.localeCompare(b.name);
-        return a.id.localeCompare(b.id);
-      });
+    if (productSortMode === 'sales') {
+      const qa = dailyQtyByProduct[a.id] || 0;
+      const qb = dailyQtyByProduct[b.id] || 0;
+      if (qa !== qb) return qb - qa;
+    } else if (productSortMode === 'name') {
+      if (a.name !== b.name) return a.name.localeCompare(b.name); // A->Z
+    }
+    // Fallback stable
+    if (a.category !== b.category) return a.category.localeCompare(b.category);
+    if (a.name !== b.name) return a.name.localeCompare(b.name);
+    return a.id.localeCompare(b.id);
+  });
   
   const currentProducts = sortedAndFilteredProducts.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredProducts.length / CARDS_PER_PAGE);
@@ -1239,30 +1330,34 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const name = (values[mapping.name] || 'Produit sans nom').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           // eslint-disable-next-line no-control-regex
           const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
-          const finalPrice = parseFloat(values[mapping.finalPrice]) || 0;
+          const finalPrice = parsePrice(values[mapping.finalPrice]);
           // eslint-disable-next-line no-control-regex
           const ean13 = (values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           // eslint-disable-next-line no-control-regex
           const reference = (values[mapping.reference] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           
           // Traiter les catégories associées
+          // Ne pas couper sur les virgules décimales (ex: "6,50").
+          // On sépare sur: point-virgule ";", pipe "|" ou virgule non suivie d'un chiffre
           // eslint-disable-next-line no-control-regex
           const associatedCategoriesStr = (values[mapping.associatedCategories] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           const associatedCategories = associatedCategoriesStr
-            .split(',')
-            // eslint-disable-next-line no-control-regex
-            .map(cat => cat.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''))
+            .split(/\s*(?:[;|]|,(?!\d))\s*/)
+            .map(cat => StorageService.sanitizeLabel(cat))
+            .map(cat => cat.trim())
             .filter(cat => cat && cat.length > 0);
 
           const wholesalePrice = mapping.wholesalePrice !== -1 ? 
-            parseFloat(values[mapping.wholesalePrice]) || finalPrice * 0.8 : 
+            parsePrice(values[mapping.wholesalePrice]) || finalPrice * 0.8 : 
             finalPrice * 0.8;
 
           // Nettoyer les données
           const cleanName = name.replace(/[^\w\s\-.]/g, '').trim();
           const cleanCategory = category.replace(/[^\w\s\-.]/g, '').trim();
+          // Préserver les décimales (6,50 / 8,50), nettoyage doux via StorageService
           const cleanAssociatedCategories = associatedCategories
-            .map(cat => cat.replace(/[^\w\s\-.]/g, '').trim())
+            .map(cat => StorageService.sanitizeLabel(cat))
+            .map(cat => cat.trim())
             .filter(cat => cat && cat.length > 0);
 
           if (cleanName && cleanName !== 'Produit sans nom') {
@@ -1325,6 +1420,65 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     // Réinitialiser l'input file
     event.target.value = '';
+  };
+
+  // Import des déclinaisons depuis "EXPORT VF DECLINAISONS WYSIWYG.csv"
+  const handleImportVariationsCSV = async (file: File) => {
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
+      if (lines.length < 2) {
+        alert('Fichier déclinaisons invalide');
+        return;
+      }
+      const headers = lines[0].split('\t').map(h => h.trim());
+      const h = (names: string[]) => headers.findIndex(x => names.some(n => x.toLowerCase().includes(n.toLowerCase())));
+      const map = {
+        productId: h(['identifiant produit','id product','id']),
+        varId: h(['identifiant déclinaison','id declinaison','id combination','id_combination']),
+        attributes: h(['liste des attributs','attributes','attribute']),
+        ean13: h(['ean13 décl.','ean13 decl.','ean13']),
+        reference: h(['référence déclinaison','reference declinaison','reference']),
+        impactTtc: h(['impact sur prix de vente ttc','impact ttc','impact sur prix de vente'])
+      } as const;
+      if (map.productId === -1 || map.attributes === -1) {
+        alert('Colonnes clés manquantes dans le CSV déclinaisons');
+        return;
+      }
+      const byProduct: Record<string, any[]> = {};
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split('\t');
+        const pid = (cols[map.productId] || '').trim();
+        if (!pid) continue;
+        const varId = (map.varId !== -1 ? cols[map.varId] : `var_${i}`).trim();
+        const attrs = (cols[map.attributes] || '').trim();
+        const ean = map.ean13 !== -1 ? (cols[map.ean13] || '').trim() : '';
+        const ref = map.reference !== -1 ? (cols[map.reference] || '').trim() : '';
+        const impact = map.impactTtc !== -1 ? parsePrice(cols[map.impactTtc]) : 0;
+        if (!byProduct[pid]) byProduct[pid] = [];
+        byProduct[pid].push({ id: varId, attributes: attrs, ean13: ean, reference: ref, priceImpact: impact });
+      }
+      // Mettre à jour les produits existants par identifiant exact
+      const updated = products.map(p => {
+        const list = byProduct[p.id];
+        if (!list || list.length === 0) return p;
+        const base = typeof p.finalPrice === 'number' ? p.finalPrice : 0;
+        const variations = list.map(v => ({
+          id: v.id || `var_${Date.now()}`,
+          ean13: v.ean13 || '',
+          reference: v.reference || '',
+          attributes: v.attributes || '',
+          priceImpact: v.priceImpact || 0,
+          finalPrice: Math.max(0, base + (v.priceImpact || 0))
+        }));
+        return { ...p, variations };
+      });
+      if (onProductsReorder) onProductsReorder(updated);
+      saveProductionData(updated, categories);
+      alert('Déclinaisons importées et mises à jour.');
+    } catch (e) {
+      alert('Erreur import déclinaisons.');
+    }
   };
 
   // Backup: exporter tout en JSON
@@ -1507,6 +1661,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onResetCartAndDiscounts={() => { setItemDiscounts({}); setGlobalDiscount(null); cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); }}
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
+            promoBanner={glassPromoOffered ? (
+              <Box sx={{ p: 1, bgcolor: '#fff8e1', borderBottom: '1px solid #ffe082', display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Promo verres 6,50€: -3,85% (6 verres) • {glassPromoApplied ? 'appliquée' : 'disponible'}</Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  {!glassPromoApplied && <Button size="small" variant="contained" onClick={applyGlassPromo}>Appliquer</Button>}
+                  {glassPromoApplied && <Button size="small" variant="outlined" onClick={refuseGlassPromo}>Retirer</Button>}
+                </Box>
+              </Box>
+            ) : null}
           />
         );
 
@@ -1519,17 +1682,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 <Button
                   variant={selectedCategory === null ? 'contained' : 'outlined'}
                   onClick={() => { setSelectedCategory(null); setSelectedSubcategory(null); }}
-                  sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                  sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0, fontSize: '0.75rem', py: 0.25, px: 1 }}
                 >
                   Toutes
                 </Button>
                 <Box ref={categoriesScrollRef} sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', overflowX: 'auto', overflowY: 'hidden', '&::-webkit-scrollbar': { display: 'none' } }}>
-                  {categories.map((category) => (
+                  {categories
+                    .filter(c => !categorySearchTerm || StorageService.normalizeLabel(c.name).includes(StorageService.normalizeLabel(categorySearchTerm)))
+                    .map((category) => (
                     <Button
                       key={category.id}
                       variant={selectedCategory === category.id ? 'contained' : 'outlined'}
                       onClick={() => { setSelectedCategory(category.id); setSelectedSubcategory(null); }}
-                      sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                      sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0, fontSize: '0.75rem', py: 0.25, px: 1 }}
                     >
                       {category.name}
                     </Button>
@@ -1543,15 +1708,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               {(() => {
                 // Construire la liste en dédupliquant sur une clé normalisée (insensible accents/casse)
                 const selectedCatName = selectedCategory ? (categories.find(c => c.id === selectedCategory)?.name || '') : '';
-                const normSelected = StorageService.normalizeLabel(selectedCatName);
+                const catKey = (s: string) => StorageService.normalizeLabel(s);
+                const normSelected = catKey(selectedCatName);
                 const normToDisplay = new Map<string, string>();
                 for (const p of products) {
-                  if (selectedCatName) {
-                    const pc = StorageService.normalizeLabel(p.category || '');
-                    if (pc !== normSelected) continue;
-                  }
+                   if (selectedCatName) {
+                     const pc = catKey(p.category || '');
+                     if (pc !== normSelected) continue;
+                   }
                   if (Array.isArray(p.associatedCategories)) {
-                    const cleaned = p.associatedCategories
+                     const cleaned = p.associatedCategories
                       .map(sc => String(sc || '').trim())
                       .filter(sc => sc && sc !== '\\u0000')
                       .filter(sc => {
@@ -1559,21 +1725,34 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                         const alnum = norm.replace(/[^a-z0-9]/g, '');
                         return alnum.length >= 2;
                       });
-                    for (const n of cleaned) {
-                      const norm = StorageService.normalizeLabel(n);
-                      const keySingular = norm.replace(/s$/i, '');
-                      const key = keySingular || norm;
+                for (const n of cleaned) {
+                  const norm = StorageService.normalizeLabel(n);
+                  const key = normalizeDecimals(norm);
                       if (!normToDisplay.has(key)) normToDisplay.set(key, n);
                     }
                   }
                 }
                 let list = Array.from(normToDisplay.values()).sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+                // Si catégorie VERRE sélectionnée, forcer l'affichage des sous-catégories canoniques
+                if (selectedCategory && normSelected === 'verre') {
+                  const canonical = ['VERRES 4', 'VERRES 6.50', 'VERRES 8.50', 'VERRES 10', 'VERRES 12'];
+                  const existingKeys = new Set(list.map(s => normalizeDecimals(StorageService.normalizeLabel(s))));
+                  for (const label of canonical) {
+                    const key = normalizeDecimals(StorageService.normalizeLabel(label));
+                    if (!existingKeys.has(key)) {
+                      list.push(label);
+                      existingKeys.add(key);
+                    }
+                  }
+                  // Réordonner après ajout
+                  list = list.sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+                }
                 // Appliquer l'ordre personnalisé si défini pour la catégorie sélectionnée
                 if (selectedCategory) {
                   const cat = categories.find(c => c.id === selectedCategory);
                   const order = (cat && (cat as any).subcategoryOrder) as string[] | undefined;
-                  if (order && Array.isArray(order) && order.length > 0) {
-                    const norm = (s: string) => StorageService.normalizeLabel(s).replace(/s$/i, '');
+                   if (order && Array.isArray(order) && order.length > 0) {
+                     const norm = (s: string) => StorageService.normalizeLabel(s);
                     list.sort((a, b) => {
                       const ia = order.findIndex(o => norm(o) === norm(a));
                       const ib = order.findIndex(o => norm(o) === norm(b));
@@ -1584,12 +1763,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     });
                   }
                 }
-                // Si aucune catégorie n'est sélectionnée et qu'une sous-catégorie est active,
-                // n'afficher que cette sous-catégorie dans la barre (priorité à la sous-catégorie)
-                if (!selectedCategory && selectedSubcategory) {
-                  const current = String(selectedSubcategory);
-                  list = [current];
-                }
+                // En "Toute catégorie", garder l'affichage complet des sous-catégories dans la barre
+                // même si une sous-catégorie est sélectionnée (on ne filtre que la grille)
                 if (list.length === 0 && !selectedCategory) {
                   try {
                     const registry = StorageService.loadSubcategories();
@@ -1598,29 +1773,30 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     list = [];
                   }
                 }
-                const normSelectedSub = StorageService.normalizeLabel(String(selectedSubcategory || '')).replace(/s$/i, '');
+                const normSelectedSub = StorageService.normalizeLabel(String(selectedSubcategory || ''));
                 return (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                     <Button
                       size="small"
                       variant={selectedSubcategory === null ? 'contained' : 'outlined'}
                       onClick={() => setSelectedSubcategory(null)}
-                      sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                      sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0, fontSize: '0.72rem', py: 0.2, px: 0.8 }}
                     >
                       Toutes
                     </Button>
                     <Box ref={subcategoriesScrollRef} sx={{ display: 'flex', gap: 0.75, alignItems: 'center', overflowX: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
-                      {list.map(sc => {
+                      {list
+                        .filter(sc => !subcategorySearchTerm || StorageService.normalizeLabel(sc).includes(StorageService.normalizeLabel(subcategorySearchTerm)))
+                        .map(sc => {
                         const norm = StorageService.normalizeLabel(sc);
-                        const singular = norm.replace(/s$/i, '');
-                        const isActive = singular === normSelectedSub;
+                        const isActive = norm === normSelectedSub;
                         return (
                           <Button
                             key={sc}
                             size="small"
                             variant={isActive ? 'contained' : 'outlined'}
                             onClick={() => setSelectedSubcategory(sc)}
-                            sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0 }}
+                            sx={{ textTransform: 'none', whiteSpace: 'nowrap', minWidth: 'fit-content', flexShrink: 0, fontSize: '0.72rem', py: 0.2, px: 0.8 }}
                           >
                             {sc}
                           </Button>
@@ -1632,8 +1808,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               })()}
             </Box>
 
-            {/* Ligne 2: Recherche + création + suppression séléction */}
-            <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center' }}>
+            {/* Ligne 2: Recherches */}
+            <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center', borderBottom: '1px solid #eee' }}>
               <TextField
                 size="small"
                 placeholder="Rechercher article..."
@@ -1642,31 +1818,27 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 value={searchTerm}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               />
-              <Button
+              <TextField
+                size="small"
+                placeholder="Rechercher catégorie..."
                 variant="outlined"
+                sx={{ width: 220 }}
+                value={categorySearchTerm}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCategorySearchTerm(e.target.value)}
+              />
+              <TextField
                 size="small"
-                onClick={() => {
-                  setSearchTerm('');
-                  setCategorySearchTerm('');
-                  setSubcategorySearchTerm('');
-                  setSelectedCategory(null);
-                  setSelectedSubcategory(null);
-                  setCurrentPage(1);
-                  // Remettre la vue sur "Toutes"
-                  if (categoriesScrollRef.current) categoriesScrollRef.current.scrollLeft = 0;
-                  if (subcategoriesScrollRef.current) subcategoriesScrollRef.current.scrollLeft = 0;
-                }}
-              >
-                Reset
-              </Button>
-              <Button
-                variant={isEditMode ? 'outlined' : 'contained'}
-                size="small"
-                onClick={() => setIsEditMode(!isEditMode)}
-              >
-                {isEditMode ? 'Mode vente' : 'Modifier article'}
-              </Button>
-              {isEditMode && selectedProductsForDeletion.size > 0 && (
+                placeholder="Rechercher sous-catégorie..."
+                variant="outlined"
+                sx={{ width: 240 }}
+                value={subcategorySearchTerm}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSubcategorySearchTerm(e.target.value)}
+              />
+            </Box>
+
+            {/* Ligne 3: suppression sélection (reste en place si besoin) */}
+            {isEditMode && selectedProductsForDeletion.size > 0 && (
+              <Box sx={{ p: 1, borderBottom: '1px solid #eee' }}>
                 <Button
                   variant="contained"
                   color="error"
@@ -1683,8 +1855,42 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 >
                   Supprimer ({selectedProductsForDeletion.size})
                 </Button>
-              )}
+              </Box>
+            )}
+
+            {/* Ligne 4: boutons Reset / Modifier article / Nouvel article / Gérer sous-catégories */}
+            <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-end', borderTop: '1px solid #eee' }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  setSearchTerm('');
+                  setCategorySearchTerm('');
+                  setSubcategorySearchTerm('');
+                  setSelectedCategory(null);
+                  setSelectedSubcategory(null);
+                  setCurrentPage(1);
+                  if (categoriesScrollRef.current) categoriesScrollRef.current.scrollLeft = 0;
+                  if (subcategoriesScrollRef.current) subcategoriesScrollRef.current.scrollLeft = 0;
+                }}
+              >
+                Reset
+              </Button>
+              <Button
+                variant={isEditMode ? 'outlined' : 'contained'}
+                size="small"
+                onClick={() => setIsEditMode(!isEditMode)}
+              >
+                {isEditMode ? 'Mode vente' : 'Modifier article'}
+              </Button>
               <Button variant="contained" size="small" onClick={handleCreateNewProduct}>➕ Nouvel article</Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setShowSubcategoryManagementModal(true)}
+              >
+                Gérer sous-catégories
+              </Button>
             </Box>
           </Box>
               );
@@ -1713,6 +1919,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             getScaledFontSize={getScaledFontSize}
             importStatus={importStatus}
             onImportCSV={handleImportCSV}
+            onImportVariationsCSV={(file)=>handleImportVariationsCSV(file)}
             onOpenCategoryManagement={() => setShowCategoryManagementModal(true)}
             onOpenSubcategoryManagement={() => setShowSubcategoryManagementModal(true)}
             isEditMode={isEditMode}
@@ -1943,6 +2150,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          cartItems={cartItems}
          onApplyDiscount={applyGlobalDiscount}
         onApplyItemDiscount={applyItemDiscount}
+         onRemoveItemDiscount={(itemId, variationId)=>{
+           const key = `${itemId}-${variationId || 'main'}`;
+           const next = { ...itemDiscounts } as any;
+           delete next[key];
+           setItemDiscounts(next);
+         }}
        />
 
        {/* Modale de gestion des catégories */}

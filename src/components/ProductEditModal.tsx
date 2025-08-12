@@ -15,10 +15,12 @@ import {
   IconButton,
   Divider,
   Alert,
-  Grid
+  Grid,
+  Chip
 } from '@mui/material';
 import { Close, Add, Delete, Edit } from '@mui/icons-material';
 import { Product, Category, ProductVariation } from '../types/Product';
+import { StorageService } from '../services/StorageService';
 
 interface ProductEditModalProps {
   open: boolean;
@@ -46,6 +48,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
   });
   const [showVariationForm, setShowVariationForm] = useState(false);
   const [error, setError] = useState('');
+  const [newSubcategory, setNewSubcategory] = useState<string>('');
 
   useEffect(() => {
     if (product) {
@@ -60,6 +63,34 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     setEditedProduct({
       ...editedProduct,
       [field]: value
+    });
+  };
+
+  const addSubcategory = (raw: string) => {
+    if (!editedProduct) return;
+    const label = StorageService.sanitizeLabel(String(raw || ''))
+      .trim();
+    if (!label) return;
+    const norm = StorageService.normalizeLabel(label);
+    const alnum = norm.replace(/[^a-z0-9]/g, '');
+    if (alnum.length < 2) return;
+    const existing = Array.isArray(editedProduct.associatedCategories) ? editedProduct.associatedCategories : [];
+    const hasAlready = existing.some(s => StorageService.normalizeLabel(String(s)).replace(/s$/i,'') === norm.replace(/s$/i,''));
+    if (hasAlready) return;
+    setEditedProduct({
+      ...editedProduct,
+      associatedCategories: [...existing, label]
+    });
+    setNewSubcategory('');
+  };
+
+  const removeSubcategory = (label: string) => {
+    if (!editedProduct) return;
+    const next = (Array.isArray(editedProduct.associatedCategories) ? editedProduct.associatedCategories : [])
+      .filter(s => s !== label);
+    setEditedProduct({
+      ...editedProduct,
+      associatedCategories: next
     });
   };
 
@@ -246,6 +277,39 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
               label="Référence"
               value={editedProduct.reference}
               onChange={(e) => handleInputChange('reference', e.target.value)}
+              sx={{ mb: 2 }}
+            />
+          </Grid>
+
+          {/* Sous-catégories */}
+          <Grid item xs={12}>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="h6" sx={{ mb: 1.5, color: '#1976d2', fontWeight: 'bold' }}>
+              Sous-catégories
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+              {(editedProduct.associatedCategories || []).map((sc) => (
+                <Chip
+                  key={sc}
+                  label={sc}
+                  onDelete={() => removeSubcategory(sc)}
+                  sx={{ backgroundColor: '#e3f2fd' }}
+                />
+              ))}
+            </Box>
+            <TextField
+              fullWidth
+              label="Ajouter une sous-catégorie"
+              placeholder="Saisir et appuyer sur Entrée ou virgule"
+              value={newSubcategory}
+              onChange={(e) => setNewSubcategory(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                  e.preventDefault();
+                  addSubcategory(newSubcategory);
+                }
+              }}
+              onBlur={() => addSubcategory(newSubcategory)}
               sx={{ mb: 2 }}
             />
           </Grid>

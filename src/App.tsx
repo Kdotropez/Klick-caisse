@@ -97,6 +97,50 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, categories]);
 
+  // Migration ciblée: corriger les sous-catégories "VERRE" approximatives (verre 6 -> VERRES 6.50, etc.)
+  useEffect(() => {
+    const FLAG = 'fix_glass_subcats_v2';
+    if (localStorage.getItem(FLAG)) return;
+    if (products.length === 0) return;
+
+    const norm = (s: string) => StorageService.normalizeLabel(s);
+    const canonical = (s: string) => s.trim();
+
+    const mapLabel = (label: string): string => {
+      const n = norm(label);
+      // Variantes 6.50
+      if (/^verres?\s*6(\s|$)/.test(n) || /^verres?\s*6[\.,]?\s*5\s*0?\s*$/.test(n)) return 'VERRES 6.50';
+      // Variantes 8.50
+      if (/^verres?\s*8(\s|$)/.test(n) || /^verres?\s*8[\.,]?\s*5\s*0?\s*$/.test(n)) return 'VERRES 8.50';
+      // 10
+      if (/^verres?\s*10\b/.test(n)) return 'VERRES 10';
+      // 12
+      if (/^verres?\s*12\b/.test(n)) return 'VERRES 12';
+      // 4
+      if (/^verres?\s*4\b/.test(n)) return 'VERRES 4';
+      return canonical(label);
+    };
+
+    const updated = products.map(p => {
+      if (norm(p.category) !== 'verre') return p;
+      const assoc = Array.isArray(p.associatedCategories) ? p.associatedCategories : [];
+      if (assoc.length === 0) return p;
+      const next = Array.from(new Set(assoc.map(mapLabel)));
+      if (next.some((v, i) => v !== assoc[i]) || next.length !== assoc.length) {
+        return { ...p, associatedCategories: next };
+      }
+      return p;
+    });
+
+    const changed = updated.some((p, i) => p !== products[i]);
+    if (changed) {
+      setProducts(updated);
+      saveProductionData(updated, categories);
+      StorageService.saveProducts(updated);
+    }
+    localStorage.setItem(FLAG, '1');
+  }, [products, categories]);
+
   const handleImportComplete = (importedProducts: Product[], importedCategories: Category[]) => {
     setProducts(importedProducts);
     setCategories(importedCategories);

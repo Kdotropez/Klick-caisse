@@ -23,6 +23,7 @@ interface GlobalDiscountModalProps {
   cartItems: CartItem[];
   onApplyDiscount: (discountType: 'euro' | 'percent', value: number) => void;
   onApplyItemDiscount?: (itemId: string, variationId: string | null, discountType: 'euro' | 'percent' | 'price', value: number) => void;
+  onRemoveItemDiscount?: (itemId: string, variationId: string | null) => void;
 }
 
 interface DiscountItem {
@@ -39,6 +40,7 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
   cartItems,
   onApplyDiscount,
   onApplyItemDiscount,
+  onRemoveItemDiscount,
 }) => {
   const [selectedDiscount, setSelectedDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -49,6 +51,9 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
     label: '', 
     description: '' 
   });
+  const [newTotalTicket, setNewTotalTicket] = useState<number>(0);
+  const [promoMode, setPromoMode] = useState<'unit'|'total'>('unit');
+  const [hideEasyclickPromo, setHideEasyclickPromo] = useState<boolean>(() => localStorage.getItem('hide_easyclickchic_promo') === '1');
 
   const [predefinedDiscounts, setPredefinedDiscounts] = useState<DiscountItem[]>(() => {
     const saved = localStorage.getItem('predefinedDiscounts');
@@ -187,9 +192,14 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
 
       <DialogContent sx={{ pt: 3 }}>
         {/* Promotions proposées (appliquer manuellement) */}
+        {!hideEasyclickPromo && (
         <Paper sx={{ p: 2, mb: 2, backgroundColor: '#fffef5', border: '1px solid #ffe082' }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Promotions proposées</Typography>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1, mr: 1 }}>
+              <Button size="small" variant={promoMode==='unit'?'contained':'outlined'} onClick={()=>setPromoMode('unit')}>Par unité</Button>
+              <Button size="small" variant={promoMode==='total'?'contained':'outlined'} onClick={()=>setPromoMode('total')}>Par total</Button>
+            </Box>
             <Button
               variant={easyclickPromo.eligible ? 'contained' : 'outlined'}
               color={easyclickPromo.eligible ? 'warning' : 'inherit'}
@@ -197,21 +207,73 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
               onClick={() => {
                 if (!onApplyItemDiscount) return;
                 const target = StorageService.normalizeLabel('easyclickchic');
+                let totalQty = 0;
                 for (const it of cartItems) {
                   const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
                   const has = list.some((c) => StorageService.normalizeLabel(String(c)).includes(target));
-                  if (has) {
-                    onApplyItemDiscount(it.product.id, it.selectedVariation?.id || null, 'euro', 1);
-                  }
+                  if (!has) continue;
+                  totalQty += (it.quantity||0);
+                }
+                const totalDiscount = totalQty * 1; // 1€ par article éligible
+                for (const it of cartItems) {
+                  const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+                  const has = list.some((c) => StorageService.normalizeLabel(String(c)).includes(target));
+                  if (!has) continue;
+                  const perUnit = promoMode==='unit' ? 1 : (totalQty>0 ? totalDiscount/totalQty : 0);
+                  if (perUnit > 0) onApplyItemDiscount(it.product.id, it.selectedVariation?.id || null, 'euro', perUnit);
                 }
               }}
             >
               6 EASYCLICKCHIC → −1€ / article {easyclickPromo.eligible ? `(${easyclickPromo.totalQty})` : ''}
             </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              disabled={!onRemoveItemDiscount}
+              onClick={() => {
+                if (!onRemoveItemDiscount) return;
+                const target = StorageService.normalizeLabel('easyclickchic');
+                for (const it of cartItems) {
+                  const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+                  const has = list.some((c) => StorageService.normalizeLabel(String(c)).includes(target));
+                  if (!has) continue;
+                  onRemoveItemDiscount(it.product.id, it.selectedVariation?.id || null);
+                }
+              }}
+            >
+              Retirer promo EASYCLICKCHIC
+            </Button>
+            <Button
+              variant="text"
+              size="small"
+              sx={{ color: '#d32f2f' }}
+              onClick={() => { localStorage.setItem('hide_easyclickchic_promo','1'); setHideEasyclickPromo(true); }}
+            >
+              Supprimer cette promo de la modale
+            </Button>
           </Box>
           <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.secondary' }}>
             Ces remises ne s'appliquent que si vous cliquez dessus; aucune application automatique.
           </Typography>
+        </Paper>
+        )}
+        {/* Fixer directement le total du ticket */}
+        <Paper sx={{ p: 2, mb: 2, backgroundColor: '#f9f9ff', border: '1px solid #bbdefb' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Fixer le total du ticket</Typography>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <TextField size="small" type="number" value={newTotalTicket}
+              onChange={(e)=>setNewTotalTicket(parseFloat(e.target.value)||0)}
+              inputProps={{ min: 0, step: 0.01 }} sx={{ width: 140 }} placeholder="Nouveau total (€)" />
+            <Button variant="contained" size="small" disabled={newTotalTicket<=0}
+              onClick={()=>{
+                const delta = Math.max(0, originalTotal - newTotalTicket);
+                onApplyDiscount('euro', delta);
+                onClose();
+              }}>Appliquer</Button>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              Total actuel: {originalTotal.toFixed(2)} €
+            </Typography>
+          </Box>
         </Paper>
         {!isEditMode && (
           <Typography variant="body2" sx={{ mb: 3, textAlign: 'center', color: 'text.secondary' }}>
@@ -396,7 +458,7 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
            })}
          </Box>
 
-        {selectedDiscount && (
+         {selectedDiscount && (
           <Paper sx={{ p: 2, backgroundColor: '#e8f5e8', mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'center' }}>
               Résumé de la remise sélectionnée

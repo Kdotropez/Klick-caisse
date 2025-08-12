@@ -7,6 +7,7 @@ interface SettingsPanelProps {
   getScaledFontSize: (baseSize: string) => string;
   importStatus: string;
   onImportCSV: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportVariationsCSV?: (file: File) => void;
   onOpenCategoryManagement: () => void;
   onOpenSubcategoryManagement: () => void;
   isEditMode: boolean;
@@ -29,6 +30,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onImportCSV,
   onOpenCategoryManagement,
   onOpenSubcategoryManagement,
+  onImportVariationsCSV,
   isEditMode,
   onToggleEditMode,
   selectedProductsForDeletionSize,
@@ -56,6 +58,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     input.onchange = (e: any) => {
       const file = e.target?.files?.[0];
       if (file && onImportAll) onImportAll(file);
+    };
+    input.click();
+  };
+
+  const handleSelectVariationsCSV = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (e: any) => {
+      const file = e.target?.files?.[0];
+      if (file && onImportVariationsCSV) onImportVariationsCSV(file);
     };
     input.click();
   };
@@ -114,6 +127,26 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           {importStatus === 'importing' ? 'Import...' : 'Import CSV'}
         </Button>
       </label>
+
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#3949ab',
+          '&:hover': { backgroundColor: '#303f9f' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={handleSelectVariationsCSV}
+      >
+        Importer déclinaisons (CSV)
+      </Button>
 
       <Button
         variant="contained"
