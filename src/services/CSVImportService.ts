@@ -12,7 +12,9 @@ export class CSVImportService {
     try {
       const text = await file.text();
       const lines = text.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
+      // Détecter séparateur (tabulation prioritaire, sinon virgule)
+      const sep = lines[0].includes('\t') ? '\t' : ',';
+      const headers = lines[0].split(sep).map(h => h.trim());
       
       const products: Product[] = [];
       const categories: Category[] = [];
@@ -23,7 +25,7 @@ export class CSVImportService {
         const line = lines[i].trim();
         if (!line) continue;
 
-        const values = line.split(',').map(v => v.trim());
+        const values = line.split(sep).map(v => v.trim());
         if (values.length < headers.length) continue;
 
         const row: any = {};
@@ -68,26 +70,28 @@ export class CSVImportService {
 
   private static createProductFromRow(row: any, mapping: any): Product | null {
     try {
-      const name = row[mapping.name] || 'Produit sans nom';
-      const category = row[mapping.category] || 'Général';
-      const price = parseFloat(row[mapping.price]) || 0;
-      const ean = row[mapping.ean] || '';
+      const name = row[mapping['Nom']] || row[mapping.name] || 'Produit sans nom';
+      const category = row[mapping['Nom catégorie par défaut']] || row[mapping.category] || 'Général';
+      const price = parseFloat(String(row[mapping['Prix de vente TTC final']] || row[mapping.price] || '0').replace(',', '.')) || 0;
+      const ean = row[mapping['ean13']] || row[mapping.ean] || '';
 
       // Extraire les catégories associées si le mapping existe
-      const associatedCategories = mapping.associatedCategories ? 
-        (row[mapping.associatedCategories] || '').split(',').map((cat: string) => cat.trim()).filter((cat: string) => cat) : 
-        [];
+      const rawAssoc = row[mapping['catégories associées']] || row[mapping.associatedCategories] || '';
+      const associatedCategories = String(rawAssoc)
+        .split(/\s*(?:[;|]|,(?!\d))\s*/)
+        .map((cat: string) => cat.trim())
+        .filter((cat: string) => !!cat);
 
       return {
-        id: `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: String(row[mapping['Identifiant produit']] || row[mapping.id] || `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`),
         name,
         category,
         associatedCategories,
         finalPrice: price,
         ean13: ean,
-        reference: '',
-        wholesalePrice: price,
-        crossedPrice: price,
+        reference: row[mapping['Référence']] || '',
+        wholesalePrice: parseFloat(String(row[mapping['wholesale_price']] || price).replace(',', '.')) || price,
+        crossedPrice: parseFloat(String(row[mapping['Prix barré TTC']] || price).replace(',', '.')) || price,
         salesCount: 0,
         position: 0,
         remisable: true, // Par défaut, tous les produits sont remisables
