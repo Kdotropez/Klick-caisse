@@ -176,8 +176,8 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                 minHeight: 0,
                 background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}80 30%, ${categoryColor}40 70%, white 100%)`,
                 border: `1px solid ${categoryColor}`,
-                borderRadius: `8px`,
-                boxShadow: `0 1px 2px rgba(0,0,0,0.1)`,
+                borderRadius: `12px`,
+                boxShadow: `0 2px 8px rgba(0,0,0,0.08)`,
                 color: '#2c3e50',
                 fontWeight: '600',
                 boxSizing: 'border-box',
@@ -288,7 +288,10 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                     display: '-webkit-box',
                     WebkitLineClamp: 3,
                     WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                    alignItems: 'center'
                   }}
                 >
                   {product.name}

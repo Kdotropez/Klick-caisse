@@ -1837,7 +1837,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               />
             </Box>
 
-            {/* Ligne 3+4 combinées: Supprimer (si sélection) + Reset / Modifier article / Nouvel article / Gérer sous-catégories */}
+            {/* Ligne 3+4 combinées: Supprimer (si sélection) + Tri / Reset / Modifier article / Nouvel article / Gérer sous-catégories */}
             <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #eee', flexWrap: 'nowrap' }}>
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', minWidth: 0 }}>
                 {isEditMode && selectedProductsForDeletion.size > 0 && (
@@ -1860,22 +1860,30 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 )}
               </Box>
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexShrink: 0 }}>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => {
-                  setSearchTerm('');
-                  setCategorySearchTerm('');
-                  setSubcategorySearchTerm('');
-                  setSelectedCategory(null);
-                  setSelectedSubcategory(null);
-                  setCurrentPage(1);
-                  if (categoriesScrollRef.current) categoriesScrollRef.current.scrollLeft = 0;
-                  if (subcategoriesScrollRef.current) subcategoriesScrollRef.current.scrollLeft = 0;
-                }}
-              >
-                Reset
-              </Button>
+                <Button
+                  variant={productSortMode === 'sales' ? 'contained' : 'outlined'}
+                  size="small"
+                  onClick={() => setProductSortMode(productSortMode === 'sales' ? 'name' : 'sales')}
+                  sx={{ textTransform: 'none', fontSize: '0.75rem' }}
+                >
+                  {productSortMode === 'sales' ? 'Alphabétique' : 'Plus vendus'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setCategorySearchTerm('');
+                    setSubcategorySearchTerm('');
+                    setSelectedCategory(null);
+                    setSelectedSubcategory(null);
+                    setCurrentPage(1);
+                    if (categoriesScrollRef.current) categoriesScrollRef.current.scrollLeft = 0;
+                    if (subcategoriesScrollRef.current) subcategoriesScrollRef.current.scrollLeft = 0;
+                  }}
+                >
+                  Reset
+                </Button>
                 <Button
                   variant={isEditMode ? 'outlined' : 'contained'}
                   size="small"
