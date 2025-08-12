@@ -30,7 +30,7 @@ import {
 import { Product, Category, CartItem, ProductVariation, Transaction } from '../types/Product';
 import { Cashier } from '../types/Cashier';
 import { saveProductionData } from '../data/productionData';
-import { formatEuro } from '../utils/currency';
+// import { formatEuro } from '../utils/currency';
 import { parsePrice } from '../utils/number';
 import VariationModal from './VariationModal';
 import RecapModal from './RecapModal';
@@ -251,8 +251,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   });
 
   // Promo verres à 6.50€: seuil 6 unités => -3.85% (arrondi total après)
+  // États d'information (pas utilisés dans l'UI, mais utiles pour logique interne)
   const [glassPromoOffered, setGlassPromoOffered] = useState(false);
   const [glassPromoApplied, setGlassPromoApplied] = useState(false);
+  const [activePromos, setActivePromos] = useState<Array<{ label: string; percent: number }>>([]);
 
   useEffect(() => {
     // Remise auto: 6 easyclickchic → -1€/article (supprimable per-ligne via la croix)
@@ -295,50 +297,64 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
   }, [todayTransactions, computePaymentTotalsFromTransactions]);
 
-  // Détecter éligibilité de la promo et auto-appliquer
+  // Détecter éligibilité des promos et auto-appliquer
   useEffect(() => {
-    const target = normalizeDecimals(StorageService.normalizeLabel('verres 6.50'));
-    let qty = 0;
-    for (const it of cartItems) {
-      const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-      const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
-      if (has) qty += (it.quantity || 0);
-    }
-    const eligible = qty >= 6; // "> 5" verres
-    setGlassPromoOffered(eligible);
+    const PROMO_RULES: Array<{ label: string; percent: number }> = [
+      { label: 'verres 4', percent: 4.17 },
+      { label: 'verres 6.50', percent: 3.85 },
+      { label: 'verres 8.50', percent: 3.92 },
+      { label: 'verres 10', percent: 5.0 },
+      { label: 'verres 12', percent: 5.56 },
+      { label: 'calice metzl', percent: 5.0 },
+    ];
 
-    if (!eligible) {
-      if (glassPromoApplied) {
-        // retirer remises -3.85% sur ces lignes
-        const next = { ...itemDiscounts } as any;
+    const normalizeKey = (s: string) => normalizeDecimals(StorageService.normalizeLabel(String(s)));
+
+    // Calculer les promos actives (>=6 unités) et appliquer/retirer
+    const next = { ...itemDiscounts } as any;
+    const newlyActive: Array<{ label: string; percent: number }> = [];
+
+    for (const rule of PROMO_RULES) {
+      const target = normalizeKey(rule.label);
+      let qty = 0;
+      for (const it of cartItems) {
+        const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+        const has = list.some((c) => normalizeKey(c) === target);
+        if (has) qty += (it.quantity || 0);
+      }
+      const eligible = qty >= 6;
+      if (eligible) {
+        newlyActive.push(rule);
         for (const it of cartItems) {
           const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-          const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
+          const has = list.some((c) => normalizeKey(c) === target);
           if (!has) continue;
-          delete next[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
+          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+          if (!next[key] || next[key].type !== 'percent' || next[key].value !== rule.percent) {
+            next[key] = { type: 'percent', value: rule.percent };
+          }
         }
-        setItemDiscounts(next);
-        setGlassPromoApplied(false);
+      } else {
+        // Retirer la remise pour cette règle
+        for (const it of cartItems) {
+          const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+          const has = list.some((c) => normalizeKey(c) === target);
+          if (!has) continue;
+          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+          if (next[key] && next[key].type === 'percent' && Math.abs(next[key].value - rule.percent) < 1e-6) {
+            delete next[key];
+          }
+        }
       }
-      return;
     }
 
-    // Auto-appliquer sur toutes les lignes éligibles
-    const next = { ...itemDiscounts } as any;
-    let applied = false;
-    for (const it of cartItems) {
-      const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-      const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
-      if (!has) continue;
-      const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-      // Forcer la remise -3.85% sur les lignes concernées
-      if (!next[key] || next[key].type !== 'percent' || next[key].value !== 3.85) {
-        next[key] = { type: 'percent', value: 3.85 };
-        applied = true;
-      }
-    }
-    if (applied) setItemDiscounts(next);
-    setGlassPromoApplied(true);
+    setActivePromos(newlyActive);
+    setGlassPromoOffered(newlyActive.length > 0);
+    setGlassPromoApplied(newlyActive.length > 0);
+    // Mettre à jour les remises si changement de mappage
+    const changed = Object.keys(next).length !== Object.keys(itemDiscounts).length ||
+      Object.keys(next).some(k => JSON.stringify(next[k]) !== JSON.stringify((itemDiscounts as any)[k]));
+    if (changed) setItemDiscounts(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartItems]);
 
@@ -1657,13 +1673,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onResetCartAndDiscounts={() => { setItemDiscounts({}); setGlobalDiscount(null); cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); }}
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
-            promoBanner={glassPromoOffered ? (
-              <Box sx={{ p: 1, bgcolor: '#fff8e1', borderBottom: '1px solid #ffe082' }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Remise automatique verres 6,50€: -3,85% dès 6 verres (retirable ligne par ligne via la croix rouge)
-                </Typography>
-              </Box>
-            ) : null}
+            promoBanner={null}
           />
         );
 
