@@ -121,6 +121,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return `${safe}${unit || 'rem'}`;
   };
 
+  // Normalisation unifiée des sous-catégories (labels et tags produits)
+  const normalizeSubcategory = useCallback((input: string) => {
+    const base = normalizeDecimals(StorageService.normalizeLabel(String(input || '')).replace(/,/g, '.'));
+    return base.replace(/[^a-z0-9. ]/g, '').replace(/\s+/g, ' ').trim();
+  }, []);
+
   // Normaliser les décimaux pour rendre équivalents 8,5 / 8.5 / 8.50 → 8.50
   const normalizeDecimals = (s: string): string => {
     if (!s) return s;
@@ -856,14 +862,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Filtrage par sous-catégorie (priorité sur la catégorie) —
     // si une catégorie est sélectionnée, on impose aussi la catégorie (intersection)
     if (selectedSubcategory) {
-      const normalizeKey = (s: string) => {
-        const base = normalizeDecimals(StorageService.normalizeLabel(String(s)).replace(/,/g, '.'));
-        // Garder uniquement lettres, chiffres, point et espaces, puis compacter
-        return base.replace(/[^a-z0-9. ]/g, '').replace(/\s+/g, ' ').trim();
-      };
-      const target = normalizeKey(String(selectedSubcategory));
+      const target = normalizeSubcategory(String(selectedSubcategory));
       const assoc = Array.isArray(product.associatedCategories) ? product.associatedCategories : [];
-      let hasSubcategory = assoc.some(cat => normalizeKey(String(cat)) === target);
+      let hasSubcategory = assoc.some(cat => normalizeSubcategory(String(cat)) === target);
 
 
       if (!hasSubcategory) return false;
