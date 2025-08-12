@@ -296,13 +296,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
   }, [todayTransactions, computePaymentTotalsFromTransactions]);
 
-  // Détecter éligibilité de la promo et appliquer automatiquement si non refusée
+  // Détecter éligibilité de la promo (sans auto-application)
   useEffect(() => {
-    const target = StorageService.normalizeLabel('verres a 6.50 €');
+    const target = normalizeDecimals(StorageService.normalizeLabel('verres 6.50'));
     let qty = 0;
     for (const it of cartItems) {
       const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-      const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+      const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
       if (has) qty += (it.quantity || 0);
     }
     const eligible = qty >= 6; // "> 5" verres
@@ -314,7 +314,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         const next = { ...itemDiscounts } as any;
         for (const it of cartItems) {
           const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-          const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+          const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
           if (!has) continue;
           delete next[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
         }
@@ -326,28 +326,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       return;
     }
 
-    // Si éligible: appliquer automatiquement si non déjà appliquée et non refusée
-    if (eligible && !glassPromoApplied && !glassPromoRefused) {
-      const next = { ...itemDiscounts } as any;
-      for (const it of cartItems) {
-        const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-        const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
-        if (!has) continue;
-        const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-        next[key] = { type: 'percent', value: 3.85 };
-      }
-      setItemDiscounts(next);
-      setGlassPromoApplied(true);
-    }
+    // L'utilisateur choisit manuellement Appliquer/Refuser via la bannière
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartItems]);
 
   const applyGlassPromo = () => {
-    const target = StorageService.normalizeLabel('verres a 6.50 €');
+    const target = normalizeDecimals(StorageService.normalizeLabel('verres 6.50'));
     const percent = 3.85;
     const next = { ...itemDiscounts } as any;
     for (const it of cartItems) {
       const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-      const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+      const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
       if (!has) continue;
       const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
       next[key] = { type: 'percent', value: percent };
@@ -358,11 +347,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const refuseGlassPromo = () => {
-    const target = StorageService.normalizeLabel('verres a 6.50 €');
+    const target = normalizeDecimals(StorageService.normalizeLabel('verres 6.50'));
     const next = { ...itemDiscounts } as any;
     for (const it of cartItems) {
       const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-      const has = list.some((c) => StorageService.normalizeLabel(String(c)) === target);
+      const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
       if (!has) continue;
       delete next[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
     }
@@ -371,10 +360,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setGlassPromoRefused(true);
   };
 
-  const acceptGlassPromo = () => {
-    setGlassPromoRefused(false);
-    applyGlassPromo();
-  };
+  // Pour accepter, utiliser applyGlassPromo()
 
   // Si le ticket sélectionné n'existe plus (ex.: vidage), réinitialiser la sélection
   // Nettoyage d'anciens états (modale édition supprimée)
@@ -1692,14 +1678,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             promoBanner={glassPromoOffered ? (
               <Box sx={{ p: 1, bgcolor: '#fff8e1', borderBottom: '1px solid #ffe082', display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Remise auto verres 6,50€: -3,85% dès 6 verres • {glassPromoApplied ? 'appliquée' : (glassPromoRefused ? 'refusée' : 'disponible')}
+                  Remise verres 6,50€: -3,85% dès 6 verres • {glassPromoApplied ? 'appliquée' : (glassPromoRefused ? 'refusée' : 'disponible')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
+                  {!glassPromoApplied && (
+                    <Button size="small" variant="contained" onClick={applyGlassPromo}>Appliquer</Button>
+                  )}
                   {glassPromoApplied && (
                     <Button size="small" variant="outlined" onClick={refuseGlassPromo}>Refuser</Button>
-                  )}
-                  {!glassPromoApplied && glassPromoRefused && (
-                    <Button size="small" variant="contained" onClick={acceptGlassPromo}>Réactiver</Button>
                   )}
                 </Box>
               </Box>
