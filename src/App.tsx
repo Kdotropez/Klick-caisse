@@ -15,7 +15,7 @@ const App: React.FC = () => {
   const [isLayoutLocked] = useState<boolean>(false);
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
   const [currentCashier, setCurrentCashier] = useState<Cashier | null>(null);
-  const [rootSize, setRootSize] = useState({ width: '1187px', height: '874px' });
+  const [rootSize, setRootSize] = useState({ width: '1280px', height: '880px' });
   const [_isResizingRoot, setIsResizingRoot] = useState(false);
 
 

@@ -94,7 +94,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TrendingUp sx={{ color: '#2196f3', fontSize: 28 }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
-          Rapport Journalier · Klick V2.3
+          Rapport Journalier · Klick V2.4
           </Typography>
         </Box>
         <IconButton onClick={onClose} size="small">

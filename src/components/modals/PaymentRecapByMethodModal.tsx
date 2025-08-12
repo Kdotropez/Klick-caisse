@@ -89,7 +89,17 @@ const PaymentRecapByMethodModal: React.FC<PaymentRecapByMethodModalProps> = ({ o
                         <Box key={`${t.id}-${idx}`} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography variant="caption" sx={{ width: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
                           <Typography variant="caption">x</Typography>
-                          <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
+                          <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {it.product.name}
+                            {it.selectedVariation && (
+                              <>
+                                {' '}
+                                <span style={{ color: '#2196f3', fontStyle: 'italic' }}>
+                                  ({it.selectedVariation.attributes})
+                                </span>
+                              </>
+                            )}
+                          </Typography>
                           <Typography variant="caption" sx={{ width: 90, textAlign: 'right', fontFamily: 'monospace' }}>{((it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * (it.quantity || 0)).toFixed(2)} €</Typography>
                         </Box>
                       ))}
@@ -107,11 +117,14 @@ const PaymentRecapByMethodModal: React.FC<PaymentRecapByMethodModalProps> = ({ o
                 const items = Array.isArray(tx.items) ? tx.items : [];
                 for (const it of items as any[]) {
                   const cat = (it.product.category || '') as string;
-                  const key = it.product.id as string;
+                  const key = `${String(it.product.id)}::${String(it.selectedVariation?.id || 'main')}`;
                   const amount = (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice) * (it.quantity || 0);
                   if (!categoryMap.has(cat)) categoryMap.set(cat, new Map());
                   const prodMap = categoryMap.get(cat)!;
-                  const prev = prodMap.get(key) || { name: (it.product as Product).name, qty: 0, amount: 0 };
+                  const displayName = it.selectedVariation && it.selectedVariation.attributes
+                    ? `${(it.product as Product).name} (${it.selectedVariation.attributes})`
+                    : (it.product as Product).name;
+                  const prev = prodMap.get(key) || { name: displayName, qty: 0, amount: 0 };
                   prev.qty += (it.quantity || 0);
                   prev.amount += amount;
                   prodMap.set(key, prev);
