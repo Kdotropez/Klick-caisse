@@ -253,7 +253,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Promo verres à 6.50€: seuil 6 unités => -3.85% (arrondi total après)
   const [glassPromoOffered, setGlassPromoOffered] = useState(false);
   const [glassPromoApplied, setGlassPromoApplied] = useState(false);
-  const [glassPromoRefused, setGlassPromoRefused] = useState(false);
 
   useEffect(() => {
     // Remise auto: 6 easyclickchic → -1€/article (supprimable per-ligne via la croix)
@@ -296,7 +295,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
   }, [todayTransactions, computePaymentTotalsFromTransactions]);
 
-  // Détecter éligibilité de la promo (sans auto-application)
+  // Détecter éligibilité de la promo et auto-appliquer
   useEffect(() => {
     const target = normalizeDecimals(StorageService.normalizeLabel('verres 6.50'));
     let qty = 0;
@@ -321,46 +320,29 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         setItemDiscounts(next);
         setGlassPromoApplied(false);
       }
-      // Réinitialiser le refus quand non éligible
-      setGlassPromoRefused(false);
       return;
     }
 
-    // L'utilisateur choisit manuellement Appliquer/Refuser via la bannière
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartItems]);
-
-  const applyGlassPromo = () => {
-    const target = normalizeDecimals(StorageService.normalizeLabel('verres 6.50'));
-    const percent = 3.85;
+    // Auto-appliquer sur toutes les lignes éligibles
     const next = { ...itemDiscounts } as any;
+    let applied = false;
     for (const it of cartItems) {
       const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
       const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
       if (!has) continue;
       const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-      next[key] = { type: 'percent', value: percent };
+      // Forcer la remise -3.85% sur les lignes concernées
+      if (!next[key] || next[key].type !== 'percent' || next[key].value !== 3.85) {
+        next[key] = { type: 'percent', value: 3.85 };
+        applied = true;
+      }
     }
-    setItemDiscounts(next);
+    if (applied) setItemDiscounts(next);
     setGlassPromoApplied(true);
-    setGlassPromoRefused(false);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartItems]);
 
-  const refuseGlassPromo = () => {
-    const target = normalizeDecimals(StorageService.normalizeLabel('verres 6.50'));
-    const next = { ...itemDiscounts } as any;
-    for (const it of cartItems) {
-      const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-      const has = list.some((c) => normalizeDecimals(StorageService.normalizeLabel(String(c))) === target);
-      if (!has) continue;
-      delete next[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
-    }
-    setItemDiscounts(next);
-    setGlassPromoApplied(false);
-    setGlassPromoRefused(true);
-  };
-
-  // Pour accepter, utiliser applyGlassPromo()
+  // La suppression se fait via la croix rouge (onRemoveItemDiscount)
 
   // Si le ticket sélectionné n'existe plus (ex.: vidage), réinitialiser la sélection
   // Nettoyage d'anciens états (modale édition supprimée)
@@ -1676,18 +1658,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
             promoBanner={glassPromoOffered ? (
-              <Box sx={{ p: 1, bgcolor: '#fff8e1', borderBottom: '1px solid #ffe082', display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ p: 1, bgcolor: '#fff8e1', borderBottom: '1px solid #ffe082' }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Remise verres 6,50€: -3,85% dès 6 verres • {glassPromoApplied ? 'appliquée' : (glassPromoRefused ? 'refusée' : 'disponible')}
+                  Remise automatique verres 6,50€: -3,85% dès 6 verres (retirable ligne par ligne via la croix rouge)
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  {!glassPromoApplied && (
-                    <Button size="small" variant="contained" onClick={applyGlassPromo}>Appliquer</Button>
-                  )}
-                  {glassPromoApplied && (
-                    <Button size="small" variant="outlined" onClick={refuseGlassPromo}>Refuser</Button>
-                  )}
-                </Box>
               </Box>
             ) : null}
           />
