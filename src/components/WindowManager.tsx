@@ -868,17 +868,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
       if (!hasSubcategory) return false;
       if (selectedCategory) {
-        const cat = categories.find(cat => cat.name === product.category);
-        const matchesCategory = !!cat && cat.id === selectedCategory;
-        return matchesCategory && matchesSearch;
+        const selectedCat = categories.find(c => c.id === selectedCategory);
+        const matchesCategory = selectedCat && StorageService.normalizeLabel(selectedCat.name) === StorageService.normalizeLabel(product.category);
+        return !!matchesCategory && matchesSearch;
       }
       return matchesSearch;
     }
     
     // Filtrage par catégorie par défaut
     if (selectedCategory) {
-      const category = categories.find(cat => cat.name === product.category);
-      const matchesCategory = category && category.id === selectedCategory;
+      const selectedCat = categories.find(c => c.id === selectedCategory);
+      const matchesCategory = selectedCat && StorageService.normalizeLabel(selectedCat.name) === StorageService.normalizeLabel(product.category);
       
       // Debug: Afficher les détails de la comparaison
       if (product.name.includes('tee shirt') || product.name.includes('vetement')) {
@@ -886,8 +886,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           productName: product.name,
           productCategory: product.category,
           selectedCategory,
-          categoryFound: category,
-          categoryId: category?.id,
+          categoryFound: selectedCat,
+          categoryId: selectedCat?.id,
           matchesCategory
         });
       }
