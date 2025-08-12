@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -54,6 +54,14 @@ const CartPanel: React.FC<CartPanelProps> = ({
   promoBanner,
 }) => {
   const total = getTotalWithGlobalDiscount();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll vers le bas quand de nouveaux articles sont ajoutés
+  useEffect(() => {
+    if (scrollContainerRef.current && cartItems.length > 0) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [cartItems.length]);
 
   return (
     <Paper
@@ -75,7 +83,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
         </Typography>
       </Box>
 
-      <Box sx={{ flexGrow: 1, overflow: 'auto', p: 0.5 }}>
+      <Box ref={scrollContainerRef} sx={{ flexGrow: 1, overflow: 'auto', p: 0.5 }}>
         {cartItems.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
             Panier vide
