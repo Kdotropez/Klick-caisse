@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Box } from '@mui/material';
+import { Box, Alert, Button, Paper, Typography } from '@mui/material';
 import CSVImport from './components/CSVImport';
 import WindowManager from './components/WindowManager';
+import LicenseActivationModal from './components/LicenseActivationModal';
+import LicenseInfoModal from './components/LicenseInfoModal';
 import { Product, Category, CartItem, ProductVariation } from './types/Product';
 import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
+import { licenseService, License } from './services/LicenseService';
 
 const App: React.FC = () => {
   const [showImport, setShowImport] = useState(false); // Changé à false pour démarrer directement
@@ -18,6 +21,12 @@ const App: React.FC = () => {
   const [rootSize, setRootSize] = useState({ width: '1280px', height: '880px' });
   const [_isResizingRoot, setIsResizingRoot] = useState(false);
 
+  // États pour la gestion de licence
+  const [licenseValidation, setLicenseValidation] = useState<any>(null);
+  const [showLicenseActivation, setShowLicenseActivation] = useState(false);
+  const [showLicenseInfo, setShowLicenseInfo] = useState(false);
+  const [isLicenseValid, setIsLicenseValid] = useState(false);
+
 
   // Charger les données de production au démarrage
   useEffect(() => {
@@ -28,6 +37,18 @@ const App: React.FC = () => {
     // Initialiser les caissiers
     const loadedCashiers = StorageService.initializeDefaultCashier();
     setCashiers(loadedCashiers);
+  }, []);
+
+  // Vérifier la licence au démarrage
+  useEffect(() => {
+    const validation = licenseService.validateCurrentLicense();
+    setLicenseValidation(validation);
+    setIsLicenseValid(validation.isValid);
+    
+    // Si pas de licence valide, afficher l'écran d'activation
+    if (!validation.isValid) {
+      setShowLicenseActivation(true);
+    }
   }, []);
 
   // Demander le stockage persistant pour protéger les données locales contre l'éviction
@@ -300,6 +321,23 @@ const App: React.FC = () => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  // Gestionnaires pour la licence
+  const handleLicenseActivated = (license: License) => {
+    const validation = licenseService.validateCurrentLicense();
+    setLicenseValidation(validation);
+    setIsLicenseValid(validation.isValid);
+    setShowLicenseActivation(false);
+  };
+
+  const handleShowLicenseInfo = () => {
+    setShowLicenseInfo(true);
+  };
+
+  const handleEditLicense = () => {
+    setShowLicenseInfo(false);
+    setShowLicenseActivation(true);
+  };
+
   return (
     <Box sx={{ 
       height: rootSize.height, 
@@ -355,24 +393,92 @@ const App: React.FC = () => {
         {parseInt(rootSize.width)}×{parseInt(rootSize.height)}
       </Box>
 
+      {/* Bannière de licence */}
+      {licenseValidation && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 5,
+            left: 5,
+            zIndex: 1000,
+            maxWidth: '300px'
+          }}
+        >
+          <Alert 
+            severity={licenseValidation.isValid ? 'success' : 'error'}
+            action={
+              <Button 
+                size="small" 
+                onClick={handleShowLicenseInfo}
+                sx={{ color: 'inherit' }}
+              >
+                Licence
+              </Button>
+            }
+          >
+            {licenseValidation.message}
+          </Alert>
+        </Box>
+      )}
+
       {/* Zone des fenêtres - plein écran */}
-      <WindowManager
-        products={products}
-        categories={categories}
-        cartItems={cartItems}
-        isLayoutLocked={isLayoutLocked}
-        cashiers={cashiers}
-        currentCashier={currentCashier}
-        onProductClick={handleProductClick}
-        onProductWithVariationClick={handleProductWithVariationClick}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onCheckout={handleCheckout}
-        onImportComplete={handleImportComplete}
-        onProductsReorder={handleProductsReorder}
-        onUpdateCategories={handleUpdateCategories}
-        onUpdateCashiers={handleUpdateCashiers}
-        onCashierLogin={handleCashierLogin}
+      {isLicenseValid ? (
+        <WindowManager
+          products={products}
+          categories={categories}
+          cartItems={cartItems}
+          isLayoutLocked={isLayoutLocked}
+          cashiers={cashiers}
+          currentCashier={currentCashier}
+          onProductClick={handleProductClick}
+          onProductWithVariationClick={handleProductWithVariationClick}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+          onImportComplete={handleImportComplete}
+          onProductsReorder={handleProductsReorder}
+          onUpdateCategories={handleUpdateCategories}
+          onUpdateCashiers={handleUpdateCashiers}
+          onCashierLogin={handleCashierLogin}
+        />
+      ) : (
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          height: '100%',
+          flexDirection: 'column',
+          gap: 2
+        }}>
+          <Paper sx={{ p: 4, textAlign: 'center', maxWidth: '500px' }}>
+            <Typography variant="h4" gutterBottom>
+              🔐 Klick Caisse
+            </Typography>
+            <Typography variant="body1" paragraph>
+              Veuillez activer votre licence pour continuer.
+            </Typography>
+            <Button 
+              variant="contained" 
+              onClick={() => setShowLicenseActivation(true)}
+              size="large"
+            >
+              Activer la Licence
+            </Button>
+          </Paper>
+        </Box>
+      )}
+
+      {/* Modals de licence */}
+      <LicenseActivationModal
+        open={showLicenseActivation}
+        onClose={() => setShowLicenseActivation(false)}
+        onLicenseActivated={handleLicenseActivated}
+      />
+
+      <LicenseInfoModal
+        open={showLicenseInfo}
+        onClose={() => setShowLicenseInfo(false)}
+        onEditLicense={handleEditLicense}
       />
     </Box>
   );

@@ -1,4 +1,4 @@
 // Version applicative incrémentée automatiquement par scripts/bump-version.js
-export const APP_VERSION = '2.12';
+export const APP_VERSION = '2.15';
 
 
