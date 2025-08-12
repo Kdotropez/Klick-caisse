@@ -1,0 +1,5 @@
+[33m4d6a6d4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Catégories/Verres: sous-catégories décimales robustes (8,5==8.5==8.50), fallback par prix, affichage canonique VERRES 4/6.50/8.50/10/12, correction import CSV (ne pas scinder décimales), rétablissement bouton 'Gérer sous-catégories'
+[33m8e1fbc1[m Affichage prix: format fr-FR avec centimes via util formatEuro (cartes, fenêtres produits, paiement)
+[33m8ed6022[m Recap: affichage des déclinaisons dans les détails et lagrégation par famille\nUI: version affichée -> V2.4\nRoot: conteneur 1280x880 par défaut
+[33mb1b2113[m Sauvegardes: rotation limitée à 10; backup auto + JSON à chaque clôture Version UI: incrément affichage en V2.3
+[33ma55e0c5[m Recherche produits: tokens flexibles (début de mots, inclusion, sous-séquence, acronyme), sans accents Tickets globaux: ajout boutons Réinitialiser filtres + Charger dates; lecture de transactions_by_day anciennes Recaps paiements: affichage détaillé par ticket (lignes article), expansion par clic; tri conservé Divers: ajustements UX mineurs

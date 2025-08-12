@@ -458,7 +458,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           x: applyScale(20), // Position personnalisée - coin haut gauche de l'espace fenêtre
           y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
           width: applyScale(802.33), // Largeur exacte mesurée
-          height: applyScale(260), // Hauteur augmentée pour afficher la barre des sous-catégories
+          height: applyScale(220), // Hauteur ajustée pour éviter tout recouvrement avec la grille
           isMinimized: false,
           isMaximized: false,
           zIndex: 3,
@@ -1836,30 +1836,29 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               />
             </Box>
 
-            {/* Ligne 3: suppression sélection (reste en place si besoin) */}
-            {isEditMode && selectedProductsForDeletion.size > 0 && (
-              <Box sx={{ p: 1, borderBottom: '1px solid #eee' }}>
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  onClick={() => {
-                    const ids = Array.from(selectedProductsForDeletion);
-                    if (ids.length === 0) return;
-                    // eslint-disable-next-line no-restricted-globals
-                    if (!confirm(`Supprimer ${ids.length} article(s) sélectionné(s) ?`)) return;
-                    const updatedProducts = products.filter(p => !ids.includes(p.id));
-                    onProductsReorder?.(updatedProducts);
-                    setSelectedProductsForDeletion(new Set());
-                  }}
-                >
-                  Supprimer ({selectedProductsForDeletion.size})
-                </Button>
+            {/* Ligne 3+4 combinées: Supprimer (si sélection) + Reset / Modifier article / Nouvel article / Gérer sous-catégories */}
+            <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #eee', flexWrap: 'nowrap' }}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', minWidth: 0 }}>
+                {isEditMode && selectedProductsForDeletion.size > 0 && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => {
+                      const ids = Array.from(selectedProductsForDeletion);
+                      if (ids.length === 0) return;
+                      // eslint-disable-next-line no-restricted-globals
+                      if (!confirm(`Supprimer ${ids.length} article(s) sélectionné(s) ?`)) return;
+                      const updatedProducts = products.filter(p => !ids.includes(p.id));
+                      onProductsReorder?.(updatedProducts);
+                      setSelectedProductsForDeletion(new Set());
+                    }}
+                  >
+                    Supprimer ({selectedProductsForDeletion.size})
+                  </Button>
+                )}
               </Box>
-            )}
-
-            {/* Ligne 4: boutons Reset / Modifier article / Nouvel article / Gérer sous-catégories */}
-            <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-end', borderTop: '1px solid #eee' }}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexShrink: 0 }}>
               <Button
                 variant="outlined"
                 size="small"
@@ -1876,21 +1875,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               >
                 Reset
               </Button>
-              <Button
-                variant={isEditMode ? 'outlined' : 'contained'}
-                size="small"
-                onClick={() => setIsEditMode(!isEditMode)}
-              >
-                {isEditMode ? 'Mode vente' : 'Modifier article'}
-              </Button>
-              <Button variant="contained" size="small" onClick={handleCreateNewProduct}>➕ Nouvel article</Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => setShowSubcategoryManagementModal(true)}
-              >
-                Gérer sous-catégories
-              </Button>
+                <Button
+                  variant={isEditMode ? 'outlined' : 'contained'}
+                  size="small"
+                  onClick={() => setIsEditMode(!isEditMode)}
+                >
+                  {isEditMode ? 'Mode vente' : 'Modifier article'}
+                </Button>
+                <Button variant="contained" size="small" onClick={handleCreateNewProduct}>➕ Nouvel article</Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setShowSubcategoryManagementModal(true)}
+                >
+                  Gérer sous-catégories
+                </Button>
+              </Box>
             </Box>
           </Box>
               );

@@ -14,6 +14,7 @@ import {
 import { Close, TrendingUp, Euro } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { CartItem } from '../types/Product';
+import { APP_VERSION } from '../version';
 
 interface DailyReportModalProps {
   open: boolean;
@@ -94,7 +95,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TrendingUp sx={{ color: '#2196f3', fontSize: 28 }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
-          Rapport Journalier · Klick V2.4
+          Rapport Journalier · Klick V{APP_VERSION}
           </Typography>
         </Box>
         <IconButton onClick={onClose} size="small">

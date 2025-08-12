@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
 import { CartItem } from '../../types/Product';
+import { APP_VERSION } from '../../version';
 
 export interface ItemDiscount {
   type: 'euro' | 'percent' | 'price';
@@ -70,7 +71,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
           TICKET DE CAISSE
         </Typography>
         <Typography variant="caption" align="center" display="block">
-          {new Date().toLocaleDateString('fr-FR')} - {new Date().toLocaleTimeString('fr-FR')} · Klick V2.4
+          {new Date().toLocaleDateString('fr-FR')} - {new Date().toLocaleTimeString('fr-FR')} · Klick V{APP_VERSION}
         </Typography>
       </Box>
 
