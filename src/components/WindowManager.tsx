@@ -866,7 +866,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Filtrage par sous-catégorie (priorité sur la catégorie) —
     // si une catégorie est sélectionnée, on impose aussi la catégorie (intersection)
     if (selectedSubcategory) {
-      const normalizeKey = (s: string) => normalizeDecimals(StorageService.normalizeLabel(String(s)).replace(/s$/i, ''));
+      const normalizeKey = (s: string) => normalizeDecimals(StorageService.normalizeLabel(String(s)).replace(/s$/i, '').replace(',', '.'));
       const target = normalizeKey(String(selectedSubcategory));
       const assoc = Array.isArray(product.associatedCategories) ? product.associatedCategories : [];
       let hasSubcategory = assoc.some(cat => normalizeKey(String(cat)) === target);
@@ -875,9 +875,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       if (!hasSubcategory) {
         const pc = StorageService.normalizeLabel(product.category || '');
         if (pc === 'verre') {
-          const match = target.match(/(\d+(?:[.]\d+)?)/);
+          const match = target.match(/(\d+(?:[\.,]\d+)?)/);
           if (match) {
-            const targetPrice = parseFloat(match[1]);
+            const targetPrice = parseFloat(match[1].replace(',', '.'));
             const equals = (a: number, b: number) => Math.abs(a - b) < 0.001;
             const baseMatch = Number.isFinite(product.finalPrice) && equals(product.finalPrice, targetPrice);
             const varMatch = Array.isArray(product.variations) && product.variations.some(v => Number.isFinite(v.finalPrice) && equals(v.finalPrice, targetPrice));
@@ -1735,7 +1735,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 let list = Array.from(normToDisplay.values()).sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
                 // Si catégorie VERRE sélectionnée, forcer l'affichage des sous-catégories canoniques
                 if (selectedCategory && normSelected === 'verre') {
-                  const canonical = ['VERRES 4', 'VERRES 6.50', 'VERRES 8.50', 'VERRES 10', 'VERRES 12'];
+                  // Afficher les libellés avec virgule (français)
+                  const canonical = ['VERRES 4', 'VERRES 6,50', 'VERRES 8,50', 'VERRES 10', 'VERRES 12'];
                   const existingKeys = new Set(list.map(s => normalizeDecimals(StorageService.normalizeLabel(s))));
                   for (const label of canonical) {
                     const key = normalizeDecimals(StorageService.normalizeLabel(label));
