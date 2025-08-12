@@ -251,10 +251,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   });
 
   // Promo verres à 6.50€: seuil 6 unités => -3.85% (arrondi total après)
-  // États d'information (pas utilisés dans l'UI, mais utiles pour logique interne)
-  const [glassPromoOffered, setGlassPromoOffered] = useState(false);
-  const [glassPromoApplied, setGlassPromoApplied] = useState(false);
-  const [activePromos, setActivePromos] = useState<Array<{ label: string; percent: number }>>([]);
+  // Remises automatiques par sous-catégorie gérées dans l'effet ci-dessous
 
   useEffect(() => {
     // Remise auto: 6 easyclickchic → -1€/article (supprimable per-ligne via la croix)
@@ -297,7 +294,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
   }, [todayTransactions, computePaymentTotalsFromTransactions]);
 
-  // Détecter éligibilité des promos et auto-appliquer
+  // Remises automatiques par sous-catégorie: s'appliquent par ligne (même produit/variation) si quantité >= 6
   useEffect(() => {
     const PROMO_RULES: Array<{ label: string; percent: number }> = [
       { label: 'verres 4', percent: 4.17 },
@@ -312,45 +309,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     // Calculer les promos actives (>=6 unités) et appliquer/retirer
     const next = { ...itemDiscounts } as any;
-    const newlyActive: Array<{ label: string; percent: number }> = [];
-
     for (const rule of PROMO_RULES) {
       const target = normalizeKey(rule.label);
-      let qty = 0;
       for (const it of cartItems) {
         const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-        const has = list.some((c) => normalizeKey(c) === target);
-        if (has) qty += (it.quantity || 0);
-      }
-      const eligible = qty >= 6;
-      if (eligible) {
-        newlyActive.push(rule);
-        for (const it of cartItems) {
-          const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-          const has = list.some((c) => normalizeKey(c) === target);
-          if (!has) continue;
-          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+        const matchesSubcategory = list.some((c) => normalizeKey(c) === target);
+        if (!matchesSubcategory) continue;
+        const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+        if ((it.quantity || 0) >= 6) {
+          // Appliquer la remise sur cette ligne uniquement
           if (!next[key] || next[key].type !== 'percent' || next[key].value !== rule.percent) {
             next[key] = { type: 'percent', value: rule.percent };
           }
-        }
-      } else {
-        // Retirer la remise pour cette règle
-        for (const it of cartItems) {
-          const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-          const has = list.some((c) => normalizeKey(c) === target);
-          if (!has) continue;
-          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+        } else {
+          // Retirer la remise si la ligne passe sous 6
           if (next[key] && next[key].type === 'percent' && Math.abs(next[key].value - rule.percent) < 1e-6) {
             delete next[key];
           }
         }
       }
     }
-
-    setActivePromos(newlyActive);
-    setGlassPromoOffered(newlyActive.length > 0);
-    setGlassPromoApplied(newlyActive.length > 0);
     // Mettre à jour les remises si changement de mappage
     const changed = Object.keys(next).length !== Object.keys(itemDiscounts).length ||
       Object.keys(next).some(k => JSON.stringify(next[k]) !== JSON.stringify((itemDiscounts as any)[k]));
@@ -878,25 +856,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Filtrage par sous-catégorie (priorité sur la catégorie) —
     // si une catégorie est sélectionnée, on impose aussi la catégorie (intersection)
     if (selectedSubcategory) {
-      const normalizeKey = (s: string) => normalizeDecimals(StorageService.normalizeLabel(String(s)).replace(/s$/i, '').replace(',', '.'));
+      const normalizeKey = (s: string) => {
+        const base = normalizeDecimals(StorageService.normalizeLabel(String(s)).replace(/,/g, '.'));
+        // Garder uniquement lettres, chiffres, point et espaces, puis compacter
+        return base.replace(/[^a-z0-9. ]/g, '').replace(/\s+/g, ' ').trim();
+      };
       const target = normalizeKey(String(selectedSubcategory));
       const assoc = Array.isArray(product.associatedCategories) ? product.associatedCategories : [];
       let hasSubcategory = assoc.some(cat => normalizeKey(String(cat)) === target);
 
-      // Fallback intelligent pour les VERRES: si pas de tag, déduire par prix
-      if (!hasSubcategory) {
-        const pc = StorageService.normalizeLabel(product.category || '');
-        if (pc === 'verre') {
-          const match = target.match(/(\d+(?:[\.,]\d+)?)/);
-          if (match) {
-            const targetPrice = parseFloat(match[1].replace(',', '.'));
-            const equals = (a: number, b: number) => Math.abs(a - b) < 0.001;
-            const baseMatch = Number.isFinite(product.finalPrice) && equals(product.finalPrice, targetPrice);
-            const varMatch = Array.isArray(product.variations) && product.variations.some(v => Number.isFinite(v.finalPrice) && equals(v.finalPrice, targetPrice));
-            if (baseMatch || varMatch) hasSubcategory = true;
-          }
-        }
-      }
 
       if (!hasSubcategory) return false;
       if (selectedCategory) {
