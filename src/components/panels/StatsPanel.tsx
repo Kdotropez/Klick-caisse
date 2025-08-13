@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Badge } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 interface StatsPanelProps {
   width: number;
