@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
+import { useUISettings } from '../../context/UISettingsContext';
 
 interface SettingsPanelProps {
   width: number;
@@ -47,6 +48,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onImportDeclinaisonsFromGit,
   onResetBaseFromGitHub,
 }) => {
+  const { compactMode, setCompactMode } = useUISettings();
   const gap = 2;
   const totalGapsWidth = 4;
   const totalGapsHeight = 6;
@@ -281,17 +283,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           height: '100%',
           fontSize: getScaledFontSize('0.5rem'),
           fontWeight: 'bold',
-          backgroundColor: '#ff9800',
-          '&:hover': { backgroundColor: '#f57c00' },
+          backgroundColor: compactMode ? '#2e7d32' : '#ff9800',
+          '&:hover': { backgroundColor: compactMode ? '#1b5e20' : '#f57c00' },
           boxSizing: 'border-box',
           overflow: 'hidden',
           textTransform: 'none',
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 7')}
+        onClick={() => setCompactMode(!compactMode)}
       >
-        Vide 7
+        Mode compact: {compactMode ? 'ON' : 'OFF'}
       </Button>
 
       <Button

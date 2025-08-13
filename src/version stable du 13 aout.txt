@@ -1,0 +1,17 @@
+Oui. On peut “geler” l’état actuel et y revenir en 1 clic.
+Ce que je mets en place tout de suite:
+Snapshot du code
+Je crée un tag et une branche stables pour l’état actuel (nommés par date).
+Revenir = déployer ce tag/commit sur Vercel.
+Snapshot des données
+Export “tout (JSON)” actuel et je le versionne dans le repo (backup daté).
+Revenir = importer ce JSON depuis Paramètres.
+Si tu veux le faire toi-même, exécute ces commandes (séparées, sans “&&” sous PowerShell):
+git tag -a v2.39-stable-2025-08-13 -m "stable au 2025-08-13"
+git push origin v2.39-stable-2025-08-13
+git branch stable-2025-08-13
+git push origin stable-2025-08-13
+Rollback rapide ensuite:
+Sur Vercel: onglet Deployments → sélectionne le déploiement “stable” → Promote/Redeploy to production.
+Dans l’app: Paramètres → Importer tout (JSON) avec le backup stable (celui qu’on a versionné).
+Voulais-tu que je fasse le tag/branche/backup maintenant et que je te confirme quand c’est prêt, pour sécuriser la suite des modifs ?

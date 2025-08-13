@@ -118,20 +118,6 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
           
           let list = Array.from(normToDisplay.values()).sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
           
-          // Si catégorie VERRE sélectionnée, forcer l'affichage des sous-catégories canoniques
-          if (selectedCategory && normSelected === 'verre') {
-            const canonical = ['VERRES 4', 'VERRES 6,50', 'VERRES 8,50', 'VERRES 10', 'VERRES 12'];
-            const existingKeys = new Set(list.map(s => normalizeDecimals(StorageService.normalizeLabel(s))));
-            for (const label of canonical) {
-              const key = normalizeDecimals(StorageService.normalizeLabel(label));
-              if (!existingKeys.has(key)) {
-                list.push(label);
-                existingKeys.add(key);
-              }
-            }
-            list = list.sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
-          }
-          
           // Appliquer l'ordre personnalisé si défini pour la catégorie sélectionnée
           if (selectedCategory) {
             const cat = categories.find(c => c.id === selectedCategory);

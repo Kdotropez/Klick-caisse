@@ -1559,22 +1559,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     try {
       setImportStatus('importing');
       setImportMessage('Réinitialisation base depuis GitHub...');
-      const urlProducts = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20ARTICLE%20WYSIWYG.csv';
-      const urlVars = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20DECLINAISONS%20WYSIWYG.csv';
-      // Vider produits/catégories/sous-catégories
-      localStorage.removeItem('klick_caisse_products');
-      localStorage.removeItem('klick_caisse_categories');
-      localStorage.removeItem('klick_caisse_subcategories');
-      // Import articles
-      const textP = await fetchText(urlProducts);
-      const fileP = new File([textP], 'articles.csv', { type: 'text/csv' });
-      await handleImportCSV({ target: { files: [fileP], value: '' } } as any);
-      // Import déclinaisons
-      const textV = await fetchText(urlVars);
-      const fileV = new File([textV], 'declinaisons.csv', { type: 'text/csv' });
-      await handleImportVariationsCSV(fileV);
+      // Charger le backup JSON versionné dans le repo (plus fiable que CSV)
+      const urlBackup = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/src/components/klick-caisse-backup-2025-08-13-21-26-12.json';
+      const text = await fetchText(urlBackup);
+      const data = JSON.parse(text);
+      // Importer uniquement produits/catégories/sous-catégories depuis le backup
+      if (data && typeof data === 'object') {
+        const productsFromBackup = Array.isArray((data as any).products) ? (data as any).products : [];
+        const categoriesFromBackup = Array.isArray((data as any).categories) ? (data as any).categories : [];
+        if (Array.isArray((data as any).subcategories)) {
+          StorageService.saveSubcategories((data as any).subcategories);
+        }
+        // Mettre à jour l'app via le callback prévu
+        onImportComplete(productsFromBackup, categoriesFromBackup);
+      }
       setImportStatus('success');
-      setImportMessage('Base réinitialisée depuis GitHub');
+      setImportMessage('Base réinitialisée depuis GitHub (backup JSON)');
       setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 3000);
     } catch (e:any) {
       setImportStatus('error');

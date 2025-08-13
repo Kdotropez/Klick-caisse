@@ -191,7 +191,7 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
 
       // Recomposer la liste fusionnée dans l'ordre d'origine + nouveaux
       const mergedById = new Map(mergedProducts.map(p => [p.id, p] as const));
-      const finalProducts = Array.from(idToIndex.values());
+      let finalProducts = Array.from(idToIndex.values());
 
       // Fusion des catégories par nom normalisé
       const existingCategories = StorageService.loadCategories();
@@ -205,19 +205,32 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
       }
       const finalCategories = Array.from(nameToCat.values());
 
-      // Sauvegarder les données fusionnées
-      StorageService.saveProducts(finalProducts);
-      StorageService.saveCategories(finalCategories);
-
-      // Recalculer le registre des sous-catégories à partir des produits (écrasement complet)
-      const allSubs = Array.from(new Set(
-        finalProducts
+      // 1) Construire la liste autorisée uniquement à partir des produits importés
+      const allowedSubsRaw = Array.from(new Set(
+        result.products
           .flatMap(p => (p.associatedCategories || []))
           .map((s: string) => StorageService.sanitizeLabel(s))
           .map((s: string) => s.trim())
           .filter((s: string) => !!s)
       ));
-      StorageService.saveSubcategories(allSubs);
+      const normalize = (s: string) => StorageService.normalizeLabel(s);
+      const allowedSet = new Set(allowedSubsRaw.map(normalize));
+
+      // 2) Purifier toutes les lignes produits: ne garder que les nouvelles sous-catégories
+      finalProducts = finalProducts.map(p => ({
+        ...p,
+        associatedCategories: Array.from(new Set((p.associatedCategories || [])
+          .map((s: string) => StorageService.sanitizeLabel(s))
+          .map((s: string) => s.trim())
+          .filter((s: string) => allowedSet.has(normalize(s))))),
+      }));
+
+      // 3) Sauvegarder les données fusionnées
+      StorageService.saveProducts(finalProducts);
+      StorageService.saveCategories(finalCategories);
+
+      // 4) Écraser le registre enregistré avec la nouvelle liste uniquement
+      StorageService.saveSubcategories(allowedSubsRaw);
 
       setImportResult({
         success: true,

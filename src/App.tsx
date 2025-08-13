@@ -5,6 +5,7 @@ import { Product, Category, CartItem, ProductVariation } from './types/Product';
 import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
+import { useUISettings } from './context/UISettingsContext';
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -154,6 +155,8 @@ const App: React.FC = () => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  const { compactMode } = useUISettings();
+
   return (
     <Box sx={{
       height: rootSize.height,
@@ -161,7 +164,9 @@ const App: React.FC = () => {
       position: 'relative',
       border: '2px solid #1976d2',
       backgroundColor: '#f5f5f5',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      transform: compactMode ? 'scale(0.9)' : 'none',
+      transformOrigin: 'top left'
     }}>
       {/* Poignée de redimensionnement du div#root */}
       <Box
