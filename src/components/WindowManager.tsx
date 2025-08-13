@@ -1234,22 +1234,32 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         throw new Error('Fichier CSV invalide - pas assez de lignes');
       }
 
-      // Analyser les en-têtes
+      // Analyser les en-têtes (normalisation pour tolérer accents/variantes)
       // eslint-disable-next-line no-control-regex
       const headers = lines[0].split('\t').map(h => h.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
-      
-      // Mapping des colonnes
+      const normalize = (s: string) => s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+      const hIndex = (aliases: string[]) => headers.findIndex(x => aliases.some(a => normalize(x).includes(normalize(a))));
+
+      // Mapping des colonnes (robuste)
       const mapping = {
-        id: headers.findIndex(h => h.includes('Identifiant produit')),
-        name: headers.findIndex(h => h.includes('Nom')),
-        category: headers.findIndex(h => h.includes('catégorie par défaut')),
-        associatedCategories: headers.findIndex(h => h.includes('catégories associées')),
-        finalPrice: headers.findIndex(h => h.includes('Prix de vente TTC final')),
-        ean13: headers.findIndex(h => h.includes('ean13')),
-        reference: headers.findIndex(h => h.includes('Référence')),
-        wholesalePrice: headers.findIndex(h => h.includes('Prix de vente HT')),
-        stock: headers.findIndex(h => h.includes('Quantité disponible'))
-      };
+        id: hIndex(['identifiant produit','id product','id']),
+        name: hIndex(['nom','name']),
+        category: hIndex(['categorie par defaut','catégorie par défaut','categorie']),
+        associatedCategories: hIndex(['categories associees','catégories associées']),
+        sub1: hIndex(['sous categorie 1','sous-categorie 1']),
+        sub2: hIndex(['sous categorie 2','sous-categorie 2']),
+        sub3: hIndex(['sous categorie 3','sous-categorie 3']),
+        finalPrice: hIndex(['prix de vente ttc final','prix de vente ttc','prix ttc']),
+        ean13: hIndex(['ean13','ean']),
+        reference: hIndex(['reference','référence']),
+        wholesalePrice: hIndex(["prix d'achat ht", 'wholesale_price', 'prix de vente ht']),
+        stock: hIndex(['quantite disponible','quantité disponible'])
+      } as const;
 
       // Vérifier les colonnes obligatoires
       if (mapping.id === -1 || mapping.name === -1 || mapping.category === -1) {
@@ -1272,7 +1282,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const name = (values[mapping.name] || 'Produit sans nom').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           // eslint-disable-next-line no-control-regex
           const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
-          const finalPrice = parsePrice(values[mapping.finalPrice]);
+          const finalPrice = mapping.finalPrice !== -1 ? parsePrice(values[mapping.finalPrice]) : 0;
           // eslint-disable-next-line no-control-regex
           const ean13 = (values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           // eslint-disable-next-line no-control-regex
@@ -1282,16 +1292,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           // Ne pas couper sur les virgules décimales (ex: "6,50").
           // On sépare sur: point-virgule ";", pipe "|" ou virgule non suivie d'un chiffre
           // eslint-disable-next-line no-control-regex
-          const associatedCategoriesStr = (values[mapping.associatedCategories] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
-          const associatedCategories = associatedCategoriesStr
-            .split(/\s*(?:[;|]|,(?!\d))\s*/)
+          const associatedCategoriesStr = (mapping.associatedCategories !== -1 ? values[mapping.associatedCategories] : '' ).replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const extraSubs = [mapping.sub1, mapping.sub2, mapping.sub3]
+            .filter(idx => idx !== -1)
+            .map(idx => values[idx] || '')
+            .filter(Boolean);
+          const associatedCategories = [
+              ...associatedCategoriesStr.split(/\s*(?:[;|]|,(?!\d))\s*/),
+              ...extraSubs
+            ]
             .map(cat => StorageService.sanitizeLabel(cat))
             .map(cat => cat.trim())
             .filter(cat => cat && cat.length > 0);
 
           const wholesalePrice = mapping.wholesalePrice !== -1 ? 
-            parsePrice(values[mapping.wholesalePrice]) || finalPrice * 0.8 : 
-            finalPrice * 0.8;
+            (parsePrice(values[mapping.wholesalePrice]) || (finalPrice > 0 ? finalPrice * 0.8 : 0)) : 
+            (finalPrice > 0 ? finalPrice * 0.8 : 0);
 
           // Nettoyer les données
           const cleanName = name.replace(/[^\w\s\-.]/g, '').trim();
@@ -1667,21 +1683,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   }
                 }
                 let list = Array.from(normToDisplay.values()).sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
-                // Si catégorie VERRE sélectionnée, forcer l'affichage des sous-catégories canoniques
-                if (selectedCategory && normSelected === 'verre') {
-                  // Afficher les libellés avec virgule (français)
-                  const canonical = ['VERRES 4', 'VERRES 6,50', 'VERRES 8,50', 'VERRES 10', 'VERRES 12'];
-                  const existingKeys = new Set(list.map(s => normalizeDecimals(StorageService.normalizeLabel(s))));
-                  for (const label of canonical) {
-                    const key = normalizeDecimals(StorageService.normalizeLabel(label));
-                    if (!existingKeys.has(key)) {
-                      list.push(label);
-                      existingKeys.add(key);
-                    }
-                  }
-                  // Réordonner après ajout
-                  list = list.sort((a,b)=>a.localeCompare(b, 'fr', { sensitivity: 'base' }));
-                }
                 // Appliquer l'ordre personnalisé si défini pour la catégorie sélectionnée
                 if (selectedCategory) {
                   const cat = categories.find(c => c.id === selectedCategory);
