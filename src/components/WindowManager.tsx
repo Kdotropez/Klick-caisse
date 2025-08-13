@@ -256,39 +256,63 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     'Carte': 0
   });
 
-  // Promo verres à 6.50€: seuil 6 unités => -3.85% (arrondi total après)
-  // Remises automatiques par sous-catégorie gérées dans l'effet ci-dessous
-
+  // Remises automatiques: 6 verres achetés d'une même sous-catégorie → remise en % par ligne
   useEffect(() => {
-    // Remise auto: 6 easyclickchic → -1€/article (supprimable per-ligne via la croix)
     try {
-      const target = StorageService.normalizeLabel('easyclickchic');
-      let totalQty = 0;
-      const byKey: Record<string, number> = {};
+      const normalizeKey = (s: string) =>
+        normalizeDecimals(StorageService.normalizeLabel(String(s)))
+          .replace(/[^a-z0-9. ]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      
+      // Table des remises par sous-catégorie (normalisées)
+      const DISCOUNT_BY_SUBCAT: Record<string, number> = {
+        [normalizeKey('VERRE 4')]: 4.17,
+        [normalizeKey('VERRE 6.50')]: 3.85,
+        [normalizeKey('VERRE 8.50')]: 3.92,
+        [normalizeKey('VERRE 10')]: 5.0,
+        [normalizeKey('VERRE 12')]: 5.56,
+        [normalizeKey('CALICE METAL')]: 5.0,
+      };
+
+      // Agréger les quantités par sous-catégorie cible + mémoriser les lignes concernées
+      const qtyBySubcat: Record<string, number> = {};
+      const lineKeysBySubcat: Record<string, string[]> = {};
       for (const it of cartItems) {
-        const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-        const has = list.some((c) => StorageService.normalizeLabel(String(c)).includes(target));
-        if (has) {
-          totalQty += (it.quantity || 0);
-          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-          byKey[key] = (byKey[key] || 0) + (it.quantity || 0);
-        }
+        const assoc = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+        const normAssoc = assoc.map(a => normalizeKey(a)).filter(Boolean);
+        const matched = normAssoc.find(a => DISCOUNT_BY_SUBCAT[a] !== undefined);
+        if (!matched) continue;
+        qtyBySubcat[matched] = (qtyBySubcat[matched] || 0) + (it.quantity || 0);
+        const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+        if (!lineKeysBySubcat[matched]) lineKeysBySubcat[matched] = [];
+        lineKeysBySubcat[matched].push(key);
       }
-      const next = { ...itemDiscounts };
-      if (totalQty >= 6) {
-        // Appliquer -1€ par article aux lignes concernées
-        for (const key of Object.keys(byKey)) {
-          next[key] = { type: 'euro', value: 1 };
-        }
-      } else {
-        // En dessous du seuil, retirer la remise auto (laisser autres remises intactes)
-        for (const key of Object.keys(byKey)) {
-          if (next[key] && next[key].type === 'euro' && next[key].value === 1) {
-            delete next[key];
+
+      const next = { ...itemDiscounts } as Record<string, {type: 'euro' | 'percent' | 'price', value: number}>;
+      // Appliquer/retirer pour chaque sous-catégorie selon seuil 6
+      for (const sub of Object.keys(qtyBySubcat)) {
+        const percent = DISCOUNT_BY_SUBCAT[sub];
+        const keys = lineKeysBySubcat[sub] || [];
+        if (qtyBySubcat[sub] >= 6) {
+          for (const key of keys) {
+            next[key] = { type: 'percent', value: percent };
+          }
+        } else {
+          for (const key of keys) {
+            if (next[key] && next[key].type === 'percent' && Math.abs(next[key].value - percent) < 1e-6) {
+              delete next[key];
+            }
           }
         }
       }
-      // Mettre à jour si changement
+
+      // Nettoyage: retirer d'anciennes remises percent qui ne correspondent plus à des lignes actuelles
+      for (const key of Object.keys(next)) {
+        const stillInCart = cartItems.some(it => `${it.product.id}-${it.selectedVariation?.id || 'main'}` === key);
+        if (!stillInCart) delete next[key];
+      }
+
       const changed = Object.keys(next).length !== Object.keys(itemDiscounts).length ||
         Object.keys(next).some(k => JSON.stringify(next[k]) !== JSON.stringify((itemDiscounts as any)[k]));
       if (changed) setItemDiscounts(next);
@@ -1277,11 +1301,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         try {
           // eslint-disable-next-line no-control-regex
-          const id = (values[mapping.id] || `prod_${i}`).replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const id = (values[mapping.id] || `prod_${i}`).replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
           // eslint-disable-next-line no-control-regex
-          const name = (values[mapping.name] || 'Produit sans nom').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const name = (values[mapping.name] || 'Produit sans nom').replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
           // eslint-disable-next-line no-control-regex
-          const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
           const finalPrice = mapping.finalPrice !== -1 ? parsePrice(values[mapping.finalPrice]) : 0;
           // eslint-disable-next-line no-control-regex
           const ean13 = (values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
