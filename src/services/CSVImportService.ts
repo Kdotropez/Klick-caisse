@@ -70,18 +70,43 @@ export class CSVImportService {
 
   private static createProductFromRow(row: any, mapping: any): Product | null {
     try {
-      const name = row[mapping['Nom']] || row[mapping.name] || 'Produit sans nom';
-      const category = row[mapping['Nom catégorie par défaut']] || row[mapping.category] || 'Général';
-      const price = parseFloat(String(row[mapping['Prix de vente TTC final']] || row[mapping.price] || '0').replace(',', '.')) || 0;
-      const ean = row[mapping['ean13']] || row[mapping.ean] || '';
+      const headerKeys: string[] = Object.keys(row || {});
+      const norm = (s: string) => String(s || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+      const normKeyMap = new Map<string, string>();
+      headerKeys.forEach(k => normKeyMap.set(norm(k), k));
+
+      const getVal = (aliases: string[]): string => {
+        for (const a of aliases) {
+          // via mapping
+          const mapped = mapping[a];
+          if (mapped && row[mapped] !== undefined) return row[mapped];
+          // via header scan
+          const nk = norm(a);
+          const hk = normKeyMap.get(nk);
+          if (hk && row[hk] !== undefined) return row[hk];
+        }
+        return '';
+      };
+
+      const name = getVal(['Nom', 'name']) || 'Produit sans nom';
+      const category = getVal(['Nom catégorie par défaut', 'categorie', 'category']) || 'Général';
+      const priceStr = getVal(['Prix de vente TTC final', 'Prix de vente TTC', 'price']);
+      const price = parseFloat(String(priceStr).replace(',', '.')) || 0;
+      const ean = getVal(['ean13', 'ean']);
 
       // Extraire les catégories associées si le mapping existe
       // Agréger sous-catégories: colonne CSV "catégories associées" + colonnes "Sous-catégorie n"
-      const rawAssocMain = row[mapping['catégories associées']] || row[mapping.associatedCategories] || '';
+      const rawAssocMain = getVal(['catégories associées', 'categories associees', 'associees']);
       const extraSubs: string[] = [];
       for (let i = 1; i <= 3; i++) {
-        const key = `Sous-catégorie ${i}`;
-        if (mapping[key] && row[mapping[key]]) extraSubs.push(String(row[mapping[key]]));
+        const labels = [`Sous-catégorie ${i}`, `Sous categorie ${i}`, `sous categorie ${i}`, `sous-categorie ${i}`];
+        const v = getVal(labels);
+        if (v) extraSubs.push(String(v));
       }
       const normalize = (s: string) => s
         .normalize('NFD')
@@ -100,14 +125,14 @@ export class CSVImportService {
       ).values());
 
       return {
-        id: String(row[mapping['Identifiant produit']] || row[mapping.id] || `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`),
+        id: String(getVal(['Identifiant produit', 'id']) || `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`),
         name,
         category,
         associatedCategories,
         finalPrice: price,
         ean13: ean,
         reference: '',
-        wholesalePrice: parseFloat(String(row[mapping['wholesale_price']] || price).replace(',', '.')) || price,
+        wholesalePrice: parseFloat(String(getVal(["wholesale_price", "Prix d'achat HT", "Prix d achat HT"]) || price).replace(',', '.')) || price,
         crossedPrice: price,
         salesCount: 0,
         position: 0,

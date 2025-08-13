@@ -76,7 +76,7 @@ const CSVMapping: React.FC<CSVMappingProps> = ({ headers, onMappingComplete, onB
     onMappingComplete(mapping);
   };
 
-  const isMappingValid = requiredFields.every(field => mapping[field] && headers.includes(mapping[field]));
+  const isMappingValid = requiredFields.every(field => mapping[field]);
 
   return (
     <Paper sx={{ p: 3, maxWidth: 800, mx: 'auto', mt: 3 }}>
