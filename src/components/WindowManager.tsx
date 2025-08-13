@@ -291,14 +291,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           .trim();
       
       // Table des remises par sous-catégorie (normalisées)
-      const DISCOUNT_BY_SUBCAT: Record<string, number> = {
-        [normalizeKey('VERRE 4')]: 4.17,
-        [normalizeKey('VERRE 6.50')]: 3.85,
-        [normalizeKey('VERRE 8.50')]: 3.92,
-        [normalizeKey('VERRE 10')]: 5.0,
-        [normalizeKey('VERRE 12')]: 5.56,
-        [normalizeKey('CALICE METAL')]: 5.0,
-      };
+      // Accepte variantes: "VERRE 6,5" => "verre 6.5", etc.
+      const discountPairs: Array<[string, number]> = [
+        ['verre 4', 4.17],
+        ['verre 4.0', 4.17],
+        ['verre 6.5', 3.85],
+        ['verre 6.50', 3.85],
+        ['verre 8.5', 3.92],
+        ['verre 8.50', 3.92],
+        ['verre 10', 5.0],
+        ['verre 12', 5.56],
+        ['calice metal', 5.0],
+      ];
+      const DISCOUNT_BY_SUBCAT: Record<string, number> = Object.fromEntries(
+        discountPairs.map(([k, v]) => [normalizeKey(k), v])
+      );
 
       // Agréger les quantités par sous-catégorie cible + mémoriser les lignes concernées
       const qtyBySubcat: Record<string, number> = {};
@@ -306,7 +313,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       for (const it of cartItems) {
         const assoc = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
         const normAssoc = assoc.map(a => normalizeKey(a)).filter(Boolean);
-        const matched = normAssoc.find(a => DISCOUNT_BY_SUBCAT[a] !== undefined);
+        // Cherche une sous-cat exacte, sinon tente un match contenant le motif "verre X".
+        let matched = normAssoc.find(a => DISCOUNT_BY_SUBCAT[a] !== undefined);
+        if (!matched) {
+          matched = normAssoc.find(a => {
+            if (!a.includes('verre')) return false;
+            // extraire un nombre type 6, 6.5, 8.50
+            const m = a.match(/verre\s*(\d+(?:\.\d+)?)/);
+            if (!m) return false;
+            const key = normalizeKey(`verre ${m[1]}`);
+            return DISCOUNT_BY_SUBCAT[key] !== undefined;
+          });
+        }
         if (!matched) continue;
         qtyBySubcat[matched] = (qtyBySubcat[matched] || 0) + (it.quantity || 0);
         const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
