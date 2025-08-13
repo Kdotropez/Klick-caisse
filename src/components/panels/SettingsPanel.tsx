@@ -20,6 +20,8 @@ interface SettingsPanelProps {
   onExportAll?: () => void;
   onImportAll?: (file: File) => void;
   onImportTxOnly?: (file: File) => void;
+  onImportArticlesFromGit?: () => void;
+  onImportDeclinaisonsFromGit?: () => void;
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -40,6 +42,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onExportAll,
   onImportAll,
   onImportTxOnly,
+  onImportArticlesFromGit,
+  onImportDeclinaisonsFromGit,
 }) => {
   const gap = 2;
   const totalGapsWidth = 4;
@@ -243,9 +247,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 5')}
+        onClick={onImportArticlesFromGit}
       >
-        Vide 5
+        Import Articles (GitHub)
       </Button>
 
       <Button
@@ -263,9 +267,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 6')}
+        onClick={onImportDeclinaisonsFromGit}
       >
-        Vide 6
+        Import Déclinaisons (GitHub)
       </Button>
 
       <Button

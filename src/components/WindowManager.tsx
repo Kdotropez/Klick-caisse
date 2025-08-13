@@ -1492,6 +1492,48 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     }
   };
 
+  // Importer Articles et Déclinaisons depuis GitHub (raw)
+  const fetchText = async (url: string): Promise<string> => {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.text();
+  };
+
+  const importArticlesFromGit = async () => {
+    try {
+      setImportStatus('importing');
+      setImportMessage('Import (GitHub) en cours...');
+      // Ajuste l’URL raw si besoin (branche/master par défaut)
+      const url = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20ARTICLE%20WYSIWYG.csv';
+      const text = await fetchText(url);
+      const file = new File([text], 'articles.csv', { type: 'text/csv' });
+      // Réutiliser le flux standard d’import CSV via un input synthétique
+      const evt = { target: { files: [file], value: '' } } as any;
+      await handleImportCSV(evt);
+    } catch (e:any) {
+      setImportStatus('error');
+      setImportMessage(`Import GitHub (articles) échoué: ${e?.message||e}`);
+    }
+  };
+
+  const importDeclinaisonsFromGit = async () => {
+    try {
+      // On passe par le parseur de déclinaisons existant
+      setImportStatus('importing');
+      setImportMessage('Import déclinaisons (GitHub) en cours...');
+      const url = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20DECLINAISONS%20WYSIWYG.csv';
+      const text = await fetchText(url);
+      const file = new File([text], 'declinaisons.csv', { type: 'text/csv' });
+      await handleImportVariationsCSV(file);
+      setImportStatus('success');
+      setImportMessage('Déclinaisons importées (GitHub)');
+      setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 3000);
+    } catch (e:any) {
+      setImportStatus('error');
+      setImportMessage(`Import GitHub (déclinaisons) échoué: ${e?.message||e}`);
+    }
+  };
+
   // Backup: exporter tout en JSON
   const handleExportAll = () => {
     const data = StorageService.exportFullBackup();
@@ -1919,6 +1961,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             importStatus={importStatus}
             onImportCSV={handleImportCSV}
             onImportVariationsCSV={(file)=>handleImportVariationsCSV(file)}
+            onImportArticlesFromGit={importArticlesFromGit}
+            onImportDeclinaisonsFromGit={importDeclinaisonsFromGit}
             onOpenCategoryManagement={() => setShowCategoryManagementModal(true)}
             onOpenSubcategoryManagement={() => setShowSubcategoryManagementModal(true)}
             isEditMode={isEditMode}
