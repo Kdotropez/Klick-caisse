@@ -1,14 +1,18 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
+import { useUISettings } from '../../context/UISettingsContext';
 
 interface FreePanelProps {
   width: number;
   height: number;
   getScaledFontSize: (base: string) => string;
   highlight?: boolean;
+  isEditMode: boolean;
+  onToggleEditMode: () => void;
 }
 
-const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight }) => {
+const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode }) => {
+  const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
   const gap = 2;
   const totalGapsWidth = 4;
   const totalGapsHeight = 6;
@@ -63,16 +67,54 @@ const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize,
         borderRadius: highlight ? '8px' : '0px',
       }}
     >
-      {colors.map(([bg, hover], idx) => (
-        <Button
-          key={idx}
-          variant="contained"
-          sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
-          onClick={() => console.log(`Libre ${idx + 1}`)}
-        >
-          {`Libre ${idx + 1}`}
-        </Button>
-      ))}
+      {colors.map(([bg, hover], idx) => {
+        if (idx === 0) {
+          return (
+            <Button
+              key={idx}
+              variant="contained"
+              sx={{ ...commonButtonSx, backgroundColor: compactMode ? '#2e7d32' : bg, '&:hover': { backgroundColor: compactMode ? '#1b5e20' : hover } }}
+              onClick={() => setCompactMode(!compactMode)}
+            >
+              {`Mode compact: ${compactMode ? 'ON' : 'OFF'}`}
+            </Button>
+          );
+        }
+        if (idx === 1) {
+          return (
+            <Button
+              key={idx}
+              variant="contained"
+              sx={{ ...commonButtonSx, backgroundColor: autoFit ? '#1976d2' : bg, '&:hover': { backgroundColor: autoFit ? '#1565c0' : hover } }}
+              onClick={() => setAutoFit(!autoFit)}
+            >
+              {`Auto-fit: ${autoFit ? 'ON' : 'OFF'}`}
+            </Button>
+          );
+        }
+        if (idx === 2) {
+          return (
+            <Button
+              key={idx}
+              variant="contained"
+              sx={{ ...commonButtonSx, backgroundColor: isEditMode ? '#f44336' : bg, '&:hover': { backgroundColor: isEditMode ? '#d32f2f' : hover } }}
+              onClick={onToggleEditMode}
+            >
+              {isEditMode ? 'Mode Vente' : 'Modifier Article'}
+            </Button>
+          );
+        }
+        return (
+          <Button
+            key={idx}
+            variant="contained"
+            sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
+            onClick={() => console.log(`Libre ${idx + 1}`)}
+          >
+            {`Libre ${idx + 1}`}
+          </Button>
+        );
+      })}
     </Box>
   );
 };

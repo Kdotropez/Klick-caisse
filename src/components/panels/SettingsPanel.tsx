@@ -98,12 +98,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         height: '100%',
         display: 'grid',
         gridTemplateColumns: `repeat(3, ${buttonWidth}px)`,
-        gridTemplateRows: `repeat(4, ${buttonHeight}px)`,
+        gridAutoRows: `${buttonHeight}px`,
         gap: `${gap}px`,
         p: 0.5,
         boxSizing: 'border-box',
         justifyContent: 'center',
         alignItems: 'center',
+        overflowY: 'auto',
       }}
     >
       <input
@@ -276,45 +277,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         Import Déclinaisons (GitHub)
       </Button>
 
-      <Button
-        variant="contained"
-        sx={{
-          width: '100%',
-          height: '100%',
-          fontSize: getScaledFontSize('0.5rem'),
-          fontWeight: 'bold',
-          backgroundColor: compactMode ? '#2e7d32' : '#ff9800',
-          '&:hover': { backgroundColor: compactMode ? '#1b5e20' : '#f57c00' },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          textTransform: 'none',
-          lineHeight: 1.0,
-          padding: '1px',
-        }}
-        onClick={() => setCompactMode(!compactMode)}
-      >
-        Mode compact: {compactMode ? 'ON' : 'OFF'}
-      </Button>
-
-      <Button
-        variant="contained"
-        sx={{
-          width: '100%',
-          height: '100%',
-          fontSize: getScaledFontSize('0.5rem'),
-          fontWeight: 'bold',
-          backgroundColor: autoFit ? '#1976d2' : '#90a4ae',
-          '&:hover': { backgroundColor: autoFit ? '#1565c0' : '#78909c' },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          textTransform: 'none',
-          lineHeight: 1.0,
-          padding: '1px',
-        }}
-        onClick={() => setAutoFit(!autoFit)}
-      >
-        Auto-fit: {autoFit ? 'ON' : 'OFF'}
-      </Button>
+      
 
       <Button
         variant="contained"
@@ -396,25 +359,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         Gestion Sous-catégories
       </Button>
 
-      <Button
-        variant="contained"
-        sx={{
-          width: '100%',
-          height: '100%',
-          fontSize: getScaledFontSize('0.5rem'),
-          fontWeight: 'bold',
-          backgroundColor: isEditMode ? '#f44336' : '#ff9800',
-          '&:hover': { backgroundColor: isEditMode ? '#d32f2f' : '#f57c00' },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          textTransform: 'none',
-          lineHeight: 1.0,
-          padding: '1px',
-        }}
-        onClick={onToggleEditMode}
-      >
-        {isEditMode ? 'Mode Vente' : 'Modifier Article'}
-      </Button>
+      
 
       {isEditMode && (
         <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>

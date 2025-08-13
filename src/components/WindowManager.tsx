@@ -327,7 +327,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
         if (!matched) continue;
         qtyBySubcat[matched] = (qtyBySubcat[matched] || 0) + (it.quantity || 0);
-        const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
         if (!lineKeysBySubcat[matched]) lineKeysBySubcat[matched] = [];
         lineKeysBySubcat[matched].push(key);
       }
@@ -340,14 +340,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         if (qtyBySubcat[sub] >= 6) {
           for (const key of keys) {
             next[key] = { type: 'percent', value: percent };
-          }
-        } else {
+        }
+      } else {
           for (const key of keys) {
             if (next[key] && next[key].type === 'percent' && Math.abs(next[key].value - percent) < 1e-6) {
-              delete next[key];
-            }
+            delete next[key];
           }
         }
+      }
       }
 
       // Nettoyage: retirer d'anciennes remises percent qui ne correspondent plus à des lignes actuelles
@@ -2081,6 +2081,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               height={window.height}
               getScaledFontSize={getScaledFontSize}
               highlight={window.id === 'window8'}
+              isEditMode={isEditMode}
+              onToggleEditMode={() => {
+                const newEditMode = !isEditMode;
+                setIsEditMode(newEditMode);
+                setShowEditModeNotification(newEditMode);
+                setSelectedProductsForDeletion(new Set());
+              }}
             />
           );
 
