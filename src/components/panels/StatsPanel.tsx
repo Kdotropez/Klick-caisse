@@ -10,6 +10,7 @@ interface StatsPanelProps {
   onOpenGlobalTickets: () => void;
   onOpenClosures: () => void;
   onOpenEndOfDay: () => void;
+  totalDailyDiscounts?: number;
 }
 
 const StatsPanel: React.FC<StatsPanelProps> = ({
@@ -21,6 +22,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
   onOpenGlobalTickets,
   onOpenClosures,
   onOpenEndOfDay,
+  totalDailyDiscounts = 0,
 }) => {
   const padding = 4;
   const gap = 2;
@@ -63,7 +65,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
           Rapport
         </Button>
         <Button variant="contained" sx={{ ...commonButtonSx, backgroundColor: '#4caf50', '&:hover': { backgroundColor: '#388e3c' } }} onClick={onOpenGlobalDiscount}>
-          Remise
+          Remise\n({totalDailyDiscounts.toFixed(2)} €)
         </Button>
       </Box>
       <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>

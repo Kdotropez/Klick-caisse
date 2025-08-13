@@ -147,6 +147,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null);
   const [itemDiscounts, setItemDiscounts] = useState<{[key: string]: {type: 'euro' | 'percent' | 'price', value: number}}>({});
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
+  const [autoGlassDiscountEnabled, setAutoGlassDiscountEnabled] = useState<boolean>(true);
   const [showCategoryManagementModal, setShowCategoryManagementModal] = useState(false);
   const [showDailyReportModal, setShowDailyReportModal] = useState(false);
   const [showProductEditModal, setShowProductEditModal] = useState(false);
@@ -255,10 +256,33 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     'SumUp': 0,
     'Carte': 0
   });
+  const totalDailyDiscounts = useMemo(() => {
+    try {
+      let total = 0;
+      for (const tx of todayTransactions) {
+        for (const it of tx.items) {
+          const originalUnit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+          const unitAfter = getItemFinalPrice(it);
+          const diffPerUnit = Math.max(0, originalUnit - unitAfter);
+          total += diffPerUnit * (it.quantity || 0);
+        }
+      }
+      return total;
+    } catch { return 0; }
+  }, [todayTransactions, itemDiscounts, globalDiscount]);
 
   // Remises automatiques: 6 verres achetés d'une même sous-catégorie → remise en % par ligne
   useEffect(() => {
     try {
+      if (!autoGlassDiscountEnabled) {
+        // Si désactivé, retirer toutes les remises auto de type percent sur verres
+        const next: typeof itemDiscounts = { ...itemDiscounts };
+        for (const key of Object.keys(next)) {
+          if (next[key]?.type === 'percent') delete next[key];
+        }
+        if (Object.keys(next).length !== Object.keys(itemDiscounts).length) setItemDiscounts(next);
+        return;
+      }
       const normalizeKey = (s: string) =>
         normalizeDecimals(StorageService.normalizeLabel(String(s)))
           .replace(/[^a-z0-9. ]/g, '')
@@ -318,7 +342,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       if (changed) setItemDiscounts(next);
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartItems]);
+  }, [cartItems, autoGlassDiscountEnabled]);
 
   useEffect(() => {
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
@@ -1630,6 +1654,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
             promoBanner={null}
+            autoGlassDiscountEnabled={autoGlassDiscountEnabled}
+            onToggleAutoGlassDiscount={() => setAutoGlassDiscountEnabled(v => !v)}
           />
         );
 
@@ -1929,6 +1955,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               onOpenGlobalTickets={() => { setGlobalOnlyToday(false); setShowGlobalTickets(true); }}
               onOpenClosures={() => { setClosures(StorageService.loadClosures()); setSelectedClosureIdx(null); setShowClosures(true); }}
               onOpenEndOfDay={() => setShowEndOfDay(true)}
+              totalDailyDiscounts={totalDailyDiscounts}
             />
           );
 
