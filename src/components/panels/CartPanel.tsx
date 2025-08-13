@@ -35,6 +35,8 @@ interface CartPanelProps {
   onRemoveItemDiscount: (discountKey: string) => void;
   onClearGlobalDiscount: () => void;
   promoBanner?: React.ReactNode;
+  autoGlassDiscountEnabled?: boolean;
+  onToggleAutoGlassDiscount?: () => void;
 }
 
 const CartPanel: React.FC<CartPanelProps> = ({
@@ -52,6 +54,8 @@ const CartPanel: React.FC<CartPanelProps> = ({
   onRemoveItemDiscount,
   onClearGlobalDiscount,
   promoBanner,
+  autoGlassDiscountEnabled = true,
+  onToggleAutoGlassDiscount,
 }) => {
   const total = getTotalWithGlobalDiscount();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -315,6 +319,19 @@ const CartPanel: React.FC<CartPanelProps> = ({
             sx={{ backgroundColor: '#f44336', flex: 1, fontSize: '0.8rem' }}
           >
             🔄 Reset
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={onToggleAutoGlassDiscount}
+            sx={{ 
+              backgroundColor: autoGlassDiscountEnabled ? '#4caf50' : '#9e9e9e', 
+              flex: 1, 
+              fontSize: '0.8rem'
+            }}
+            title="Activer/désactiver la remise auto 6 verres"
+          >
+            {autoGlassDiscountEnabled ? '✅ Remise auto' : '⛔ Remise auto'}
           </Button>
         </Box>
       </Box>
