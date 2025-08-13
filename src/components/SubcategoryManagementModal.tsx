@@ -6,14 +6,9 @@ import {
   DialogActions,
   Button,
   TextField,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Box,
   Typography,
-  Divider,
   Alert,
   FormControl,
   InputLabel,
@@ -21,7 +16,7 @@ import {
   MenuItem,
   Chip
 } from '@mui/material';
-import { Delete, Edit, Add, Save, Cancel } from '@mui/icons-material';
+import { Add, Save, Cancel } from '@mui/icons-material';
 import { Category } from '../types/Product';
 import { StorageService } from '../services/StorageService';
 
@@ -105,7 +100,7 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
     } else {
       setSubcategories([]);
     }
-  }, [selectedCategory, products, categories]);
+  }, [selectedCategory, products, categories, getSubcategoriesForCategory]);
 
   const handleAddSubcategory = () => {
     if (!selectedCategory) {
