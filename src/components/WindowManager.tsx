@@ -1512,75 +1512,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   // Importer Articles et Déclinaisons depuis GitHub (raw)
-  const fetchText = async (url: string): Promise<string> => {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.text();
-  };
+  // util retiré (plus d'import GitHub)
 
-  const importArticlesFromGit = async () => {
-    try {
-      setImportStatus('importing');
-      setImportMessage('Import (GitHub) en cours...');
-      // Ajuste l’URL raw si besoin (branche/master par défaut)
-      const url = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20ARTICLE%20WYSIWYG.csv';
-      const text = await fetchText(url);
-      const file = new File([text], 'articles.csv', { type: 'text/csv' });
-      // Réutiliser le flux standard d’import CSV via un input synthétique
-      const evt = { target: { files: [file], value: '' } } as any;
-      await handleImportCSV(evt);
-    } catch (e:any) {
-      setImportStatus('error');
-      setImportMessage(`Import GitHub (articles) échoué: ${e?.message||e}`);
-    }
-  };
+  // (Import GitHub retiré sur demande)
 
-  const importDeclinaisonsFromGit = async () => {
-    try {
-      // On passe par le parseur de déclinaisons existant
-      setImportStatus('importing');
-      setImportMessage('Import déclinaisons (GitHub) en cours...');
-      const url = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20DECLINAISONS%20WYSIWYG.csv';
-      const text = await fetchText(url);
-      const file = new File([text], 'declinaisons.csv', { type: 'text/csv' });
-      await handleImportVariationsCSV(file);
-      setImportStatus('success');
-      setImportMessage('Déclinaisons importées (GitHub)');
-      setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 3000);
-    } catch (e:any) {
-      setImportStatus('error');
-      setImportMessage(`Import GitHub (déclinaisons) échoué: ${e?.message||e}`);
-    }
-  };
-
-  // Réinitialiser complètement la base (produits, catégories, sous-catégories) depuis GitHub
-  // Sans toucher tickets/clôtures/caissiers
-  const resetBaseFromGitHub = async () => {
-    try {
-      setImportStatus('importing');
-      setImportMessage('Réinitialisation base depuis GitHub...');
-      // Charger le backup JSON versionné dans le repo (plus fiable que CSV)
-      const urlBackup = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/src/components/klick-caisse-backup-2025-08-13-21-26-12.json';
-      const text = await fetchText(urlBackup);
-      const data = JSON.parse(text);
-      // Importer uniquement produits/catégories/sous-catégories depuis le backup
-      if (data && typeof data === 'object') {
-        const productsFromBackup = Array.isArray((data as any).products) ? (data as any).products : [];
-        const categoriesFromBackup = Array.isArray((data as any).categories) ? (data as any).categories : [];
-        if (Array.isArray((data as any).subcategories)) {
-          StorageService.saveSubcategories((data as any).subcategories);
-        }
-        // Mettre à jour l'app via le callback prévu
-        onImportComplete(productsFromBackup, categoriesFromBackup);
-      }
-      setImportStatus('success');
-      setImportMessage('Base réinitialisée depuis GitHub (backup JSON)');
-      setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 3000);
-    } catch (e:any) {
-      setImportStatus('error');
-      setImportMessage(`Échec réinitialisation GitHub: ${e?.message||e}`);
-    }
-  };
+  // Réinitialiser base (GitHub) retiré sur demande
 
   // Backup: exporter tout en JSON
   const handleExportAll = () => {
@@ -2009,9 +1945,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             importStatus={importStatus}
             onImportCSV={handleImportCSV}
             onImportVariationsCSV={(file)=>handleImportVariationsCSV(file)}
-            onImportArticlesFromGit={importArticlesFromGit}
-            onImportDeclinaisonsFromGit={importDeclinaisonsFromGit}
-            onResetBaseFromGitHub={resetBaseFromGitHub}
             onOpenCategoryManagement={() => setShowCategoryManagementModal(true)}
             onOpenSubcategoryManagement={() => setShowSubcategoryManagementModal(true)}
             isEditMode={isEditMode}

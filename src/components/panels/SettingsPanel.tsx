@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
-import { useUISettings } from '../../context/UISettingsContext';
+ 
 
 interface SettingsPanelProps {
   width: number;
@@ -21,9 +21,7 @@ interface SettingsPanelProps {
   onExportAll?: () => void;
   onImportAll?: (file: File) => void;
   onImportTxOnly?: (file: File) => void;
-  onImportArticlesFromGit?: () => void;
-  onImportDeclinaisonsFromGit?: () => void;
-  onResetBaseFromGitHub?: () => void;
+  
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -44,11 +42,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onExportAll,
   onImportAll,
   onImportTxOnly,
-  onImportArticlesFromGit,
-  onImportDeclinaisonsFromGit,
-  onResetBaseFromGitHub,
+  
 }) => {
-  const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
+  
   const gap = 2;
   const totalGapsWidth = 4;
   const totalGapsHeight = 6;
@@ -237,45 +233,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         Importer tickets/clôtures (JSON)
       </Button>
 
-      <Button
-        variant="contained"
-        sx={{
-          width: '100%',
-          height: '100%',
-          fontSize: getScaledFontSize('0.5rem'),
-          fontWeight: 'bold',
-          backgroundColor: '#3f51b5',
-          '&:hover': { backgroundColor: '#303f9f' },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          textTransform: 'none',
-          lineHeight: 1.0,
-          padding: '1px',
-        }}
-        onClick={onImportArticlesFromGit}
-      >
-        Import Articles (GitHub)
-      </Button>
-
-      <Button
-        variant="contained"
-        sx={{
-          width: '100%',
-          height: '100%',
-          fontSize: getScaledFontSize('0.5rem'),
-          fontWeight: 'bold',
-          backgroundColor: '#4caf50',
-          '&:hover': { backgroundColor: '#388e3c' },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          textTransform: 'none',
-          lineHeight: 1.0,
-          padding: '1px',
-        }}
-        onClick={onImportDeclinaisonsFromGit}
-      >
-        Import Déclinaisons (GitHub)
-      </Button>
+      
 
       
 
@@ -299,25 +257,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         Vide 8
       </Button>
 
-      <Button
-        variant="contained"
-        sx={{
-          width: '100%',
-          height: '100%',
-          fontSize: getScaledFontSize('0.5rem'),
-          fontWeight: 'bold',
-          backgroundColor: '#00bcd4',
-          '&:hover': { backgroundColor: '#0097a7' },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          textTransform: 'none',
-          lineHeight: 1.0,
-          padding: '1px',
-        }}
-        onClick={onResetBaseFromGitHub}
-      >
-        Réinitialiser base (GitHub)
-      </Button>
+      
 
       <Button
         variant="contained"
