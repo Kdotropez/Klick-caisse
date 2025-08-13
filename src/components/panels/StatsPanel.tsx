@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Badge } from '@mui/material';
 
 interface StatsPanelProps {
   width: number;
@@ -64,9 +64,20 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
         <Button variant="contained" sx={{ ...commonButtonSx, backgroundColor: '#2196f3', '&:hover': { backgroundColor: '#1976d2' } }} onClick={onOpenDailyReport}>
           Rapport
         </Button>
-        <Button variant="contained" sx={{ ...commonButtonSx, backgroundColor: '#4caf50', '&:hover': { backgroundColor: '#388e3c' } }} onClick={onOpenGlobalDiscount}>
-          Remise\n({totalDailyDiscounts.toFixed(2)} €)
-        </Button>
+        <Badge
+          color="secondary"
+          badgeContent={`${totalDailyDiscounts.toFixed(2)} €`}
+          invisible={totalDailyDiscounts <= 0}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          sx={{
+            width: '100%',
+            '& .MuiBadge-badge': { right: -6, top: -6, fontSize: '0.7rem', padding: '2px 6px' }
+          }}
+        >
+          <Button variant="contained" sx={{ ...commonButtonSx, backgroundColor: '#4caf50', '&:hover': { backgroundColor: '#388e3c' }, width: '100%' }} onClick={onOpenGlobalDiscount}>
+            Remise
+          </Button>
+        </Badge>
       </Box>
       <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
         <Button variant="contained" sx={{ ...commonButtonSx, backgroundColor: '#607d8b', '&:hover': { backgroundColor: '#546e7a' } }} onClick={onOpenSalesRecap}>

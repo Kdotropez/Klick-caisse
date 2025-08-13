@@ -260,16 +260,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     try {
       let total = 0;
       for (const tx of todayTransactions) {
-        for (const it of tx.items) {
-          const originalUnit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
-          const unitAfter = getItemFinalPrice(it);
-          const diffPerUnit = Math.max(0, originalUnit - unitAfter);
-          total += diffPerUnit * (it.quantity || 0);
-        }
+        // Somme des montants sans remise (prix catalogue)
+        const originalSum = tx.items.reduce((sum, it) => {
+          const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+          return sum + unit * (it.quantity || 0);
+        }, 0);
+        const discountTx = Math.max(0, originalSum - tx.total);
+        total += discountTx;
       }
       return total;
     } catch { return 0; }
-  }, [todayTransactions, itemDiscounts, globalDiscount]);
+  }, [todayTransactions]);
 
   // Remises automatiques: 6 verres achetés d'une même sous-catégorie → remise en % par ligne
   useEffect(() => {
