@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -59,8 +59,8 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
     return Array.from(allSubcategories).sort();
   };
 
-  // Extraire les sous-catégories pour une catégorie spécifique
-  const getSubcategoriesForCategory = (categoryId: string): string[] => {
+  // Extraire les sous-catégories pour une catégorie spécifique (mémoïsée pour CI)
+  const getSubcategoriesForCategory = useCallback((categoryId: string): string[] => {
     const category = categories.find(cat => cat.id === categoryId) as (Category & { subcategoryOrder?: string[] }) | undefined;
     if (!category) return [];
 
@@ -89,7 +89,7 @@ const SubcategoryManagementModal: React.FC<SubcategoryManagementModalProps> = ({
       list.sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
     }
     return list;
-  };
+  }, [categories, products]);
 
   // Mettre à jour les sous-catégories quand une catégorie est sélectionnée
   useEffect(() => {
