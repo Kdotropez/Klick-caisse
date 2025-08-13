@@ -3,6 +3,8 @@ import React, { createContext, useContext, useMemo, useState } from 'react';
 interface UISettingsContextValue {
   compactMode: boolean;
   setCompactMode: (value: boolean) => void;
+  autoFit: boolean;
+  setAutoFit: (value: boolean) => void;
 }
 
 const UISettingsContext = createContext<UISettingsContextValue | undefined>(undefined);
@@ -17,6 +19,15 @@ export const UISettingsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   });
 
+  const [autoFitState, setAutoFitState] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('ui.autofit');
+      return stored === '1';
+    } catch {
+      return true; // utile par défaut sur iPad
+    }
+  });
+
   const setCompactMode = (value: boolean) => {
     setCompactModeState(value);
     try {
@@ -26,10 +37,21 @@ export const UISettingsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  const setAutoFit = (value: boolean) => {
+    setAutoFitState(value);
+    try {
+      localStorage.setItem('ui.autofit', value ? '1' : '0');
+    } catch {
+      // ignore storage errors
+    }
+  };
+
   const value = useMemo<UISettingsContextValue>(() => ({
     compactMode: compactModeState,
     setCompactMode,
-  }), [compactModeState]);
+    autoFit: autoFitState,
+    setAutoFit,
+  }), [compactModeState, autoFitState]);
 
   return (
     <UISettingsContext.Provider value={value}>{children}</UISettingsContext.Provider>

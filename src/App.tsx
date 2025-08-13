@@ -155,7 +155,31 @@ const App: React.FC = () => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const { compactMode } = useUISettings();
+  const { compactMode, autoFit } = useUISettings();
+  const [viewportSize, setViewportSize] = useState<{ width: number; height: number }>({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1280,
+    height: typeof window !== 'undefined' ? window.innerHeight : 880,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
+
+  const rootWidthPx = parseInt(rootSize.width);
+  const rootHeightPx = parseInt(rootSize.height);
+  const fitScale = autoFit
+    ? Math.min(viewportSize.width / rootWidthPx, viewportSize.height / rootHeightPx, 1)
+    : 1;
+  const baseScale = compactMode ? 0.9 : 1;
+  const finalScale = Math.min(baseScale, fitScale);
 
   return (
     <Box sx={{
@@ -165,7 +189,7 @@ const App: React.FC = () => {
       border: '2px solid #1976d2',
       backgroundColor: '#f5f5f5',
       overflow: 'hidden',
-      transform: compactMode ? 'scale(0.9)' : 'none',
+      transform: `scale(${finalScale})`,
       transformOrigin: 'top left'
     }}>
       {/* Poignée de redimensionnement du div#root */}

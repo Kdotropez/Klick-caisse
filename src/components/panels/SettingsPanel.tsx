@@ -48,7 +48,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onImportDeclinaisonsFromGit,
   onResetBaseFromGitHub,
 }) => {
-  const { compactMode, setCompactMode } = useUISettings();
+  const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
   const gap = 2;
   const totalGapsWidth = 4;
   const totalGapsHeight = 6;
@@ -294,6 +294,26 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={() => setCompactMode(!compactMode)}
       >
         Mode compact: {compactMode ? 'ON' : 'OFF'}
+      </Button>
+
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: autoFit ? '#1976d2' : '#90a4ae',
+          '&:hover': { backgroundColor: autoFit ? '#1565c0' : '#78909c' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => setAutoFit(!autoFit)}
+      >
+        Auto-fit: {autoFit ? 'ON' : 'OFF'}
       </Button>
 
       <Button
