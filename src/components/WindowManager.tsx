@@ -300,47 +300,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
   }, [todayTransactions, computePaymentTotalsFromTransactions]);
 
-  // Remises automatiques par sous-catégorie: s'appliquent par ligne (même produit/variation) si quantité >= 6
-  useEffect(() => {
-    const PROMO_RULES: Array<{ label: string; percent: number }> = [
-      { label: 'verres 4', percent: 4.17 },
-      { label: 'verres 6.50', percent: 3.85 },
-      { label: 'verres 8.50', percent: 3.92 },
-      { label: 'verres 10', percent: 5.0 },
-      { label: 'verres 12', percent: 5.56 },
-      { label: 'calice metzl', percent: 5.0 },
-    ];
-
-    const normalizeKey = (s: string) => normalizeDecimals(StorageService.normalizeLabel(String(s)));
-
-    // Calculer les promos actives (>=6 unités) et appliquer/retirer
-    const next = { ...itemDiscounts } as any;
-    for (const rule of PROMO_RULES) {
-      const target = normalizeKey(rule.label);
-      for (const it of cartItems) {
-        const list = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
-        const matchesSubcategory = list.some((c) => normalizeKey(c) === target);
-        if (!matchesSubcategory) continue;
-        const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-        if ((it.quantity || 0) >= 6) {
-          // Appliquer la remise sur cette ligne uniquement
-          if (!next[key] || next[key].type !== 'percent' || next[key].value !== rule.percent) {
-            next[key] = { type: 'percent', value: rule.percent };
-          }
-        } else {
-          // Retirer la remise si la ligne passe sous 6
-          if (next[key] && next[key].type === 'percent' && Math.abs(next[key].value - rule.percent) < 1e-6) {
-            delete next[key];
-          }
-        }
-      }
-    }
-    // Mettre à jour les remises si changement de mappage
-    const changed = Object.keys(next).length !== Object.keys(itemDiscounts).length ||
-      Object.keys(next).some(k => JSON.stringify(next[k]) !== JSON.stringify((itemDiscounts as any)[k]));
-    if (changed) setItemDiscounts(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartItems]);
+  // Remises automatiques désactivées temporairement (réintégration prévue)
+  // useEffect(() => {}, [cartItems]);
 
   // La suppression se fait via la croix rouge (onRemoveItemDiscount)
 

@@ -58,6 +58,17 @@ const CSVMapping: React.FC<CSVMappingProps> = ({ headers, onMappingComplete, onB
     'Référence déclinaison',
     'Liste des attributs',
     'Impact sur prix de vente TTC',
+    // Sous-catégories multi-colonnes (optionnelles)
+    'Sous-catégorie 1',
+    'Sous-catégorie 2',
+    'Sous-catégorie 3',
+    'Sous-catégorie 4',
+    'Sous-catégorie 5',
+    'Sous-catégorie 6',
+    'Sous-catégorie 7',
+    'Sous-catégorie 8',
+    'Sous-catégorie 9',
+    'Sous-catégorie 10',
   ];
 
   const handleMappingChange = (field: string, value: string) => {

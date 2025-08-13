@@ -76,9 +76,17 @@ export class CSVImportService {
       const ean = row[mapping['ean13']] || row[mapping.ean] || '';
 
       // Extraire les catégories associées si le mapping existe
-      const rawAssoc = row[mapping['catégories associées']] || row[mapping.associatedCategories] || '';
-      const associatedCategories = String(rawAssoc)
-        .split(/\s*(?:[;|]|,(?!\d))\s*/)
+      // Agréger sous-catégories: colonne CSV "catégories associées" + colonnes "Sous-catégorie n"
+      const rawAssocMain = row[mapping['catégories associées']] || row[mapping.associatedCategories] || '';
+      const extraSubs: string[] = [];
+      for (let i = 1; i <= 10; i++) {
+        const key = `Sous-catégorie ${i}`;
+        if (mapping[key] && row[mapping[key]]) extraSubs.push(String(row[mapping[key]]));
+      }
+      const associatedCategories = [
+        ...String(rawAssocMain).split(/\s*(?:[;|]|,(?!\d))\s*/),
+        ...extraSubs
+      ]
         .map((cat: string) => cat.trim())
         .filter((cat: string) => !!cat);
 
