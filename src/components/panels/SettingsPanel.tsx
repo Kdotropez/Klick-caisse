@@ -22,6 +22,7 @@ interface SettingsPanelProps {
   onImportTxOnly?: (file: File) => void;
   onImportArticlesFromGit?: () => void;
   onImportDeclinaisonsFromGit?: () => void;
+  onResetBaseFromGitHub?: () => void;
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -44,6 +45,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onImportTxOnly,
   onImportArticlesFromGit,
   onImportDeclinaisonsFromGit,
+  onResetBaseFromGitHub,
 }) => {
   const gap = 2;
   const totalGapsWidth = 4;
@@ -327,9 +329,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 9')}
+        onClick={onResetBaseFromGitHub}
       >
-        Vide 9
+        Réinitialiser base (GitHub)
       </Button>
 
       <Button

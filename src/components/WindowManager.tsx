@@ -1447,8 +1447,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       }
       const detectDelimiter = (s: string) => (s.includes('\t') ? '\t' : (s.includes(';') ? ';' : ','));
       const delimiter = detectDelimiter(lines[0]);
-      const headers = lines[0].split(delimiter).map(h => h.trim());
-      const h = (names: string[]) => headers.findIndex(x => names.some(n => x.toLowerCase().includes(n.toLowerCase())));
+      // Nettoyer et normaliser les en-têtes (insensible accents/casse)
+      // eslint-disable-next-line no-control-regex
+      const rawHeaders = lines[0].split(delimiter).map(h => h.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim());
+      const normalize = (s: string) => s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+      const normHeaders = rawHeaders.map(normalize);
+      const h = (aliases: string[]) => {
+        const normAliases = aliases.map(normalize);
+        return normHeaders.findIndex(x => normAliases.some(a => x.includes(a)));
+      };
       const map = {
         productId: h(['identifiant produit','id product','id']),
         varId: h(['identifiant déclinaison','id declinaison','id combination','id_combination']),
@@ -1466,8 +1478,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         const cols = lines[i].split(delimiter);
         const pid = (cols[map.productId] || '').trim();
         if (!pid) continue;
-        const varId = (map.varId !== -1 ? cols[map.varId] : `var_${i}`).trim();
-        const attrs = (cols[map.attributes] || '').trim();
+        // eslint-disable-next-line no-control-regex
+        const varId = (map.varId !== -1 ? cols[map.varId] : `var_${i}`).replace(/\u0000/g, '').trim();
+        // eslint-disable-next-line no-control-regex
+        const attrs = (cols[map.attributes] || '').replace(/\u0000/g, '').trim();
         const ean = map.ean13 !== -1 ? (cols[map.ean13] || '').trim() : '';
         const ref = map.reference !== -1 ? (cols[map.reference] || '').trim() : '';
         const impact = map.impactTtc !== -1 ? parsePrice(cols[map.impactTtc]) : 0;
@@ -1536,6 +1550,35 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     } catch (e:any) {
       setImportStatus('error');
       setImportMessage(`Import GitHub (déclinaisons) échoué: ${e?.message||e}`);
+    }
+  };
+
+  // Réinitialiser complètement la base (produits, catégories, sous-catégories) depuis GitHub
+  // Sans toucher tickets/clôtures/caissiers
+  const resetBaseFromGitHub = async () => {
+    try {
+      setImportStatus('importing');
+      setImportMessage('Réinitialisation base depuis GitHub...');
+      const urlProducts = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20ARTICLE%20WYSIWYG.csv';
+      const urlVars = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/EXPORT%20VF%20DECLINAISONS%20WYSIWYG.csv';
+      // Vider produits/catégories/sous-catégories
+      localStorage.removeItem('klick_caisse_products');
+      localStorage.removeItem('klick_caisse_categories');
+      localStorage.removeItem('klick_caisse_subcategories');
+      // Import articles
+      const textP = await fetchText(urlProducts);
+      const fileP = new File([textP], 'articles.csv', { type: 'text/csv' });
+      await handleImportCSV({ target: { files: [fileP], value: '' } } as any);
+      // Import déclinaisons
+      const textV = await fetchText(urlVars);
+      const fileV = new File([textV], 'declinaisons.csv', { type: 'text/csv' });
+      await handleImportVariationsCSV(fileV);
+      setImportStatus('success');
+      setImportMessage('Base réinitialisée depuis GitHub');
+      setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 3000);
+    } catch (e:any) {
+      setImportStatus('error');
+      setImportMessage(`Échec réinitialisation GitHub: ${e?.message||e}`);
     }
   };
 
@@ -1968,6 +2011,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onImportVariationsCSV={(file)=>handleImportVariationsCSV(file)}
             onImportArticlesFromGit={importArticlesFromGit}
             onImportDeclinaisonsFromGit={importDeclinaisonsFromGit}
+            onResetBaseFromGitHub={resetBaseFromGitHub}
             onOpenCategoryManagement={() => setShowCategoryManagementModal(true)}
             onOpenSubcategoryManagement={() => setShowSubcategoryManagementModal(true)}
             isEditMode={isEditMode}
