@@ -83,12 +83,21 @@ export class CSVImportService {
         const key = `Sous-catégorie ${i}`;
         if (mapping[key] && row[mapping[key]]) extraSubs.push(String(row[mapping[key]]));
       }
-      const associatedCategories = [
-        ...String(rawAssocMain).split(/\s*(?:[;|]|,(?!\d))\s*/),
-        ...extraSubs
-      ]
-        .map((cat: string) => cat.trim())
-        .filter((cat: string) => !!cat);
+      const normalize = (s: string) => s
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+      const associatedCategories = Array.from(new Map(
+        [
+          ...String(rawAssocMain).split(/\s*(?:[;|]|,(?!\d))\s*/),
+          ...extraSubs
+        ]
+        .map((cat: string) => (cat || '').trim())
+        .filter((cat: string) => !!cat)
+        .map((cat: string) => [normalize(cat), cat] as [string, string])
+      ).values());
 
       return {
         id: String(row[mapping['Identifiant produit']] || row[mapping.id] || `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`),
@@ -97,9 +106,9 @@ export class CSVImportService {
         associatedCategories,
         finalPrice: price,
         ean13: ean,
-        reference: row[mapping['Référence']] || '',
+        reference: '',
         wholesalePrice: parseFloat(String(row[mapping['wholesale_price']] || price).replace(',', '.')) || price,
-        crossedPrice: parseFloat(String(row[mapping['Prix barré TTC']] || price).replace(',', '.')) || price,
+        crossedPrice: price,
         salesCount: 0,
         position: 0,
         remisable: true, // Par défaut, tous les produits sont remisables

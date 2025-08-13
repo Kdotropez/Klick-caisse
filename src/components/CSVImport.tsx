@@ -160,9 +160,52 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
         totalVariations: totalVariations,
       };
 
-      // Sauvegarder les données
-      StorageService.saveProducts(result.products);
-      StorageService.saveCategories(result.categories);
+      // Sauvegarder un backup avant fusion
+      StorageService.addAutoBackup();
+
+      // Fusion non destructive par Identifiant produit
+      const existingProducts = StorageService.loadProducts();
+      const idToIndex = new Map(existingProducts.map((p) => [p.id, p] as const));
+      const mergedProducts = [...existingProducts];
+      for (const np of result.products) {
+        const existing = idToIndex.get(np.id);
+        if (existing) {
+          // Mettre à jour des champs de base sans détruire d'autres propriétés
+          idToIndex.set(np.id, {
+            ...existing,
+            name: np.name || existing.name,
+            category: np.category || existing.category,
+            associatedCategories: Array.from(new Set([...(existing.associatedCategories || []), ...(np.associatedCategories || [])])),
+            finalPrice: Number.isFinite(np.finalPrice) ? np.finalPrice : existing.finalPrice,
+            ean13: np.ean13 || existing.ean13,
+            wholesalePrice: Number.isFinite(np.wholesalePrice) ? np.wholesalePrice : existing.wholesalePrice,
+            crossedPrice: Number.isFinite(np.crossedPrice) ? np.crossedPrice : existing.crossedPrice,
+          });
+        } else {
+          idToIndex.set(np.id, np);
+          mergedProducts.push(np);
+        }
+      }
+
+      // Recomposer la liste fusionnée dans l'ordre d'origine + nouveaux
+      const mergedById = new Map(mergedProducts.map(p => [p.id, p] as const));
+      const finalProducts = Array.from(idToIndex.values());
+
+      // Fusion des catégories par nom normalisé
+      const existingCategories = StorageService.loadCategories();
+      const norm = (s: string) => StorageService.normalizeLabel(s);
+      const nameToCat = new Map(existingCategories.map(c => [norm(c.name), c] as const));
+      for (const c of result.categories) {
+        const key = norm(c.name);
+        if (!nameToCat.has(key)) {
+          nameToCat.set(key, c);
+        }
+      }
+      const finalCategories = Array.from(nameToCat.values());
+
+      // Sauvegarder les données fusionnées
+      StorageService.saveProducts(finalProducts);
+      StorageService.saveCategories(finalCategories);
 
       setImportResult({
         success: true,

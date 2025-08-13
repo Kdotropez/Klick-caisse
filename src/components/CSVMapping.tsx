@@ -44,15 +44,15 @@ const CSVMapping: React.FC<CSVMappingProps> = ({ headers, onMappingComplete, onB
     'Identifiant produit',
     'Nom',
     'ean13',
-    'Référence',
     'Nom catégorie par défaut',
-    'catégories associées',
     'wholesale_price',
     'Prix de vente TTC final',
-    'Prix barré TTC',
   ];
 
   const optionalFields = [
+    'Référence',
+    'catégories associées',
+    'Prix barré TTC',
     'Identifiant déclinaison',
     'ean13 décl.',
     'Référence déclinaison',
