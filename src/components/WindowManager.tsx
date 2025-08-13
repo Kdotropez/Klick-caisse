@@ -1216,30 +1216,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     const category = categories.find(cat => cat.id === categoryId);
     if (!category) return;
 
-    // Mettre à jour les produits qui appartiennent à cette catégorie
-    const updatedProducts = products.map(product => {
-      if (product.category === category.name) {
-        return {
-          ...product,
-          associatedCategories: newSubcategories
-        };
-      }
-      return product;
-    });
-
-    if (onProductsReorder) onProductsReorder(updatedProducts);
-
-    // Sauvegarder automatiquement dans localStorage
-    saveProductionData(updatedProducts, categories);
-
-    console.log(`✅ Sous-catégories mises à jour pour ${category.name}:`, newSubcategories);
-
-    // Mettre à jour l'ordre des sous-catégories dans la catégorie (état + persistance)
-    const normalizedOrder = Array.from(new Set(newSubcategories.map(s => StorageService.sanitizeLabel(s)).filter(Boolean)));
+    // Ne pas écraser les sous-catégories des produits; only save display order for the category
+    const normalizedOrder = Array.from(new Set(newSubcategories
+      .map(s => StorageService.sanitizeLabel(s))
+      .filter(Boolean)));
     const updatedCategories = categories.map(cat =>
       cat.id === categoryId ? { ...cat, subcategoryOrder: normalizedOrder } as any : cat
     );
     onUpdateCategories?.(updatedCategories);
+    saveProductionData(products, updatedCategories);
+    console.log(`✅ Ordre des sous-catégories mis à jour pour ${category.name}:`, normalizedOrder);
   };
 
   // Fonction pour importer un fichier CSV
