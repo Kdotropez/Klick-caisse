@@ -79,7 +79,7 @@ export class CSVImportService {
       // Agréger sous-catégories: colonne CSV "catégories associées" + colonnes "Sous-catégorie n"
       const rawAssocMain = row[mapping['catégories associées']] || row[mapping.associatedCategories] || '';
       const extraSubs: string[] = [];
-      for (let i = 1; i <= 10; i++) {
+      for (let i = 1; i <= 3; i++) {
         const key = `Sous-catégorie ${i}`;
         if (mapping[key] && row[mapping[key]]) extraSubs.push(String(row[mapping[key]]));
       }

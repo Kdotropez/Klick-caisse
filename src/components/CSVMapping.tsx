@@ -62,13 +62,7 @@ const CSVMapping: React.FC<CSVMappingProps> = ({ headers, onMappingComplete, onB
     'Sous-catégorie 1',
     'Sous-catégorie 2',
     'Sous-catégorie 3',
-    'Sous-catégorie 4',
-    'Sous-catégorie 5',
-    'Sous-catégorie 6',
-    'Sous-catégorie 7',
-    'Sous-catégorie 8',
-    'Sous-catégorie 9',
-    'Sous-catégorie 10',
+    // Limité à 1..3 pour rester simple et propre
   ];
 
   const handleMappingChange = (field: string, value: string) => {

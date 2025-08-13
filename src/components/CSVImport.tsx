@@ -175,7 +175,9 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
             ...existing,
             name: np.name || existing.name,
             category: np.category || existing.category,
-            associatedCategories: Array.from(new Set([...(existing.associatedCategories || []), ...(np.associatedCategories || [])])),
+            associatedCategories: (np.associatedCategories && np.associatedCategories.length > 0)
+              ? np.associatedCategories
+              : (existing.associatedCategories || []),
             finalPrice: Number.isFinite(np.finalPrice) ? np.finalPrice : existing.finalPrice,
             ean13: np.ean13 || existing.ean13,
             wholesalePrice: Number.isFinite(np.wholesalePrice) ? np.wholesalePrice : existing.wholesalePrice,
@@ -206,6 +208,16 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
       // Sauvegarder les données fusionnées
       StorageService.saveProducts(finalProducts);
       StorageService.saveCategories(finalCategories);
+
+      // Recalculer le registre des sous-catégories à partir des produits (écrasement complet)
+      const allSubs = Array.from(new Set(
+        finalProducts
+          .flatMap(p => (p.associatedCategories || []))
+          .map((s: string) => StorageService.sanitizeLabel(s))
+          .map((s: string) => s.trim())
+          .filter((s: string) => !!s)
+      ));
+      StorageService.saveSubcategories(allSubs);
 
       setImportResult({
         success: true,
