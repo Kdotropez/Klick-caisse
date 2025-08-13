@@ -1287,9 +1287,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         throw new Error('Fichier CSV invalide - pas assez de lignes');
       }
 
+      // Détecter le séparateur: tab, point-virgule, virgule
+      const detectDelimiter = (s: string) => (s.includes('\t') ? '\t' : (s.includes(';') ? ';' : ','));
+      const delimiter = detectDelimiter(lines[0]);
       // Analyser les en-têtes (normalisation pour tolérer accents/variantes)
       // eslint-disable-next-line no-control-regex
-      const headers = lines[0].split('\t').map(h => h.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
+      const headers = lines[0].split(delimiter).map(h => h.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
       const normalize = (s: string) => s
         .toLowerCase()
         .normalize('NFD')
@@ -1325,7 +1328,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
       // Traiter chaque ligne
       for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split('\t');
+        const values = lines[i].split(delimiter);
         if (values.length < Math.max(...Object.values(mapping).filter(v => v !== -1)) + 1) continue;
 
         try {
@@ -1442,7 +1445,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         alert('Fichier déclinaisons invalide');
         return;
       }
-      const headers = lines[0].split('\t').map(h => h.trim());
+      const detectDelimiter = (s: string) => (s.includes('\t') ? '\t' : (s.includes(';') ? ';' : ','));
+      const delimiter = detectDelimiter(lines[0]);
+      const headers = lines[0].split(delimiter).map(h => h.trim());
       const h = (names: string[]) => headers.findIndex(x => names.some(n => x.toLowerCase().includes(n.toLowerCase())));
       const map = {
         productId: h(['identifiant produit','id product','id']),
@@ -1458,7 +1463,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       }
       const byProduct: Record<string, any[]> = {};
       for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split('\t');
+        const cols = lines[i].split(delimiter);
         const pid = (cols[map.productId] || '').trim();
         if (!pid) continue;
         const varId = (map.varId !== -1 ? cols[map.varId] : `var_${i}`).trim();
