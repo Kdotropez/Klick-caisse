@@ -509,11 +509,29 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Fonction pour gérer le scan de code-barre (déplacée au-dessus de l'effet qui l'utilise)
   const handleBarcodeScan = useCallback((barcode: string) => {
+    const normalizeEan13 = (raw: string): string => {
+      if (!raw) return '';
+      let s = String(raw).trim().replace(/\s+/g, '');
+      s = s.replace(/,/g, '.');
+      if (/e[+\-]?/i.test(s)) {
+        const n = Number.parseFloat(s);
+        if (Number.isFinite(n)) s = Math.round(n).toString();
+      }
+      s = s.replace(/\D/g, '');
+      if (s.length > 13) s = s.slice(0, 13);
+      return s;
+    };
+
     if (isEditMode) {
       setSearchTerm(barcode);
       return;
     }
-    const scannedProduct = products.find(p => p.ean13 === barcode || p.reference === barcode);
+    const nb = normalizeEan13(barcode);
+    const scannedProduct = products.find(p => {
+      const pe = normalizeEan13(p.ean13);
+      if (pe && pe === nb) return true;
+      return p.reference === barcode;
+    });
     if (scannedProduct) {
       if (scannedProduct.variations && scannedProduct.variations.length > 0) {
         setSelectedProduct(scannedProduct);
@@ -545,7 +563,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       clearTimeout(barcodeTimeout);
       
       // Si on a 13 chiffres, traiter comme un code-barres
-      if (barcodeBuffer.length === 13 && /^\d{13}$/.test(barcodeBuffer)) {
+      if (/^\d{8,13}$/.test(barcodeBuffer)) {
         console.log(`🎯 Code-barres détecté globalement: ${barcodeBuffer}`);
         e.preventDefault();
         e.stopPropagation();
@@ -1426,6 +1444,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         .trim();
       const hIndex = (aliases: string[]) => headers.findIndex(x => aliases.some(a => normalizeHeader(x).includes(normalizeHeader(a))));
 
+      const normalizeEanFromCell = (raw: string): string => {
+        if (!raw) return '';
+        let s = String(raw).trim().replace(/\s+/g, '');
+        s = s.replace(/,/g, '.');
+        if (/e[+\-]?/i.test(s)) {
+          const n = Number.parseFloat(s);
+          if (Number.isFinite(n)) s = Math.round(n).toString();
+        }
+        s = s.replace(/\D/g, '');
+        if (s.length > 13) s = s.slice(0, 13);
+        return s;
+      };
+
       // Mapping des colonnes (robuste)
       const mapping = {
         id: hIndex(['identifiant produit','id product','id']),
@@ -1465,7 +1496,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
           const finalPrice = mapping.finalPrice !== -1 ? parsePrice(values[mapping.finalPrice]) : 0;
           // eslint-disable-next-line no-control-regex
-          const ean13 = (values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+          const ean13 = normalizeEanFromCell((values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
           // eslint-disable-next-line no-control-regex
           const reference = (values[mapping.reference] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           
@@ -1606,6 +1637,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         const normAliases = aliases.map(normalizeHeader2);
         return normHeaders.findIndex(x => normAliases.some(a => x.includes(a)));
       };
+      const normalizeEanFromCell = (raw: string): string => {
+        if (!raw) return '';
+        let s = String(raw).trim().replace(/\s+/g, '');
+        s = s.replace(/,/g, '.');
+        if (/e[+\-]?/i.test(s)) {
+          const n = Number.parseFloat(s);
+          if (Number.isFinite(n)) s = Math.round(n).toString();
+        }
+        s = s.replace(/\D/g, '');
+        if (s.length > 13) s = s.slice(0, 13);
+        return s;
+      };
       const map = {
         productId: h(['identifiant produit','id product','id']),
         varId: h(['identifiant déclinaison','id declinaison','id combination','id_combination']),
@@ -1628,10 +1671,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // eslint-disable-next-line no-control-regex
         const attrs = (cols[map.attributes] || '').replace(/\u0000/g, '').trim();
         const ean = map.ean13 !== -1 ? (cols[map.ean13] || '').trim() : '';
+        const eanNorm = normalizeEanFromCell(ean);
         const ref = map.reference !== -1 ? (cols[map.reference] || '').trim() : '';
         const impact = map.impactTtc !== -1 ? parsePrice(cols[map.impactTtc]) : 0;
         if (!byProduct[pid]) byProduct[pid] = [];
-        byProduct[pid].push({ id: varId, attributes: attrs, ean13: ean, reference: ref, priceImpact: impact });
+        byProduct[pid].push({ id: varId, attributes: attrs, ean13: eanNorm, reference: ref, priceImpact: impact });
       }
       // Mettre à jour les produits existants par identifiant exact
       const updated = products.map(p => {
