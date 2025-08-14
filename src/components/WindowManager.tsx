@@ -1444,18 +1444,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         .trim();
       const hIndex = (aliases: string[]) => headers.findIndex(x => aliases.some(a => normalizeHeader(x).includes(normalizeHeader(a))));
 
-      const normalizeEanFromCell = (raw: string): string => {
-        if (!raw) return '';
-        let s = String(raw).trim().replace(/\s+/g, '');
-        s = s.replace(/,/g, '.');
-        if (/e[+\-]?/i.test(s)) {
-          const n = Number.parseFloat(s);
-          if (Number.isFinite(n)) s = Math.round(n).toString();
-        }
-        s = s.replace(/\D/g, '');
-        if (s.length > 13) s = s.slice(0, 13);
-        return s;
-      };
+      // NOTE: On NE modifie PLUS l'EAN importé; on le conserve tel quel (texte).
 
       // Mapping des colonnes (robuste)
       const mapping = {
@@ -1496,7 +1485,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const category = (values[mapping.category] || 'Général').replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
           const finalPrice = mapping.finalPrice !== -1 ? parsePrice(values[mapping.finalPrice]) : 0;
           // eslint-disable-next-line no-control-regex
-          const ean13 = normalizeEanFromCell((values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
+          const ean13 = ((values[mapping.ean13] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '')).trim();
           // eslint-disable-next-line no-control-regex
           const reference = (values[mapping.reference] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           
@@ -1637,18 +1626,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         const normAliases = aliases.map(normalizeHeader2);
         return normHeaders.findIndex(x => normAliases.some(a => x.includes(a)));
       };
-      const normalizeEanFromCell = (raw: string): string => {
-        if (!raw) return '';
-        let s = String(raw).trim().replace(/\s+/g, '');
-        s = s.replace(/,/g, '.');
-        if (/e[+\-]?/i.test(s)) {
-          const n = Number.parseFloat(s);
-          if (Number.isFinite(n)) s = Math.round(n).toString();
-        }
-        s = s.replace(/\D/g, '');
-        if (s.length > 13) s = s.slice(0, 13);
-        return s;
-      };
+      // Pas de normalisation destructrice sur l'EAN des déclinaisons non plus
       const map = {
         productId: h(['identifiant produit','id product','id']),
         varId: h(['identifiant déclinaison','id declinaison','id combination','id_combination']),
@@ -1671,11 +1649,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // eslint-disable-next-line no-control-regex
         const attrs = (cols[map.attributes] || '').replace(/\u0000/g, '').trim();
         const ean = map.ean13 !== -1 ? (cols[map.ean13] || '').trim() : '';
-        const eanNorm = normalizeEanFromCell(ean);
         const ref = map.reference !== -1 ? (cols[map.reference] || '').trim() : '';
         const impact = map.impactTtc !== -1 ? parsePrice(cols[map.impactTtc]) : 0;
         if (!byProduct[pid]) byProduct[pid] = [];
-        byProduct[pid].push({ id: varId, attributes: attrs, ean13: eanNorm, reference: ref, priceImpact: impact });
+        byProduct[pid].push({ id: varId, attributes: attrs, ean13: ean, reference: ref, priceImpact: impact });
       }
       // Mettre à jour les produits existants par identifiant exact
       const updated = products.map(p => {
