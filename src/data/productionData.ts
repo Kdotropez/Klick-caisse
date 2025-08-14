@@ -28097,12 +28097,9 @@ export const loadProductionData = (): { products: Product[]; categories: Categor
     console.error('❌ Erreur lors du chargement depuis localStorage:', error);
   }
 
-  // Si pas de données sauvegardées, charger les données par défaut
-  console.log('📦 Chargement des données par défaut WYSIWYG');
-  return {
-    products,
-    categories
-  };
+  // Si pas de données sauvegardées, ne pas charger de données par défaut
+  console.log('📦 Aucune donnée locale, on démarre vide (pas de fallback).');
+  return { products: [], categories: [] };
 };
 
 export const saveProductionData = (newProducts: Product[], newCategories: Category[]): void => {

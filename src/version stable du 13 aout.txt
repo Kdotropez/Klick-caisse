@@ -15,3 +15,36 @@ Rollback rapide ensuite:
 Sur Vercel: onglet Deployments → sélectionne le déploiement “stable” → Promote/Redeploy to production.
 Dans l’app: Paramètres → Importer tout (JSON) avec le backup stable (celui qu’on a versionné).
 Voulais-tu que je fasse le tag/branche/backup maintenant et que je te confirme quand c’est prêt, pour sécuriser la suite des modifs ?
+
+
+
+Oui, on a verrouillé l’état actuel: tu pourras y revenir à tout moment.
+Ce que j’ai fait
+Créé un tag: stable-2025-08-13 (poussé sur GitHub).
+Créé et poussé une branche: stable-2025-08-13.
+Comment revenir à cet état
+Local (code):
+Voir la branche stable: git checkout stable-2025-08-13
+Voir le tag (lecture seule): git checkout tags/stable-2025-08-13
+Vercel (prod):
+Deployments → sélectionner le déploiement/tag stable-2025-08-13 → Promote/Redeploy to production.
+Ou définir temporairement la branche de production sur stable-2025-08-13.
+Données:
+Utiliser l’outil “Réinitialiser base (GitHub)” ou “Importer tout (JSON)” avec le backup déjà versionné (src/components/klick-caisse-backup-2025-08-13-21-26-12.json) pour remettre la base telle qu’aujourd’hui.
+
+Console (F12) – cas courant, remettre catalogue/catégories à zéro:
+localStorage.removeItem('klick_caisse_products');
+localStorage.removeItem('klick_caisse_categories');
+localStorage.removeItem('klick_caisse_subcategories');
+
+
+effacer toutes les donnees 
+
+Object.keys(localStorage)
+  .filter(k => k.startsWith('klick_caisse'))
+  .forEach(k => localStorage.removeItem(k));
+  
+  effacet tickets fin de journee
+  localStorage.removeItem('klick_caisse_transactions_by_day');
+localStorage.removeItem('klick_caisse_closures');
+localStorage.removeItem('klick_caisse_z_counter');
