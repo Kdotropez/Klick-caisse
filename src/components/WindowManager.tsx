@@ -350,6 +350,73 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       }
       }
 
+      // Règle complémentaire: pour chaque set (6 verres même sous-catégorie) + 1 "seau" → avantage 20€
+      // Le seau reçoit une remise en euros égale à 20€ moins la remise déjà acquise par les 6 verres.
+      // On répartit cet avantage sur les lignes "seau" tant que possible.
+      const normSeau = normalizeKey('seau');
+      const seauLineInfos: Array<{ key: string; subtotal: number }> = [];
+      let totalSeauQty = 0;
+      for (const it of cartItems) {
+        const assoc = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+        const normAssoc = assoc.map(a => normalizeKey(a));
+        if (normAssoc.includes(normSeau)) {
+          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+          const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+          const qty = it.quantity || 0;
+          seauLineInfos.push({ key, subtotal: unit * qty });
+          totalSeauQty += qty;
+        }
+      }
+
+      // Prépare infos par sous-catégorie verre: nombre de sets et remise/verre → remise pour 6
+      type SubSetInfo = { sets: number; perSetGlassDiscount: number };
+      const subSetInfos: SubSetInfo[] = [];
+      for (const sub of Object.keys(qtyBySubcat)) {
+        const qty = qtyBySubcat[sub] || 0;
+        if (qty < 6) continue;
+        const percent = DISCOUNT_BY_SUBCAT[sub] || 0;
+        const keys = lineKeysBySubcat[sub] || [];
+        // Euros de remise appliqués sur TOUTES les lignes de cette sous-catégorie
+        let totalEuroDiscountOnSub = 0;
+        for (const key of keys) {
+          const [pid, vid] = key.split('-');
+          const item = cartItems.find(it => it.product.id === pid && (vid === 'main' ? !it.selectedVariation : it.selectedVariation?.id === vid));
+          if (!item) continue;
+          const unit = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+          const lineQty = item.quantity || 0;
+          totalEuroDiscountOnSub += unit * lineQty * (percent / 100);
+        }
+        const sets = Math.floor(qty / 6);
+        const discountPerUnit = qty > 0 ? (totalEuroDiscountOnSub / qty) : 0;
+        const perSetGlassDiscount = discountPerUnit * 6;
+        subSetInfos.push({ sets, perSetGlassDiscount });
+      }
+
+      // Allouer les sets aux articles "seau" disponibles
+      let remainingSets = Math.min(subSetInfos.reduce((s, i) => s + i.sets, 0), totalSeauQty);
+      let totalCompensation = 0; // montant total à appliquer en € sur les seaux
+      for (const info of subSetInfos) {
+        if (remainingSets <= 0) break;
+        const use = Math.min(info.sets, remainingSets);
+        const perSetComp = Math.max(0, 20 - info.perSetGlassDiscount);
+        totalCompensation += use * perSetComp;
+        remainingSets -= use;
+      }
+
+      // Nettoyer anciennes remises € sur les seaux, puis appliquer la nouvelle répartition
+      for (const { key } of seauLineInfos) {
+        if (next[key] && next[key].type === 'euro') delete next[key];
+      }
+      if (totalCompensation > 0 && seauLineInfos.length > 0) {
+        let remaining = totalCompensation;
+        for (const { key, subtotal } of seauLineInfos) {
+          if (remaining <= 0) break;
+          const apply = Math.min(remaining, subtotal);
+          if (apply > 0) next[key] = { type: 'euro', value: apply };
+          remaining -= apply;
+        }
+      }
+
       // Nettoyage: retirer d'anciennes remises percent qui ne correspondent plus à des lignes actuelles
       for (const key of Object.keys(next)) {
         const stillInCart = cartItems.some(it => `${it.product.id}-${it.selectedVariation?.id || 'main'}` === key);
