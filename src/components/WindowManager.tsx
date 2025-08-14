@@ -2154,6 +2154,109 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             importStatus={importStatus as any}
             importMessage={importMessage}
             onImportCSV={handleImportCSV}
+            onRepairEANArticles={async (file: File) => {
+              try {
+                const text = await file.text();
+                const lines = text.split('\n').filter(l => l.trim());
+                if (lines.length < 2) { alert('CSV invalide'); return; }
+                const detectDelimiter = (s: string) => (s.includes('\t') ? '\t' : (s.includes(';') ? ';' : ','));
+                const delimiter = detectDelimiter(lines[0]);
+                const headers = lines[0].split(delimiter).map(h => h.trim());
+                const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g,' ').trim();
+                const idxId = headers.findIndex(h => norm(h).includes('identifiant produit') || norm(h) === 'id' || norm(h).includes('id product'));
+                const idxEan = headers.findIndex(h => norm(h).includes('ean'));
+                if (idxId === -1 || idxEan === -1) { alert('Colonnes ID/EAN manquantes'); return; }
+                const eanById = new Map<string,string>();
+                for (let i=1;i<lines.length;i++){
+                  const cols = lines[i].split(delimiter);
+                  const pid = (cols[idxId]||'').trim();
+                  const ean = (cols[idxEan]||'').trim();
+                  if (pid) eanById.set(pid, ean);
+                }
+                const updated = products.map(p => eanById.has(p.id) ? { ...p, ean13: eanById.get(p.id) || '' } : p);
+                onProductsReorder?.(updated);
+                saveProductionData(updated, categories);
+                alert(`EAN réparés (articles): ${eanById.size}`);
+              } catch { alert('Erreur réparation EAN (articles)'); }
+            }}
+            onRepairEANVariations={async (file: File) => {
+              try {
+                const text = await file.text();
+                const lines = text.split('\n').filter(l => l.trim());
+                if (lines.length < 2) { alert('CSV invalide'); return; }
+                const detectDelimiter = (s: string) => (s.includes('\t') ? '\t' : (s.includes(';') ? ';' : ','));
+                const delimiter = detectDelimiter(lines[0]);
+                const headers = lines[0].split(delimiter).map(h => h.trim());
+                const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g,' ').trim();
+                const idxPid = headers.findIndex(h => norm(h).includes('identifiant produit') || norm(h).includes('id product') || norm(h)==='id');
+                const idxAttr = headers.findIndex(h => norm(h).includes('liste des attributs') || norm(h).includes('attributes'));
+                const idxEan = headers.findIndex(h => norm(h).includes('ean'));
+                if (idxPid === -1 || idxAttr === -1 || idxEan === -1) { alert('Colonnes clés manquantes'); return; }
+                const byPid: Record<string, Array<{attributes:string, ean13:string}>> = {};
+                for (let i=1;i<lines.length;i++){
+                  const cols = lines[i].split(delimiter);
+                  const pid = (cols[idxPid]||'').trim();
+                  const attributes = (cols[idxAttr]||'').trim();
+                  const ean = (cols[idxEan]||'').trim();
+                  if (!pid) continue;
+                  if (!byPid[pid]) byPid[pid] = [];
+                  byPid[pid].push({ attributes, ean13: ean });
+                }
+                const updated = products.map(p => {
+                  const entries = byPid[p.id];
+                  if (!entries || entries.length===0) return p;
+                  const base = typeof p.finalPrice==='number'? p.finalPrice : 0;
+                  const variations = entries.map((e,idx)=>({
+                    id: p.variations?.[idx]?.id || `var_${Date.now()}_${idx}`,
+                    attributes: e.attributes,
+                    ean13: e.ean13,
+                    reference: p.variations?.[idx]?.reference || '',
+                    priceImpact: p.variations?.[idx]?.priceImpact || 0,
+                    finalPrice: Math.max(0, base + (p.variations?.[idx]?.priceImpact || 0))
+                  }));
+                  return { ...p, variations };
+                });
+                onProductsReorder?.(updated);
+                saveProductionData(updated, categories);
+                alert('EAN réparés (déclinaisons)');
+              } catch { alert('Erreur réparation EAN (déclinaisons)'); }
+            }}
+            onRepairEANArticlesFromGitHub={async () => {
+              try {
+                setImportStatus('importing');
+                setImportMessage('Téléchargement EAN depuis GitHub...');
+                const url = 'https://raw.githubusercontent.com/Kdotropez/Klick-caisse/master/code%20barre%20pour%20synchro.csv';
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) throw new Error('Téléchargement impossible');
+                const text = await res.text();
+                const lines = text.split('\n').filter(l => l.trim());
+                if (lines.length < 2) throw new Error('CSV vide');
+                const detectDelimiter = (s: string) => (s.includes('\t') ? '\t' : (s.includes(';') ? ';' : ','));
+                const delimiter = detectDelimiter(lines[0]);
+                const headers = lines[0].split(delimiter).map(h => h.trim());
+                const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+                const idxId = headers.findIndex(h => norm(h).includes('identifiant produit') || norm(h).includes('id product') || norm(h)==='id');
+                const idxEan = headers.findIndex(h => norm(h)==='ean13' || norm(h).includes('ean'));
+                if (idxId === -1 || idxEan === -1) throw new Error('Colonnes ID/EAN manquantes');
+                const eanById = new Map<string,string>();
+                for (let i=1;i<lines.length;i++){
+                  const cols = lines[i].split(delimiter);
+                  const pid = (cols[idxId]||'').trim();
+                  const ean = (cols[idxEan]||'').trim();
+                  if (pid) eanById.set(pid, ean);
+                }
+                const updated = products.map(p => eanById.has(p.id) ? { ...p, ean13: eanById.get(p.id) || '' } : p);
+                onProductsReorder?.(updated);
+                saveProductionData(updated, categories);
+                setImportStatus('success');
+                setImportMessage(`EAN mis à jour depuis GitHub: ${eanById.size}`);
+                setTimeout(()=>{ setImportStatus('idle'); setImportMessage(''); }, 3000);
+              } catch (e) {
+                setImportStatus('error');
+                setImportMessage('Erreur MAJ EAN depuis GitHub');
+                setTimeout(()=>{ setImportStatus('idle'); setImportMessage(''); }, 3000);
+              }
+            }}
           />
         );
 

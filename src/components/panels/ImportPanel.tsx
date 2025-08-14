@@ -8,6 +8,9 @@ interface ImportPanelProps {
   importStatus: 'idle' | 'importing' | 'success' | 'error';
   importMessage: string;
   onImportCSV: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onRepairEANArticles: (file: File) => void;
+  onRepairEANVariations: (file: File) => void;
+  onRepairEANArticlesFromGitHub: () => void;
 }
 
 const ImportPanel: React.FC<ImportPanelProps> = ({
@@ -16,6 +19,9 @@ const ImportPanel: React.FC<ImportPanelProps> = ({
   importStatus,
   importMessage,
   onImportCSV,
+  onRepairEANArticles,
+  onRepairEANVariations,
+  onRepairEANArticlesFromGitHub,
 }) => {
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -41,6 +47,46 @@ const ImportPanel: React.FC<ImportPanelProps> = ({
               sx={{ width: '100%', backgroundColor: importStatus === 'importing' ? '#f5f5f5' : 'transparent' }}
             >
               {importStatus === 'importing' ? 'Import en cours...' : 'Importer CSV'}
+            </Button>
+          </label>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={onRepairEANArticlesFromGitHub}
+            sx={{ width: '100%' }}
+          >
+            Mettre à jour EAN (Articles) depuis GitHub
+          </Button>
+          <input
+            type="file"
+            accept=".csv"
+            style={{ display: 'none' }}
+            id="repair-ean-articles-input"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onRepairEANArticles(f);
+              (e.target as HTMLInputElement).value = '';
+            }}
+          />
+          <label htmlFor="repair-ean-articles-input">
+            <Button variant="outlined" size="small" component="span" sx={{ width: '100%' }}>
+              Réparer EAN (Articles)
+            </Button>
+          </label>
+          <input
+            type="file"
+            accept=".csv"
+            style={{ display: 'none' }}
+            id="repair-ean-variations-input"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onRepairEANVariations(f);
+              (e.target as HTMLInputElement).value = '';
+            }}
+          />
+          <label htmlFor="repair-ean-variations-input">
+            <Button variant="outlined" size="small" component="span" sx={{ width: '100%' }}>
+              Réparer EAN (Déclinaisons)
             </Button>
           </label>
           {importStatus !== 'idle' && (
