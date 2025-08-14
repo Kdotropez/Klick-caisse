@@ -355,6 +355,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       // Compensation fixe par set selon la sous-catégorie de verre
       // - verre 6.5 → 19€
       // - verre 8.5 → 21€
+      // Préparer un index des lignes (prix unitaire, quantité) utilisable par seau/vasque
+      const keyToInfo: Record<string, { unit: number; qty: number }> = {};
+      for (const it of cartItems) {
+        const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+        const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+        keyToInfo[key] = { unit, qty: it.quantity || 0 };
+      }
       const seauLineInfos: Array<{ key: string; subtotal: number; qty: number }> = [];
       let totalSeauQty = 0;
       for (const it of cartItems) {
@@ -382,13 +389,47 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           [normalizeKey('verre 8.50')]: 21,
         };
 
-        // Construire la liste des compensations par set (sans proratisation)
+        // Construire la liste des compensations par set en tenant compte de la remise verres déjà appliquée
+        // La compensation d'un set = max(0, compensationFixe - remiseVerresSurCes 6 unités)
+        const keyToInfo: Record<string, { unit: number; qty: number }> = {};
+        for (const it of cartItems) {
+          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+          const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+          keyToInfo[key] = { unit, qty: it.quantity || 0 };
+        }
+
         const seauComps: number[] = [];
         for (const sub of Object.keys(qtyBySubcat)) {
-          const qty = qtyBySubcat[sub] || 0;
-          const sets = Math.floor(qty / 6);
+          const totalQty = qtyBySubcat[sub] || 0;
+          const sets = Math.floor(totalQty / 6);
+          if (sets <= 0) continue;
           const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
-          for (let i = 0; i < sets; i++) if (compPerSet > 0) seauComps.push(compPerSet);
+          if (compPerSet <= 0) continue;
+          const percentVerre = autoGlassDiscountEnabled ? (DISCOUNT_BY_SUBCAT[sub] || 0) : 0;
+          const keys = lineKeysBySubcat[sub] || [];
+          // Cloner les quantités éligibles pour consommer 6 unités par set
+          const pools = keys
+            .map(k => keyToInfo[k])
+            .filter(Boolean)
+            .map(info => ({ unit: info.unit, qty: info.qty }));
+          const perSetGlassDiscounts: number[] = [];
+          for (let s = 0; s < sets; s++) {
+            let need = 6;
+            let discountSum = 0;
+            for (let idx = 0; idx < pools.length && need > 0; idx++) {
+              const take = Math.min(need, Math.max(0, pools[idx].qty));
+              if (take > 0) {
+                discountSum += take * pools[idx].unit * (percentVerre / 100);
+                pools[idx].qty -= take;
+                need -= take;
+              }
+            }
+            perSetGlassDiscounts.push(discountSum);
+          }
+          for (let i = 0; i < sets; i++) {
+            const net = Math.max(0, compPerSet - (perSetGlassDiscounts[i] || 0));
+            if (net > 0) seauComps.push(net);
+          }
         }
 
         const usableSets = Math.min(seauComps.length, totalSeauQty);
@@ -437,7 +478,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           if (next[key] && next[key].type === 'euro') delete next[key];
         }
       } else {
-        // Compensation fixe par set pour la vasque: 12 verres 6.5 ou 8.5 → 22€
+        // Compensation fixe par set pour la vasque: 12 verres 6.5 ou 8.5 → 22€ (net de la remise verres)
         const VASQUE_COMP_BY_SUB: Record<string, number> = {
           [normalizeKey('verre 6.5')]: 22,
           [normalizeKey('verre 6.50')]: 22,
@@ -447,10 +488,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         const vasqueComps: number[] = [];
         for (const sub of Object.keys(qtyBySubcat)) {
-          const qty = qtyBySubcat[sub] || 0;
-          const sets = Math.floor(qty / 12);
+          const totalQty = qtyBySubcat[sub] || 0;
+          const sets = Math.floor(totalQty / 12);
+          if (sets <= 0) continue;
           const compPerSet = VASQUE_COMP_BY_SUB[sub] || 0;
-          for (let i = 0; i < sets; i++) if (compPerSet > 0) vasqueComps.push(compPerSet);
+          if (compPerSet <= 0) continue;
+          const percentVerre = autoGlassDiscountEnabled ? (DISCOUNT_BY_SUBCAT[sub] || 0) : 0;
+          const keys = lineKeysBySubcat[sub] || [];
+          const pools = keys
+            .map(k => keyToInfo[k])
+            .filter(Boolean)
+            .map(info => ({ unit: info.unit, qty: info.qty }))
+            .filter(p => p.qty > 0 && p.unit > 0);
+          const perSetGlassDiscounts: number[] = [];
+          for (let s = 0; s < sets; s++) {
+            let need = 12;
+            let discountSum = 0;
+            for (let idx = 0; idx < pools.length && need > 0; idx++) {
+              const take = Math.min(need, Math.max(0, pools[idx].qty));
+              if (take > 0) {
+                discountSum += take * pools[idx].unit * (percentVerre / 100);
+                pools[idx].qty -= take;
+                need -= take;
+              }
+            }
+            perSetGlassDiscounts.push(discountSum);
+          }
+          for (let i = 0; i < sets; i++) {
+            const net = Math.max(0, compPerSet - (perSetGlassDiscounts[i] || 0));
+            if (net > 0) vasqueComps.push(net);
+          }
         }
 
         const usableSets12 = Math.min(vasqueComps.length, totalVasqueQty);
