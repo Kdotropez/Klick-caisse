@@ -369,7 +369,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
       }
 
-      // Si l’associative est désactivée, nettoyer et ne rien appliquer
+      // Si l'associative est désactivée, nettoyer et ne rien appliquer
       if (!autoAssocDiscountEnabled) {
         for (const { key } of seauLineInfos) {
           if (next[key] && next[key].type === 'euro') delete next[key];
@@ -399,7 +399,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Limiter par le nombre total de seaux présents
         const usableSets = Math.min(totalEligibleSets, totalSeauQty);
         if (usableSets === 0) {
-          // rien à distribuer → nettoyer d’éventuelles anciennes remises
+          // rien à distribuer → nettoyer d'éventuelles anciennes remises
           for (const { key } of seauLineInfos) {
             if (next[key] && next[key].type === 'euro') delete next[key];
           }
@@ -440,55 +440,50 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           totalVasqueQty += qty;
         }
       }
-      // Si l’associative est désactivée, enlever toute remise € sur vasque et ne pas appliquer
+      // Si l'associative est désactivée, enlever toute remise € sur vasque et ne pas appliquer
       if (!autoAssocDiscountEnabled) {
         for (const { key } of vasqueLineInfos) {
           if (next[key] && next[key].type === 'euro') delete next[key];
         }
       } else {
-        // Calcul des sets de 12 et de la remise déjà acquise sur les verres
-        type SubSetInfo12 = { sets: number; perSetGlassDiscount: number };
-        const subSetInfos12: SubSetInfo12[] = [];
+        // Compensation fixe par set pour la vasque: 12 verres 6.5 ou 8.5 → 22€
+        const VASQUE_COMP_BY_SUB: Record<string, number> = {
+          [normalizeKey('verre 6.5')]: 22,
+          [normalizeKey('verre 6.50')]: 22,
+          [normalizeKey('verre 8.5')]: 22,
+          [normalizeKey('verre 8.50')]: 22,
+        };
+
+        let totalEligibleSets12 = 0;
+        let totalCompensation12 = 0;
         for (const sub of Object.keys(qtyBySubcat)) {
           const qty = qtyBySubcat[sub] || 0;
           if (qty < 12) continue;
-          const percent = DISCOUNT_BY_SUBCAT[sub] || 0;
-          const keys = lineKeysBySubcat[sub] || [];
-          let totalEuroDiscountOnSub = 0;
-          for (const key of keys) {
-            const [pid, vid] = key.split('-');
-            const item = cartItems.find(it => it.product.id === pid && (vid === 'main' ? !it.selectedVariation : it.selectedVariation?.id === vid));
-            if (!item) continue;
-            const unit = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-            const lineQty = item.quantity || 0;
-            totalEuroDiscountOnSub += unit * lineQty * (percent / 100);
-          }
           const sets = Math.floor(qty / 12);
-          const discountPerUnit = qty > 0 ? (totalEuroDiscountOnSub / qty) : 0;
-          const perSetGlassDiscount = discountPerUnit * 12;
-          subSetInfos12.push({ sets, perSetGlassDiscount });
+          const compPerSet = VASQUE_COMP_BY_SUB[sub] || 0;
+          if (compPerSet > 0 && sets > 0) {
+            totalEligibleSets12 += sets;
+            totalCompensation12 += sets * compPerSet;
+          }
         }
 
-        let remainingSets12 = Math.min(subSetInfos12.reduce((s, i) => s + i.sets, 0), totalVasqueQty);
-        let totalCompensation12 = 0;
-        for (const info of subSetInfos12) {
-          if (remainingSets12 <= 0) break;
-          const use = Math.min(info.sets, remainingSets12);
-          const perSetComp = Math.max(0, 20 - info.perSetGlassDiscount);
-          totalCompensation12 += use * perSetComp;
-          remainingSets12 -= use;
-        }
-
-        // Nettoyer remises € existantes sur vasque puis appliquer
-        for (const { key } of vasqueLineInfos) {
-          if (next[key] && next[key].type === 'euro') delete next[key];
-        }
-        if (totalCompensation12 > 0 && vasqueLineInfos.length > 0) {
+        const usableSets12 = Math.min(totalEligibleSets12, totalVasqueQty);
+        if (usableSets12 === 0) {
+          for (const { key } of vasqueLineInfos) {
+            if (next[key] && next[key].type === 'euro') delete next[key];
+          }
+        } else {
+          if (totalEligibleSets12 > 0 && usableSets12 < totalEligibleSets12) {
+            const ratio = usableSets12 / totalEligibleSets12;
+            totalCompensation12 = totalCompensation12 * ratio;
+          }
+          for (const { key } of vasqueLineInfos) {
+            if (next[key] && next[key].type === 'euro') delete next[key];
+          }
           let remaining = totalCompensation12;
           for (const { key, subtotal, qty } of vasqueLineInfos) {
             if (remaining <= 0) break;
-            const maxLine = subtotal;
-            const apply = Math.min(remaining, maxLine);
+            const apply = Math.min(remaining, subtotal);
             const perUnitEuro = qty > 0 ? (apply / qty) : 0;
             if (perUnitEuro > 0) next[key] = { type: 'euro', value: perUnitEuro };
             remaining -= apply;
@@ -496,10 +491,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
       }
 
-      // Nettoyage: retirer d'anciennes remises percent qui ne correspondent plus à des lignes actuelles
-      for (const key of Object.keys(next)) {
-        const stillInCart = cartItems.some(it => `${it.product.id}-${it.selectedVariation?.id || 'main'}` === key);
-        if (!stillInCart) delete next[key];
+      // Nettoyer remises € existantes sur vasque puis appliquer
+      for (const { key } of vasqueLineInfos) {
+        if (next[key] && next[key].type === 'euro') delete next[key];
       }
 
       const changed = Object.keys(next).length !== Object.keys(itemDiscounts).length ||
