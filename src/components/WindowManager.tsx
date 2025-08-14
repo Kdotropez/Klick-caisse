@@ -351,15 +351,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       }
       }
 
-      // Règle complémentaire: pour chaque set (6 verres même sous-catégorie) + 1 "seau" → avantage 20€
-      // Le seau reçoit une remise en euros égale à 20€ moins la remise déjà acquise par les 6 verres.
-      // On répartit cet avantage sur les lignes "seau" tant que possible.
+      // Règle complémentaire: pour chaque set (6 verres même sous-catégorie) + 1 "seau"
+      // Compensation fixe par set selon la sous-catégorie de verre
+      // - verre 6.5 → 19€
+      // - verre 8.5 → 21€
       const seauLineInfos: Array<{ key: string; subtotal: number; qty: number }> = [];
       let totalSeauQty = 0;
       for (const it of cartItems) {
         const assoc = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
         const normAssoc = assoc.map(a => normalizeKey(a));
-        // tolérant: toute sous-catégorie contenant "seau" après normalisation
         if (normAssoc.some(a => a.includes('seau'))) {
           const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
           const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
@@ -369,55 +369,59 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
       }
 
-      // Prépare infos par sous-catégorie verre: nombre de sets et remise/verre → remise pour 6
-      type SubSetInfo = { sets: number; perSetGlassDiscount: number };
-      const subSetInfos: SubSetInfo[] = [];
-      for (const sub of Object.keys(qtyBySubcat)) {
-        const qty = qtyBySubcat[sub] || 0;
-        if (qty < 6) continue;
-        const percent = DISCOUNT_BY_SUBCAT[sub] || 0;
-        const keys = lineKeysBySubcat[sub] || [];
-        // Euros de remise appliqués sur TOUTES les lignes de cette sous-catégorie
-        let totalEuroDiscountOnSub = 0;
-        for (const key of keys) {
-          const [pid, vid] = key.split('-');
-          const item = cartItems.find(it => it.product.id === pid && (vid === 'main' ? !it.selectedVariation : it.selectedVariation?.id === vid));
-          if (!item) continue;
-          const unit = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-          const lineQty = item.quantity || 0;
-          totalEuroDiscountOnSub += unit * lineQty * (percent / 100);
+      // Si l’associative est désactivée, nettoyer et ne rien appliquer
+      if (!autoAssocDiscountEnabled) {
+        for (const { key } of seauLineInfos) {
+          if (next[key] && next[key].type === 'euro') delete next[key];
         }
-        const sets = Math.floor(qty / 6);
-        const discountPerUnit = qty > 0 ? (totalEuroDiscountOnSub / qty) : 0;
-        const perSetGlassDiscount = discountPerUnit * 6;
-        subSetInfos.push({ sets, perSetGlassDiscount });
-      }
+      } else {
+        const SEAU_COMP_BY_SUB: Record<string, number> = {
+          [normalizeKey('verre 6.5')]: 19,
+          [normalizeKey('verre 6.50')]: 19,
+          [normalizeKey('verre 8.5')]: 21,
+          [normalizeKey('verre 8.50')]: 21,
+        };
 
-      // Allouer les sets aux articles "seau" disponibles
-      let remainingSets = Math.min(subSetInfos.reduce((s, i) => s + i.sets, 0), totalSeauQty);
-      let totalCompensation = 0; // montant total à appliquer en € sur les seaux
-      for (const info of subSetInfos) {
-        if (remainingSets <= 0) break;
-        const use = Math.min(info.sets, remainingSets);
-        const perSetComp = Math.max(0, 20 - info.perSetGlassDiscount);
-        totalCompensation += use * perSetComp;
-        remainingSets -= use;
-      }
+        // Calculer le nombre de sets éligibles et la compensation totale
+        let totalEligibleSets = 0;
+        let totalCompensation = 0;
+        for (const sub of Object.keys(qtyBySubcat)) {
+          const qty = qtyBySubcat[sub] || 0;
+          if (qty < 6) continue;
+          const sets = Math.floor(qty / 6);
+          const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
+          if (compPerSet > 0) {
+            totalEligibleSets += sets;
+            totalCompensation += sets * compPerSet;
+          }
+        }
 
-      // Nettoyer anciennes remises € sur les seaux, puis appliquer la nouvelle répartition
-      for (const { key } of seauLineInfos) {
-        if (next[key] && next[key].type === 'euro') delete next[key];
-      }
-      if (totalCompensation > 0 && seauLineInfos.length > 0) {
-        let remaining = totalCompensation;
-        for (const { key, subtotal, qty } of seauLineInfos) {
-          if (remaining <= 0) break;
-          const maxLine = subtotal;
-          const apply = Math.min(remaining, maxLine);
-          // Remise en euro est interprétée par unité dans le calcul existant → répartir par quantité
-          const perUnitEuro = qty > 0 ? (apply / qty) : 0;
-          if (perUnitEuro > 0) next[key] = { type: 'euro', value: perUnitEuro };
-          remaining -= apply;
+        // Limiter par le nombre total de seaux présents
+        const usableSets = Math.min(totalEligibleSets, totalSeauQty);
+        if (usableSets === 0) {
+          // rien à distribuer → nettoyer d’éventuelles anciennes remises
+          for (const { key } of seauLineInfos) {
+            if (next[key] && next[key].type === 'euro') delete next[key];
+          }
+        } else {
+          // Ajuster la compensation totale si moins de seaux que de sets
+          if (totalEligibleSets > 0 && usableSets < totalEligibleSets) {
+            const ratio = usableSets / totalEligibleSets;
+            totalCompensation = totalCompensation * ratio;
+          }
+
+          // Répartir sur les lignes seau en euros par unité
+          for (const { key } of seauLineInfos) {
+            if (next[key] && next[key].type === 'euro') delete next[key];
+          }
+          let remaining = totalCompensation;
+          for (const { key, subtotal, qty } of seauLineInfos) {
+            if (remaining <= 0) break;
+            const apply = Math.min(remaining, subtotal);
+            const perUnitEuro = qty > 0 ? (apply / qty) : 0;
+            if (perUnitEuro > 0) next[key] = { type: 'euro', value: perUnitEuro };
+            remaining -= apply;
+          }
         }
       }
 
