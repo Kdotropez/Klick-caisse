@@ -1624,21 +1624,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       const baseId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
       let added = 0;
 
-      const mergedCategories: Category[] = Array.from(categoriesSet).map((catName) => {
-        const norm = normalizeCat(catName);
-        const existing = existingByNormName.get(norm);
-        if (existing) {
-          // Préserver l'ordre des sous-catégories et les méta-données
-          return { ...existing, name: existing.name || catName } as Category;
-        }
-        added += 1;
-        return {
-          id: `cat_${baseId + added}`,
-        name: catName,
-        color: getRandomColor(),
-          productOrder: [],
-        } as Category;
-      });
+      // Ne plus supprimer les catégories existantes: on garde tout l'existant et on AJOUTE les nouvelles
+      const newOnes: Category[] = Array.from(categoriesSet)
+        .filter((catName) => !existingByNormName.has(normalizeCat(catName)))
+        .map((catName) => {
+          added += 1;
+          return {
+            id: `cat_${baseId + added}`,
+            name: catName,
+            color: getRandomColor(),
+            productOrder: [],
+          } as Category;
+        });
+      const mergedCategories: Category[] = [...categories, ...newOnes];
 
       // Appeler la fonction de callback pour mettre à jour les données (sans écraser les ordres existants)
       onImportComplete(newProducts, mergedCategories);
@@ -1851,6 +1849,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       setImportMessage('Erreur MAJ EAN depuis GitHub');
       setTimeout(()=>{ setImportStatus('idle'); setImportMessage(''); }, 3000);
     }
+  };
+
+  // Nettoyer catégories orphelines (qui ne correspondent à aucun produit)
+  const handleCleanUnusedCategories = () => {
+    const normalizeCat = (s: string) => StorageService.normalizeLabel(s);
+    const used = new Set(products.map(p => normalizeCat(p.category)));
+    const kept = categories.filter(c => used.has(normalizeCat(c.name)));
+    if (kept.length === categories.length) {
+      alert('Aucune catégorie orpheline à supprimer.');
+      return;
+    }
+    onUpdateCategories?.(kept);
+    saveProductionData(products, kept);
+    alert('Catégories orphelines supprimées.');
   };
 
   // Importer Articles et Déclinaisons depuis GitHub (raw)
@@ -2471,6 +2483,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               onRepairEANArticles={handleRepairEANArticles}
               onRepairEANVariations={handleRepairEANVariations}
               onRepairEANArticlesFromGitHub={handleRepairEANArticlesFromGitHub}
+              onCleanUnusedCategories={handleCleanUnusedCategories}
             />
           );
 

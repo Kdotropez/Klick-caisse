@@ -12,9 +12,10 @@ interface FreePanelProps {
   onRepairEANArticles: (file: File) => void;
   onRepairEANVariations: (file: File) => void;
   onRepairEANArticlesFromGitHub: () => void;
+  onCleanUnusedCategories?: () => void;
 }
 
-const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode, onRepairEANArticles, onRepairEANVariations, onRepairEANArticlesFromGitHub }) => {
+const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode, onRepairEANArticles, onRepairEANVariations, onRepairEANArticlesFromGitHub, onCleanUnusedCategories }) => {
   const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
   const gap = 2;
   const totalGapsWidth = 4;
@@ -166,6 +167,18 @@ const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize,
               onClick={onRepairEANArticlesFromGitHub}
             >
               MAJ EAN depuis GitHub
+            </Button>
+          );
+        }
+        if (idx === 6) {
+          return (
+            <Button
+              key={idx}
+              variant="contained"
+              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
+              onClick={onCleanUnusedCategories}
+            >
+              Nettoyer catégories orphelines
             </Button>
           );
         }
