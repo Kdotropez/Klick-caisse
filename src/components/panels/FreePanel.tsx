@@ -13,9 +13,11 @@ interface FreePanelProps {
   onRepairEANVariations: (file: File) => void;
   onRepairEANArticlesFromGitHub: () => void;
   onCleanUnusedCategories?: () => void;
+  onPurgeCategories?: () => void;
+  onAuditEAN13?: () => void;
 }
 
-const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode, onRepairEANArticles, onRepairEANVariations, onRepairEANArticlesFromGitHub, onCleanUnusedCategories }) => {
+const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode, onRepairEANArticles, onRepairEANVariations, onRepairEANArticlesFromGitHub, onCleanUnusedCategories, onPurgeCategories, onAuditEAN13 }) => {
   const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
   const gap = 2;
   const totalGapsWidth = 4;
@@ -179,6 +181,30 @@ const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize,
               onClick={onCleanUnusedCategories}
             >
               Nettoyer catégories orphelines
+            </Button>
+          );
+        }
+        if (idx === 7) {
+          return (
+            <Button
+              key={idx}
+              variant="contained"
+              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
+              onClick={onPurgeCategories}
+            >
+              Purger catégories
+            </Button>
+          );
+        }
+        if (idx === 8) {
+          return (
+            <Button
+              key={idx}
+              variant="contained"
+              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
+              onClick={onAuditEAN13}
+            >
+              Audit EAN‑13
             </Button>
           );
         }

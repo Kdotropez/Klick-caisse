@@ -1865,6 +1865,38 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     alert('Catégories orphelines supprimées.');
   };
 
+  // Purger toutes les catégories/sous-catégories localement
+  const handlePurgeCategories = () => {
+    // Efface les catégories et vide les associations sur les produits
+    const purgedProducts = products.map(p => ({
+      ...p,
+      category: '',
+      associatedCategories: [],
+    }));
+    onProductsReorder?.(purgedProducts);
+    onUpdateCategories?.([]);
+    saveProductionData(purgedProducts, []);
+    alert('Catégories et sous-catégories effacées (local). Réimportez vos CSV.');
+  };
+
+  // Auditer les EAN (13 chiffres)
+  const handleAuditEAN13 = () => {
+    const onlyDigits = (s: string) => String(s || '').replace(/\D/g, '');
+    let invalidProducts = 0;
+    let invalidVariations = 0;
+    for (const p of products) {
+      const d = onlyDigits(p.ean13);
+      if (d && d.length !== 13) invalidProducts += 1;
+      if (Array.isArray(p.variations)) {
+        for (const v of p.variations) {
+          const dv = onlyDigits(v.ean13);
+          if (dv && dv.length !== 13) invalidVariations += 1;
+        }
+      }
+    }
+    alert(`Audit EAN: produits invalides=${invalidProducts}, déclinaisons invalides=${invalidVariations}.\nUtilisez “Réparer EAN (Articles)” et “Réparer EAN (Décl.)” pour mettre à jour.`);
+  };
+
   // Importer Articles et Déclinaisons depuis GitHub (raw)
   // util retiré (plus d'import GitHub)
 
@@ -2484,6 +2516,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               onRepairEANVariations={handleRepairEANVariations}
               onRepairEANArticlesFromGitHub={handleRepairEANArticlesFromGitHub}
               onCleanUnusedCategories={handleCleanUnusedCategories}
+              onPurgeCategories={handlePurgeCategories}
+              onAuditEAN13={handleAuditEAN13}
             />
           );
 
