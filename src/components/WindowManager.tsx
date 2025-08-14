@@ -382,35 +382,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           [normalizeKey('verre 8.50')]: 21,
         };
 
-        // Calculer le nombre de sets éligibles et la compensation totale
-        let totalEligibleSets = 0;
-        let totalCompensation = 0;
+        // Construire la liste des compensations par set (sans proratisation)
+        const seauComps: number[] = [];
         for (const sub of Object.keys(qtyBySubcat)) {
           const qty = qtyBySubcat[sub] || 0;
-          if (qty < 6) continue;
           const sets = Math.floor(qty / 6);
           const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
-          if (compPerSet > 0) {
-            totalEligibleSets += sets;
-            totalCompensation += sets * compPerSet;
-          }
+          for (let i = 0; i < sets; i++) if (compPerSet > 0) seauComps.push(compPerSet);
         }
 
-        // Limiter par le nombre total de seaux présents
-        const usableSets = Math.min(totalEligibleSets, totalSeauQty);
+        const usableSets = Math.min(seauComps.length, totalSeauQty);
         if (usableSets === 0) {
           // rien à distribuer → nettoyer d'éventuelles anciennes remises
           for (const { key } of seauLineInfos) {
             if (next[key] && next[key].type === 'euro') delete next[key];
           }
         } else {
-          // Ajuster la compensation totale si moins de seaux que de sets
-          if (totalEligibleSets > 0 && usableSets < totalEligibleSets) {
-            const ratio = usableSets / totalEligibleSets;
-            totalCompensation = totalCompensation * ratio;
-          }
+          // Somme des X premiers sets (X = nb de seaux disponibles)
+          const totalCompensation = seauComps.slice(0, usableSets).reduce((s, v) => s + v, 0);
 
-          // Répartir sur les lignes seau en euros par unité
+          // Répartir sur les lignes seau en euros par unité (plafonné au sous-total)
           for (const { key } of seauLineInfos) {
             if (next[key] && next[key].type === 'euro') delete next[key];
           }
@@ -454,32 +445,24 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           [normalizeKey('verre 8.50')]: 22,
         };
 
-        let totalEligibleSets12 = 0;
-        let totalCompensation12 = 0;
+        const vasqueComps: number[] = [];
         for (const sub of Object.keys(qtyBySubcat)) {
           const qty = qtyBySubcat[sub] || 0;
-          if (qty < 12) continue;
           const sets = Math.floor(qty / 12);
           const compPerSet = VASQUE_COMP_BY_SUB[sub] || 0;
-          if (compPerSet > 0 && sets > 0) {
-            totalEligibleSets12 += sets;
-            totalCompensation12 += sets * compPerSet;
-          }
+          for (let i = 0; i < sets; i++) if (compPerSet > 0) vasqueComps.push(compPerSet);
         }
 
-        const usableSets12 = Math.min(totalEligibleSets12, totalVasqueQty);
+        const usableSets12 = Math.min(vasqueComps.length, totalVasqueQty);
         if (usableSets12 === 0) {
           for (const { key } of vasqueLineInfos) {
             if (next[key] && next[key].type === 'euro') delete next[key];
           }
         } else {
-          if (totalEligibleSets12 > 0 && usableSets12 < totalEligibleSets12) {
-            const ratio = usableSets12 / totalEligibleSets12;
-            totalCompensation12 = totalCompensation12 * ratio;
-          }
           for (const { key } of vasqueLineInfos) {
             if (next[key] && next[key].type === 'euro') delete next[key];
           }
+          const totalCompensation12 = vasqueComps.slice(0, usableSets12).reduce((s, v) => s + v, 0);
           let remaining = totalCompensation12;
           for (const { key, subtotal, qty } of vasqueLineInfos) {
             if (remaining <= 0) break;
@@ -490,6 +473,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           }
         }
       }
+
+      // Si une association a fourni une compensation, on laisse le toggle tel quel (pas de verrouillage auto)
 
       // Nettoyer remises € existantes sur vasque puis appliquer
       for (const { key } of vasqueLineInfos) {
@@ -1433,13 +1418,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       // Analyser les en-têtes (normalisation pour tolérer accents/variantes)
       // eslint-disable-next-line no-control-regex
       const headers = lines[0].split(delimiter).map(h => h.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, ''));
-      const normalize = (s: string) => s
+      const normalizeHeader = (s: string) => s
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
-      const hIndex = (aliases: string[]) => headers.findIndex(x => aliases.some(a => normalize(x).includes(normalize(a))));
+      const hIndex = (aliases: string[]) => headers.findIndex(x => aliases.some(a => normalizeHeader(x).includes(normalizeHeader(a))));
 
       // Mapping des colonnes (robuste)
       const mapping = {
@@ -1540,19 +1525,39 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
       }
 
-      // Créer les nouvelles catégories
-      const newCategories: Category[] = Array.from(categoriesSet).map((catName, index) => ({
-        id: `cat_${index + 1}`,
+      // Fusionner les catégories importées avec les existantes en préservant id/couleur/subcategoryOrder
+      const normalizeCat = (s: string) => StorageService.normalizeLabel(s);
+      const existingByNormName = new Map<string, Category>();
+      for (const cat of categories) existingByNormName.set(normalizeCat(cat.name), cat);
+
+      // Calculer le prochain id numérique pour éviter les collisions
+      const existingIds = categories
+        .map(c => c.id)
+        .map(id => (id && /^cat_\d+$/.test(id) ? parseInt(id.split('_')[1], 10) : 0));
+      const baseId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+      let added = 0;
+
+      const mergedCategories: Category[] = Array.from(categoriesSet).map((catName) => {
+        const norm = normalizeCat(catName);
+        const existing = existingByNormName.get(norm);
+        if (existing) {
+          // Préserver l'ordre des sous-catégories et les méta-données
+          return { ...existing, name: existing.name || catName } as Category;
+        }
+        added += 1;
+        return {
+          id: `cat_${baseId + added}`,
         name: catName,
         color: getRandomColor(),
-        productOrder: []
-      }));
+          productOrder: [],
+        } as Category;
+      });
 
-      // Appeler la fonction de callback pour mettre à jour les données
-      onImportComplete(newProducts, newCategories);
+      // Appeler la fonction de callback pour mettre à jour les données (sans écraser les ordres existants)
+      onImportComplete(newProducts, mergedCategories);
 
       setImportStatus('success');
-      setImportMessage(`Import réussi : ${newProducts.length} produits, ${newCategories.length} catégories, ${associatedCategoriesSet.size} sous-catégories`);
+      setImportMessage(`Import réussi : ${newProducts.length} produits, ${mergedCategories.length} catégories, ${associatedCategoriesSet.size} sous-catégories`);
 
       // Réinitialiser le statut après 3 secondes
       setTimeout(() => {
@@ -1590,15 +1595,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       // Nettoyer et normaliser les en-têtes (insensible accents/casse)
       // eslint-disable-next-line no-control-regex
       const rawHeaders = lines[0].split(delimiter).map(h => h.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim());
-      const normalize = (s: string) => s
+      const normalizeHeader2 = (s: string) => s
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
-      const normHeaders = rawHeaders.map(normalize);
+      const normHeaders = rawHeaders.map(normalizeHeader2);
       const h = (aliases: string[]) => {
-        const normAliases = aliases.map(normalize);
+        const normAliases = aliases.map(normalizeHeader2);
         return normHeaders.findIndex(x => normAliases.some(a => x.includes(a)));
       };
       const map = {

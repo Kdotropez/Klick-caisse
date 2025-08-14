@@ -109,12 +109,20 @@ const App: React.FC = () => {
 
   const handleProductsReorder = (reorderedProducts: Product[]) => {
     setProducts(reorderedProducts);
+    // Préserver les catégories existantes (dont l'ordre des sous-catégories)
     saveProductionData(reorderedProducts, categories);
   };
 
   const handleUpdateCategories = (updatedCategories: Category[]) => {
-    setCategories(updatedCategories);
-    saveProductionData(products, updatedCategories);
+    // Fusion non destructive: préserver subcategoryOrder existant quand identifiant identique
+    const byId = new Map(categories.map(c => [c.id, c] as const));
+    const merged = updatedCategories.map(cat => {
+      const prev = byId.get(cat.id);
+      if (!prev) return cat;
+      return { ...cat, subcategoryOrder: prev.subcategoryOrder ?? cat.subcategoryOrder };
+    });
+    setCategories(merged);
+    saveProductionData(products, merged);
   };
 
   const handleUpdateCashiers = (updatedCashiers: Cashier[]) => {
