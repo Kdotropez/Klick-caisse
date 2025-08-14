@@ -2,7 +2,12 @@ export function parsePrice(input: unknown): number {
   if (typeof input === 'number' && Number.isFinite(input)) return input;
   let s = String(input ?? '').trim();
   if (!s) return 0;
-  s = s.replace(/\u00A0/g, '').replace(/\s+/g, '').replace(/[€]/g, '');
+  // Nettoyages supplémentaires: guillemets, espaces insécables, symbole €, espaces
+  s = s
+    .replace(/["']/g, '')
+    .replace(/\u00A0/g, '')
+    .replace(/\s+/g, '')
+    .replace(/[€]/g, '');
   const hasComma = s.includes(',');
   const hasDot = s.includes('.');
   if (hasComma && !hasDot) {
