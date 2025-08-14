@@ -1875,6 +1875,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     }));
     onProductsReorder?.(purgedProducts);
     onUpdateCategories?.([]);
+    // Vider le registre des sous-catégories persistant
+    StorageService.saveSubcategories([]);
+    // Réinitialiser l'UI
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
+    setCategorySearchTerm('');
+    setSubcategorySearchTerm('');
     saveProductionData(purgedProducts, []);
     alert('Catégories et sous-catégories effacées (local). Réimportez vos CSV.');
   };
