@@ -36,7 +36,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({
           {categoriesCount} catégories
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <input type="file" accept=".csv" style={{ display: 'none' }} id="csv-import-input" onChange={onImportCSV} />
+          <input type="file" accept=".csv,.json" style={{ display: 'none' }} id="csv-import-input" onChange={onImportCSV} />
           <label htmlFor="csv-import-input">
             <Button
               variant="outlined"
@@ -46,7 +46,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({
               disabled={importStatus === 'importing'}
               sx={{ width: '100%', backgroundColor: importStatus === 'importing' ? '#f5f5f5' : 'transparent' }}
             >
-              {importStatus === 'importing' ? 'Import en cours...' : 'Importer CSV'}
+              {importStatus === 'importing' ? 'Import en cours...' : 'Importer CSV/JSON'}
             </Button>
           </label>
           <Button

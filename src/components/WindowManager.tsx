@@ -1481,7 +1481,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     console.log(`✅ Ordre des sous-catégories mis à jour pour ${category.name}:`, normalizedOrder);
   };
 
-  // Fonction pour importer un fichier CSV
+  // Fonction pour importer un fichier CSV ou JSON nested
   const handleImportCSV = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -1490,6 +1490,68 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setImportMessage('Import en cours...');
 
     try {
+      // Branche JSON nested
+      if (file.name.toLowerCase().endsWith('.json')) {
+        const result = await (await import('../services/CSVImportService')).CSVImportService.importJSONNested(file);
+        if (!result.success) throw new Error(result.message);
+
+        // Fusion catégories sur nom normalisé
+        const normalizeCat = (s: string) => StorageService.normalizeLabel(s);
+        const existingByNormName = new Map<string, Category>();
+        for (const cat of categories) existingByNormName.set(normalizeCat(cat.name), cat);
+        const existingIds = categories
+          .map(c => c.id)
+          .map(id => (id && /^cat_\d+$/.test(id) ? parseInt(id.split('_')[1], 10) : 0));
+        const baseId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+        let added = 0;
+        const newOnes: Category[] = result.categories
+          .filter(c => !existingByNormName.has(normalizeCat(c.name)))
+          .map(c => ({ ...c, id: `cat_${baseId + (++added)}` }));
+        const mergedCategories: Category[] = [...categories, ...newOnes];
+
+        // Fusion non destructive des produits par id
+        const byId = new Map(products.map(p => [p.id, p] as const));
+        const mergedProducts: Product[] = (() => {
+          const updated = new Map<string, Product>();
+          // Commencer par existants
+          for (const p of products) updated.set(p.id, p);
+          // Appliquer nouveaux
+          for (const np of result.products) {
+            const existing = byId.get(np.id);
+            if (existing) {
+              updated.set(np.id, {
+                ...existing,
+                name: np.name || existing.name,
+                category: np.category || existing.category,
+                ean13: np.ean13 || existing.ean13,
+                finalPrice: Number.isFinite(np.finalPrice as any) ? np.finalPrice : existing.finalPrice,
+                wholesalePrice: Number.isFinite(np.wholesalePrice as any) ? np.wholesalePrice : existing.wholesalePrice,
+                crossedPrice: Number.isFinite(np.crossedPrice as any) ? np.crossedPrice : existing.crossedPrice,
+                // Conserver sous-catégories existantes si non fournies
+                associatedCategories: (Array.isArray(np.associatedCategories) && np.associatedCategories.length > 0)
+                  ? np.associatedCategories
+                  : (existing.associatedCategories || []),
+                // Conserver variations si non fournies
+                variations: (Array.isArray(np.variations) && np.variations.length > 0)
+                  ? np.variations
+                  : (existing.variations || []),
+              });
+            } else {
+              updated.set(np.id, np);
+            }
+          }
+          return Array.from(updated.values());
+        })();
+
+        // Mettre à jour état + persistance
+        onImportComplete(mergedProducts, mergedCategories);
+        saveProductionData(mergedProducts, mergedCategories);
+        setImportStatus('success');
+        setImportMessage(`Import JSON réussi : ${mergedProducts.length} produits, ${mergedCategories.length} catégories`);
+        setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 3000);
+        return;
+      }
+
       const text = await file.text();
       const lines = text.split('\n').filter(line => line.trim());
       
@@ -1631,8 +1693,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           added += 1;
           return {
             id: `cat_${baseId + added}`,
-            name: catName,
-            color: getRandomColor(),
+        name: catName,
+        color: getRandomColor(),
             productOrder: [],
           } as Category;
         });

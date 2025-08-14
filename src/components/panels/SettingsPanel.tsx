@@ -105,7 +105,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     >
       <input
         type="file"
-        accept=".csv"
+        accept=".csv,.json"
         style={{ display: 'none' }}
         id="csv-import-settings"
         onChange={onImportCSV}
@@ -129,7 +129,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             padding: '1px',
           }}
         >
-          {importStatus === 'importing' ? 'Import...' : 'Import CSV'}
+          {importStatus === 'importing' ? 'Import...' : 'Import CSV/JSON'}
         </Button>
       </label>
 

@@ -135,8 +135,8 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
             }
           }
           
-          // En "Toute catégorie", garder l'affichage complet des sous-catégories dans la barre
-          if (list.length === 0 && !selectedCategory) {
+          // Fallback: si aucune sous-catégorie détectée (quelle que soit la catégorie), afficher le registre global
+          if (list.length === 0) {
             try {
               const registry = StorageService.loadSubcategories();
               list = Array.isArray(registry) ? registry.slice(0, 200) : [];

@@ -48,6 +48,97 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
     setImportResult(null);
 
     try {
+      // Si JSON, déléguer directement au service JSON nested
+      if (file.name.toLowerCase().endsWith('.json')) {
+        const result = await CSVImportService.importJSONNested(file);
+        if (!result.success) throw result.message;
+
+        // Sauvegarder un backup avant fusion
+        StorageService.addAutoBackup();
+
+        // Fusion non destructive par Identifiant produit
+        const existingProducts = StorageService.loadProducts();
+        const idToIndex = new Map(existingProducts.map((p) => [p.id, p] as const));
+        const mergedProducts = [...existingProducts];
+        for (const np of result.products) {
+          const existing = idToIndex.get(np.id);
+          if (existing) {
+            idToIndex.set(np.id, {
+              ...existing,
+              name: np.name || existing.name,
+              category: np.category || existing.category,
+              associatedCategories: (np.associatedCategories && np.associatedCategories.length > 0)
+                ? np.associatedCategories
+                : (existing.associatedCategories || []),
+              finalPrice: Number.isFinite(np.finalPrice) ? np.finalPrice : existing.finalPrice,
+              ean13: np.ean13 || existing.ean13,
+              wholesalePrice: Number.isFinite(np.wholesalePrice) ? np.wholesalePrice : existing.wholesalePrice,
+              crossedPrice: Number.isFinite(np.crossedPrice) ? np.crossedPrice : existing.crossedPrice,
+              variations: (np.variations && np.variations.length > 0) ? np.variations : existing.variations,
+            });
+          } else {
+            idToIndex.set(np.id, np);
+            mergedProducts.push(np);
+          }
+        }
+
+        const mergedById = new Map(mergedProducts.map(p => [p.id, p] as const));
+        let finalProducts = Array.from(idToIndex.values());
+
+        // Fusion des catégories par nom normalisé
+        const existingCategories = StorageService.loadCategories();
+        const norm = (s: string) => StorageService.normalizeLabel(s);
+        const nameToCat = new Map(existingCategories.map(c => [norm(c.name), c] as const));
+        for (const c of result.categories) {
+          const key = norm(c.name);
+          if (!nameToCat.has(key)) nameToCat.set(key, c);
+        }
+        const finalCategories = Array.from(nameToCat.values());
+
+        // Mettre à jour le registre des sous-catégories depuis les produits importés
+        const allowedSubsRaw = Array.from(new Set(
+          result.products
+            .flatMap(p => (p.associatedCategories || []))
+            .map((s: string) => StorageService.sanitizeLabel(s))
+            .map((s: string) => s.trim())
+            .filter((s: string) => !!s)
+        ));
+        const normalize = (s: string) => StorageService.normalizeLabel(s);
+        const allowedSet = new Set(allowedSubsRaw.map(normalize));
+        finalProducts = finalProducts.map(p => ({
+          ...p,
+          associatedCategories: Array.from(new Set((p.associatedCategories || [])
+            .map((s: string) => StorageService.sanitizeLabel(s))
+            .map((s: string) => s.trim())
+            .filter((s: string) => allowedSet.has(normalize(s))))),
+        }));
+
+        StorageService.saveProducts(finalProducts);
+        StorageService.saveCategories(finalCategories);
+        StorageService.saveSubcategories(allowedSubsRaw);
+
+        const totalVariations = result.products.reduce(
+          (sum: number, product: Product) => sum + product.variations.length,
+          0
+        );
+        const stats = {
+          totalProducts: result.products.length,
+          totalCategories: result.categories.length,
+          totalVariations: totalVariations,
+        };
+
+        setImportResult({
+          success: true,
+          message: `Import JSON réussi ! ${stats.totalProducts} produits, ${stats.totalCategories} catégories, ${stats.totalVariations} déclinaisons`,
+          products: result.products,
+          categories: result.categories,
+          stats,
+        });
+        onImportComplete(StorageService.loadProducts(), StorageService.loadCategories());
+        setIsLoading(false);
+        return;
+      }
+
       const fileContent = await file.text();
       console.log('Contenu du fichier lu, taille:', fileContent.length);
 
@@ -284,7 +375,7 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
 
       <Box sx={{ textAlign: 'center', mb: 3 }}>
         <input
-          accept=".csv"
+          accept=".csv,.json"
           style={{ display: 'none' }}
           id="csv-file-input"
           type="file"

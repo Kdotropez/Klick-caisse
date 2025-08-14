@@ -78,9 +78,10 @@ export class StorageService {
   static sanitizeLabel(input: string): string {
     const map: Array<[RegExp, string]> = [
       [/[^\S\r\n]+/g, ' '],
-      //[control chars]\x00-\x1F, \x7F
+      // Supprimer uniquement les caractères de contrôle, conserver les lettres accentuées
       // eslint-disable-next-line no-control-regex
-      [/[^\x20-\x7E]/g, ' '],
+      [/([\x00-\x1F\x7F])/g, ''],
+      [/\uFEFF/g, ''],
       [/\uFFFD/g, ''],
       // Common mojibake (UTF-8 read as CP1252)
       [/â‚¬/g, '€'],
@@ -116,8 +117,11 @@ export class StorageService {
     ];
     let s = (input || '').toString();
     for (const [re, rep] of map) s = s.replace(re, rep);
-    // Prix suivis d'un caractère remplacé -> ajouter 
-    s = s.replace(/(\d+[.,]\d{1,2})\s*$/g, '$1');
+    // Normalisations spécifiques signalées:
+    s = s.replace(/\bpalid\b/gi, 'plaid');
+    s = s.replace(/\bverre\s*650\b/gi, 'verre 6.50');
+    // Conserver les décimales/€ en fin de libellé
+    s = s.replace(/(\d+[.,]\d{1,2})\s*€/g, '$1 €');
     return s.replace(/\s+/g, ' ').trim();
   }
 
