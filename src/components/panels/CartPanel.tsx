@@ -37,6 +37,8 @@ interface CartPanelProps {
   promoBanner?: React.ReactNode;
   autoGlassDiscountEnabled?: boolean;
   onToggleAutoGlassDiscount?: () => void;
+  autoAssocDiscountEnabled?: boolean;
+  onToggleAutoAssocDiscount?: () => void;
 }
 
 const CartPanel: React.FC<CartPanelProps> = ({
@@ -56,6 +58,8 @@ const CartPanel: React.FC<CartPanelProps> = ({
   promoBanner,
   autoGlassDiscountEnabled = true,
   onToggleAutoGlassDiscount,
+  autoAssocDiscountEnabled = true,
+  onToggleAutoAssocDiscount,
 }) => {
   const total = getTotalWithGlobalDiscount();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -332,6 +336,20 @@ const CartPanel: React.FC<CartPanelProps> = ({
             title="Activer/désactiver la remise auto 6 verres"
           >
             {autoGlassDiscountEnabled ? '✅ Remise auto' : '⛔ Remise auto'}
+          </Button>
+
+          <Button
+            variant="contained"
+            size="small"
+            onClick={onToggleAutoAssocDiscount}
+            sx={{ 
+              backgroundColor: autoAssocDiscountEnabled ? '#4caf50' : '#9e9e9e', 
+              flex: 1, 
+              fontSize: '0.8rem'
+            }}
+            title="Activer/désactiver la remise associative (seau/vasque)"
+          >
+            {autoAssocDiscountEnabled ? '✅ Assoc' : '⛔ Assoc'}
           </Button>
         </Box>
       </Box>
