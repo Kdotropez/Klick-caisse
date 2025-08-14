@@ -9,9 +9,12 @@ interface FreePanelProps {
   highlight?: boolean;
   isEditMode: boolean;
   onToggleEditMode: () => void;
+  onRepairEANArticles: (file: File) => void;
+  onRepairEANVariations: (file: File) => void;
+  onRepairEANArticlesFromGitHub: () => void;
 }
 
-const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode }) => {
+const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode, onRepairEANArticles, onRepairEANVariations, onRepairEANArticlesFromGitHub }) => {
   const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
   const gap = 2;
   const totalGapsWidth = 4;
@@ -101,6 +104,68 @@ const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize,
               onClick={onToggleEditMode}
             >
               {isEditMode ? 'Mode Vente' : 'Modifier Article'}
+            </Button>
+          );
+        }
+        if (idx === 3) {
+          return (
+            <>
+              <input
+                type="file"
+                accept=".csv"
+                id="repair-ean-articles-free"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) onRepairEANArticles(f);
+                  (e.target as HTMLInputElement).value = '';
+                }}
+              />
+              <Button
+                key={idx}
+                variant="contained"
+                sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
+                onClick={() => document.getElementById('repair-ean-articles-free')?.click()}
+              >
+                Réparer EAN (Articles)
+              </Button>
+            </>
+          );
+        }
+        if (idx === 4) {
+          return (
+            <>
+              <input
+                type="file"
+                accept=".csv"
+                id="repair-ean-variations-free"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) onRepairEANVariations(f);
+                  (e.target as HTMLInputElement).value = '';
+                }}
+              />
+              <Button
+                key={idx}
+                variant="contained"
+                sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
+                onClick={() => document.getElementById('repair-ean-variations-free')?.click()}
+              >
+                Réparer EAN (Décl.)
+              </Button>
+            </>
+          );
+        }
+        if (idx === 5) {
+          return (
+            <Button
+              key={idx}
+              variant="contained"
+              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
+              onClick={onRepairEANArticlesFromGitHub}
+            >
+              MAJ EAN depuis GitHub
             </Button>
           );
         }
