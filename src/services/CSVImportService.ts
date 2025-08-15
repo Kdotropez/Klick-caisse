@@ -160,6 +160,12 @@ export class CSVImportService {
           if (!s) return;
           out.add(this.sanitizeSubcategoryLabel(s));
         };
+        
+        // NOUVEAU: Champ sousCategorie du JSON nested
+        if (row?.sousCategorie) {
+          push(row.sousCategorie);
+        }
+        
         // Tableau direct
         if (Array.isArray(row?.associatedCategories)) {
           for (const v of row.associatedCategories) push(v);
