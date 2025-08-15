@@ -331,6 +331,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             return DISCOUNT_BY_SUBCAT[key] !== undefined;
           });
         }
+        // Fallback: déduire la sous‑catégorie à partir du prix unitaire si le nom/assoc ne l'exprime pas
+        if (!matched) {
+          const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+          // formater: 6.5 → "6.5", 8.50 → "8.5", 12.00 → "12"
+          const n = Math.round(unit * 100) / 100;
+          const whole = Math.round(n);
+          const frac = Math.round((n - whole) * 100);
+          const label = frac === 0 ? `${whole}` : (frac === 50 ? `${whole}.5` : n.toFixed(1));
+          const key = normalizeKey(`verre ${label}`);
+          if (DISCOUNT_BY_SUBCAT[key] !== undefined) matched = key;
+        }
         if (!matched) continue;
         qtyBySubcat[matched] = (qtyBySubcat[matched] || 0) + (it.quantity || 0);
           const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
@@ -471,7 +482,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       for (const it of cartItems) {
         const assoc = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
         const normAssoc = assoc.map(a => normalizeKey(a));
-        if (normAssoc.some(a => a.includes('vasque'))) {
+        const normName = normalizeKey(it.product.name || '');
+        if (normAssoc.some(a => a.includes('vasque')) || normName.includes('vasque')) {
           const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
           const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
           const qty = it.quantity || 0;
@@ -491,6 +503,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           [normalizeKey('verre 6.50')]: 22,
           [normalizeKey('verre 8.5')]: 22,
           [normalizeKey('verre 8.50')]: 22,
+          [normalizeKey('verre 10')]: 22,
+          [normalizeKey('verre 12')]: 22,
         };
 
         const vasqueComps: number[] = [];
