@@ -21,12 +21,45 @@ const App: React.FC = () => {
   useEffect(() => {
     const { products: loadedProducts, categories: loadedCategories } = loadProductionData(currentStoreCode);
     setProducts(loadedProducts);
-    setCategories(loadedCategories);
+
+    // Appliquer l'ordre des catégories sauvegardé (persistance entre refresh/import)
+    try {
+      const settings = StorageService.loadSettings() || {};
+      const savedOrder: string[] | undefined = Array.isArray(settings.categoryOrder) ? settings.categoryOrder : undefined;
+      if (savedOrder && savedOrder.length > 0) {
+        const byId = new Map(loadedCategories.map(c => [c.id, c] as const));
+        const ordered: typeof loadedCategories = [];
+        for (const id of savedOrder) {
+          const c = byId.get(id);
+          if (c) {
+            ordered.push(c);
+            byId.delete(id);
+          }
+        }
+        // Ajouter les catégories nouvelles/non référencées à la fin, en conservant leur ordre d'arrivée
+        const rest = loadedCategories.filter(c => byId.has(c.id));
+        setCategories([...ordered, ...rest]);
+      } else {
+        setCategories(loadedCategories);
+      }
+    } catch {
+      setCategories(loadedCategories);
+    }
     
     // Initialiser les caissiers
     const loadedCashiers = StorageService.initializeDefaultCashier();
     setCashiers(loadedCashiers);
   }, []);
+
+  // Persister l'ordre des catégories à chaque modification (drag & drop, ajout, import)
+  useEffect(() => {
+    if (!categories || categories.length === 0) return;
+    try {
+      const settings = StorageService.loadSettings() || {};
+      const next = { ...settings, categoryOrder: categories.map(c => c.id) };
+      StorageService.saveSettings(next);
+    } catch {}
+  }, [categories]);
 
 
 
@@ -108,6 +141,30 @@ const App: React.FC = () => {
 
   const handleImportComplete = (importedProducts: Product[], importedCategories: Category[]) => {
     setProducts(importedProducts);
+    // Réappliquer l'ordre utilisateur des catégories si présent dans les settings
+    try {
+      const settings = StorageService.loadSettings() || {};
+      const savedOrder: string[] | undefined = Array.isArray(settings.categoryOrder) ? settings.categoryOrder : undefined;
+      if (savedOrder && savedOrder.length > 0) {
+        const byId = new Map(importedCategories.map(c => [c.id, c] as const));
+        const ordered: Category[] = [];
+        for (const id of savedOrder) {
+          const c = byId.get(id);
+          if (c) {
+            ordered.push(c);
+            byId.delete(id);
+          }
+        }
+        const rest = importedCategories.filter(c => byId.has(c.id));
+        const finalCategories = [...ordered, ...rest];
+        setCategories(finalCategories);
+        saveProductionData(importedProducts, finalCategories);
+        // Mettre à jour l'ordre sauvegardé (pour inclure d'éventuelles nouvelles catégories)
+        const next = { ...settings, categoryOrder: finalCategories.map(c => c.id) };
+        StorageService.saveSettings(next);
+        return;
+      }
+    } catch {}
     setCategories(importedCategories);
     saveProductionData(importedProducts, importedCategories);
   };
@@ -128,6 +185,12 @@ const App: React.FC = () => {
     });
     setCategories(merged);
     saveProductionData(products, merged);
+    // Sauvegarder l'ordre courant immédiatement
+    try {
+      const settings = StorageService.loadSettings() || {};
+      const next = { ...settings, categoryOrder: merged.map(c => c.id) };
+      StorageService.saveSettings(next);
+    } catch {}
   };
 
   const handleUpdateCashiers = (updatedCashiers: Cashier[]) => {

@@ -102,6 +102,11 @@ const CartPanel: React.FC<CartPanelProps> = ({
               const variationId = item.selectedVariation?.id || null;
               const discountKey = `${item.product.id}-${variationId || 'main'}`;
               const discount = itemDiscounts[discountKey];
+              if (discount) {
+                console.log(`[CART] remise détectée pour ${discountKey}:`, discount);
+              } else {
+                console.log(`[CART] aucune remise pour ${discountKey}`);
+              }
               const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
               const finalPrice = getItemFinalPrice(item);
               const originalTotal = originalPrice * item.quantity;
