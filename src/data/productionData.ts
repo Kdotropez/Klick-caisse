@@ -2,7 +2,8 @@
 // Date: 2025-08-08T12:30:47.251Z
 // Source: EXPORT VF ARTICLE WYSIWYG.csv + EXPORT VF DECLINAISONS WYSIWYG.csv
 
-import { Product, Category } from '../types/Product';
+import { Product, Category } from '../types';
+import { StorageService } from '../services/StorageService';
 
 export const products: Product[] = [
   {
@@ -28066,31 +28067,31 @@ export const categories: Category[] = [
   }
 ];
 
-export const loadProductionData = (): { products: Product[]; categories: Category[] } => {
+export const loadProductionData = (storeCode?: string): { products: Product[]; categories: Category[] } => {
   console.log('🔄 Chargement des données de production...');
-
+  
+  const currentStore = storeCode || StorageService.getCurrentStoreCode();
+  
   try {
-    // 1) Essayer avec les clés unifiées (underscore), alignées avec StorageService
+    // Utiliser le StorageService avec support des boutiques
+    const storeData = StorageService.loadProductionData(currentStore);
+    if (storeData) {
+      console.log(`✅ Données chargées pour boutique ${currentStore}:`, { 
+        products: storeData.products.length, 
+        categories: storeData.categories.length 
+      });
+      return storeData;
+    }
+
+    // Compatibilité arrière: essayer les anciennes clés
     const savedProductsUS = localStorage.getItem('klick_caisse_products');
     const savedCategoriesUS = localStorage.getItem('klick_caisse_categories');
     if (savedProductsUS && savedCategoriesUS) {
       const parsedProducts = JSON.parse(savedProductsUS);
       const parsedCategories = JSON.parse(savedCategoriesUS);
-      console.log('✅ Données chargées (underscore):', { products: parsedProducts.length, categories: parsedCategories.length });
-      return { products: parsedProducts, categories: parsedCategories };
-    }
-
-    // 2) Compatibilité arrière: anciennes clés camelCase -> migrer vers underscore
-    const savedProductsCC = localStorage.getItem('klickCaisse_products');
-    const savedCategoriesCC = localStorage.getItem('klickCaisse_categories');
-    if (savedProductsCC && savedCategoriesCC) {
-      const parsedProducts = JSON.parse(savedProductsCC);
-      const parsedCategories = JSON.parse(savedCategoriesCC);
-      console.log('✅ Données chargées (camelCase) → migration vers underscore');
-      try {
-        localStorage.setItem('klick_caisse_products', JSON.stringify(parsedProducts));
-        localStorage.setItem('klick_caisse_categories', JSON.stringify(parsedCategories));
-      } catch {}
+      console.log('✅ Données chargées (ancien format) → migration vers boutique');
+      // Migrer vers le nouveau format
+      StorageService.saveProductionData(parsedProducts, parsedCategories, currentStore);
       return { products: parsedProducts, categories: parsedCategories };
     }
   } catch (error) {
@@ -28102,16 +28103,13 @@ export const loadProductionData = (): { products: Product[]; categories: Categor
   return { products: [], categories: [] };
 };
 
-export const saveProductionData = (newProducts: Product[], newCategories: Category[]): void => {
-  // Sauvegarder dans localStorage pour persistance (clés unifiées + compat)
+export const saveProductionData = (newProducts: Product[], newCategories: Category[], storeCode?: string): void => {
+  const currentStore = storeCode || StorageService.getCurrentStoreCode();
+  
   try {
-    // Clés unifiées (alignées avec StorageService)
-    localStorage.setItem('klick_caisse_categories', JSON.stringify(newCategories));
-    localStorage.setItem('klick_caisse_products', JSON.stringify(newProducts));
-    // Compat arrière: écrire aussi les anciennes clés pour éviter toute régression
-    localStorage.setItem('klickCaisse_categories', JSON.stringify(newCategories));
-    localStorage.setItem('klickCaisse_products', JSON.stringify(newProducts));
-    console.log('✅ Données sauvegardées (underscore + camelCase):', {
+    // Utiliser le StorageService avec support des boutiques
+    StorageService.saveProductionData(newProducts, newCategories, currentStore);
+    console.log(`✅ Données sauvegardées pour boutique ${currentStore}:`, {
       products: newProducts.length,
       categories: newCategories.length,
     });

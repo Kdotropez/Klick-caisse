@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, Typography } from '@mui/material';
-import { Transaction, Product } from '../../types/Product';
+import { Transaction, Product } from '../../types';
 
 export type PaymentRecapSort = 'qty' | 'amount' | 'name' | 'category' | 'subcategory';
 export type PaymentMethodKey = 'cash' | 'card' | 'sumup';

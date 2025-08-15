@@ -115,7 +115,7 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
                       timestamp: new Date(),
                     } as any;
                     StorageService.addDailyTransaction(inverse);
-                    // Sauvegarde auto + téléchargement après ajout d'un ticket inverse
+                    // Sauvegarde auto + téléchargement JSON après ajout d'un ticket inverse
                     try { StorageService.addAutoBackup(); } catch {}
                     try { StorageService.downloadFullBackup(); } catch {}
                     setTransactions(StorageService.loadTodayTransactions());
@@ -152,6 +152,9 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
           Array.from(daySelectedIds).forEach((tid) => {
             try { StorageService.deleteDailyTransaction(String(tid)); } catch {}
           });
+          // Sauvegarde auto + téléchargement JSON après suppression/annulation
+          try { StorageService.addAutoBackup(); } catch {}
+          try { StorageService.downloadFullBackup(); } catch {}
           setTransactions(StorageService.loadTodayTransactions());
           setDaySelectedIds(() => new Set());
           // eslint-disable-next-line no-alert

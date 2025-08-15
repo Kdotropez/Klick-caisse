@@ -14,7 +14,7 @@ import {
 import { Upload, CheckCircle, Error } from '@mui/icons-material';
 import { CSVImportService } from '../services/CSVImportService';
 import { StorageService } from '../services/StorageService';
-import { Product, Category, CSVProduct } from '../types/Product';
+import { Product, Category, CSVProduct } from '../types';
 import CSVMapping from './CSVMapping';
 
 interface CSVImportProps {
@@ -53,7 +53,7 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
         const result = await CSVImportService.importJSONNested(file);
         if (!result.success) throw result.message;
 
-        // Sauvegarder un backup avant fusion
+        // Sauvegarde auto (silencieuse) avant fusion
         StorageService.addAutoBackup();
 
         // Fusion non destructive par Identifiant produit
@@ -251,7 +251,7 @@ const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
         totalVariations: totalVariations,
       };
 
-      // Sauvegarder un backup avant fusion
+      // Sauvegarde auto (silencieuse) avant fusion
       StorageService.addAutoBackup();
 
       // Fusion non destructive par Identifiant produit

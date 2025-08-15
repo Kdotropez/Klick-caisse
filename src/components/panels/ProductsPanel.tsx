@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Chip, Paper, Typography, IconButton } from '@mui/material';
-import { Product } from '../../types/Product';
+import { Product } from '../../types';
 import { NavigateBefore, NavigateNext, Edit as EditIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
 import { formatEuro } from '../../utils/currency';
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import WindowManager from './components/WindowManager';
-import { Product, Category, CartItem, ProductVariation } from './types/Product';
+
+import { Product, Category, CartItem, ProductVariation } from './types';
 import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
@@ -13,10 +14,12 @@ const App: React.FC = () => {
   const [isLayoutLocked] = useState<boolean>(false);
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
   const [currentCashier, setCurrentCashier] = useState<Cashier | null>(null);
+
   const [rootSize, setRootSize] = useState<{ width: string; height: string }>({ width: '1280px', height: '880px' });
+  const [currentStoreCode, setCurrentStoreCode] = useState<string>(StorageService.getCurrentStoreCode());
   // Charger les données de production au démarrage
   useEffect(() => {
-    const { products: loadedProducts, categories: loadedCategories } = loadProductionData();
+    const { products: loadedProducts, categories: loadedCategories } = loadProductionData(currentStoreCode);
     setProducts(loadedProducts);
     setCategories(loadedCategories);
     
@@ -24,6 +27,8 @@ const App: React.FC = () => {
     const loadedCashiers = StorageService.initializeDefaultCashier();
     setCashiers(loadedCashiers);
   }, []);
+
+
 
   // Demander le stockage persistant pour protéger les données locales contre l'éviction
   useEffect(() => {
@@ -243,6 +248,8 @@ const App: React.FC = () => {
         onUpdateCategories={handleUpdateCategories}
         onUpdateCashiers={handleUpdateCashiers}
         onCashierLogin={handleCashierLogin}
+        currentStoreCode={currentStoreCode}
+        onStoreChange={setCurrentStoreCode}
       />
     </Box>
   );

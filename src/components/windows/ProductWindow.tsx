@@ -18,7 +18,7 @@ import {
   NavigateBefore,
   NavigateNext,
 } from '@mui/icons-material';
-import { Product, Category, CartItem, ProductVariation } from '../../types/Product';
+import { Product, Category, CartItem, ProductVariation } from '../../types';
 
 interface ProductWindowProps {
   products: Product[];

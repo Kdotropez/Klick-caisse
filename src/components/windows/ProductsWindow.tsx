@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Typography, Paper, Chip } from '@mui/material';
-import { Product } from '../../types/Product';
+import { Product } from '../../types';
 import { formatEuro } from '../../utils/currency';
 
 interface ProductsWindowProps {

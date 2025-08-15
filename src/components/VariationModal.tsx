@@ -12,7 +12,7 @@ import {
   Chip,
   Divider
 } from '@mui/material';
-import { Product, ProductVariation } from '../types/Product';
+import { Product, ProductVariation } from '../types';
 
 interface VariationModalProps {
   open: boolean;

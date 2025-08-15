@@ -282,8 +282,8 @@ export class CSVImportService {
       const price = parseFloat(String(priceStr).replace(',', '.')) || 0;
       const ean = getVal(['ean13', 'ean']);
 
-      // Extraire les catégories associées si le mapping existe
-      // Agréger sous-catégories: colonne CSV "catégories associées" + colonnes "Sous-catégorie n"
+      // Extraire les sous-catégories en PRIORITÉ depuis les colonnes "Sous-catégorie 1..3".
+      // Si elles sont vides, on retombe sur la colonne "catégories associées".
       const rawAssocMain = getVal(['catégories associées', 'categories associees', 'associees']);
       const extraSubs: string[] = [];
       for (let i = 1; i <= 3; i++) {
@@ -297,14 +297,12 @@ export class CSVImportService {
         .toLowerCase()
         .replace(/\s+/g, ' ')
         .trim();
-      const associatedCategories = Array.from(new Map(
-        [
-          ...String(rawAssocMain).split(/\s*(?:[;|]|,(?!\d))\s*/),
-          ...extraSubs
-        ]
+      const fromAssoc = String(rawAssocMain).split(/\s*(?:[;|]|,(?!\d))\s*/);
+      const chosen = (extraSubs.length > 0 ? extraSubs : fromAssoc)
         .map((cat: string) => (cat || '').trim())
-        .filter((cat: string) => !!cat)
-        .map((cat: string) => [normalize(cat), cat] as [string, string])
+        .filter((cat: string) => !!cat);
+      const associatedCategories = Array.from(new Map(
+        chosen.map((cat: string) => [normalize(cat), cat] as [string, string])
       ).values());
 
       return {

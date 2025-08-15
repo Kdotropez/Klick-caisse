@@ -27,7 +27,7 @@ import {
 //   Add,
 //   Remove,
 // } from '@mui/icons-material';
-import { Product, Category, CartItem, ProductVariation, Transaction } from '../types/Product';
+import { Product, Category, CartItem, ProductVariation, Transaction } from '../types';
 import { Cashier } from '../types/Cashier';
 import { saveProductionData } from '../data/productionData';
 // import { formatEuro } from '../utils/currency';
@@ -81,6 +81,9 @@ interface WindowManagerProps {
   onUpdateCategories?: (newCategories: Category[]) => void;
   onUpdateCashiers?: (newCashiers: Cashier[]) => void;
   onCashierLogin?: (cashier: Cashier) => void;
+  currentStoreCode?: string;
+  onStoreChange?: (code: string) => void;
+
 }
 
 const WindowManager: React.FC<WindowManagerProps> = ({
@@ -100,6 +103,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   onUpdateCategories,
   onUpdateCashiers,
   onCashierLogin,
+  currentStoreCode,
+  onStoreChange,
 }) => {
   // Dimensions pour l'émulation 1920×1080
   const APP_BAR_HEIGHT = 64;
@@ -926,9 +931,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       timestamp: new Date(),
     };
     StorageService.addDailyTransaction(tx as any);
-    // Sauvegarde automatique complète après encaissement
+    // Sauvegarde automatique complète (silencieuse) + téléchargement JSON (obligatoire après encaissement)
     try { StorageService.addAutoBackup(); } catch {}
-    // Téléchargement d'un fichier backup JSON
     try { StorageService.downloadFullBackup(); } catch {}
     setTodayTransactions(StorageService.loadTodayTransactions());
 
@@ -1548,7 +1552,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         saveProductionData(mergedProducts, mergedCategories);
         setImportStatus('success');
         setImportMessage(`Import JSON réussi : ${mergedProducts.length} produits, ${mergedCategories.length} catégories`);
-        setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 3000);
+        setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 1200);
         return;
       }
 
@@ -1627,10 +1631,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             .filter(idx => idx !== -1)
             .map(idx => values[idx] || '')
             .filter(Boolean);
-          const associatedCategories = [
-              ...associatedCategoriesStr.split(/\s*(?:[;|]|,(?!\d))\s*/),
-              ...extraSubs
-            ]
+          // Priorité stricte aux colonnes "sous categorie 1..3" si présentes
+          const associatedCategories = (extraSubs.length > 0)
+            ? extraSubs
+            : associatedCategoriesStr.split(/\s*(?:[;|]|,(?!\d))\s*/)
             .map(cat => StorageService.sanitizeLabel(cat))
             .map(cat => cat.trim())
             .filter(cat => cat && cat.length > 0);
@@ -2587,6 +2591,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               onCleanUnusedCategories={handleCleanUnusedCategories}
               onPurgeCategories={handlePurgeCategories}
               onAuditEAN13={handleAuditEAN13}
+
             />
           );
 

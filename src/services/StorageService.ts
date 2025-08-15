@@ -1,6 +1,6 @@
-import { Product, Category } from '../types/Product';
-import type { Transaction } from '../types/Product';
-import { Cashier } from '../types/Cashier';
+import { Product, Category, Transaction, Cashier } from '../types';
+import { Store } from '../types/Store';
+import { getStoreByCode } from '../types/Store';
 import { defaultSubcategoriesRegistry } from '../data/subcategoriesRegistry';
 
 export class StorageService {
@@ -13,6 +13,10 @@ export class StorageService {
   private static readonly Z_COUNTER_KEY = 'klick_caisse_z_counter';
   private static readonly CASHIERS_KEY = 'klick_caisse_cashiers';
   private static readonly AUTO_BACKUPS_KEY = 'klick_caisse_auto_backups';
+
+  private static getStoreKey(storeCode: string, key: string): string {
+    return `klick_caisse_${storeCode}_${key}`;
+  }
 
   // Sauvegarder les produits
   static saveProducts(products: Product[]): void {
@@ -347,19 +351,21 @@ export class StorageService {
 
   // === GESTION DES CAISSIERS ===
 
-  // Sauvegarder les caissiers
-  static saveCashiers(cashiers: Cashier[]): void {
+  // Sauvegarder les caissiers (version avec support boutique)
+  static saveCashiers(cashiers: Cashier[], storeCode: string = '1'): void {
+    const key = this.getStoreKey(storeCode, 'cashiers');
     try {
-      localStorage.setItem(this.CASHIERS_KEY, JSON.stringify(cashiers));
+      localStorage.setItem(key, JSON.stringify(cashiers));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des caissiers:', error);
     }
   }
 
-  // Charger les caissiers
-  static loadCashiers(): Cashier[] {
+  // Charger les caissiers (version avec support boutique)
+  static loadCashiers(storeCode: string = '1'): Cashier[] {
+    const key = this.getStoreKey(storeCode, 'cashiers');
     try {
-      const data = localStorage.getItem(this.CASHIERS_KEY);
+      const data = localStorage.getItem(key);
       if (data) {
         const cashiers = JSON.parse(data);
         // Convertir les dates string en objets Date
@@ -511,7 +517,7 @@ export class StorageService {
   }
 
   // Sauvegarde automatique locale (rotation limitée)
-  static addAutoBackup(): void {
+  static addAutoBackup(storeCode: string = '1'): void {
     try {
       const data = this.exportFullBackup();
       if (!data) return;
@@ -525,4 +531,105 @@ export class StorageService {
       console.error('Erreur sauvegarde auto:', e);
     }
   }
+
+  // === GESTION DES BOUTIQUES ===
+
+  static saveProductionData(products: Product[], categories: Category[], storeCode: string = '1'): void {
+    const data = { products, categories, timestamp: Date.now() };
+    const key = this.getStoreKey(storeCode, 'productionData');
+    localStorage.setItem(key, JSON.stringify(data));
+    this.addAutoBackup(storeCode);
+  }
+
+  static loadProductionData(storeCode: string = '1'): { products: Product[]; categories: Category[] } | null {
+    const key = this.getStoreKey(storeCode, 'productionData');
+    const data = localStorage.getItem(key);
+    if (!data) return null;
+    
+    try {
+      const parsed = JSON.parse(data);
+      return {
+        products: parsed.products || [],
+        categories: parsed.categories || []
+      };
+    } catch (error) {
+      console.error('Erreur lors du chargement des données de production:', error);
+      return null;
+    }
+  }
+
+  static saveTransactions(transactions: Transaction[], storeCode: string = '1'): void {
+    const key = this.getStoreKey(storeCode, 'transactions');
+    localStorage.setItem(key, JSON.stringify(transactions));
+  }
+
+  static loadTransactions(storeCode: string = '1'): Transaction[] {
+    const key = this.getStoreKey(storeCode, 'transactions');
+    const data = localStorage.getItem(key);
+    if (!data) return [];
+    
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des transactions:', error);
+      return [];
+    }
+  }
+
+  static getCurrentStoreCode(): string {
+    return localStorage.getItem('klick_caisse_current_store') || '1';
+  }
+
+  static setCurrentStoreCode(storeCode: string): void {
+    localStorage.setItem('klick_caisse_current_store', storeCode);
+  }
+
+  static getAllStoreData(storeCode: string): {
+    products: Product[];
+    categories: Category[];
+    transactions: Transaction[];
+    cashiers: Cashier[];
+  } {
+    return {
+      products: this.loadProductionData(storeCode)?.products || [],
+      categories: this.loadProductionData(storeCode)?.categories || [],
+      transactions: this.loadTransactions(storeCode),
+      cashiers: this.loadCashiers(storeCode)
+    };
+  }
+
+  static exportStoreData(storeCode: string): string {
+    const data = this.getAllStoreData(storeCode);
+    const store = getStoreByCode(storeCode);
+    const exportData = {
+      store: store,
+      data: data,
+      exportDate: new Date().toISOString()
+    };
+    return JSON.stringify(exportData, null, 2);
+  }
+
+  static importStoreData(storeCode: string, jsonData: string): boolean {
+    try {
+      const parsed = JSON.parse(jsonData);
+      if (parsed.data) {
+        if (parsed.data.products && parsed.data.categories) {
+          this.saveProductionData(parsed.data.products, parsed.data.categories, storeCode);
+        }
+        if (parsed.data.transactions) {
+          this.saveTransactions(parsed.data.transactions, storeCode);
+        }
+        if (parsed.data.cashiers) {
+          this.saveCashiers(parsed.data.cashiers, storeCode);
+        }
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erreur lors de l\'import des données:', error);
+      return false;
+    }
+  }
+
+
 } 

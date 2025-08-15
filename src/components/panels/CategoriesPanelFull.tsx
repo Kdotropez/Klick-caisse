@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Box, Button, Chip, TextField } from '@mui/material';
-import { Category, Product } from '../../types/Product';
+import { Category, Product } from '../../types';
 
 interface CategoriesPanelFullProps {
   categories: Category[];

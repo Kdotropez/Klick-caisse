@@ -19,7 +19,7 @@ import {
   Chip
 } from '@mui/material';
 import { Close, Add, Delete, Edit } from '@mui/icons-material';
-import { Product, Category, ProductVariation } from '../types/Product';
+import { Product, Category, ProductVariation } from '../types';
 import { StorageService } from '../services/StorageService';
 
 interface ProductEditModalProps {
