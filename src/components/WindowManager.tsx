@@ -1592,7 +1592,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         ean13: hIndex(['ean13','ean']),
         reference: hIndex(['reference','référence']),
         wholesalePrice: hIndex(["prix d'achat ht", 'wholesale_price', 'prix de vente ht']),
-        stock: hIndex(['quantite disponible','quantité disponible'])
+        stock: hIndex(['quantite disponible','quantité disponible']),
+        type: hIndex(['type']),
+        variantId: hIndex(['identifiant declinaison','identifiant déclinaison','id declinaison','id déclinaison']),
+        variantAttributes: hIndex(['liste des attributs','attributs','attributes'])
       } as const;
 
       // Vérifier les colonnes obligatoires
@@ -1622,7 +1625,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           // eslint-disable-next-line no-control-regex
           const reference = (values[mapping.reference] || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
           
-          // Traiter les catégories associées
+          const rowType = mapping.type !== -1 ? String(values[mapping.type] || '').toUpperCase().trim() : '';
+          const variantIdRaw = mapping.variantId !== -1 ? String(values[mapping.variantId] || '').trim() : '';
+          const variantAttributesRaw = mapping.variantAttributes !== -1 ? String(values[mapping.variantAttributes] || '').trim() : '';
+          
+          // Traiter les catégories associées (priorité sous-catégories 1..3)
           // Ne pas couper sur les virgules décimales (ex: "6,50").
           // On sépare sur: point-virgule ";", pipe "|" ou virgule non suivie d'un chiffre
           // eslint-disable-next-line no-control-regex
@@ -1631,27 +1638,48 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             .filter(idx => idx !== -1)
             .map(idx => values[idx] || '')
             .filter(Boolean);
-          // Priorité stricte aux colonnes "sous categorie 1..3" si présentes
           const associatedCategories = (extraSubs.length > 0)
             ? extraSubs
             : associatedCategoriesStr.split(/\s*(?:[;|]|,(?!\d))\s*/)
             .map(cat => StorageService.sanitizeLabel(cat))
             .map(cat => cat.trim())
             .filter(cat => cat && cat.length > 0);
-
+          
           const wholesalePrice = mapping.wholesalePrice !== -1 ? 
             (parsePrice(values[mapping.wholesalePrice]) || (finalPrice > 0 ? finalPrice * 0.8 : 0)) : 
             (finalPrice > 0 ? finalPrice * 0.8 : 0);
-
-          // Nettoyer les données
+          
           const cleanName = name.replace(/[^\w\s\-.]/g, '').trim();
           const cleanCategory = category.replace(/[^\w\s\-.]/g, '').trim();
-          // Préserver les décimales (6,50 / 8,50), nettoyage doux via StorageService
           const cleanAssociatedCategories = associatedCategories
             .map(cat => StorageService.sanitizeLabel(cat))
             .map(cat => cat.trim())
             .filter(cat => cat && cat.length > 0);
-
+          
+          // Si c'est une ligne de variation, on l'attache au produit parent existant ou en cours de création
+          const isVariationRow = (rowType === 'VARIATION' || (!!variantIdRaw));
+          if (isVariationRow) {
+            // Chercher le produit parent par id
+            let parent = newProducts.find(p => p.id === id);
+            if (!parent) parent = products.find(p => p.id === id);
+            // En fallback, tenter par nom + catégorie
+            if (!parent) parent = newProducts.find(p => p.name === cleanName && p.category === cleanCategory);
+            if (!parent) parent = products.find(p => p.name === cleanName && p.category === cleanCategory);
+            if (parent) {
+              const variation = {
+                id: variantIdRaw || `var_${i}`,
+                ean13: ean13,
+                reference: reference,
+                attributes: variantAttributesRaw,
+                priceImpact: 0,
+                finalPrice: finalPrice > 0 ? finalPrice : (parent.finalPrice || 0),
+              } as ProductVariation;
+              parent.variations = Array.isArray(parent.variations) ? [...parent.variations, variation] : [variation];
+              continue; // ne pas créer un produit séparé pour cette ligne
+            }
+            // si aucun parent trouvé, on laissera créer un produit simple ci-dessous
+          }
+          
           if (cleanName && cleanName !== 'Produit sans nom') {
             const product: Product = {
               id,
@@ -1967,7 +1995,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
       }
     }
-    alert(`Audit EAN: produits invalides=${invalidProducts}, déclinaisons invalides=${invalidVariations}.\nUtilisez “Réparer EAN (Articles)” et “Réparer EAN (Décl.)” pour mettre à jour.`);
+    alert(`Audit EAN: produits invalides=${invalidProducts}, déclinaisons invalides=${invalidVariations}.\nUtilisez "Réparer EAN (Articles)" et "Réparer EAN (Décl.)" pour mettre à jour.`);
   };
 
   // Importer Articles et Déclinaisons depuis GitHub (raw)
