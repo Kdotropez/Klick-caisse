@@ -392,8 +392,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           [normalizeKey('verre 6.50')]: 19,
           [normalizeKey('verre 8.5')]: 21,
           [normalizeKey('verre 8.50')]: 21,
-          [normalizeKey('verre 10')]: 17,
-          [normalizeKey('verre 12')]: 16,
+          [normalizeKey('verre 10')]: 20,
+          [normalizeKey('verre 12')]: 20,
         };
 
         // Construire la liste des compensations par set en tenant compte de la remise verres déjà appliquée
