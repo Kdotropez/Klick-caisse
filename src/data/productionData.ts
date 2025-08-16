@@ -4,6 +4,7 @@
 
 import { Product, Category } from '../types';
 import { StorageService } from '../services/StorageService';
+import { APP_VERSION } from '../version';
 
 // Import de la nouvelle base de données
 import newBaseData from '../components/base complete 15 aout.nested.json';
@@ -53,6 +54,18 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
   categories: Category[];
 }> => {
   try {
+    // Si la version applicative change, on recharge la base intégrée et on marque la version
+    try {
+      const DATA_VERSION_KEY = 'klick_caisse_data_version';
+      const current = localStorage.getItem(DATA_VERSION_KEY);
+      if (current !== APP_VERSION) {
+        console.log(`🆕 Nouvelle version détectée (${current || 'none'} -> ${APP_VERSION}). Recharge de la base intégrée.`);
+        StorageService.saveProducts(products);
+        StorageService.saveCategories(categories);
+        localStorage.setItem(DATA_VERSION_KEY, APP_VERSION);
+        return { products, categories };
+      }
+    } catch {}
     // Essayer de charger depuis le localStorage d'abord
     const savedProducts = StorageService.loadProducts();
     const savedCategories = StorageService.loadCategories();
