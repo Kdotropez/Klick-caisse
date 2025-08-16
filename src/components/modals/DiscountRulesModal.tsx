@@ -8,6 +8,7 @@ type RuleRow = {
   subcategory: string; // ex: "verre 6.5"
   target: 'seau' | 'vasque';
   amount: number; // en €
+  sourceCategory: 'verres' | 'pack verre';
 };
 
 interface DiscountRulesModalProps {
@@ -16,6 +17,18 @@ interface DiscountRulesModalProps {
 }
 
 const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }) => {
+  const canonicalizeSubcat = (input: string): string => {
+    try {
+      const s = StorageService.sanitizeLabel(String(input || '')).toLowerCase();
+      const m = s.match(/verre\s*(\d+(?:[.,]\d+)?)/);
+      if (!m) return 'verre ' + s.replace(/[^0-9.,]/g, '');
+      const n = parseFloat(m[1].replace(',', '.'));
+      if (!Number.isFinite(n)) return 'verre ' + m[1].replace(',', '.');
+      const oneDecimal = Math.round(n * 10) / 10;
+      const label = Number.isInteger(oneDecimal) ? String(Math.round(oneDecimal)) : oneDecimal.toFixed(1);
+      return `verre ${label}`;
+    } catch { return StorageService.sanitizeLabel(input).toLowerCase(); }
+  };
   const initialRows = useMemo<RuleRow[]>(() => {
     try {
       const s = StorageService.loadSettings() || {} as any;
@@ -37,8 +50,8 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
       const seau: Record<string, number> = (seauFromSettings && Object.keys(seauFromSettings).length > 0) ? seauFromSettings : seauDefaults;
       const vasque: Record<string, number> = (vasqueFromSettings && Object.keys(vasqueFromSettings).length > 0) ? vasqueFromSettings : vasqueDefaults;
       const rows: RuleRow[] = [];
-      for (const [k, v] of Object.entries(seau)) rows.push({ id: `s-${k}`, minQty: 6, subcategory: k, target: 'seau', amount: v });
-      for (const [k, v] of Object.entries(vasque)) rows.push({ id: `v-${k}`, minQty: 12, subcategory: k, target: 'vasque', amount: v });
+      for (const [k, v] of Object.entries(seau)) rows.push({ id: `s-${k}`, minQty: 6, subcategory: canonicalizeSubcat(k), target: 'seau', amount: v, sourceCategory: 'verres' });
+      for (const [k, v] of Object.entries(vasque)) rows.push({ id: `v-${k}`, minQty: 12, subcategory: canonicalizeSubcat(k), target: 'vasque', amount: v, sourceCategory: 'verres' });
       return rows;
     } catch { return []; }
   }, []);
@@ -49,21 +62,23 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
       // Récupérer toutes les sous-catégories connues (registre + storage)
       const all = StorageService.loadSubcategories();
       // Filtrer celles qui ressemblent aux verres ciblés
-      const wanted = ['verre 6.5', 'verre 6.50', 'verre 8.5', 'verre 8.50', 'verre 10', 'verre 12'];
-      const norm = (s: string) => StorageService.normalizeLabel(s);
+      const allowed = ['verre 4', 'verre 6.5', 'verre 8.5', 'verre 10', 'verre 12'];
       const set = new Set<string>();
-      for (const w of wanted) {
-        const hit = all.find(s => norm(s) === norm(w));
-        if (hit) set.add(StorageService.sanitizeLabel(hit)); else set.add(w);
+      // Ajouter celles présentes dans le registre
+      for (const s of all) {
+        const canon = canonicalizeSubcat(s);
+        if (allowed.includes(canon)) set.add(canon);
       }
-      return Array.from(set);
+      // Ajouter les valeurs de secours
+      for (const w of allowed) set.add(canonicalizeSubcat(w));
+      return Array.from(set).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
     } catch { return ['verre 6.5','verre 8.5','verre 10','verre 12']; }
   }, []);
 
   useEffect(() => { if (open) setRows(initialRows); }, [open, initialRows]);
 
   const addRow = () => {
-    setRows(prev => [...prev, { id: String(Date.now()), minQty: 6, subcategory: '', target: 'seau', amount: 0 }]);
+    setRows(prev => [...prev, { id: String(Date.now()), minQty: 6, subcategory: '', target: 'seau', amount: 0, sourceCategory: 'verres' }]);
   };
 
   const updateRow = (idx: number, patch: Partial<RuleRow>) => {
@@ -110,15 +125,15 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
       const glassMap: Record<string, number> = (glassFromSettings && Object.keys(glassFromSettings).length > 0)
         ? glassFromSettings
         : glassDefaults;
-      const norm = (s: string) => StorageService.normalizeLabel(s);
+      const canonRow = canonicalizeSubcat(r.subcategory);
       // Trouver la clé correspondante dans la map
       let percent = 0;
       for (const [k, v] of Object.entries(glassMap)) {
-        if (norm(k) === norm(r.subcategory)) { percent = v; break; }
+        if (canonicalizeSubcat(k) === canonRow) { percent = v; break; }
       }
       if (percent <= 0 || r.amount <= 0) return '';
       // Extraire le prix depuis le libellé "verre X" si présent
-      const m = r.subcategory.match(/(\d+(?:[.,]\d+)?)/);
+      const m = canonRow.match(/(\d+(?:[.,]\d+)?)/);
       const unit = m ? parseFloat(m[1].replace(',', '.')) : 0;
       if (unit <= 0) return '';
       const autoDiscount = r.minQty * unit * (percent / 100);
@@ -151,14 +166,23 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
               ) : rows.map((r, idx) => (
                 <TableRow key={r.id}>
                   <TableCell>
-                    <FormControl size="small" sx={{ minWidth: 80 }}>
-                      <Select value={r.minQty} onChange={(e) => updateRow(idx, { minQty: Number(e.target.value) })}>
-                        <MenuItem value={6}>6</MenuItem>
-                        <MenuItem value={12}>12</MenuItem>
+                    <TextField
+                      size="small"
+                      type="number"
+                      value={r.minQty}
+                      onChange={(e)=>updateRow(idx, { minQty: Math.max(1, parseInt(e.target.value || '0', 10) || 1) })}
+                      sx={{ width: 90 }}
+                      inputProps={{ min: 1 }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                      <Select value={r.sourceCategory} onChange={(e)=>updateRow(idx, { sourceCategory: e.target.value as RuleRow['sourceCategory'] })}>
+                        <MenuItem value="verres">verres</MenuItem>
+                        <MenuItem value="pack verre">pack verre</MenuItem>
                       </Select>
                     </FormControl>
                   </TableCell>
-                  <TableCell>verres</TableCell>
                   <TableCell>
                     <Autocomplete
                       size="small"

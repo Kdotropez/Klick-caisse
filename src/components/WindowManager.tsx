@@ -325,6 +325,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         Object.entries(glassEffective).map(([k, v]) => [normalizeKey(k), v])
       );
 
+      // Remises automatiques PACK VERRE (à l'unité, en euros)
+      const defaultPackPairs: Array<[string, number]> = [
+        ['pack 6.5', 1.5],
+        ['pack 6.50', 1.5],
+        ['pack 8.5', 2],
+        ['pack 8.50', 2],
+        ['pack 10', 3],
+        ['pack 12', 4],
+      ];
+      const packMapEffective: Record<string, number> = Object.fromEntries(
+        defaultPackPairs.map(([k, v]) => [normalizeKey(k), v])
+      );
+
       // Agréger les quantités par type de verre (basé sur catégorie/verre et prix) + mémoriser les lignes
       const qtyBySubcat: Record<string, number> = {};
       const lineKeysBySubcat: Record<string, string[]> = {};
@@ -383,6 +396,47 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           }
         }
       }
+      }
+
+      // Appliquer remises PACK VERRE à l'unité (si Auto activé)
+      if (autoGlassDiscountEnabled) {
+        for (const it of cartItems) {
+          const categoryNorm = normalizeKey(it.product.category || '');
+          const nameNorm = normalizeKey(it.product.name || '');
+          const assocList = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+          let matchedPackKey: string | undefined;
+          // Chercher dans les sous-catégories associées
+          for (const raw of assocList) {
+            const n = normalizeKey(String(raw));
+            if (packMapEffective[n] !== undefined) { matchedPackKey = n; break; }
+          }
+          // Sinon tenter via le nom produit
+          if (!matchedPackKey && (categoryNorm.includes('pack') || nameNorm.includes('pack'))) {
+            const m = nameNorm.match(/pack\s*(\d+(?:\.\d+)?)/);
+            if (m) {
+              const possible = normalizeKey(`pack ${m[1]}`);
+              if (packMapEffective[possible] !== undefined) matchedPackKey = possible;
+            }
+          }
+          if (!matchedPackKey) continue;
+          const discountEuro = packMapEffective[matchedPackKey] || 0;
+          if (discountEuro > 0) {
+            const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+            next[key] = { type: 'euro', value: discountEuro };
+          }
+        }
+      } else {
+        // Si Auto désactivé: retirer remises PACK appliquées précédemment
+        for (const it of cartItems) {
+          const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+          if (next[key] && next[key].type === 'euro') {
+            const val = next[key].value;
+            // Supprimer si cela correspond à l'un des montants pack connus
+            if ([1.5, 2, 3, 4].some(v => Math.abs((val as number) - v) < 1e-6)) {
+              delete next[key];
+            }
+          }
+        }
       }
 
       // Détecter, par sous-catégorie, si une remise verres est effectivement appliquée
