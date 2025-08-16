@@ -31,6 +31,7 @@ interface CartPanelProps {
   onOpenDiscountModal: (item: CartItem) => void;
   onOpenRecap: () => void;
   onOpenGlobalDiscount: () => void;
+  
   onResetCartAndDiscounts: () => void;
   onRemoveItemDiscount: (discountKey: string) => void;
   onClearGlobalDiscount: () => void;
@@ -81,6 +82,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
         overflow: 'hidden',
       }}
     >
+      
       {promoBanner}
       <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
         <Typography variant="h6" align="center" sx={{ fontWeight: 'bold' }}>

@@ -42,8 +42,10 @@ import GlobalTicketsModal from './modals/GlobalTicketsModal';
 import GlobalTicketEditorModal from './modals/GlobalTicketEditorModal';
 import ClosuresModal from './modals/ClosuresModal';
 import EndOfDayModal from './modals/EndOfDayModal';
+import DiscountRulesModal from './modals/DiscountRulesModal';
 import GlobalDiscountModal from './GlobalDiscountModal';
 import ItemDiscountModal from './ItemDiscountModal';
+ 
 import CategoryManagementModal from './CategoryManagementModal';
 import DailyReportModal from './DailyReportModal';
 import ProductEditModal from './ProductEditModal';
@@ -147,6 +149,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   
   // État pour la modale récapitulative
   const [showRecapModal, setShowRecapModal] = useState(false);
+  const [showDiscountRules, setShowDiscountRules] = useState(false);
+  
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showGlobalDiscountModal, setShowGlobalDiscountModal] = useState(false);
   const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null);
@@ -296,9 +300,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           .replace(/\s+/g, ' ')
           .trim();
       
-      // Table des remises par sous-catégorie (normalisées)
-      // Accepte variantes: "VERRE 6,5" => "verre 6.5", etc.
-      const discountPairs: Array<[string, number]> = [
+      // Barèmes configurables (chargés depuis les paramètres), avec valeurs par défaut
+      const settings = ((): any => {
+        try { return StorageService.loadSettings() || {}; } catch { return {}; }
+      })();
+      const rules = settings.autoDiscountRules || {};
+      const defaultGlassPairs: Array<[string, number]> = [
         ['verre 4', 4.17],
         ['verre 4.0', 4.17],
         ['verre 6.5', 3.85],
@@ -309,8 +316,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         ['verre 12', 5.56],
         ['calice metal', 5.0],
       ];
+      // `glassBySubcat` attendu comme Record<string, number>
+      const glassMapFromSettings: Record<string, number> | undefined = rules.glassBySubcat;
+      const glassEffective: Record<string, number> = (glassMapFromSettings && Object.keys(glassMapFromSettings).length > 0)
+        ? glassMapFromSettings
+        : Object.fromEntries(defaultGlassPairs);
       const DISCOUNT_BY_SUBCAT: Record<string, number> = Object.fromEntries(
-        discountPairs.map(([k, v]) => [normalizeKey(k), v])
+        Object.entries(glassEffective).map(([k, v]) => [normalizeKey(k), v])
       );
 
       // Agréger les quantités par type de verre (basé sur catégorie/verre et prix) + mémoriser les lignes
@@ -413,14 +425,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           if (next[key] && next[key].type === 'euro') delete next[key];
         }
       } else {
-        const SEAU_COMP_BY_SUB: Record<string, number> = {
-          [normalizeKey('verre 6.5')]: 19,
-          [normalizeKey('verre 6.50')]: 19,
-          [normalizeKey('verre 8.5')]: 21,
-          [normalizeKey('verre 8.50')]: 21,
-          [normalizeKey('verre 10')]: 20,
-          [normalizeKey('verre 12')]: 20,
+        const defaultSeau: Record<string, number> = {
+          'verre 6.5': 19,
+          'verre 6.50': 19,
+          'verre 8.5': 21,
+          'verre 8.50': 21,
+          'verre 10': 20,
+          'verre 12': 22,
         };
+        const seauFromSettings: Record<string, number> | undefined = rules.seauBySubcat;
+        const seauEffective: Record<string, number> = (seauFromSettings && Object.keys(seauFromSettings).length > 0)
+          ? seauFromSettings
+          : defaultSeau;
+        const SEAU_COMP_BY_SUB: Record<string, number> = Object.fromEntries(
+          Object.entries(seauEffective).map(([k, v]) => [normalizeKey(k), v])
+        );
 
         // Préparer info lignes (prix/qty) pour allocation
         const keyToInfo: Record<string, { unit: number; qty: number }> = {};
@@ -439,14 +458,23 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         // 1) VASQUES: consommer des sets de 12 verres (2x 6) par sous-type
         const vasqueComps: number[] = [];
-        const VASQUE_COMP_BY_SUB: Record<string, number> = {
-          [normalizeKey('verre 6.5')]: 23,
-          [normalizeKey('verre 6.50')]: 23,
-          [normalizeKey('verre 8.5')]: 22,
-          [normalizeKey('verre 8.50')]: 22,
-          [normalizeKey('verre 10')]: 20,
-          [normalizeKey('verre 12')]: 18,
+        const defaultVasque: Record<string, number> = {
+          'verre 6.5': 23,
+          'verre 6.50': 23,
+          'verre 8.5': 22,
+          'verre 8.50': 22,
+          'verre 10': 20,
+          'verre 12': 22,
         };
+        const vasqueFromSettings: Record<string, number> | undefined = rules.vasqueBySubcat;
+        const vasqueEffective: Record<string, number> = (vasqueFromSettings && Object.keys(vasqueFromSettings).length > 0)
+          ? { ...vasqueFromSettings }
+          : { ...defaultVasque };
+        // Demande client: 12 verres (verre 12) → vasque = 24€
+        vasqueEffective['verre 12'] = 24;
+        const VASQUE_COMP_BY_SUB: Record<string, number> = Object.fromEntries(
+          Object.entries(vasqueEffective).map(([k, v]) => [normalizeKey(k), v])
+        );
         const remainingPoolsBySub: Record<string, Array<{unit:number; qty:number}>> = {};
         for (const sub of Object.keys(qtyBySubcat)) {
           const totalQty = qtyBySubcat[sub] || 0;
@@ -2178,6 +2206,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onOpenDiscountModal={openDiscountModal}
             onOpenRecap={() => setShowRecapModal(true)}
             onOpenGlobalDiscount={openGlobalDiscountModal}
+            // Ouvre le tableau des remises via le bouton Récap s'il faut un accès rapide
             onResetCartAndDiscounts={() => { setItemDiscounts({}); setGlobalDiscount(null); cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); }}
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
@@ -2215,6 +2244,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                       {category.name}
                     </Button>
                   ))}
+                  <Button variant="outlined" size="small" onClick={()=>setShowDiscountRules(true)} sx={{ textTransform: 'none', fontSize: '0.7rem' }}>Barèmes remises</Button>
                 </Box>
               </Box>
             </Box>
@@ -2471,6 +2501,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onExportAll={handleExportAll}
             onImportAll={handleImportAll}
             onImportTxOnly={handleImportTxOnly}
+            onOpenDiscountRules={() => setShowDiscountRules(true)}
           />
         )
 
@@ -2780,7 +2811,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          open={showRecapModal}
          onClose={() => setShowRecapModal(false)}
          cartItems={cartItems}
+         itemDiscounts={itemDiscounts as any}
+         globalDiscount={globalDiscount as any}
+         getItemFinalPrice={getItemFinalPrice}
        />
+       
 
        {/* Modale de remise globale */}
        <GlobalDiscountModal
@@ -2795,6 +2830,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
            delete next[key];
            setItemDiscounts(next);
          }}
+       />
+
+       {/* Modale barèmes remises */}
+       <DiscountRulesModal
+         open={showDiscountRules}
+         onClose={()=>setShowDiscountRules(false)}
        />
 
        {/* Modale de gestion des catégories */}

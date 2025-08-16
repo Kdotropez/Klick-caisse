@@ -20,23 +20,10 @@ const ImportPanel: React.FC<ImportPanelProps> = ({
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h6" sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
-        Base de Données
+        Données
       </Typography>
       <Box sx={{ p: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: 1, 
-          p: 1, 
-          backgroundColor: '#e8f5e8', 
-          borderRadius: 1,
-          border: '1px solid #4caf50'
-        }}>
-          <CheckCircle sx={{ color: '#4caf50' }} />
-          <Typography variant="body2" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
-            Base intégrée automatiquement
-          </Typography>
-        </Box>
+        {/* Indication "base intégrée" retirée sur demande */}
         
         <Typography variant="body2" align="center" sx={{ mb: 1 }}>
           {productsCount} produits chargés
@@ -51,9 +38,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({
           borderRadius: 1,
           border: '1px solid #ddd'
         }}>
-          <Typography variant="caption" sx={{ color: '#666' }}>
-            ✅ Base de données complète intégrée au démarrage
-          </Typography>
+          {/* Message retiré */}
         </Box>
       </Box>
     </Box>

@@ -21,6 +21,7 @@ interface SettingsPanelProps {
   onImportAll?: (file: File) => Promise<void>;
   onImportTxOnly?: (file: File) => Promise<void>;
   onClearAllCategories?: () => void;
+  onOpenDiscountRules?: () => void; // nouveau
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -32,6 +33,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onOpenSubcategoryManagement,
   isEditMode,
   onClearAllCategories,
+  onOpenDiscountRules,
 }) => {
   const gap = 2;
   const totalGapsWidth = 4;
@@ -42,6 +44,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const availableHeight = height - totalGapsHeight - totalPaddingHeight;
   const buttonWidth = Math.floor(availableWidth / 3);
   const buttonHeight = Math.floor(availableHeight / 4);
+
+  
 
   return (
     <Box
@@ -67,21 +71,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         id="klick-import-json-input"
       />
 
-      <Box sx={{ 
-        gridColumn: '1 / -1', 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: 1, 
-        p: 1, 
-        backgroundColor: '#e8f5e8', 
-        borderRadius: 1,
-        border: '1px solid #4caf50'
-      }}>
-        <CheckCircle sx={{ color: '#4caf50' }} />
-        <span style={{ color: '#2e7d32', fontWeight: 'bold', fontSize: getScaledFontSize('0.6rem') }}>
-          Base de données intégrée
-        </span>
-      </Box>
+      {/* Indication "base intégrée" retirée sur demande */}
 
       <Button
         variant="contained"
@@ -178,6 +168,27 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={onClearAllCategories}
       >
         Effacer toutes les catégories
+      </Button>
+
+      {/* Bouton libre: Barèmes remises */}
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#ff9800',
+          '&:hover': { backgroundColor: '#f57c00' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={onOpenDiscountRules}
+      >
+        Barèmes remises
       </Button>
 
       <Button

@@ -54,19 +54,7 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
   categories: Category[];
 }> => {
   try {
-    // Si la version applicative change, on recharge la base intégrée et on marque la version
-    try {
-      const DATA_VERSION_KEY = 'klick_caisse_data_version';
-      const current = localStorage.getItem(DATA_VERSION_KEY);
-      if (current !== APP_VERSION) {
-        console.log(`🆕 Nouvelle version détectée (${current || 'none'} -> ${APP_VERSION}). Recharge de la base intégrée.`);
-        StorageService.saveProducts(products);
-        StorageService.saveCategories(categories);
-        localStorage.setItem(DATA_VERSION_KEY, APP_VERSION);
-        return { products, categories };
-      }
-    } catch {}
-    // Essayer de charger depuis le localStorage d'abord
+    // 1) Charger depuis le localStorage d'abord (ne jamais écraser si des données utilisateur existent)
     const savedProducts = StorageService.loadProducts();
     const savedCategories = StorageService.loadCategories();
     
@@ -107,10 +95,9 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
       return { products: savedProducts, categories: savedCategories };
     }
     
-    // Sinon, utiliser les nouvelles données par défaut
-    console.log(`🆕 Chargement de la nouvelle base de données (${products.length} produits, ${categories.length} catégories)`);
-    
-    // Sauvegarder automatiquement les nouvelles données
+    // 2) Sinon, utiliser les nouvelles données par défaut (intégrées)
+    console.log(`Chargement des données par défaut (${products.length} produits, ${categories.length} catégories)`);
+    // Sauvegarder automatiquement les nouvelles données par défaut
     StorageService.saveProducts(products);
     StorageService.saveCategories(categories);
     

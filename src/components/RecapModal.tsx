@@ -22,17 +22,49 @@ import {
 } from '@mui/icons-material';
 import { CartItem } from '../types/Product';
 
+type ItemDiscount = { type: 'euro' | 'percent' | 'price'; value: number };
+type GlobalDiscount = { type: 'euro' | 'percent'; value: number } | null;
+
 interface RecapModalProps {
   open: boolean;
   onClose: () => void;
   cartItems: CartItem[];
+  itemDiscounts?: Record<string, ItemDiscount>;
+  globalDiscount?: GlobalDiscount;
+  getItemFinalPrice?: (item: CartItem) => number;
 }
 
-const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => {
-  const totalAmount = cartItems.reduce((sum, item) => {
+const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems, itemDiscounts = {}, globalDiscount = null, getItemFinalPrice }) => {
+  const subtotalOriginal = cartItems.reduce((sum, item) => {
     const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
     return sum + (price * item.quantity);
   }, 0);
+
+  const individualDiscounts = cartItems.reduce((sum, item) => {
+    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+    const originalTotal = originalPrice * item.quantity;
+    const finalPrice = getItemFinalPrice ? getItemFinalPrice(item) : originalPrice;
+    const finalTotal = finalPrice * item.quantity;
+    return sum + Math.max(0, (originalTotal - finalTotal));
+  }, 0);
+
+  let globalDiscountAmount = 0;
+  if (globalDiscount) {
+    const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
+      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+      const hasIndividualDiscount = (itemDiscounts as any)[discountKey];
+      if (!hasIndividualDiscount) {
+        const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+        return sum + (originalPrice * item.quantity);
+      }
+      return sum;
+    }, 0);
+    globalDiscountAmount = globalDiscount.type === 'euro'
+      ? Math.min(totalWithoutIndividualDiscount, globalDiscount.value)
+      : totalWithoutIndividualDiscount * (globalDiscount.value / 100);
+  }
+
+  const grandTotal = subtotalOriginal - (individualDiscounts + globalDiscountAmount);
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -101,7 +133,7 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
           </Typography>
         </Paper>
 
-        {/* Résumé des achats */}
+        {/* Résumé des achats (avec remises) */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
             Détail des Articles
@@ -109,8 +141,12 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
           
           <List sx={{ backgroundColor: 'white', borderRadius: 1, border: '1px solid #e0e0e0' }}>
             {cartItems.map((item, index) => {
-              const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-              const totalPrice = price * item.quantity;
+              const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+              const finalPrice = getItemFinalPrice ? getItemFinalPrice(item) : originalPrice;
+              const originalTotal = originalPrice * item.quantity;
+              const finalTotal = finalPrice * item.quantity;
+              const discountAmount = Math.max(0, originalTotal - finalTotal);
+              const discountPercent = originalPrice > 0 ? ((originalPrice - finalPrice) / originalPrice) * 100 : 0;
               
               return (
                 <React.Fragment key={`${item.product.id}-${item.selectedVariation?.id || 'main'}`}>
@@ -124,9 +160,16 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
                           <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
                             × {item.quantity}
                           </Typography>
-                          <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2', whiteSpace: 'nowrap' }}>
-                            {totalPrice.toFixed(2)} €
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {discountAmount > 0 && (
+                              <Typography variant="body2" sx={{ color: '#f44336', textDecoration: 'line-through' }}>
+                                {originalTotal.toFixed(2)} €
+                              </Typography>
+                            )}
+                            <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2', whiteSpace: 'nowrap' }}>
+                              {finalTotal.toFixed(2)} €
+                            </Typography>
+                          </Box>
                         </Box>
                       }
                       secondary={
@@ -140,7 +183,13 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
                               sx={{ mr: 1, mb: 1 }}
                             />
                           )}
-                          {/* Prix unitaire supprimé */}
+                          {discountAmount > 0 && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                              <Chip label={`Remise: -${discountAmount.toFixed(2)}€`} size="small" color="warning" />
+                              <Chip label={`(-${discountPercent.toFixed(1)}%)`} size="small" />
+                              <Chip label={`PU: ${originalPrice.toFixed(2)}€ → ${finalPrice.toFixed(2)}€`} size="small" variant="outlined" />
+                            </Box>
+                          )}
                         </Box>
                       }
                     />
@@ -152,7 +201,7 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
           </List>
         </Box>
 
-        {/* Résumé financier */}
+        {/* Résumé financier (avec remises) */}
         <Paper elevation={2} sx={{ p: 2, backgroundColor: '#e3f2fd' }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
             Résumé Financier
@@ -173,13 +222,38 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems }) => 
           </Box>
           
           <Divider sx={{ my: 1 }} />
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+            <Typography variant="body1">Sous-total (avant remises):</Typography>
+            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              {subtotalOriginal.toFixed(2)} €
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+            <Typography variant="body1">Remises lignes:</Typography>
+            <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#f44336' }}>
+              -{individualDiscounts.toFixed(2)} €
+            </Typography>
+          </Box>
+
+          {globalDiscount && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+              <Typography variant="body1">Remise globale ({globalDiscount.type === 'euro' ? '€' : '%'}):</Typography>
+              <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#f44336' }}>
+                -{globalDiscountAmount.toFixed(2)} €
+              </Typography>
+            </Box>
+          )}
+          
+          <Divider sx={{ my: 1 }} />
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               TOTAL:
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-              {totalAmount.toFixed(2)} €
+              {grandTotal.toFixed(2)} €
             </Typography>
           </Box>
         </Paper>
