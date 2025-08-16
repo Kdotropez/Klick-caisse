@@ -487,10 +487,27 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           'verre 10': 20,
           'verre 12': 22,
         };
+        // Mêler règles sauvegardées (pack verre -> seau) et map seauBySubcat
         const seauFromSettings: Record<string, number> | undefined = rules.seauBySubcat;
         const seauEffective: Record<string, number> = (seauFromSettings && Object.keys(seauFromSettings).length > 0)
-          ? seauFromSettings
+          ? { ...defaultSeau, ...seauFromSettings }
           : defaultSeau;
+        // Construire aussi une map des règles explicites PACK VERRE -> SEAU (PACK X -> verre X)
+        const packToSeauComp: Record<string, number> = (() => {
+          const out: Record<string, number> = {};
+          const saved: any[] = Array.isArray(rules.savedRows) ? rules.savedRows : [];
+          for (const row of saved) {
+            if (row && row.sourceCategory === 'pack verre' && row.target === 'seau') {
+              const m = String(row.subcategory || '').match(/(\d+(?:[.,]\d+)?)/);
+              if (!m) continue;
+              const num = m[1].replace(',', '.');
+              const verreKey = normalizeKey(`verre ${num}`);
+              const euro = Number(row.amount) || 0;
+              if (euro > 0) out[verreKey] = euro;
+            }
+          }
+          return out;
+        })();
         const SEAU_COMP_BY_SUB: Record<string, number> = Object.fromEntries(
           Object.entries(seauEffective).map(([k, v]) => [normalizeKey(k), v])
         );
@@ -587,6 +604,111 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           }
         }
 
+        const VASQUE_BASELINE = 22;
+        // 2bis) VASQUES: consommer des sets de 12 verres en mélangeant les sous-catégories
+        // Règle: compensation nette = 22 - remise verres auto sur 12 unités
+        const vasqueFromMixedTwelve: number[] = [];
+        {
+          // Cloner les pools restants pour consommer en global
+          const mixedPools: Record<string, Array<{unit:number; qty:number}>> = {};
+          for (const [sub, arr] of Object.entries(remainingPoolsBySub)) {
+            mixedPools[sub] = arr.map(p => ({ ...p }));
+          }
+          // Fonction pour calculer le total restant
+          const totalQty = () => Object.values(mixedPools).reduce((s, arr) => s + arr.reduce((ss, p) => ss + Math.max(0, p.qty), 0), 0);
+          while (totalQty() >= 12) {
+            let need = 12;
+            let discountSum12 = 0;
+            // Parcours simple: consommer séquentiellement par sous-catégorie
+            for (const sub of Object.keys(mixedPools)) {
+              if (need <= 0) break;
+              const percentVerre = DISCOUNT_BY_SUBCAT[sub] || 0;
+              const arr = mixedPools[sub];
+              for (let idx = 0; idx < arr.length && need > 0; idx++) {
+                const take = Math.min(need, Math.max(0, arr[idx].qty));
+                if (take > 0) {
+                  discountSum12 += take * arr[idx].unit * (percentVerre / 100);
+                  arr[idx].qty -= take;
+                  need -= take;
+                }
+              }
+            }
+            if (need > 0) break; // sécurité
+            const net = Math.max(0, VASQUE_BASELINE - discountSum12);
+            if (net > 0) vasqueFromMixedTwelve.push(net);
+          }
+        }
+
+        // 3) VASQUES via (2 packs) ou (1 pack + 6 verres)
+        
+        // Préparer la liste des packs présents (par type 6.5/8.5/10/12)
+        type PackUnit = { key: string; num: number; auto: number };
+        const packUnits: PackUnit[] = [];
+        for (const it of cartItems) {
+          const catNorm = normalizeKey(it.product.category || '');
+          if (!(catNorm.includes('pack') && catNorm.includes('verre'))) continue;
+          // Détecter le type PACK X depuis sous-catégories associées puis nom
+          let num: number | null = null;
+          const assocList = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+          for (const raw of assocList) {
+            const m = normalizeKey(String(raw)).match(/pack\s*(\d+(?:\.\d+)?)/);
+            if (m) { num = parseFloat(m[1]); break; }
+          }
+          if (num === null) {
+            const m = normalizeKey(it.product.name || '').match(/pack\s*(\d+(?:\.\d+)?)/);
+            if (m) num = parseFloat(m[1]);
+          }
+          if (num === null || !Number.isFinite(num)) continue;
+          const auto = (num === 6.5 ? 1.5 : num === 8.5 ? 2 : num === 10 ? 3 : num === 12 ? 4 : 0);
+          const qty = Math.max(1, it.quantity || 0);
+          for (let q = 0; q < qty; q++) packUnits.push({ key: `${it.product.id}-${it.selectedVariation?.id || 'main'}`, num, auto });
+        }
+        // a) Paires de packs (similaires ou différents) → 1 vasque
+        const vasqueFromPackPairs: number[] = [];
+        if (packUnits.length >= 2) {
+          // Former des paires deux par deux en minimisant la somme des remises auto pour maximiser la compensation
+          const autos = packUnits.map(p => p.auto).sort((a,b)=>a-b);
+          for (let i = 0; i + 1 < autos.length; i += 2) {
+            const net = Math.max(0, VASQUE_BASELINE - (autos[i] + autos[i+1]));
+            if (net > 0) vasqueFromPackPairs.push(net);
+          }
+        }
+        // b) 1 pack + 6 verres (sur pools restants) → 1 vasque
+        const vasqueFromPackPlusSix: number[] = [];
+        if (packUnits.length >= 1) {
+          // Construire des pools modifiables pour consommer 6 verres
+          const poolsBySub: Record<string, Array<{unit:number; qty:number}>> = {};
+          for (const [sub, arr] of Object.entries(remainingPoolsBySub)) {
+            poolsBySub[sub] = arr.map(p=>({ ...p }));
+          }
+          const autoOf = (n:number)=> (n===6.5?1.5:n===8.5?2:n===10?3:n===12?4:0);
+          // trier packs pour donner priorité à ceux avec auto le plus élevé (ça réduit le net, mais l'ordre n'est pas critique)
+          const sortedPacks = [...packUnits].sort((a,b)=>a.auto-b.auto);
+          for (const p of sortedPacks) {
+            // calculer remise verres sur 6 unités, en consommant depuis poolsBySub
+            let need6 = 6;
+            let discount6 = 0;
+            const subs = Object.keys(poolsBySub);
+            // ordre arbitraire; on peut aussi prioriser les sous-types avec plus de qty
+            for (const sub of subs) {
+              if (need6<=0) break;
+              const percentVerre = (DISCOUNT_BY_SUBCAT[sub] || 0);
+              const arr = poolsBySub[sub];
+              for (let idx=0; idx<arr.length && need6>0; idx++) {
+                const take = Math.min(need6, Math.max(0, arr[idx].qty));
+                if (take>0) {
+                  discount6 += take * arr[idx].unit * (percentVerre/100);
+                  arr[idx].qty -= take;
+                  need6 -= take;
+                }
+              }
+            }
+            if (need6>0) continue; // pas assez de verres pour constituer un set de 6
+            const net = Math.max(0, VASQUE_BASELINE - autoOf(p.num) - discount6);
+            if (net>0) vasqueFromPackPlusSix.push(net);
+          }
+        }
+
         // Répartition sur vasques puis sur seaux, séparément
         const vasqueTargets = targetLineInfos.filter(t => {
           const prod = cartItems.find(ci => `${ci.product.id}-${ci.selectedVariation?.id || 'main'}` === t.key)?.product;
@@ -598,6 +720,48 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const catNorm = normalizeKey(prod?.category || '');
           return catNorm.includes('seau');
         });
+
+        // Cas explicite demandé: 1 PACK VERRE (ex: PACK 6.5) + 1 SEAU => appliquer la compensation du barème "seau"
+        // On détecte des lignes PACK VERRE et on mappe PACK X.Y -> "verre X.Y" pour utiliser SEAU_COMP_BY_SUB
+        // Cette compensation s'applique même si aucune remise verres (percent) n'a été appliquée sur des lignes "verre"
+        const packBasedComps: number[] = [];
+        if (seauTargets.length > 0) {
+          for (const it of cartItems) {
+            const catNorm = normalizeKey(it.product.category || '');
+            if (!(catNorm.includes('pack') && catNorm.includes('verre'))) continue;
+
+            // Tenter d'extraire "pack X" depuis sous-catégories associées puis depuis le nom
+            let matchedSub: string | null = null;
+            const assocList = Array.isArray(it.product.associatedCategories) ? it.product.associatedCategories : [];
+            for (const raw of assocList) {
+              const n = normalizeKey(String(raw));
+              const m = n.match(/pack\s*(\d+(?:\.\d+)?)/);
+              if (m) { matchedSub = normalizeKey(`verre ${m[1]}`); break; }
+            }
+            if (!matchedSub) {
+              const nameNorm = normalizeKey(it.product.name || '');
+              const m = nameNorm.match(/pack\s*(\d+(?:\.\d+)?)/);
+              if (m) matchedSub = normalizeKey(`verre ${m[1]}`);
+            }
+            if (!matchedSub) continue;
+
+            // Priorité: n'appliquer la compensation PACK->SEAU que si une règle explicite existe
+            const compConfigured = packToSeauComp[matchedSub];
+            if (compConfigured === undefined) continue;
+            // Calcul de la compensation nette (barème pack->seau − remise auto du pack)
+            const mnum = matchedSub.match(/verre\s*(\d+(?:\.\d+)?)/);
+            const num = mnum ? parseFloat(mnum[1]) : NaN;
+            const packAuto = Number.isFinite(num)
+              ? (num === 6.5 ? 1.5 : num === 8.5 ? 2 : num === 10 ? 3 : num === 12 ? 4 : 0)
+              : 0;
+            const compNet = Math.max(0, compConfigured - packAuto);
+            if (compNet <= 0) continue;
+
+            // Ajouter une compensation par quantité de packs (verrouillage global plus bas par nb de seaux)
+            const times = Math.max(1, it.quantity || 0);
+            for (let i = 0; i < times; i++) packBasedComps.push(compNet);
+          }
+        }
 
         // Nettoyage des anciennes remises
         for (const { key } of targetLineInfos) {
@@ -626,7 +790,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         // Vasques: appliquer sur UNE SEULE vasque
         distribute(vasqueComps, vasqueTargets, { singleTarget: true });
+        // Seaux
         distribute(seauComps, seauTargets);
+        // Packs -> Seaux (compensation nette)
+        if (packBasedComps.length > 0 && seauTargets.length > 0) {
+          const limited = packBasedComps.slice(0, seauTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0));
+          distribute(limited, seauTargets);
+        }
+        // Nouvelles règles vasque (2 packs), (1 pack + 6 verres), (12 verres mélangés)
+        const extraVasque = [...vasqueFromPackPairs, ...vasqueFromPackPlusSix, ...vasqueFromMixedTwelve];
+        if (extraVasque.length > 0 && vasqueTargets.length > 0) {
+          const limitQty = vasqueTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0);
+          const limited = extraVasque.slice(0, limitQty);
+          distribute(limited, vasqueTargets, { singleTarget: true });
+        }
       }
 
       // (Suppression demandée) — logique de compensation vasque retirée entièrement.

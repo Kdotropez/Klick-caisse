@@ -29,10 +29,23 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
       return `verre ${label}`;
     } catch { return StorageService.sanitizeLabel(input).toLowerCase(); }
   };
-  const initialRows = useMemo<RuleRow[]>(() => {
+  const loadRowsFromSettings = (): RuleRow[] => {
     try {
       const s = StorageService.loadSettings() || {} as any;
       const r = s.autoDiscountRules || {};
+      // 1) Lignes sauvegardées
+      const savedRows: any[] | undefined = r.savedRows;
+      if (Array.isArray(savedRows) && savedRows.length > 0) {
+        return savedRows.map((row: any) => ({
+          id: String(row.id || `${Date.now()}-${Math.random()}`),
+          minQty: Number.isFinite(Number(row.minQty)) ? Number(row.minQty) : (row.target === 'vasque' ? 12 : 6),
+          subcategory: String(row.subcategory || ''),
+          target: (row.target === 'vasque' ? 'vasque' : 'seau') as RuleRow['target'],
+          amount: Number.isFinite(Number(row.amount)) ? Number(row.amount) : 0,
+          sourceCategory: (row.sourceCategory === 'pack verre' ? 'pack verre' : 'verres') as RuleRow['sourceCategory'],
+        })).filter(rw => rw.subcategory && rw.amount > 0);
+      }
+      // 2) Compat depuis maps ou défauts
       const seauDefaults: Record<string, number> = {
         'verre 6.5': 19,
         'verre 8.5': 21,
@@ -54,10 +67,73 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
       for (const [k, v] of Object.entries(vasque)) rows.push({ id: `v-${k}`, minQty: 12, subcategory: canonicalizeSubcat(k), target: 'vasque', amount: v, sourceCategory: 'verres' });
       return rows;
     } catch { return []; }
-  }, []);
+  };
 
-  const [rows, setRows] = useState<RuleRow[]>(initialRows);
-  const subcategoryOptions = useMemo(() => {
+  const canonicalizePackSubcat = (input: string): string => {
+    try {
+      const s = StorageService.sanitizeLabel(String(input || '')).toLowerCase();
+      const m = s.match(/(\d+(?:[.,]\d+)?)/);
+      if (!m) return 'PACK ' + s.replace(/[^0-9.,]/g, '').toUpperCase();
+      const n = parseFloat(m[1].replace(',', '.'));
+      if (!Number.isFinite(n)) return 'PACK ' + m[1].replace(',', '.');
+      const oneDecimal = Math.round(n * 10) / 10;
+      const label = Number.isInteger(oneDecimal) ? String(Math.round(oneDecimal)) : oneDecimal.toFixed(1);
+      return `PACK ${label}`;
+    } catch { return 'PACK ' + StorageService.sanitizeLabel(input); }
+  };
+
+  const [rows, setRows] = useState<RuleRow[]>(loadRowsFromSettings());
+  // Sous-catégories dérivées des produits, regroupées par "sourceCategory" (verres vs pack verre)
+  const subcatsForSourceCategory = useMemo(() => {
+    try {
+      const data = StorageService.loadProductionData() || { products: [], categories: [] } as any;
+      const add = (map: Record<string, Set<string>>, key: string, label: string) => {
+        const normKey = StorageService.normalizeLabel(key || '');
+        if (!map[normKey]) map[normKey] = new Set<string>();
+        const clean = StorageService.sanitizeLabel(String(label || '')).trim();
+        if (clean) map[normKey].add(clean);
+      };
+      const map: Record<string, Set<string>> = {};
+      for (const p of (data.products || [])) {
+        const catNorm = StorageService.normalizeLabel(String(p?.category || ''));
+        const assoc: string[] = Array.isArray(p?.associatedCategories) ? (p.associatedCategories as string[]) : [];
+        if (assoc.length === 0) continue;
+        const isGlass = catNorm.includes('verre');
+        const isPack = catNorm.includes('pack');
+        if (isGlass && !isPack) {
+          for (const sc of assoc) add(map, 'verres', sc);
+        }
+        if (isGlass && isPack) {
+          for (const sc of assoc) add(map, 'pack verre', sc);
+        }
+      }
+      const out: Record<string, string[]> = {};
+      for (const [k, set] of Object.entries(map)) {
+        const list = Array.from(set);
+        if (k === StorageService.normalizeLabel('verres')) {
+          out[k] = list
+            .map(s => canonicalizeSubcat(s))
+            .filter(Boolean)
+            .sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+        } else if (k === StorageService.normalizeLabel('pack verre')) {
+          out[k] = list
+            .map(s => canonicalizePackSubcat(s))
+            .filter(Boolean)
+            .sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+        } else {
+          out[k] = list
+            .map(s => StorageService.sanitizeLabel(s))
+            .filter(Boolean)
+            .sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+        }
+      }
+      return out;
+    } catch {
+      return {} as Record<string, string[]>;
+    }
+  }, []);
+  // Liste de secours globale (toutes sous-catégories pertinentes connues)
+  const subcategoryOptionsAll = useMemo(() => {
     try {
       // Récupérer toutes les sous-catégories connues (registre + storage)
       const all = StorageService.loadSubcategories();
@@ -74,8 +150,17 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
       return Array.from(set).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
     } catch { return ['verre 6.5','verre 8.5','verre 10','verre 12']; }
   }, []);
+  const packFallbackOptions = useMemo(() => ['PACK 6.5','PACK 8.5','PACK 10','PACK 12'], []);
+  const getSubcategoryOptions = (sourceCategory: string): string[] => {
+    const key = StorageService.normalizeLabel(sourceCategory || '');
+    const list = (subcatsForSourceCategory as any)[key] as string[] | undefined;
+    if (list && list.length > 0) return list;
+    // Fallback spécifique par catégorie
+    if (key.includes('pack')) return packFallbackOptions;
+    return subcategoryOptionsAll;
+  };
 
-  useEffect(() => { if (open) setRows(initialRows); }, [open, initialRows]);
+  useEffect(() => { if (open) setRows(loadRowsFromSettings()); }, [open]);
 
   const addRow = () => {
     setRows(prev => [...prev, { id: String(Date.now()), minQty: 6, subcategory: '', target: 'seau', amount: 0, sourceCategory: 'verres' }]);
@@ -92,14 +177,33 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
       const seau: Record<string, number> = {};
       const vasque: Record<string, number> = {};
       for (const r of rows) {
-        const key = String(r.subcategory || '').trim();
+        const key = canonicalizeSubcat(String(r.subcategory || '').trim());
         if (!key || r.amount <= 0) continue;
-        if (r.target === 'seau' && r.minQty === 6) seau[key] = r.amount;
-        if (r.target === 'vasque' && r.minQty === 12) vasque[key] = r.amount;
+        if (r.target === 'seau') seau[key] = r.amount;
+        if (r.target === 'vasque') vasque[key] = r.amount;
       }
       const s = StorageService.loadSettings() || {} as any;
       const prev = s.autoDiscountRules || {};
-      StorageService.saveSettings({ ...s, autoDiscountRules: { ...prev, seauBySubcat: seau, vasqueBySubcat: vasque } });
+      const rowsToSave = rows
+        .filter(r => String(r.subcategory || '').trim() && r.amount > 0)
+        .map(r => ({
+          id: r.id,
+          minQty: r.minQty,
+          // Conserver l'étiquette telle que choisie par l'utilisateur
+          subcategory: r.sourceCategory === 'pack verre' ? canonicalizePackSubcat(r.subcategory) : canonicalizeSubcat(r.subcategory),
+          target: r.target,
+          amount: r.amount,
+          sourceCategory: r.sourceCategory,
+        }));
+      StorageService.saveSettings({
+        ...s,
+        autoDiscountRules: {
+          ...prev,
+          seauBySubcat: seau,
+          vasqueBySubcat: vasque,
+          savedRows: rowsToSave,
+        }
+      });
       onClose();
     } catch {
       onClose();
@@ -109,6 +213,19 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
   // Calcul de la remise compensatoire attendue (barème − remise auto verres)
   const computeCompText = (r: RuleRow): string => {
     try {
+      // Cas PACK VERRE: afficher la compensation nette à appliquer sur le seau
+      // net = montant barème − remise auto du pack (ex: 6.5→1.5, 8.5→2, 10→3, 12→4)
+      if (r.sourceCategory === 'pack verre') {
+        const amt = Number(r.amount) || 0;
+        if (amt <= 0) return '';
+        const m = String(r.subcategory || '').match(/(\d+(?:[.,]\d+)?)/);
+        const num = m ? parseFloat(m[1].replace(',', '.')) : NaN;
+        const packAuto = Number.isFinite(num)
+          ? (num === 6.5 ? 1.5 : num === 8.5 ? 2 : num === 10 ? 3 : num === 12 ? 4 : 0)
+          : 0;
+        const net = Math.max(0, amt - packAuto);
+        return `${net.toFixed(2)} €`;
+      }
       const s = StorageService.loadSettings() || {} as any;
       const rules = s.autoDiscountRules || {};
       const glassDefaults: Record<string, number> = {
@@ -186,7 +303,7 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
                   <TableCell>
                     <Autocomplete
                       size="small"
-                      options={subcategoryOptions}
+                      options={getSubcategoryOptions(r.sourceCategory)}
                       value={r.subcategory || ''}
                       onChange={(_, val) => updateRow(idx, { subcategory: val || '' })}
                       renderInput={(params) => (
