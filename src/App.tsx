@@ -19,36 +19,40 @@ const App: React.FC = () => {
   const [currentStoreCode, setCurrentStoreCode] = useState<string>(StorageService.getCurrentStoreCode());
   // Charger les données de production au démarrage
   useEffect(() => {
-    const { products: loadedProducts, categories: loadedCategories } = loadProductionData(currentStoreCode);
-    setProducts(loadedProducts);
+    const loadData = async () => {
+      const { products: loadedProducts, categories: loadedCategories } = await loadProductionData(currentStoreCode);
+      setProducts(loadedProducts);
 
-    // Appliquer l'ordre des catégories sauvegardé (persistance entre refresh/import)
-    try {
-      const settings = StorageService.loadSettings() || {};
-      const savedOrder: string[] | undefined = Array.isArray(settings.categoryOrder) ? settings.categoryOrder : undefined;
-      if (savedOrder && savedOrder.length > 0) {
-        const byId = new Map(loadedCategories.map(c => [c.id, c] as const));
-        const ordered: typeof loadedCategories = [];
-        for (const id of savedOrder) {
-          const c = byId.get(id);
-          if (c) {
-            ordered.push(c);
-            byId.delete(id);
+      // Appliquer l'ordre des catégories sauvegardé (persistance entre refresh/import)
+      try {
+        const settings = StorageService.loadSettings() || {};
+        const savedOrder: string[] | undefined = Array.isArray(settings.categoryOrder) ? settings.categoryOrder : undefined;
+        if (savedOrder && savedOrder.length > 0) {
+          const byId = new Map(loadedCategories.map(c => [c.id, c] as const));
+          const ordered: typeof loadedCategories = [];
+          for (const id of savedOrder) {
+            const c = byId.get(id);
+            if (c) {
+              ordered.push(c);
+              byId.delete(id);
+            }
           }
+          // Ajouter les catégories nouvelles/non référencées à la fin, en conservant leur ordre d'arrivée
+          const rest = loadedCategories.filter(c => byId.has(c.id));
+          setCategories([...ordered, ...rest]);
+        } else {
+          setCategories(loadedCategories);
         }
-        // Ajouter les catégories nouvelles/non référencées à la fin, en conservant leur ordre d'arrivée
-        const rest = loadedCategories.filter(c => byId.has(c.id));
-        setCategories([...ordered, ...rest]);
-      } else {
+      } catch {
         setCategories(loadedCategories);
       }
-    } catch {
-      setCategories(loadedCategories);
-    }
+      
+      // Initialiser les caissiers
+      const loadedCashiers = StorageService.initializeDefaultCashier();
+      setCashiers(loadedCashiers);
+    };
     
-    // Initialiser les caissiers
-    const loadedCashiers = StorageService.initializeDefaultCashier();
-    setCashiers(loadedCashiers);
+    loadData();
   }, []);
 
   // Persister l'ordre des catégories à chaque modification (drag & drop, ajout, import)

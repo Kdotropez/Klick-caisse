@@ -40,14 +40,14 @@ const uniqueSubcategories = new Set(
 export const categories: Category[] = [
   ...Array.from(uniqueCategories).map((name, index) => ({
     id: `cat-${index + 1}`,
-    name: name,
+    name: name || `Catégorie ${index + 1}`,
     color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
     productOrder: [],
     subcategoryOrder: []
   })),
   ...Array.from(uniqueSubcategories).map((name, index) => ({
     id: `subcat-${index + 1}`,
-    name: name,
+    name: name || `Sous-catégorie ${index + 1}`,
     color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
     productOrder: [],
     subcategoryOrder: []
@@ -60,8 +60,8 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
 }> => {
   try {
     // Essayer de charger depuis le localStorage d'abord
-    const savedProducts = StorageService.loadProducts(storeCode);
-    const savedCategories = StorageService.loadCategories(storeCode);
+    const savedProducts = StorageService.loadProducts();
+    const savedCategories = StorageService.loadCategories();
     
     if (savedProducts.length > 0 && savedCategories.length > 0) {
       console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories)`);
@@ -72,8 +72,8 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
     console.log(`🆕 Chargement de la nouvelle base de données (${products.length} produits, ${categories.length} catégories)`);
     
     // Sauvegarder automatiquement les nouvelles données
-    StorageService.saveProducts(products, storeCode);
-    StorageService.saveCategories(categories, storeCode);
+    StorageService.saveProducts(products);
+    StorageService.saveCategories(categories);
     
     return { products, categories };
   } catch (error) {
@@ -88,8 +88,8 @@ export const saveProductionData = async (
   storeCode: string = 'default'
 ): Promise<void> => {
   try {
-    StorageService.saveProducts(products, storeCode);
-    StorageService.saveCategories(categories, storeCode);
+    StorageService.saveProducts(products);
+    StorageService.saveCategories(categories);
     console.log(`💾 Données sauvegardées (${products.length} produits, ${categories.length} catégories)`);
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde:', error);
