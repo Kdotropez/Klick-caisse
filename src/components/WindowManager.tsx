@@ -2361,6 +2361,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onOpenCategoryManagement={() => setShowCategoryManagementModal(true)}
             onOpenSubcategoryManagement={() => setShowSubcategoryManagementModal(true)}
             isEditMode={isEditMode}
+            onClearAllCategories={() => {
+              const ok = typeof globalThis !== 'undefined' && typeof (globalThis as any).confirm === 'function'
+                ? (globalThis as any).confirm('Effacer TOUTES les catégories ? Les produits resteront mais leur champ category sera vidé.')
+                : true;
+              if (!ok) return;
+              const clearedProducts = products.map(p => ({ ...p, category: '' }));
+              const clearedCategories: Category[] = [];
+              onImportComplete(clearedProducts, clearedCategories);
+              saveProductionData(clearedProducts, clearedCategories);
+              if (typeof (globalThis as any).alert === 'function') (globalThis as any).alert('Toutes les catégories ont été effacées.');
+            }}
             onToggleEditMode={() => {
               const newEditMode = !isEditMode;
               setIsEditMode(newEditMode);

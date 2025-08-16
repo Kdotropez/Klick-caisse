@@ -51,23 +51,33 @@ const CategoriesPanelFull: React.FC<CategoriesPanelFullProps> = ({
 }) => {
   const subcategories = useMemo(() => {
     const set = new Set<string>();
+    
     if (selectedCategory) {
       const selected = categories.find(c => c.id === selectedCategory);
       const selectedName = selected ? selected.name : null;
+      
       products.forEach(p => {
         if (!selectedName || p.category !== selectedName) return;
         if (Array.isArray(p.associatedCategories)) {
-          p.associatedCategories.forEach(sc => { const n = (sc || '').trim(); if (n) set.add(n); });
+          p.associatedCategories.forEach(sc => { 
+            const n = (sc || '').trim(); 
+            if (n) set.add(n); 
+          });
         }
       });
     } else {
+      // Si aucune catégorie n'est sélectionnée, afficher toutes les sous-catégories
       products.forEach(p => {
         if (Array.isArray(p.associatedCategories)) {
-          p.associatedCategories.forEach(sc => { const n = (sc || '').trim(); if (n) set.add(n); });
+          p.associatedCategories.forEach(sc => { 
+            const n = (sc || '').trim(); 
+            if (n) set.add(n); 
+          });
         }
       });
     }
-    return Array.from(set);
+    
+    return Array.from(set).sort();
   }, [products, categories, selectedCategory]);
 
   const digits = ['1','2','3','4','5','6','7','8','9','0'];

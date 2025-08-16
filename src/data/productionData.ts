@@ -33,26 +33,20 @@ export const products: Product[] = newBaseData.map((item: any) => ({
 
 // Extraire les catégories uniques
 const uniqueCategories = new Set(products.map(p => p.category).filter(Boolean));
-const uniqueSubcategories = new Set(
-  products.flatMap(p => p.associatedCategories).filter(Boolean)
-);
 
-export const categories: Category[] = [
-  ...Array.from(uniqueCategories).map((name, index) => ({
-    id: `cat-${index + 1}`,
-    name: name || `Catégorie ${index + 1}`,
-    color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
-    productOrder: [],
-    subcategoryOrder: []
-  })),
-  ...Array.from(uniqueSubcategories).map((name, index) => ({
-    id: `subcat-${index + 1}`,
-    name: name || `Sous-catégorie ${index + 1}`,
-    color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
-    productOrder: [],
-    subcategoryOrder: []
-  }))
-];
+
+
+
+
+
+
+export const categories: Category[] = Array.from(uniqueCategories).map((name, index) => ({
+  id: `cat-${index + 1}`,
+  name: name || `Catégorie ${index + 1}`,
+  color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
+  productOrder: [],
+  subcategoryOrder: [],
+}));
 
 export const loadProductionData = async (storeCode: string = 'default'): Promise<{
   products: Product[];
@@ -64,6 +58,38 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
     const savedCategories = StorageService.loadCategories();
     
     if (savedProducts.length > 0 && savedCategories.length > 0) {
+      // Migration automatique: réinjecter les sous-catégories manquantes depuis la base intégrée
+      try {
+        const refById = new Map<string, { categorie?: string; sousCategorie?: string }>();
+        (newBaseData as any[]).forEach((it: any) => {
+          refById.set(String(it.productId), { categorie: it.categorie, sousCategorie: it.sousCategorie });
+        });
+
+        let changed = false;
+        const migratedProducts: Product[] = savedProducts.map((p: any) => {
+          const ref = refById.get(String(p.id));
+          if (!ref) return p;
+          const next = { ...p } as Product;
+          const hasSubcats = Array.isArray((next as any).associatedCategories) && (next as any).associatedCategories.length > 0;
+          const fromRef = (ref.sousCategorie || '').toString().trim();
+          if (!hasSubcats && fromRef) {
+            (next as any).associatedCategories = [fromRef];
+            changed = true;
+          }
+          if ((!next.category || !next.category.toString().trim()) && (ref.categorie || '').toString().trim()) {
+            next.category = String(ref.categorie);
+            changed = true;
+          }
+          return next;
+        });
+
+        if (changed) {
+          StorageService.saveProducts(migratedProducts);
+          console.log(`🛠 Migration appliquée: sous-catégories restaurées pour ${migratedProducts.length} produits`);
+          return { products: migratedProducts, categories: savedCategories };
+        }
+      } catch {}
+
       console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories)`);
       return { products: savedProducts, categories: savedCategories };
     }

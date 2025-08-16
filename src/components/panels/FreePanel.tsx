@@ -1,8 +1,6 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import { useUISettings } from '../../context/UISettingsContext';
-import { STORES } from '../../types/Store';
-import { StorageService } from '../../services/StorageService';
 
 interface FreePanelProps {
   width: number;
@@ -11,16 +9,22 @@ interface FreePanelProps {
   highlight?: boolean;
   isEditMode: boolean;
   onToggleEditMode: () => void;
-  onRepairEANArticles: (file: File) => void;
-  onRepairEANVariations: (file: File) => void;
-  onRepairEANArticlesFromGitHub: () => void;
+  onRepairEANArticles?: (file: File) => Promise<void>;
+  onRepairEANVariations?: (file: File) => Promise<void>;
+  onRepairEANArticlesFromGitHub?: () => Promise<void>;
   onCleanUnusedCategories?: () => void;
   onPurgeCategories?: () => void;
   onAuditEAN13?: () => void;
-
 }
 
-const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize, highlight, isEditMode, onToggleEditMode, onRepairEANArticles, onRepairEANVariations, onRepairEANArticlesFromGitHub, onCleanUnusedCategories, onPurgeCategories, onAuditEAN13 }) => {
+const FreePanel: React.FC<FreePanelProps> = ({ 
+  width, 
+  height, 
+  getScaledFontSize, 
+  highlight, 
+  isEditMode, 
+  onToggleEditMode 
+}) => {
   const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
   const gap = 2;
   const totalGapsWidth = 4;
@@ -113,143 +117,6 @@ const FreePanel: React.FC<FreePanelProps> = ({ width, height, getScaledFontSize,
             </Button>
           );
         }
-        if (idx === 3) {
-          return (
-            <>
-              <input
-                type="file"
-                accept=".csv"
-                id="repair-ean-articles-free"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) onRepairEANArticles(f);
-                  (e.target as HTMLInputElement).value = '';
-                }}
-              />
-              <Button
-                key={idx}
-                variant="contained"
-                sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
-                onClick={() => document.getElementById('repair-ean-articles-free')?.click()}
-              >
-                Réparer EAN (Articles) — Avancé
-              </Button>
-            </>
-          );
-        }
-        if (idx === 4) {
-          return (
-            <>
-              <input
-                type="file"
-                accept=".csv"
-                id="repair-ean-variations-free"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) onRepairEANVariations(f);
-                  (e.target as HTMLInputElement).value = '';
-                }}
-              />
-              <Button
-                key={idx}
-                variant="contained"
-                sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
-                onClick={() => document.getElementById('repair-ean-variations-free')?.click()}
-              >
-                Réparer EAN (Décl.) — Avancé
-              </Button>
-            </>
-          );
-        }
-        if (idx === 5) {
-          return (
-            <Button
-              key={idx}
-              variant="contained"
-              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
-              onClick={onRepairEANArticlesFromGitHub}
-            >
-              MAJ EAN depuis GitHub — Avancé
-            </Button>
-          );
-        }
-        if (idx === 6) {
-          return (
-            <Button
-              key={idx}
-              variant="contained"
-              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
-              onClick={onCleanUnusedCategories}
-            >
-              Nettoyer catégories orphelines
-            </Button>
-          );
-        }
-        if (idx === 7) {
-          return (
-            <Button
-              key={idx}
-              variant="contained"
-              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
-              onClick={() => {
-                if (!window.confirm('Action avancée: Purger toutes les catégories et sous-catégories ?')) return;
-                if (!window.confirm('Confirmer à nouveau: cette action est destructive. Continuer ?')) return;
-                onPurgeCategories?.();
-              }}
-            >
-              Purger catégories — Avancé
-            </Button>
-          );
-        }
-        if (idx === 8) {
-          return (
-            <Button
-              key={idx}
-              variant="contained"
-              sx={{ ...commonButtonSx, backgroundColor: bg, '&:hover': { backgroundColor: hover } }}
-              onClick={onAuditEAN13}
-            >
-              Audit EAN‑13 — Avancé
-            </Button>
-          );
-        }
-        // if (idx === 9) {
-        //   const currentStore = STORES.find(s => s.code === (currentStoreCode || '1'));
-        //   const currentIndex = STORES.findIndex(s => s.code === (currentStoreCode || '1'));
-        //   const nextIndex = (currentIndex + 1) % STORES.length;
-        //   const nextStore = STORES[nextIndex];
-        //   
-        //   return (
-        //     <Button
-        //       key={idx}
-        //       variant="contained"
-        //       sx={{ 
-        //         ...commonButtonSx, 
-        //         backgroundColor: bg, 
-        //         '&:hover': { backgroundColor: hover },
-        //         fontSize: getScaledFontSize('0.6rem'),
-        //         lineHeight: 1.2,
-        //         padding: '4px'
-        //       }}
-        //       onClick={() => {
-        //         const newStoreCode = nextStore.code;
-        //         StorageService.setCurrentStoreCode(newStoreCode);
-        //         onStoreChange?.(newStoreCode);
-        //       }}
-        //     >
-        //       <div style={{ textAlign: 'center', width: '100%' }}>
-        //         <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
-        //           {currentStore?.code} - {currentStore?.name}
-        //         </div>
-        //         <div style={{ fontSize: '0.8em', opacity: 0.8 }}>
-        //           → {nextStore?.code} - {nextStore?.name}
-        //         </div>
-        //       </div>
-        //     </Button>
-        //   );
-        // }
         return (
           <Button
             key={idx}
