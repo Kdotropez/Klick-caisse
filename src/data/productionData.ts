@@ -35,6 +35,18 @@ export const products: Product[] = newBaseData.map((item: any) => ({
 // Extraire les catégories uniques
 const uniqueCategories = new Set(products.map(p => p.category).filter(Boolean));
 
+// Helper: extraire les sous-catégories à partir d'une liste de produits
+const extractSubcategoriesFromProducts = (list: Product[]): string[] => {
+  const set = new Set<string>();
+  for (const p of list) {
+    const arr = Array.isArray((p as any).associatedCategories) ? (p as any).associatedCategories as string[] : [];
+    for (const raw of arr) {
+      const clean = StorageService.sanitizeLabel(String(raw || '')).trim();
+      if (clean) set.add(clean);
+    }
+  }
+  return Array.from(set).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+};
 
 
 
@@ -86,8 +98,18 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
 
         if (changed) {
           StorageService.saveProducts(migratedProducts);
+          // Mettre à jour le registre des sous-catégories à partir des produits migrés
+          try { StorageService.saveSubcategories(extractSubcategoriesFromProducts(migratedProducts)); } catch {}
           console.log(`🛠 Migration appliquée: sous-catégories restaurées pour ${migratedProducts.length} produits`);
           return { products: migratedProducts, categories: savedCategories };
+        }
+      } catch {}
+
+      // Si aucune migration, s'assurer que le registre des sous-catégories est peuplé
+      try {
+        const existing = StorageService.loadSubcategories();
+        if (!existing || existing.length === 0) {
+          StorageService.saveSubcategories(extractSubcategoriesFromProducts(savedProducts));
         }
       } catch {}
 
@@ -100,6 +122,8 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
     // Sauvegarder automatiquement les nouvelles données par défaut
     StorageService.saveProducts(products);
     StorageService.saveCategories(categories);
+    // Initialiser le registre des sous-catégories à partir de la base intégrée
+    try { StorageService.saveSubcategories(extractSubcategoriesFromProducts(products)); } catch {}
     
     return { products, categories };
   } catch (error) {
@@ -119,5 +143,17 @@ export const saveProductionData = async (
     console.log(`💾 Données sauvegardées (${products.length} produits, ${categories.length} catégories)`);
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde:', error);
+  }
+};
+
+// Utilitaire: forcer la réinitialisation immédiate vers la base intégrée
+export const resetToEmbeddedBase = (): void => {
+  try {
+    StorageService.saveProducts(products);
+    StorageService.saveCategories(categories);
+    try { StorageService.saveSubcategories(extractSubcategoriesFromProducts(products)); } catch {}
+    console.log('🔁 Base intégrée restaurée (produits, catégories, sous-catégories)');
+  } catch (e) {
+    console.error('Erreur resetToEmbeddedBase:', e);
   }
 };

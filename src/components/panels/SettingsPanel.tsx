@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import { CheckCircle } from '@mui/icons-material';
+import { resetToEmbeddedBase } from '../../data/productionData';
+import { StorageService } from '../../services/StorageService';
 
 interface SettingsPanelProps {
   width: number;
@@ -91,6 +93,73 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={() => (document.getElementById('klick-import-json-input') as HTMLInputElement)?.click()}
       >
         Importer JSON (nested)
+      </Button>
+
+      {/* Restaurer base par défaut (purge + recharger base intégrée et sous-catégories) */}
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#455a64',
+          '&:hover': { backgroundColor: '#37474f' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            localStorage.removeItem('klick_caisse_products');
+            localStorage.removeItem('klick_caisse_categories');
+            localStorage.removeItem('klick_caisse_settings');
+            // Réinjecter immédiatement la base intégrée et les sous-catégories
+            resetToEmbeddedBase();
+            alert('Données locales réinitialisées. Base intégrée restaurée. Rechargement...');
+            window.location.reload();
+          } catch (e) { alert('Erreur réinitialisation données'); }
+        }}
+      >
+        Restaurer base par défaut
+      </Button>
+
+      {/* Reconstituer sous-catégories depuis les produits (sans reload) */}
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#607d8b',
+          '&:hover': { backgroundColor: '#546e7a' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            const products = StorageService.loadProducts() as any[];
+            const set = new Set<string>();
+            for (const p of products) {
+              const list = Array.isArray((p as any).associatedCategories) ? (p as any).associatedCategories as string[] : [];
+              for (const raw of list) {
+                const clean = StorageService.sanitizeLabel(String(raw || '')).trim();
+                if (clean) set.add(clean);
+              }
+            }
+            const subcats = Array.from(set).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+            StorageService.saveSubcategories(subcats);
+            alert(`Sous-catégories reconstruites (${subcats.length}).`);
+          } catch (e) { alert('Erreur reconstitution sous-catégories'); }
+        }}
+      >
+        Reconstituer sous-catégories
       </Button>
 
       <Button

@@ -46,6 +46,19 @@ const App: React.FC = () => {
       } catch {
         setCategories(loadedCategories);
       }
+      // Alimenter le registre global des sous-catégories depuis les produits chargés
+      try {
+        const set = new Set<string>();
+        for (const p of loadedProducts) {
+          const list = Array.isArray((p as any).associatedCategories) ? (p as any).associatedCategories as string[] : [];
+          for (const raw of list) {
+            const clean = StorageService.sanitizeLabel(String(raw || '')).trim();
+            if (clean) set.add(clean);
+          }
+        }
+        const subcats = Array.from(set).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
+        if (subcats.length > 0) StorageService.saveSubcategories(subcats);
+      } catch {}
       
       // Initialiser les caissiers
       const loadedCashiers = StorageService.initializeDefaultCashier();
