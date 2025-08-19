@@ -182,3 +182,4 @@ export const useKeyboardShortcuts = ({
 
   return { getShortcutsList };
 };
+

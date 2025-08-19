@@ -83,3 +83,4 @@ const ShortcutsHelpModal: React.FC<ShortcutsHelpModalProps> = ({
 };
 
 export default ShortcutsHelpModal;
+

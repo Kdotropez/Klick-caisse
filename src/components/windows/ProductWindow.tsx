@@ -231,3 +231,4 @@ const ProductWindow: React.FC<ProductWindowProps> = ({
 };
 
 export default ProductWindow;
+

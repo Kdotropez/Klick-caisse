@@ -158,6 +158,57 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [autoGlassDiscountEnabled, setAutoGlassDiscountEnabled] = useState<boolean>(true);
   const [autoAssocDiscountEnabled, setAutoAssocDiscountEnabled] = useState<boolean>(true);
+
+  // Initialiser automatiquement les barèmes PACK → Seau si absents
+  useEffect(() => {
+    try {
+      const settings = StorageService.loadSettings() || {} as any;
+      const rules = settings.autoDiscountRules || {};
+      const savedRows: any[] = Array.isArray(rules.savedRows) ? rules.savedRows : [];
+
+      const desired: Array<{ num: number; label: string; amount: number }> = [
+        { num: 6.5, label: 'PACK 6.5', amount: 19 },
+        { num: 8.5, label: 'PACK 8.5', amount: 21 },
+        { num: 10,  label: 'PACK 10',  amount: 20 },
+        { num: 12,  label: 'PACK 12',  amount: 22 },
+      ];
+
+      const extractNum = (s: string): number => {
+        const m = String(s || '').match(/(\d+(?:[.,]\d+)?)/);
+        return m ? parseFloat(m[1].replace(',', '.')) : NaN;
+      };
+
+      const hasRowFor = (num: number): boolean => savedRows.some(r => {
+        if (!r) return false;
+        const isPack = String(r.sourceCategory || '').toLowerCase().includes('pack verre');
+        const isSeau = String(r.target || '').toLowerCase() === 'seau';
+        const n = extractNum(r.subcategory);
+        return isPack && isSeau && Number.isFinite(n) && Math.abs(n - num) < 1e-6;
+      });
+
+      const toAdd = desired
+        .filter(d => !hasRowFor(d.num))
+        .map((d, i) => ({
+          id: `def-pack-seau-${Date.now()}-${i}`,
+          minQty: 1,
+          subcategory: d.label,
+          target: 'seau',
+          amount: d.amount,
+          sourceCategory: 'pack verre',
+        }));
+
+      if (toAdd.length > 0) {
+        const next = {
+          ...settings,
+          autoDiscountRules: {
+            ...rules,
+            savedRows: [...savedRows, ...toAdd],
+          }
+        };
+        StorageService.saveSettings(next);
+      }
+    } catch {}
+  }, []);
   const [showCategoryManagementModal, setShowCategoryManagementModal] = useState(false);
   const [showDailyReportModal, setShowDailyReportModal] = useState(false);
   const [showProductEditModal, setShowProductEditModal] = useState(false);

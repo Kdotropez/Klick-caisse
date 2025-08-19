@@ -95,6 +95,35 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         Importer JSON (nested)
       </Button>
 
+      {/* Diagnostics sous-catégories */}
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#607d8b',
+          '&:hover': { backgroundColor: '#546e7a' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            const products = StorageService.loadProducts() as any[];
+            const categories = StorageService.loadCategories() as any[];
+            const subcats = StorageService.loadSubcategories();
+            const sample = products.slice(0, 5).map(p => ({ id: p.id, cat: p.category, sub: p.associatedCategories }));
+            alert(`Produits: ${products.length}\nCatégories: ${categories.length}\nSous-catégories (registre): ${subcats.length}\nExemples:\n${JSON.stringify(sample, null, 2)}`);
+          } catch (e) { alert('Erreur diagnostics'); }
+        }}
+      >
+        Diagnostics sous-catégories
+      </Button>
+
       {/* Restaurer base par défaut (purge + recharger base intégrée et sous-catégories) */}
       <Button
         variant="contained"
