@@ -34,13 +34,13 @@ export function generateDailyCode(): string {
       };
     }
     
-    // Code incorrect - ne jamais révéler le code attendu
-    return {
-      isValid: false,
-      code: '', // Ne pas révéler le code attendu
-      date: today.toLocaleDateString('fr-FR'),
-      message: 'Code incorrect - Accès refusé'
-    };
+      // Code incorrect - ne jamais révéler le code attendu
+  return {
+    isValid: false,
+    code: '', // Ne pas révéler le code attendu
+    date: '', // Ne pas révéler la date non plus
+    message: 'Code incorrect - Accès refusé'
+  };
   }
 
 // Fonction pour obtenir le code du jour (pour affichage)

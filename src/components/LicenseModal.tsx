@@ -120,16 +120,21 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid, isLoc
          </Box>
 
         <Box sx={{ mb: 3 }}>
-          <TextField
-            fullWidth
-            label="Code d'autorisation"
-            value={licenseCode}
-            onChange={(e) => setLicenseCode(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Code à 4 chiffres"
-            disabled={isLoading}
-            sx={{ mb: 2 }}
-          />
+                     <TextField
+             fullWidth
+             label="Code d'autorisation"
+             value={licenseCode}
+             onChange={(e) => setLicenseCode(e.target.value)}
+             onKeyPress={handleKeyPress}
+             placeholder="Code à 4 chiffres"
+             disabled={isLoading}
+             type="password"
+             inputProps={{
+               maxLength: 4,
+               style: { fontFamily: 'monospace', letterSpacing: '0.5em' }
+             }}
+             sx={{ mb: 2 }}
+           />
 
                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
@@ -147,11 +152,7 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid, isLoc
             <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
               {validationResult.message}
             </Typography>
-                         {!validationResult.isValid && (
-               <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-                 Date: {validationResult.date}
-               </Typography>
-             )}
+            
           </Alert>
         )}
 
