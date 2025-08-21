@@ -275,46 +275,29 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                         }
                       }
                       
-                                             return (
+                                                                    return (
                          <Box key={it.product.id} sx={{ 
-                           display: 'grid', 
-                           gridTemplateColumns: '26px 84px 120px 110px 120px 86px', 
-                           alignItems: 'center', 
+                           display: 'flex', 
+                           flexDirection: 'column', 
                            gap: 0.5, 
-                           width: '100%',
                            pl: 1,
                            py: 0.25
                          }}>
-                           <Box></Box>
-                           <Box></Box>
-                           <Box></Box>
-                           <Box></Box>
-                           <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                             {it.quantity}x {it.product.name}
-                           </Typography>
-                           <Typography variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                             {finalTotal.toFixed(2)} €
-                           </Typography>
-                                                       {discountAmount > 0 && (
-                              <Box sx={{ 
-                                display: 'grid', 
-                                gridTemplateColumns: '26px 84px 120px 110px 120px 86px', 
-                                alignItems: 'center', 
-                                gap: 0.5, 
-                                width: '100%',
-                                pl: 1,
-                                py: 0.25
-                              }}>
-                                <Box></Box>
-                                <Box></Box>
-                                <Box></Box>
-                                <Box></Box>
-                                <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                                  -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
-                                </Typography>
-                                <Box></Box>
-                              </Box>
-                            )}
+                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                             <Typography variant="caption" sx={{ fontFamily: 'monospace', minWidth: 200 }}>
+                               {it.quantity}x {it.product.name}
+                             </Typography>
+                             <Typography variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                               {finalTotal.toFixed(2)} €
+                             </Typography>
+                           </Box>
+                           {discountAmount > 0 && (
+                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                               <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                 -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
+                               </Typography>
+                             </Box>
+                           )}
                          </Box>
                        );
                     })}
