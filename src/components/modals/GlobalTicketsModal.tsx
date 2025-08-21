@@ -27,6 +27,8 @@ interface GlobalTicketsModalProps {
   setSelectedIds: (updater: (prev: Set<string>) => Set<string>) => void;
   expandedIds: Set<string>;
   setExpandedIds: (updater: (prev: Set<string>) => Set<string>) => void;
+  showDiscountDetails: boolean;
+  setShowDiscountDetails: (v: boolean) => void;
   onOpenEditor: (txId: string) => void;
   refreshTodayTransactions: () => void;
 }
@@ -56,6 +58,8 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   setSelectedIds,
   expandedIds,
   setExpandedIds,
+  showDiscountDetails,
+  setShowDiscountDetails,
   onOpenEditor,
   refreshTodayTransactions,
 }) => {
@@ -129,13 +133,14 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Tickets globaux</DialogTitle>
       <DialogContent>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 0.5, mb: 1 }}>
-          <Button size="small" variant={filterPayment==='all'?'contained':'outlined'} onClick={() => setFilterPayment('all')}>Tous</Button>
-          <Button size="small" variant={filterPayment==='cash'?'contained':'outlined'} onClick={() => setFilterPayment('cash')}>Espèces</Button>
-          <Button size="small" variant={filterPayment==='card'?'contained':'outlined'} onClick={() => setFilterPayment('card')}>Carte</Button>
-          <Button size="small" variant={filterPayment==='sumup'?'contained':'outlined'} onClick={() => setFilterPayment('sumup')}>SumUp</Button>
-          <Button size="small" variant={onlyToday?'contained':'outlined'} onClick={() => setOnlyToday(!onlyToday)}>Aujourd'hui</Button>
-        </Box>
+                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 0.5, mb: 1 }}>
+           <Button size="small" variant={filterPayment==='all'?'contained':'outlined'} onClick={() => setFilterPayment('all')}>Tous</Button>
+           <Button size="small" variant={filterPayment==='cash'?'contained':'outlined'} onClick={() => setFilterPayment('cash')}>Espèces</Button>
+           <Button size="small" variant={filterPayment==='card'?'contained':'outlined'} onClick={() => setFilterPayment('card')}>Carte</Button>
+           <Button size="small" variant={filterPayment==='sumup'?'contained':'outlined'} onClick={() => setFilterPayment('sumup')}>SumUp</Button>
+           <Button size="small" variant={onlyToday?'contained':'outlined'} onClick={() => setOnlyToday(!onlyToday)}>Aujourd'hui</Button>
+           <Button size="small" variant={showDiscountDetails?'contained':'outlined'} onClick={() => setShowDiscountDetails(!showDiscountDetails)}>Détails remises</Button>
+         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, mb: 1 }}>
           <TextField size="small" label="Montant min" value={amountMin} onChange={(e) => setAmountMin(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
           <TextField size="small" label="Montant max" value={amountMax} onChange={(e) => setAmountMax(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
@@ -240,9 +245,9 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                            <Box></Box>
                            <Box></Box>
                            <Box></Box>
-                           <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 'bold', color: '#f44336' }}>
-                             {totalDiscountForTx > 0 ? `TOTAL REMISE ${totalDiscountForTx.toFixed(0)} €` : ''}
-                           </Typography>
+                                                       <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 'bold', color: '#f44336' }}>
+                              {showDiscountDetails && totalDiscountForTx > 0 ? `TOTAL REMISE ${totalDiscountForTx.toFixed(0)} €` : ''}
+                            </Typography>
                            <Box></Box>
                          </Box>
                        );
@@ -296,14 +301,14 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                                {finalTotal.toFixed(2)} €
                              </Typography>
                            </Box>
-                                                       {Math.abs(discountAmount) > 0.01 && (
+                                                       {showDiscountDetails && Math.abs(discountAmount) > 0.01 && (
                               <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
                                 <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
                                   -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
                                 </Typography>
                               </Box>
                             )}
-                            {Math.abs(discountAmount) <= 0.01 && (
+                            {showDiscountDetails && Math.abs(discountAmount) <= 0.01 && (
                               <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
                                 <Typography variant="caption" sx={{ color: '#666', fontFamily: 'monospace' }}>
                                   Pas de remise
