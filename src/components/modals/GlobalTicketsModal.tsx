@@ -520,12 +520,12 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                                    display: 'inline-block'
                                  }}>
                                    <Typography variant="caption" sx={{ 
-                                     color: '#f44336', 
+                                     color: '#000000', 
                                      fontFamily: 'monospace', 
                                      fontWeight: 'bold',
                                      fontSize: '12px'
                                    }}>
-                                     -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€)
+                                     -{discountAmount.toFixed(2)}€ ({((discountAmount / originalTotal) * 100).toFixed(1)}%) / ({originalTotal.toFixed(2)}€)
                                    </Typography>
                                  </Box>
                                ) : (
