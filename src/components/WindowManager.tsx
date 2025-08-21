@@ -277,6 +277,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [globalTimeTo, setGlobalTimeTo] = useState<string>('');
   const [globalSelectedIds, setGlobalSelectedIds] = useState<Set<string>>(new Set());
   const [globalOnlyToday, setGlobalOnlyToday] = useState<boolean>(false);
+  const [showDiscountDetails, setShowDiscountDetails] = useState<boolean>(false);
   // Saisie de quantité via pavé numérique (catégories)
   const [pendingQtyInput, setPendingQtyInput] = useState<string>('');
   // Expansion des lignes (détails des tickets)
@@ -3347,6 +3348,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         setSelectedIds={(updater:any)=>setGlobalSelectedIds(prev=>updater(prev))}
         expandedIds={expandedGlobalTicketIds}
         setExpandedIds={(updater:any)=>setExpandedGlobalTicketIds(prev=>updater(prev))}
+        showDiscountDetails={showDiscountDetails}
+        setShowDiscountDetails={setShowDiscountDetails}
         onOpenEditor={(tid:string)=>{
           const todays = StorageService.loadTodayTransactions();
           let tx: any = todays.find(t => String(t.id) === String(tid));
