@@ -158,6 +158,29 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [autoGlassDiscountEnabled, setAutoGlassDiscountEnabled] = useState<boolean>(true);
   const [autoAssocDiscountEnabled, setAutoAssocDiscountEnabled] = useState<boolean>(true);
+  
+  // État pour mémoriser les compensations déjà appliquées (verrouillage)
+  const [lockedCompensations, setLockedCompensations] = useState<{
+    seau: Record<string, number>; // key -> montant compensé
+    vasque: Record<string, number>; // key -> montant compensé
+  }>({ seau: {}, vasque: {} });
+
+  // Fonction wrapper pour onRemoveItem qui gère aussi les compensations verrouillées
+  const handleRemoveItem = (productId: string, variationId: string | null) => {
+    const key = `${productId}-${variationId || 'main'}`;
+    
+    // Supprimer les compensations verrouillées pour cet article
+    setLockedCompensations(prev => {
+      const newSeau = { ...prev.seau };
+      const newVasque = { ...prev.vasque };
+      delete newSeau[key];
+      delete newVasque[key];
+      return { seau: newSeau, vasque: newVasque };
+    });
+    
+    // Supprimer l'article
+    onRemoveItem(productId, variationId);
+  };
 
   // Initialiser automatiquement les barèmes PACK → Seau si absents
   useEffect(() => {
@@ -580,6 +603,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         // 1) VASQUES: consommer des sets de 12 verres (2x 6) par sous-type
         const vasqueComps: number[] = [];
+        let totalVasqueComps = 0; // Limiter le nombre total de compensations vasque
         const defaultVasque: Record<string, number> = {
           'verre 6.5': 23,
           'verre 6.50': 23,
@@ -608,6 +632,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           if (hasVasqueTargets && hasGlassDiscountBySub[sub]) {
             const sets12 = Math.floor(totalQty / 12);
             for (let s = 0; s < sets12; s++) {
+              // Limiter à 1 compensation vasque par set de 12 verres
+              if (totalVasqueComps >= 1) break;
+              
               let need12 = 12;
               let discountSum12 = 0;
               for (let idx = 0; idx < pools.length && need12 > 0; idx++) {
@@ -621,7 +648,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               // Compensation vasque = barème dédié
               const comp12 = VASQUE_COMP_BY_SUB[sub] || 0;
               const net12 = Math.max(0, comp12 - discountSum12);
-              if (net12 > 0) vasqueComps.push(net12);
+              if (net12 > 0) {
+                console.log(`[COMPENSATION VASQUE] Sous-cat: ${sub}, Barème: ${comp12}€, Remise auto: ${discountSum12.toFixed(2)}€, Net: ${net12.toFixed(2)}€`);
+                vasqueComps.push(net12);
+                totalVasqueComps++;
+              }
             }
           }
           remainingPoolsBySub[sub] = pools;
@@ -629,6 +660,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         // 2) SEAUX: consommer des sets de 6 verres sur le reste
         const seauComps: number[] = [];
+        let totalSeauComps = 0; // Limiter le nombre total de compensations seau
         for (const sub of Object.keys(qtyBySubcat)) {
           const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
           if (compPerSet <= 0) continue;
@@ -640,6 +672,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const remainingQty = pools.reduce((s, p) => s + Math.max(0, p.qty), 0);
           const sets6 = Math.floor(remainingQty / 6);
           for (let s = 0; s < sets6; s++) {
+            // Limiter à 1 compensation seau par set de 6 verres
+            if (totalSeauComps >= 1) break;
+            
             let need = 6;
             let discountSum = 0;
             for (let idx = 0; idx < pools.length && need > 0; idx++) {
@@ -650,8 +685,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 need -= take;
               }
             }
+            // Compensation seau = barème seau - remise auto sur 6 verres
             const net = Math.max(0, compPerSet - discountSum);
-            if (net > 0) seauComps.push(net);
+            if (net > 0) {
+              console.log(`[COMPENSATION SEAU] Sous-cat: ${sub}, Barème: ${compPerSet}€, Remise auto: ${discountSum.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              seauComps.push(net);
+              totalSeauComps++;
+            }
           }
         }
 
@@ -659,6 +699,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // 2bis) VASQUES: consommer des sets de 12 verres en mélangeant les sous-catégories
         // Règle: compensation nette = 22 - remise verres auto sur 12 unités
         const vasqueFromMixedTwelve: number[] = [];
+        let mixedVasqueComps = 0; // Limiter les compensations vasque mixtes
         {
           // Cloner les pools restants pour consommer en global
           const mixedPools: Record<string, Array<{unit:number; qty:number}>> = {};
@@ -667,7 +708,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           }
           // Fonction pour calculer le total restant
           const totalQty = () => Object.values(mixedPools).reduce((s, arr) => s + arr.reduce((ss, p) => ss + Math.max(0, p.qty), 0), 0);
-          while (totalQty() >= 12) {
+          while (totalQty() >= 12 && mixedVasqueComps < 1) {
             let need = 12;
             let discountSum12 = 0;
             // Parcours simple: consommer séquentiellement par sous-catégorie
@@ -686,7 +727,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             }
             if (need > 0) break; // sécurité
             const net = Math.max(0, VASQUE_BASELINE - discountSum12);
-            if (net > 0) vasqueFromMixedTwelve.push(net);
+            if (net > 0) {
+              console.log(`[COMPENSATION VASQUE MIXTE] Barème: ${VASQUE_BASELINE}€, Remise auto: ${discountSum12.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              vasqueFromMixedTwelve.push(net);
+              mixedVasqueComps++;
+            }
           }
         }
 
@@ -695,6 +740,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Préparer la liste des packs présents (par type 6.5/8.5/10/12)
         type PackUnit = { key: string; num: number; auto: number };
         const packUnits: PackUnit[] = [];
+        let packVasqueComps = 0; // Limiter les compensations vasque par packs
         for (const it of cartItems) {
           const catNorm = normalizeKey(it.product.category || '');
           if (!(catNorm.includes('pack') && catNorm.includes('verre'))) continue;
@@ -716,17 +762,21 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
         // a) Paires de packs (similaires ou différents) → 1 vasque
         const vasqueFromPackPairs: number[] = [];
-        if (packUnits.length >= 2) {
+        if (packUnits.length >= 2 && packVasqueComps < 1) {
           // Former des paires deux par deux en minimisant la somme des remises auto pour maximiser la compensation
           const autos = packUnits.map(p => p.auto).sort((a,b)=>a-b);
-          for (let i = 0; i + 1 < autos.length; i += 2) {
+          for (let i = 0; i + 1 < autos.length && packVasqueComps < 1; i += 2) {
             const net = Math.max(0, VASQUE_BASELINE - (autos[i] + autos[i+1]));
-            if (net > 0) vasqueFromPackPairs.push(net);
+            if (net > 0) {
+              console.log(`[COMPENSATION VASQUE PACKS] Barème: ${VASQUE_BASELINE}€, Remise auto packs: ${(autos[i] + autos[i+1]).toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              vasqueFromPackPairs.push(net);
+              packVasqueComps++;
+            }
           }
         }
         // b) 1 pack + 6 verres (sur pools restants) → 1 vasque
         const vasqueFromPackPlusSix: number[] = [];
-        if (packUnits.length >= 1) {
+        if (packUnits.length >= 1 && packVasqueComps < 1) {
           // Construire des pools modifiables pour consommer 6 verres
           const poolsBySub: Record<string, Array<{unit:number; qty:number}>> = {};
           for (const [sub, arr] of Object.entries(remainingPoolsBySub)) {
@@ -736,6 +786,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           // trier packs pour donner priorité à ceux avec auto le plus élevé (ça réduit le net, mais l'ordre n'est pas critique)
           const sortedPacks = [...packUnits].sort((a,b)=>a.auto-b.auto);
           for (const p of sortedPacks) {
+            if (packVasqueComps >= 1) break; // Limiter à 1 compensation vasque par pack+6
             // calculer remise verres sur 6 unités, en consommant depuis poolsBySub
             let need6 = 6;
             let discount6 = 0;
@@ -756,7 +807,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             }
             if (need6>0) continue; // pas assez de verres pour constituer un set de 6
             const net = Math.max(0, VASQUE_BASELINE - autoOf(p.num) - discount6);
-            if (net>0) vasqueFromPackPlusSix.push(net);
+            if (net>0) {
+              console.log(`[COMPENSATION VASQUE PACK+6] Barème: ${VASQUE_BASELINE}€, Remise auto pack: ${autoOf(p.num)}€, Remise auto 6 verres: ${discount6.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              vasqueFromPackPlusSix.push(net);
+              packVasqueComps++;
+            }
           }
         }
 
@@ -776,6 +831,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // On détecte des lignes PACK VERRE et on mappe PACK X.Y -> "verre X.Y" pour utiliser SEAU_COMP_BY_SUB
         // Cette compensation s'applique même si aucune remise verres (percent) n'a été appliquée sur des lignes "verre"
         const packBasedComps: number[] = [];
+        let packSeauComps = 0; // Limiter les compensations pack→seau
         if (seauTargets.length > 0) {
           for (const it of cartItems) {
             const catNorm = normalizeKey(it.product.category || '');
@@ -808,52 +864,121 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const compNet = Math.max(0, compConfigured - packAuto);
             if (compNet <= 0) continue;
 
+            console.log(`[COMPENSATION PACK→SEAU] Pack: ${matchedSub}, Barème: ${compConfigured}€, Remise auto pack: ${packAuto}€, Net: ${compNet.toFixed(2)}€`);
+
             // Ajouter une compensation par quantité de packs (verrouillage global plus bas par nb de seaux)
             const times = Math.max(1, it.quantity || 0);
-            for (let i = 0; i < times; i++) packBasedComps.push(compNet);
+            for (let i = 0; i < times && packSeauComps < 1; i++) {
+              packBasedComps.push(compNet);
+              packSeauComps++;
+            }
           }
         }
 
-        // Nettoyage des anciennes remises
+        // Nettoyage des anciennes remises (sauf celles verrouillées)
         for (const { key } of targetLineInfos) {
-          if (next[key] && next[key].type === 'euro') delete next[key];
+          if (next[key] && next[key].type === 'euro') {
+            // Garder les compensations verrouillées
+            const isLockedSeau = lockedCompensations.seau[key] !== undefined;
+            const isLockedVasque = lockedCompensations.vasque[key] !== undefined;
+            if (!isLockedSeau && !isLockedVasque) {
+              delete next[key];
+            }
+          }
         }
 
-        const distribute = (amounts: number[], targets: Array<{key:string; subtotal:number; qty:number}>, options?: {singleTarget?: boolean}) => {
+        // Réappliquer les compensations verrouillées existantes
+        for (const [key, amount] of Object.entries(lockedCompensations.seau)) {
+          const target = targetLineInfos.find(t => t.key === key);
+          if (target && target.qty > 0) {
+            next[key] = { type: 'euro', value: amount / target.qty };
+          }
+        }
+        for (const [key, amount] of Object.entries(lockedCompensations.vasque)) {
+          const target = targetLineInfos.find(t => t.key === key);
+          if (target && target.qty > 0) {
+            next[key] = { type: 'euro', value: amount / target.qty };
+          }
+        }
+
+        const distribute = (amounts: number[], targets: Array<{key:string; subtotal:number; qty:number}>, options?: {singleTarget?: boolean}, compensationType?: 'seau' | 'vasque') => {
           const total = amounts.reduce((s,v)=>s+v,0);
           if (total <= 0 || targets.length === 0) return;
+          
           if (options?.singleTarget) {
             const first = targets[0];
+            // Vérifier si déjà compensé
+            const isLocked = compensationType && lockedCompensations[compensationType][first.key] !== undefined;
+            if (isLocked) return; // Ne pas recalculer si déjà verrouillé
+            
             const apply = Math.min(total, first.subtotal);
             const perUnitEuro = first.qty > 0 ? (apply / first.qty) : 0;
-            if (perUnitEuro > 0) next[first.key] = { type: 'euro', value: perUnitEuro };
+            if (perUnitEuro > 0) {
+              next[first.key] = { type: 'euro', value: perUnitEuro };
+              // Verrouiller cette compensation
+              if (compensationType) {
+                setLockedCompensations(prev => ({
+                  ...prev,
+                  [compensationType]: { ...prev[compensationType], [first.key]: apply }
+                }));
+              }
+            }
             return;
           }
+          
           let remaining = total;
           for (const { key, subtotal, qty } of targets) {
             if (remaining <= 0) break;
+            
+            // Vérifier si déjà compensé
+            const isLocked = compensationType && lockedCompensations[compensationType][key] !== undefined;
+            if (isLocked) continue; // Passer au suivant si déjà verrouillé
+            
             const apply = Math.min(remaining, subtotal);
             const perUnitEuro = qty > 0 ? (apply / qty) : 0;
-            if (perUnitEuro > 0) next[key] = { type: 'euro', value: perUnitEuro };
+            if (perUnitEuro > 0) {
+              next[key] = { type: 'euro', value: perUnitEuro };
+              // Verrouiller cette compensation
+              if (compensationType) {
+                setLockedCompensations(prev => ({
+                  ...prev,
+                  [compensationType]: { ...prev[compensationType], [key]: apply }
+                }));
+              }
+            }
             remaining -= apply;
           }
         };
 
         // Vasques: appliquer sur UNE SEULE vasque
-        distribute(vasqueComps, vasqueTargets, { singleTarget: true });
+        distribute(vasqueComps, vasqueTargets, { singleTarget: true }, 'vasque');
         // Seaux
-        distribute(seauComps, seauTargets);
-        // Packs -> Seaux (compensation nette)
+        distribute(seauComps, seauTargets, undefined, 'seau');
+        // Packs -> Seaux (compensation nette) - seulement pour les seaux sans compensation existante
         if (packBasedComps.length > 0 && seauTargets.length > 0) {
-          const limited = packBasedComps.slice(0, seauTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0));
-          distribute(limited, seauTargets);
+          const availableSeauTargets = seauTargets.filter(t => {
+            const isLocked = lockedCompensations.seau[t.key] !== undefined;
+            const hasExistingDiscount = next[t.key] && next[t.key].type === 'euro';
+            return !isLocked && !hasExistingDiscount;
+          });
+          if (availableSeauTargets.length > 0) {
+            const limited = packBasedComps.slice(0, availableSeauTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0));
+            distribute(limited, availableSeauTargets, undefined, 'seau');
+          }
         }
-        // Nouvelles règles vasque (2 packs), (1 pack + 6 verres), (12 verres mélangés)
+        // Nouvelles règles vasque (2 packs), (1 pack + 6 verres), (12 verres mélangés) - seulement pour les vasques sans compensation existante
         const extraVasque = [...vasqueFromPackPairs, ...vasqueFromPackPlusSix, ...vasqueFromMixedTwelve];
         if (extraVasque.length > 0 && vasqueTargets.length > 0) {
-          const limitQty = vasqueTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0);
-          const limited = extraVasque.slice(0, limitQty);
-          distribute(limited, vasqueTargets, { singleTarget: true });
+          const availableVasqueTargets = vasqueTargets.filter(t => {
+            const isLocked = lockedCompensations.vasque[t.key] !== undefined;
+            const hasExistingDiscount = next[t.key] && next[t.key].type === 'euro';
+            return !isLocked && !hasExistingDiscount;
+          });
+          if (availableVasqueTargets.length > 0) {
+            const limitQty = availableVasqueTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0);
+            const limited = extraVasque.slice(0, limitQty);
+            distribute(limited, availableVasqueTargets, { singleTarget: true }, 'vasque');
+          }
         }
       }
 
@@ -864,7 +989,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       if (changed) setItemDiscounts(next);
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartItems, autoGlassDiscountEnabled, autoAssocDiscountEnabled]);
+  }, [cartItems, autoGlassDiscountEnabled, autoAssocDiscountEnabled, lockedCompensations]);
 
   useEffect(() => {
     setPaymentTotals(computePaymentTotalsFromTransactions(todayTransactions));
@@ -2484,12 +2609,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             getItemFinalPrice={getItemFinalPrice}
             getTotalWithGlobalDiscount={getTotalWithGlobalDiscount}
             onUpdateQuantity={onUpdateQuantity}
-            onRemoveItem={onRemoveItem}
+            onRemoveItem={handleRemoveItem}
             onOpenDiscountModal={openDiscountModal}
             onOpenRecap={() => setShowRecapModal(true)}
             onOpenGlobalDiscount={openGlobalDiscountModal}
             // Ouvre le tableau des remises via le bouton Récap s'il faut un accès rapide
-            onResetCartAndDiscounts={() => { setItemDiscounts({}); setGlobalDiscount(null); cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); }}
+            onResetCartAndDiscounts={() => { 
+  setItemDiscounts({}); 
+  setGlobalDiscount(null); 
+  setLockedCompensations({ seau: {}, vasque: {} });
+  cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); 
+}}
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
             promoBanner={null}

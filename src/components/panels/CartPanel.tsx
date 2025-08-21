@@ -89,7 +89,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
           TICKET DE CAISSE
         </Typography>
         <Typography variant="caption" align="center" display="block">
-          {new Date().toLocaleDateString('fr-FR')} - {new Date().toLocaleTimeString('fr-FR')} · Klick V{APP_VERSION}
+          {new Date().toLocaleDateString('fr-FR')} - {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} · Klick V{APP_VERSION}
         </Typography>
       </Box>
 
