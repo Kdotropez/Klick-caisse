@@ -686,8 +686,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           totalGlassesForSeau += remainingQty;
         }
         
-        // Limiter à 1 compensation seau par set de 6 verres (global)
-        const maxSeauComps = Math.floor(totalGlassesForSeau / 6);
+        // Calculer le nombre maximum de compensations seau (sera ajusté plus tard)
+        let maxSeauComps = Math.floor(totalGlassesForSeau / 6);
         
         for (const sub of Object.keys(qtyBySubcat)) {
           const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
@@ -854,6 +854,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const catNorm = normalizeKey(prod?.category || '');
           return catNorm.includes('seau');
         });
+        
+        // Ajuster le nombre maximum de compensations seau en fonction du nombre de seaux disponibles
+        maxSeauComps = Math.min(maxSeauComps, seauTargets.length);
 
         // Cas explicite demandé: 1 PACK VERRE (ex: PACK 6.5) + 1 SEAU => appliquer la compensation du barème "seau"
         // On détecte des lignes PACK VERRE et on mappe PACK X.Y -> "verre X.Y" pour utiliser SEAU_COMP_BY_SUB
