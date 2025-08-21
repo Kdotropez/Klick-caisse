@@ -63,36 +63,57 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   onOpenEditor,
   refreshTodayTransactions,
 }) => {
-  // Charger toutes les transactions
-  const allClosures = StorageService.loadClosures();
-  const allTx: any[] = [];
-  
-  // Ajouter les transactions des clôtures
-  for (const c of allClosures) {
-    const txs = Array.isArray(c.transactions) ? c.transactions : [];
-    for (const t of txs) allTx.push(t);
-  }
-  
-  // Ajouter les transactions du jour
-  const todayTxs = StorageService.loadTodayTransactions();
-  for (const t of todayTxs) allTx.push(t);
-  
-  // Ajouter les transactions archivées par jour
-  try {
-    const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-    if (raw) {
-      const map = JSON.parse(raw) as Record<string, any[]>;
-      const todayStr = new Date().toISOString().slice(0,10);
-      Object.keys(map).forEach((day) => {
-        const list = Array.isArray(map[day]) ? map[day] : [];
-        if (day !== todayStr) {
-          list.forEach((t: any) => allTx.push(t));
-        }
-      });
-    }
-  } catch {}
-  
-  // Filtrer par date si nécessaire
+     // Charger toutes les transactions
+   const allClosures = StorageService.loadClosures();
+   const allTx: any[] = [];
+   const seenIds = new Set<string>();
+   
+   // Ajouter les transactions des clôtures
+   for (const c of allClosures) {
+     const txs = Array.isArray(c.transactions) ? c.transactions : [];
+     for (const t of txs) {
+       const txId = String(t.id);
+       if (!seenIds.has(txId)) {
+         seenIds.add(txId);
+         allTx.push(t);
+       }
+     }
+   }
+   
+   // Ajouter les transactions du jour
+   const todayTxs = StorageService.loadTodayTransactions();
+   for (const t of todayTxs) {
+     const txId = String(t.id);
+     if (!seenIds.has(txId)) {
+       seenIds.add(txId);
+       allTx.push(t);
+     }
+   }
+   
+   // Ajouter les transactions archivées par jour
+   try {
+     const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+     if (raw) {
+       const map = JSON.parse(raw) as Record<string, any[]>;
+       const todayStr = new Date().toISOString().slice(0,10);
+       Object.keys(map).forEach((day) => {
+         const list = Array.isArray(map[day]) ? map[day] : [];
+         if (day !== todayStr) {
+           list.forEach((t: any) => {
+             const txId = String(t.id);
+             if (!seenIds.has(txId)) {
+               seenIds.add(txId);
+               allTx.push(t);
+             }
+           });
+         }
+       });
+          }
+   } catch {}
+   
+   console.log('Transactions chargées après déduplication:', allTx.length);
+   
+   // Filtrer par date si nécessaire
   if (onlyToday) {
     const todayStart = new Date(); 
     todayStart.setHours(0,0,0,0);
