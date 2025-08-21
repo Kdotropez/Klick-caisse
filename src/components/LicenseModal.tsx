@@ -17,9 +17,10 @@ import { validateLicenseCode, getTodayCode, getExpectedFormat, LicenseInfo } fro
 interface LicenseModalProps {
   open: boolean;
   onLicenseValid: () => void;
+  isLocked?: boolean;
 }
 
-const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid }) => {
+const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid, isLocked = false }) => {
   const [licenseCode, setLicenseCode] = useState('');
   const [validationResult, setValidationResult] = useState<LicenseInfo | null>(null);
 
@@ -79,33 +80,44 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid }) => 
       fullWidth
       disableEscapeKeyDown
     >
-      <DialogTitle sx={{ 
-        backgroundColor: '#1976d2', 
-        color: 'white',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Lock />
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            Code d'Autorisation Klick Caisse
-          </Typography>
-        </Box>
-      </DialogTitle>
+             <DialogTitle sx={{ 
+         backgroundColor: isLocked ? '#f57c00' : '#1976d2', 
+         color: 'white',
+         display: 'flex',
+         justifyContent: 'space-between',
+         alignItems: 'center'
+       }}>
+         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+           <Lock />
+           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+             {isLocked ? 'Application Verrouillée' : 'Code d\'Autorisation Klick Caisse'}
+           </Typography>
+         </Box>
+       </DialogTitle>
 
       <DialogContent sx={{ p: 3 }}>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="body1" sx={{ mb: 2, textAlign: 'center' }}>
-            Veuillez saisir le code d'autorisation du jour pour accéder à l'application.
-          </Typography>
-          
-          <Alert severity="info" sx={{ mb: 2 }}>
-            <Typography variant="body2">
-              {getExpectedFormat()}
-            </Typography>
-          </Alert>
-        </Box>
+                 <Box sx={{ mb: 3 }}>
+           <Typography variant="body1" sx={{ mb: 2, textAlign: 'center' }}>
+             {isLocked 
+               ? 'Application verrouillée par inactivité. Veuillez saisir le code d\'autorisation pour déverrouiller.'
+               : 'Veuillez saisir le code d\'autorisation du jour pour accéder à l\'application.'
+             }
+           </Typography>
+           
+           {isLocked && (
+             <Alert severity="warning" sx={{ mb: 2 }}>
+               <Typography variant="body2">
+                 🔒 Verrouillage automatique après 15 minutes d'inactivité
+               </Typography>
+             </Alert>
+           )}
+           
+           <Alert severity="info" sx={{ mb: 2 }}>
+             <Typography variant="body2">
+               {getExpectedFormat()}
+             </Typography>
+           </Alert>
+         </Box>
 
         <Box sx={{ mb: 3 }}>
           <TextField

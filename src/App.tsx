@@ -18,6 +18,8 @@ const App: React.FC = () => {
   const [isLicenseValid, setIsLicenseValid] = useState<boolean>(false);
   const [showLicenseModal, setShowLicenseModal] = useState<boolean>(true);
   const [lastValidatedDate, setLastValidatedDate] = useState<string>('');
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [isLocked, setIsLocked] = useState<boolean>(false);
 
   const [rootSize, setRootSize] = useState<{ width: string; height: string }>({ width: '1280px', height: '880px' });
   const [currentStoreCode, setCurrentStoreCode] = useState<string>(StorageService.getCurrentStoreCode());
@@ -263,6 +265,8 @@ const App: React.FC = () => {
     setIsLicenseValid(true);
     setShowLicenseModal(false);
     setLastValidatedDate(new Date().toLocaleDateString('fr-FR'));
+    setLastActivity(Date.now());
+    setIsLocked(false);
   };
 
   // Vérifier si la licence est toujours valide (même date)
@@ -272,6 +276,25 @@ const App: React.FC = () => {
       setIsLicenseValid(false);
       setShowLicenseModal(true);
       setLastValidatedDate('');
+      setIsLocked(false);
+    }
+  };
+
+  // Gestion du verrouillage automatique
+  const updateActivity = () => {
+    setLastActivity(Date.now());
+  };
+
+  const checkAutoLock = () => {
+    if (isLicenseValid && !isLocked) {
+      const now = Date.now();
+      const timeSinceLastActivity = now - lastActivity;
+      const lockTimeout = 15 * 60 * 1000; // 15 minutes en millisecondes
+      
+      if (timeSinceLastActivity >= lockTimeout) {
+        setIsLocked(true);
+        setShowLicenseModal(true);
+      }
     }
   };
 
@@ -287,16 +310,18 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Vérifier la validité de la licence toutes les minutes et au focus
+  // Vérifier la validité de la licence et le verrouillage automatique
   useEffect(() => {
     if (isLicenseValid) {
       const interval = setInterval(() => {
         checkLicenseValidity();
+        checkAutoLock();
       }, 60000); // Vérifier toutes les minutes
 
       // Vérifier aussi quand la fenêtre reprend le focus
       const handleFocus = () => {
         checkLicenseValidity();
+        checkAutoLock();
       };
 
       window.addEventListener('focus', handleFocus);
@@ -308,7 +333,7 @@ const App: React.FC = () => {
         document.removeEventListener('visibilitychange', handleFocus);
       };
     }
-  }, [isLicenseValid, lastValidatedDate]);
+  }, [isLicenseValid, lastValidatedDate, lastActivity, isLocked]);
 
   const rootWidthPx = parseInt(rootSize.width);
   const rootHeightPx = parseInt(rootSize.height);
@@ -318,12 +343,13 @@ const App: React.FC = () => {
   const baseScale = compactMode ? 0.9 : 1;
   const finalScale = Math.min(baseScale, fitScale);
 
-  // Si la licence n'est pas valide, afficher seulement la modale de licence
-  if (!isLicenseValid) {
+  // Si la licence n'est pas valide ou si l'application est verrouillée, afficher la modale de licence
+  if (!isLicenseValid || isLocked) {
     return (
       <LicenseModal 
         open={showLicenseModal} 
-        onLicenseValid={handleLicenseValid} 
+        onLicenseValid={handleLicenseValid}
+        isLocked={isLocked}
       />
     );
   }
@@ -365,26 +391,33 @@ const App: React.FC = () => {
         ⬌
       </Box>
 
-      <WindowManager
-        products={products}
-        categories={categories}
-        cartItems={cartItems}
-        isLayoutLocked={isLayoutLocked}
-        cashiers={cashiers}
-        currentCashier={currentCashier}
-        onProductClick={handleProductClick}
-        onProductWithVariationClick={handleProductWithVariationClick}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onCheckout={handleCheckout}
-        onImportComplete={handleImportComplete}
-        onProductsReorder={handleProductsReorder}
-        onUpdateCategories={handleUpdateCategories}
-        onUpdateCashiers={handleUpdateCashiers}
-        onCashierLogin={handleCashierLogin}
-        currentStoreCode={currentStoreCode}
-        onStoreChange={setCurrentStoreCode}
-      />
+      <Box 
+        onClick={updateActivity}
+        onMouseMove={updateActivity}
+        onKeyDown={updateActivity}
+        sx={{ width: '100%', height: '100%' }}
+      >
+        <WindowManager
+          products={products}
+          categories={categories}
+          cartItems={cartItems}
+          isLayoutLocked={isLayoutLocked}
+          cashiers={cashiers}
+          currentCashier={currentCashier}
+          onProductClick={handleProductClick}
+          onProductWithVariationClick={handleProductWithVariationClick}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+          onImportComplete={handleImportComplete}
+          onProductsReorder={handleProductsReorder}
+          onUpdateCategories={handleUpdateCategories}
+          onUpdateCashiers={handleUpdateCashiers}
+          onCashierLogin={handleCashierLogin}
+          currentStoreCode={currentStoreCode}
+          onStoreChange={setCurrentStoreCode}
+        />
+      </Box>
     </Box>
   );
 };
