@@ -257,23 +257,26 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                       let finalTotal = originalTotal;
                       let discountAmount = 0;
                       
-                      // Vérifier s'il y a des remises sur cet article
-                      if (t.itemDiscounts && t.itemDiscounts[`${it.product.id}-${it.selectedVariation?.id || 'main'}`]) {
-                        const discount = t.itemDiscounts[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
-                        if (discount.type === 'euro') {
-                          finalPrice = Math.max(0, originalPrice - discount.value);
-                          finalTotal = finalPrice * it.quantity;
-                          discountAmount = originalTotal - finalTotal;
-                        } else if (discount.type === 'percent') {
-                          finalPrice = originalPrice * (1 - discount.value / 100);
-                          finalTotal = finalPrice * it.quantity;
-                          discountAmount = originalTotal - finalTotal;
-                        } else if (discount.type === 'price') {
-                          finalPrice = discount.value;
-                          finalTotal = finalPrice * it.quantity;
-                          discountAmount = originalTotal - finalTotal;
-                        }
-                      }
+                                             // Vérifier s'il y a des remises sur cet article
+                       const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+                       console.log('Checking discount for:', discountKey, 'ItemDiscounts:', t.itemDiscounts);
+                       if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
+                         const discount = t.itemDiscounts[discountKey];
+                         console.log('Found discount:', discount);
+                         if (discount.type === 'euro') {
+                           finalPrice = Math.max(0, originalPrice - discount.value);
+                           finalTotal = finalPrice * it.quantity;
+                           discountAmount = originalTotal - finalTotal;
+                         } else if (discount.type === 'percent') {
+                           finalPrice = originalPrice * (1 - discount.value / 100);
+                           finalTotal = finalPrice * it.quantity;
+                           discountAmount = originalTotal - finalTotal;
+                         } else if (discount.type === 'price') {
+                           finalPrice = discount.value;
+                           finalTotal = finalPrice * it.quantity;
+                           discountAmount = originalTotal - finalTotal;
+                         }
+                       }
                       
                                                                     return (
                          <Box key={it.product.id} sx={{ 
@@ -290,6 +293,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                              <Typography variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
                                {finalTotal.toFixed(2)} €
                              </Typography>
+                             {console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount)}
                            </Box>
                            {discountAmount > 0 && (
                              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
