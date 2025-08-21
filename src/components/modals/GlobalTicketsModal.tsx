@@ -498,57 +498,60 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                           py: 0.5,
                           borderBottom: '1px solid #f0f0f0'
                         }}>
-                          {/* Ligne principale de l'article */}
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="caption" sx={{ 
-                              fontFamily: 'monospace', 
-                              minWidth: 300,
-                              fontSize: '13px'
-                            }}>
-                              {it.quantity}x {it.product.name}
-                            </Typography>
-                            <Typography variant="caption" sx={{ 
-                              textAlign: 'right', 
-                              fontFamily: 'monospace', 
-                              fontWeight: 'bold',
-                              fontSize: '13px'
-                            }}>
-                              {finalTotal.toFixed(2)} €
-                            </Typography>
-                          </Box>
-
-                          {/* Détails des remises */}
-                          {showDiscountDetails && (
-                            <Box sx={{ pl: 2 }}>
-                              {Math.abs(discountAmount) > 0.01 ? (
-                                <Box sx={{ 
-                                  backgroundColor: '#ffebee', 
-                                  p: 0.5, 
-                                  borderRadius: 0.5,
-                                  border: '1px solid #f44336',
-                                  display: 'inline-block'
-                                }}>
-                                  <Typography variant="caption" sx={{ 
-                                    color: '#f44336', 
-                                    fontFamily: 'monospace', 
-                                    fontWeight: 'bold',
-                                    fontSize: '12px'
-                                  }}>
-                                    -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
-                                  </Typography>
-                                </Box>
-                              ) : (
-                                <Typography variant="caption" sx={{ 
-                                  color: '#666', 
-                                  fontFamily: 'monospace',
-                                  fontSize: '12px',
-                                  fontStyle: 'italic'
-                                }}>
-                                  Pas de remise
-                                </Typography>
-                              )}
-                            </Box>
-                          )}
+                                                   {/* Ligne principale de l'article avec remises sur la même ligne */}
+                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+                             <Typography variant="caption" sx={{ 
+                               fontFamily: 'monospace', 
+                               fontSize: '13px'
+                             }}>
+                               {it.quantity}x {it.product.name}
+                             </Typography>
+                             
+                             {/* Détails des remises sur la même ligne */}
+                             {showDiscountDetails && (
+                               <>
+                                 {Math.abs(discountAmount) > 0.01 ? (
+                                   <Box sx={{ 
+                                     backgroundColor: '#ffebee', 
+                                     p: 0.5, 
+                                     borderRadius: 0.5,
+                                     border: '1px solid #f44336',
+                                     display: 'inline-block'
+                                   }}>
+                                     <Typography variant="caption" sx={{ 
+                                       color: '#f44336', 
+                                       fontFamily: 'monospace', 
+                                       fontWeight: 'bold',
+                                       fontSize: '12px'
+                                     }}>
+                                       -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
+                                     </Typography>
+                                   </Box>
+                                 ) : (
+                                   <Typography variant="caption" sx={{ 
+                                     color: '#666', 
+                                     fontFamily: 'monospace',
+                                     fontSize: '12px',
+                                     fontStyle: 'italic'
+                                   }}>
+                                     Pas de remise
+                                   </Typography>
+                                 )}
+                               </>
+                             )}
+                           </Box>
+                           
+                           <Typography variant="caption" sx={{ 
+                             textAlign: 'right', 
+                             fontFamily: 'monospace', 
+                             fontWeight: 'bold',
+                             fontSize: '13px',
+                             minWidth: 80
+                           }}>
+                             {finalTotal.toFixed(2)} €
+                           </Typography>
+                         </Box>
                                                                                                    </Box>
                        );
                      })}
