@@ -202,14 +202,56 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                 </Box>
                 {isEx && (
                   <Box sx={{ mt: 0.5, ml: 1 }}>
-                    {(Array.isArray(t.items)?t.items:[]).map((it:any) => (
-                      <Box key={it.product.id} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, pl: 1 }}>
-                        <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
-                        <Typography variant="caption">x</Typography>
-                        <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
-                        <Typography variant="caption" sx={{ minWidth: 90, textAlign: 'right', fontFamily: 'monospace' }}>{(it.quantity * (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice)).toFixed(2)} €</Typography>
-                      </Box>
-                    ))}
+                    {(Array.isArray(t.items)?t.items:[]).map((it:any) => {
+                      const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+                      const originalTotal = originalPrice * it.quantity;
+                      
+                      // Calculer le prix final avec remises
+                      let finalPrice = originalPrice;
+                      let finalTotal = originalTotal;
+                      let discountAmount = 0;
+                      
+                      // Vérifier s'il y a des remises sur cet article
+                      if (t.itemDiscounts && t.itemDiscounts[`${it.product.id}-${it.selectedVariation?.id || 'main'}`]) {
+                        const discount = t.itemDiscounts[`${it.product.id}-${it.selectedVariation?.id || 'main'}`];
+                        if (discount.type === 'euro') {
+                          finalPrice = Math.max(0, originalPrice - discount.value);
+                          finalTotal = finalPrice * it.quantity;
+                          discountAmount = originalTotal - finalTotal;
+                        } else if (discount.type === 'percent') {
+                          finalPrice = originalPrice * (1 - discount.value / 100);
+                          finalTotal = finalPrice * it.quantity;
+                          discountAmount = originalTotal - finalTotal;
+                        } else if (discount.type === 'price') {
+                          finalPrice = discount.value;
+                          finalTotal = finalPrice * it.quantity;
+                          discountAmount = originalTotal - finalTotal;
+                        }
+                      }
+                      
+                      return (
+                        <Box key={it.product.id} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, pl: 1 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, alignItems: 'center' }}>
+                            <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
+                            <Typography variant="caption">x</Typography>
+                            <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
+                            <Typography variant="caption" sx={{ minWidth: 90, textAlign: 'right', fontFamily: 'monospace' }}>
+                              {finalTotal.toFixed(2)} €
+                            </Typography>
+                          </Box>
+                          {discountAmount > 0 && (
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pl: 1 }}>
+                              <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace' }}>
+                                -{discountAmount.toFixed(2)} €
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: '#666' }}>
+                                ({originalTotal.toFixed(2)} €)
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      );
+                    })}
                   </Box>
                 )}
               </ListItem>
