@@ -1392,6 +1392,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       paymentMethod: method as any,
       cashierName: 'Caissier',
       timestamp: new Date(),
+      itemDiscounts: { ...itemDiscounts },
+      globalDiscount: globalDiscount ? { ...globalDiscount } : null,
     };
     StorageService.addDailyTransaction(tx as any);
     // Sauvegarde automatique complète (silencieuse) + téléchargement JSON (obligatoire après encaissement)

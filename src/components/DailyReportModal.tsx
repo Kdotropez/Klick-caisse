@@ -48,32 +48,44 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
 
   // Calculer les statistiques quotidiennes
   useEffect(() => {
-    // Charger les transactions du jour
-    const todayTransactions = StorageService.loadTodayTransactions();
-    
-    if (todayTransactions.length > 0) {
-      let totalSales = 0;
-      let totalItems = 0;
-      let totalOriginalAmount = 0;
-      let totalDiscounts = 0;
-
-      todayTransactions.forEach(transaction => {
-        // Montant final de la transaction
-        totalSales += transaction.total || 0;
+            // Charger les transactions du jour
+        const todayTransactions = StorageService.loadTodayTransactions();
         
-        // Calculer le montant original et les remises
-        if (transaction.items && Array.isArray(transaction.items)) {
-          transaction.items.forEach(item => {
-            const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-            const originalTotal = originalPrice * item.quantity;
-            totalOriginalAmount += originalTotal;
-            totalItems += item.quantity;
-          });
-        }
-      });
+        if (todayTransactions.length > 0) {
+          let totalSales = 0;
+          let totalItems = 0;
+          let totalOriginalAmount = 0;
+          let totalDiscounts = 0;
 
-      // Calculer les remises totales
-      totalDiscounts = totalOriginalAmount - totalSales;
+          todayTransactions.forEach(transaction => {
+            // Montant final de la transaction
+            totalSales += transaction.total || 0;
+            
+            // Calculer le montant original et les remises
+            if (transaction.items && Array.isArray(transaction.items)) {
+              transaction.items.forEach(item => {
+                const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                const originalTotal = originalPrice * item.quantity;
+                
+                // Calculer le montant final avec remises
+                let finalTotal = originalTotal;
+                if (transaction.itemDiscounts && transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
+                  const discount = transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
+                  if (discount.type === 'euro') {
+                    finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+                  } else if (discount.type === 'percent') {
+                    finalTotal = originalTotal * (1 - discount.value / 100);
+                  } else if (discount.type === 'price') {
+                    finalTotal = discount.value * item.quantity;
+                  }
+                }
+                
+                totalOriginalAmount += originalTotal;
+                totalItems += item.quantity;
+                totalDiscounts += (originalTotal - finalTotal);
+              });
+            }
+          });
       
       const totalTransactions = todayTransactions.length;
       const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;

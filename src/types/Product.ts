@@ -74,4 +74,6 @@ export interface Transaction {
   paymentMethod: 'cash' | 'card' | 'sumup';
   cashierName: string;
   timestamp: Date;
+  itemDiscounts?: Record<string, { type: 'euro' | 'percent' | 'price'; value: number }>;
+  globalDiscount?: { type: 'euro' | 'percent'; value: number } | null;
 }
