@@ -193,13 +193,16 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
           >
             Aujourd'hui
           </Button>
-          <Button 
-            size="small" 
-            variant={showDiscountDetails?'contained':'outlined'} 
-            onClick={() => setShowDiscountDetails(!showDiscountDetails)}
-          >
-            Détails remises
-          </Button>
+                     <Button 
+             size="small" 
+             variant={showDiscountDetails?'contained':'outlined'} 
+             onClick={() => {
+               console.log('Toggle showDiscountDetails from', showDiscountDetails, 'to', !showDiscountDetails);
+               setShowDiscountDetails(!showDiscountDetails);
+             }}
+           >
+             Détails remises
+           </Button>
         </Box>
 
         {/* Champs de filtres */}
@@ -438,23 +441,25 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                       let finalTotal = originalTotal;
                       let discountAmount = 0;
                       
-                      // Vérifier s'il y a des remises sur cet article
-                      const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-                      if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
+                                             // Vérifier s'il y a des remises sur cet article
+                       const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+                       console.log('Checking discount for:', discountKey, 'ItemDiscounts:', t.itemDiscounts);
+                       if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
                         const discount = t.itemDiscounts[discountKey];
-                        if (discount.type === 'euro') {
-                          finalPrice = Math.max(0, originalPrice - discount.value);
-                          finalTotal = finalPrice * it.quantity;
-                          discountAmount = originalTotal - finalTotal;
-                        } else if (discount.type === 'percent') {
-                          finalPrice = originalPrice * (1 - discount.value / 100);
-                          finalTotal = finalPrice * it.quantity;
-                          discountAmount = originalTotal - finalTotal;
-                        } else if (discount.type === 'price') {
-                          finalPrice = discount.value;
-                          finalTotal = finalPrice * it.quantity;
-                          discountAmount = originalTotal - finalTotal;
-                        }
+                                                 console.log('Found discount:', discount);
+                         if (discount.type === 'euro') {
+                           finalPrice = Math.max(0, originalPrice - discount.value);
+                           finalTotal = finalPrice * it.quantity;
+                           discountAmount = originalTotal - finalTotal;
+                         } else if (discount.type === 'percent') {
+                           finalPrice = originalPrice * (1 - discount.value / 100);
+                           finalTotal = finalPrice * it.quantity;
+                           discountAmount = originalTotal - finalTotal;
+                         } else if (discount.type === 'price') {
+                           finalPrice = discount.value;
+                           finalTotal = finalPrice * it.quantity;
+                           discountAmount = originalTotal - finalTotal;
+                         }
                       }
                       
                       return (
@@ -516,9 +521,11 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                               )}
                             </Box>
                           )}
-                        </Box>
-                      );
-                    })}
+                                                 </Box>
+                       );
+                     })}
+                     
+                     {console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01)}
                   </Box>
                 )}
               </ListItem>
