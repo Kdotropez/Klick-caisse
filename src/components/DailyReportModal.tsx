@@ -46,10 +46,11 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     totalOriginalAmount: 0
   });
 
+    // Charger les transactions du jour
+  const todayTransactions = StorageService.loadTodayTransactions();
+
   // Calculer les statistiques quotidiennes
   useEffect(() => {
-            // Charger les transactions du jour
-        const todayTransactions = StorageService.loadTodayTransactions();
         
         if (todayTransactions.length > 0) {
           let totalSales = 0;
@@ -206,6 +207,33 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                 </Typography>
               </Box>
 
+              {/* Remises totales */}
+              {dailyStats.totalDiscounts > 0 && (
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  p: 2,
+                  backgroundColor: '#fff3e0',
+                  borderRadius: 1,
+                  border: '1px solid #ff9800'
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Discount sx={{ color: '#ff9800', fontSize: 20 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+                      Total des Remises Appliquées
+                    </Typography>
+                  </Box>
+                  <Typography variant="h4" sx={{ 
+                    fontWeight: 'bold', 
+                    color: '#f57c00',
+                    fontFamily: 'monospace'
+                  }}>
+                    -{formatPrice(dailyStats.totalDiscounts)}
+                  </Typography>
+                </Box>
+              )}
+
               {/* Détails */}
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
                 <Card sx={{ backgroundColor: '#f5f5f5' }}>
@@ -301,6 +329,105 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
             </Box>
           </CardContent>
         </Card>
+
+        {/* Détail des transactions avec remises */}
+        {todayTransactions.length > 0 && (
+          <Card sx={{ 
+            mb: 3, 
+            border: '2px solid #ff9800',
+            backgroundColor: '#fffbf0'
+          }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Discount sx={{ color: '#ff9800', fontSize: 28 }} />
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+                  Détail des Transactions avec Remises
+                </Typography>
+              </Box>
+              
+              <Divider sx={{ mb: 2 }} />
+              
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {todayTransactions.map((transaction, txIndex) => (
+                  <Box key={transaction.id} sx={{ 
+                    p: 2, 
+                    backgroundColor: '#fff8e1', 
+                    borderRadius: 1,
+                    border: '1px solid #ffcc02'
+                  }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      Transaction #{transaction.id.slice(-6)} - {new Date(transaction.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - {formatPrice(transaction.total)}
+                    </Typography>
+                    
+                    {transaction.items && Array.isArray(transaction.items) && transaction.items.map((item, itemIndex) => {
+                      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                      const originalTotal = originalPrice * item.quantity;
+                      
+                      // Calculer le montant final avec remises
+                      let finalTotal = originalTotal;
+                      let discountAmount = 0;
+                      
+                      if (transaction.itemDiscounts && transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
+                        const discount = transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
+                        if (discount.type === 'euro') {
+                          finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+                          discountAmount = originalTotal - finalTotal;
+                        } else if (discount.type === 'percent') {
+                          finalTotal = originalTotal * (1 - discount.value / 100);
+                          discountAmount = originalTotal - finalTotal;
+                        } else if (discount.type === 'price') {
+                          finalTotal = discount.value * item.quantity;
+                          discountAmount = originalTotal - finalTotal;
+                        }
+                      }
+                      
+                      return (
+                        <Box key={`${item.product.id}-${item.selectedVariation?.id || 'main'}`} sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center',
+                          pl: 2,
+                          py: 0.5
+                        }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+                            <Typography variant="body2" sx={{ minWidth: 30, textAlign: 'right', fontFamily: 'monospace' }}>
+                              {item.quantity}
+                            </Typography>
+                            <Typography variant="body2">×</Typography>
+                            <Typography variant="body2" sx={{ flex: 1 }}>
+                              {item.product.name}
+                            </Typography>
+                          </Box>
+                          
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {discountAmount > 0 && (
+                              <>
+                                <Typography variant="body2" sx={{ color: '#f44336', fontWeight: 'bold' }}>
+                                  -{formatPrice(discountAmount)}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#666' }}>
+                                  / ({formatPrice(originalTotal)})
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                                  / {formatPrice(finalTotal)}
+                                </Typography>
+                              </>
+                            )}
+                            {discountAmount === 0 && (
+                              <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                                {formatPrice(finalTotal)}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Placeholder pour les prochains points */}
         <Box sx={{ 

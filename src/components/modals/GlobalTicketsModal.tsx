@@ -193,16 +193,62 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             const isEx = expandedIds.has(String(t.id));
             return (
               <ListItem key={`${t.id}-${t.timestamp}`} sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1 }}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '26px 84px 120px 110px 86px', alignItems: 'center', gap: 0.5, width: '100%' }}>
-                  <input type="checkbox" checked={selectedIds.has(String(t.id))} onChange={() => setSelectedIds(prev => { const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next; })} />
-                  <Typography noWrap variant="caption" onClick={() => setExpandedIds(prev=>{const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next;})} sx={{ fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer' }}>#{String(t.id).slice(-6)}</Typography>
-                  <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} {new Date(t.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</Typography>
-                  <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>{`${qty} article${qty>1?'s':''}`}</Typography>
-                  <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
-                </Box>
-                {isEx && (
-                  <Box sx={{ mt: 0.5, ml: 1 }}>
-                    {(Array.isArray(t.items)?t.items:[]).map((it:any) => {
+                                 <Box sx={{ display: 'grid', gridTemplateColumns: '26px 84px 120px 110px 120px 86px', alignItems: 'center', gap: 0.5, width: '100%' }}>
+                   <input type="checkbox" checked={selectedIds.has(String(t.id))} onChange={() => setSelectedIds(prev => { const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next; })} />
+                   <Typography noWrap variant="caption" onClick={() => setExpandedIds(prev=>{const next=new Set(prev); const k=String(t.id); if(next.has(k)) next.delete(k); else next.add(k); return next;})} sx={{ fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer' }}>#{String(t.id).slice(-6)}</Typography>
+                   <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}</Typography>
+                   <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>{new Date(t.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</Typography>
+                   <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>{`${qty} article${qty>1?'s':''}`}</Typography>
+                   <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{(t.total||0).toFixed(2)} €</Typography>
+                 </Box>
+                                 {isEx && (
+                   <Box sx={{ mt: 0.5, ml: 1 }}>
+                     {/* Calculer le total des remises pour cette transaction */}
+                     {(() => {
+                       let totalDiscountForTx = 0;
+                       if (t.items && Array.isArray(t.items)) {
+                         t.items.forEach((item: any) => {
+                           const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                           const originalTotal = originalPrice * item.quantity;
+                           if (t.itemDiscounts && t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
+                             const discount = t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
+                             let finalTotal = originalTotal;
+                             if (discount.type === 'euro') {
+                               finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+                             } else if (discount.type === 'percent') {
+                               finalTotal = originalTotal * (1 - discount.value / 100);
+                             } else if (discount.type === 'price') {
+                               finalTotal = discount.value * item.quantity;
+                             }
+                             totalDiscountForTx += (originalTotal - finalTotal);
+                           }
+                         });
+                       }
+                       return (
+                         <Box sx={{ 
+                           display: 'grid', 
+                           gridTemplateColumns: '26px 84px 120px 110px 120px 86px', 
+                           alignItems: 'center', 
+                           gap: 0.5, 
+                           width: '100%',
+                           mb: 1,
+                           backgroundColor: '#fff3e0',
+                           p: 0.5,
+                           borderRadius: 0.5
+                         }}>
+                           <Box></Box>
+                           <Box></Box>
+                           <Box></Box>
+                           <Box></Box>
+                           <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 'bold', color: '#f44336' }}>
+                             {totalDiscountForTx > 0 ? `TOTAL REMISE ${totalDiscountForTx.toFixed(0)} €` : ''}
+                           </Typography>
+                           <Box></Box>
+                         </Box>
+                       );
+                     })()}
+                     
+                     {(Array.isArray(t.items)?t.items:[]).map((it:any) => {
                       const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
                       const originalTotal = originalPrice * it.quantity;
                       
@@ -229,28 +275,56 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                         }
                       }
                       
-                      return (
-                        <Box key={it.product.id} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, pl: 1 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, alignItems: 'center' }}>
-                            <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
-                            <Typography variant="caption">x</Typography>
-                            <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
-                            <Typography variant="caption" sx={{ minWidth: 90, textAlign: 'right', fontFamily: 'monospace' }}>
-                              {finalTotal.toFixed(2)} €
-                            </Typography>
-                          </Box>
-                          {discountAmount > 0 && (
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pl: 1 }}>
-                              <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace' }}>
-                                -{discountAmount.toFixed(2)} €
-                              </Typography>
-                              <Typography variant="caption" sx={{ color: '#666' }}>
-                                ({originalTotal.toFixed(2)} €)
-                              </Typography>
-                            </Box>
-                          )}
-                        </Box>
-                      );
+                                             return (
+                         <Box key={it.product.id} sx={{ 
+                           display: 'grid', 
+                           gridTemplateColumns: '26px 84px 120px 110px 120px 86px', 
+                           alignItems: 'center', 
+                           gap: 0.5, 
+                           width: '100%',
+                           pl: 1,
+                           py: 0.25
+                         }}>
+                           <Box></Box>
+                           <Box></Box>
+                           <Box></Box>
+                           <Box></Box>
+                           <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                             {it.quantity}x {it.product.name}
+                           </Typography>
+                           <Typography variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                             {finalTotal.toFixed(2)} €
+                           </Typography>
+                           {discountAmount > 0 && (
+                             <Box sx={{ 
+                               display: 'grid', 
+                               gridTemplateColumns: '26px 84px 120px 110px 120px 86px', 
+                               alignItems: 'center', 
+                               gap: 0.5, 
+                               width: '100%',
+                               pl: 1,
+                               py: 0.25
+                             }}>
+                               <Box></Box>
+                               <Box></Box>
+                               <Box></Box>
+                               <Box></Box>
+                               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                 <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                   -{discountAmount.toFixed(2)}€
+                                 </Typography>
+                                 <Typography variant="caption" sx={{ color: '#666' }}>
+                                   / ({originalTotal.toFixed(2)}€)
+                                 </Typography>
+                                 <Typography variant="caption" sx={{ color: '#1976d2', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                   / {finalTotal.toFixed(2)}€
+                                 </Typography>
+                               </Box>
+                               <Box></Box>
+                             </Box>
+                           )}
+                         </Box>
+                       );
                     })}
                   </Box>
                 )}
@@ -261,6 +335,86 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>Aucun ticket pour ces filtres</Box>
           )}
         </List>
+
+        {/* Résumé avec total des remises */}
+        {filtered.length > 0 && (
+          <Box sx={{ 
+            mt: 2, 
+            p: 2, 
+            backgroundColor: '#fff3e0', 
+            borderRadius: 1,
+            border: '1px solid #ff9800'
+          }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+                Résumé des {filtered.length} transaction{filtered.length > 1 ? 's' : ''}
+              </Typography>
+            </Box>
+            
+            {(() => {
+              let totalSales = 0;
+              let totalOriginalAmount = 0;
+              let totalDiscounts = 0;
+
+              filtered.forEach((t: any) => {
+                totalSales += t.total || 0;
+                
+                if (t.items && Array.isArray(t.items)) {
+                  t.items.forEach((item: any) => {
+                    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                    const originalTotal = originalPrice * item.quantity;
+                    totalOriginalAmount += originalTotal;
+                    
+                    // Calculer les remises
+                    if (t.itemDiscounts && t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
+                      const discount = t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
+                      let finalTotal = originalTotal;
+                      
+                      if (discount.type === 'euro') {
+                        finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+                      } else if (discount.type === 'percent') {
+                        finalTotal = originalTotal * (1 - discount.value / 100);
+                      } else if (discount.type === 'price') {
+                        finalTotal = discount.value * item.quantity;
+                      }
+                      
+                      totalDiscounts += (originalTotal - finalTotal);
+                    }
+                  });
+                }
+              });
+
+              return (
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#666' }}>CA Total</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                      {totalSales.toFixed(2)} €
+                    </Typography>
+                  </Box>
+                  
+                  {totalDiscounts > 0 && (
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="body2" sx={{ color: '#666' }}>Remises Total</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#f44336' }}>
+                        -{totalDiscounts.toFixed(2)} €
+                      </Typography>
+                    </Box>
+                  )}
+                  
+                  {totalDiscounts > 0 && (
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="body2" sx={{ color: '#666' }}>Montant Original</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#666' }}>
+                        {totalOriginalAmount.toFixed(2)} €
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              );
+            })()}
+          </Box>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Fermer</Button>
