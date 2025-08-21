@@ -295,34 +295,26 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                            <Typography variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
                              {finalTotal.toFixed(2)} €
                            </Typography>
-                           {discountAmount > 0 && (
-                             <Box sx={{ 
-                               display: 'grid', 
-                               gridTemplateColumns: '26px 84px 120px 110px 120px 86px', 
-                               alignItems: 'center', 
-                               gap: 0.5, 
-                               width: '100%',
-                               pl: 1,
-                               py: 0.25
-                             }}>
-                               <Box></Box>
-                               <Box></Box>
-                               <Box></Box>
-                               <Box></Box>
-                               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                 <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                                   -{discountAmount.toFixed(2)}€
-                                 </Typography>
-                                 <Typography variant="caption" sx={{ color: '#666' }}>
-                                   / ({originalTotal.toFixed(2)}€)
-                                 </Typography>
-                                 <Typography variant="caption" sx={{ color: '#1976d2', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                                   / {finalTotal.toFixed(2)}€
-                                 </Typography>
-                               </Box>
-                               <Box></Box>
-                             </Box>
-                           )}
+                                                       {discountAmount > 0 && (
+                              <Box sx={{ 
+                                display: 'grid', 
+                                gridTemplateColumns: '26px 84px 120px 110px 120px 86px', 
+                                alignItems: 'center', 
+                                gap: 0.5, 
+                                width: '100%',
+                                pl: 1,
+                                py: 0.25
+                              }}>
+                                <Box></Box>
+                                <Box></Box>
+                                <Box></Box>
+                                <Box></Box>
+                                <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                  -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
+                                </Typography>
+                                <Box></Box>
+                              </Box>
+                            )}
                          </Box>
                        );
                     })}
