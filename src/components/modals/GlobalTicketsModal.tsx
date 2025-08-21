@@ -139,7 +139,10 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
            <Button size="small" variant={filterPayment==='card'?'contained':'outlined'} onClick={() => setFilterPayment('card')}>Carte</Button>
            <Button size="small" variant={filterPayment==='sumup'?'contained':'outlined'} onClick={() => setFilterPayment('sumup')}>SumUp</Button>
            <Button size="small" variant={onlyToday?'contained':'outlined'} onClick={() => setOnlyToday(!onlyToday)}>Aujourd'hui</Button>
-           <Button size="small" variant={showDiscountDetails?'contained':'outlined'} onClick={() => setShowDiscountDetails(!showDiscountDetails)}>Détails remises</Button>
+                       <Button size="small" variant={showDiscountDetails?'contained':'outlined'} onClick={() => {
+              console.log('Toggle showDiscountDetails from', showDiscountDetails, 'to', !showDiscountDetails);
+              setShowDiscountDetails(!showDiscountDetails);
+            }}>Détails remises</Button>
          </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, mb: 1 }}>
           <TextField size="small" label="Montant min" value={amountMin} onChange={(e) => setAmountMin(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
@@ -283,7 +286,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                          }
                        }
                        
-                       console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01);
+                       console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01, 'showDiscountDetails:', showDiscountDetails);
                        
                        return (
                          <Box key={it.product.id} sx={{ 
@@ -308,6 +311,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                                </Typography>
                              </Box>
                            )}
+                           {console.log('Rendering discount line for', it.product.name, 'showDiscountDetails:', showDiscountDetails, 'discountAmount:', discountAmount, 'condition:', showDiscountDetails && Math.abs(discountAmount) > 0.01)}
                            {showDiscountDetails && Math.abs(discountAmount) <= 0.01 && (
                              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
                                <Typography variant="caption" sx={{ color: '#666', fontFamily: 'monospace' }}>
