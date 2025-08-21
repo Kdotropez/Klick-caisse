@@ -603,7 +603,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         // 1) VASQUES: consommer des sets de 12 verres (2x 6) par sous-type
         const vasqueComps: number[] = [];
-        let totalVasqueComps = 0; // Limiter le nombre total de compensations vasque
+        let totalVasqueComps = 0; // Limiter le nombre total de compensations vasque (GLOBAL)
         const defaultVasque: Record<string, number> = {
           'verre 6.5': 23,
           'verre 6.50': 23,
@@ -622,6 +622,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           Object.entries(vasqueEffective).map(([k, v]) => [normalizeKey(k), v])
         );
         const remainingPoolsBySub: Record<string, Array<{unit:number; qty:number}>> = {};
+        
+        // Calculer les limites globales pour les compensations VASQUE
+        let totalGlassesForVasque = 0;
+        for (const sub of Object.keys(qtyBySubcat)) {
+          const comp12 = VASQUE_COMP_BY_SUB[sub] || 0;
+          if (comp12 <= 0) continue;
+          if (!hasGlassDiscountBySub[sub]) continue;
+          const keys = lineKeysBySubcat[sub] || [];
+          const pools = keys.map(k => keyToInfo[k]).filter(Boolean).map(info => ({ unit: info.unit, qty: info.qty }));
+          const remainingQty = pools.reduce((s, p) => s + Math.max(0, p.qty), 0);
+          totalGlassesForVasque += remainingQty;
+        }
+        const maxVasqueComps = Math.floor(totalGlassesForVasque / 12);
         for (const sub of Object.keys(qtyBySubcat)) {
           const totalQty = qtyBySubcat[sub] || 0;
           const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
@@ -632,8 +645,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           if (hasVasqueTargets && hasGlassDiscountBySub[sub]) {
             const sets12 = Math.floor(totalQty / 12);
             for (let s = 0; s < sets12; s++) {
-              // Limiter à 1 compensation vasque par set de 12 verres
-              if (totalVasqueComps >= 1) break;
+              // Limiter à 1 compensation vasque par set de 12 verres (GLOBAL)
+              if (totalVasqueComps >= maxVasqueComps) break;
               
               let need12 = 12;
               let discountSum12 = 0;
@@ -660,7 +673,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         // 2) SEAUX: consommer des sets de 6 verres sur le reste
         const seauComps: number[] = [];
-        let totalSeauComps = 0; // Limiter le nombre total de compensations seau
+        let totalSeauComps = 0; // Limiter le nombre total de compensations seau (GLOBAL)
+        
+        // Calculer d'abord le total de verres disponibles pour les compensations seau
+        let totalGlassesForSeau = 0;
+        for (const sub of Object.keys(qtyBySubcat)) {
+          const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
+          if (compPerSet <= 0) continue;
+          if (!hasGlassDiscountBySub[sub]) continue;
+          const pools = (remainingPoolsBySub[sub] || []).map(p => ({...p}));
+          const remainingQty = pools.reduce((s, p) => s + Math.max(0, p.qty), 0);
+          totalGlassesForSeau += remainingQty;
+        }
+        
+        // Limiter à 1 compensation seau par set de 6 verres (global)
+        const maxSeauComps = Math.floor(totalGlassesForSeau / 6);
+        
         for (const sub of Object.keys(qtyBySubcat)) {
           const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
           if (compPerSet <= 0) continue;
@@ -672,8 +700,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const remainingQty = pools.reduce((s, p) => s + Math.max(0, p.qty), 0);
           const sets6 = Math.floor(remainingQty / 6);
           for (let s = 0; s < sets6; s++) {
-            // Limiter à 1 compensation seau par set de 6 verres
-            if (totalSeauComps >= 1) break;
+            // Limiter à 1 compensation seau par set de 6 verres (GLOBAL)
+            if (totalSeauComps >= maxSeauComps) break;
             
             let need = 6;
             let discountSum = 0;
