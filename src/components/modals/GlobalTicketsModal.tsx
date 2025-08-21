@@ -327,7 +327,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                                </Typography>
                              </Box>
                            )}
-                           {console.log('Rendering discount line for', it.product.name, 'showDiscountDetails:', showDiscountDetails, 'discountAmount:', discountAmount, 'condition:', showDiscountDetails && Math.abs(discountAmount) > 0.01)}
+                           
                            {showDiscountDetails && Math.abs(discountAmount) <= 0.01 && (
                              <Box sx={{ 
                                display: 'flex', 
