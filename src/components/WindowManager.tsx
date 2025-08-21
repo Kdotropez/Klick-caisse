@@ -983,8 +983,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
         // Vasques: appliquer sur UNE SEULE vasque
         distribute(vasqueComps, vasqueTargets, { singleTarget: true }, 'vasque');
-        // Seaux
-        distribute(seauComps, seauTargets, undefined, 'seau');
+        // Seaux - limiter le nombre de seaux cibles
+        const limitedSeauTargets = seauTargets.slice(0, seauComps.length);
+        distribute(seauComps, limitedSeauTargets, undefined, 'seau');
         // Packs -> Seaux (compensation nette) - seulement pour les seaux sans compensation existante
         if (packBasedComps.length > 0 && seauTargets.length > 0) {
           const availableSeauTargets = seauTargets.filter(t => {
