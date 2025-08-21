@@ -147,11 +147,11 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid, isLoc
             <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
               {validationResult.message}
             </Typography>
-            {!validationResult.isValid && (
-              <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-                Date: {validationResult.date} | Code attendu: {validationResult.code}
-              </Typography>
-            )}
+                         {!validationResult.isValid && (
+               <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+                 Date: {validationResult.date}
+               </Typography>
+             )}
           </Alert>
         )}
 

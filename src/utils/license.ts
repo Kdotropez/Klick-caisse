@@ -19,29 +19,29 @@ export function generateDailyCode(): string {
   return `${day.toString().padStart(2, '0')}${month.toString().padStart(2, '0')}`;
 }
 
-// Fonction pour valider un code
-export function validateLicenseCode(inputCode: string): LicenseInfo {
-  const today = new Date();
-  const expectedCode = generateDailyCode();
-  
-  // Vérifier si le code correspond
-  if (inputCode === expectedCode) {
+  // Fonction pour valider un code
+  export function validateLicenseCode(inputCode: string): LicenseInfo {
+    const today = new Date();
+    const expectedCode = generateDailyCode();
+    
+    // Vérifier si le code correspond
+    if (inputCode === expectedCode) {
+      return {
+        isValid: true,
+        code: expectedCode,
+        date: today.toLocaleDateString('fr-FR'),
+        message: 'Code valide - Accès autorisé'
+      };
+    }
+    
+    // Code incorrect - ne jamais révéler le code attendu
     return {
-      isValid: true,
-      code: expectedCode,
+      isValid: false,
+      code: '', // Ne pas révéler le code attendu
       date: today.toLocaleDateString('fr-FR'),
-      message: 'Code valide - Accès autorisé'
+      message: 'Code incorrect - Accès refusé'
     };
   }
-  
-  // Code incorrect
-  return {
-    isValid: false,
-    code: expectedCode,
-    date: today.toLocaleDateString('fr-FR'),
-    message: 'Code incorrect - Accès refusé'
-  };
-}
 
 // Fonction pour obtenir le code du jour (pour affichage)
 export function getTodayCode(): string {
