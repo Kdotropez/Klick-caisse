@@ -281,11 +281,11 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                            finalTotal = finalPrice * it.quantity;
                            discountAmount = originalTotal - finalTotal;
                          }
-                                                }
+                       }
                        
-                         console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01);
+                       console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01);
                        
-                         return (
+                       return (
                          <Box key={it.product.id} sx={{ 
                            display: 'flex', 
                            flexDirection: 'column', 
@@ -301,20 +301,20 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                                {finalTotal.toFixed(2)} €
                              </Typography>
                            </Box>
-                                                       {showDiscountDetails && Math.abs(discountAmount) > 0.01 && (
-                              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
-                                <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                                  -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
-                                </Typography>
-                              </Box>
-                            )}
-                            {showDiscountDetails && Math.abs(discountAmount) <= 0.01 && (
-                              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
-                                <Typography variant="caption" sx={{ color: '#666', fontFamily: 'monospace' }}>
-                                  Pas de remise
-                                </Typography>
-                              </Box>
-                            )}
+                           {showDiscountDetails && Math.abs(discountAmount) > 0.01 && (
+                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
+                               <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                 -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
+                               </Typography>
+                             </Box>
+                           )}
+                           {showDiscountDetails && Math.abs(discountAmount) <= 0.01 && (
+                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
+                               <Typography variant="caption" sx={{ color: '#666', fontFamily: 'monospace' }}>
+                                 Pas de remise
+                               </Typography>
+                             </Box>
+                           )}
                          </Box>
                        );
                     })}
