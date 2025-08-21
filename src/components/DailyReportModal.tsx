@@ -46,8 +46,36 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     totalOriginalAmount: 0
   });
 
-    // Charger les transactions du jour
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
+  const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [showTicketModal, setShowTicketModal] = useState(false);
+
+  // Charger les transactions du jour
   const todayTransactions = StorageService.loadTodayTransactions();
+
+  // Charger les transactions pour la date sélectionnée
+  const selectedDateTransactions = React.useMemo(() => {
+    if (selectedDate === new Date().toISOString().slice(0, 10)) {
+      return todayTransactions;
+    }
+    
+    // Charger depuis les transactions archivées par jour
+    try {
+      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+      if (raw) {
+        const map = JSON.parse(raw) as Record<string, any[]>;
+        return Array.isArray(map[selectedDate]) ? map[selectedDate] : [];
+      }
+    } catch {}
+    
+    return [];
+  }, [selectedDate, todayTransactions]);
+
+  // Fonction pour afficher les détails d'un ticket
+  const showTicketDetails = (transaction: any) => {
+    setSelectedTicket(transaction);
+    setShowTicketModal(true);
+  };
 
   // Calculer les statistiques quotidiennes
   useEffect(() => {
@@ -330,104 +358,111 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           </CardContent>
         </Card>
 
-        {/* Détail des transactions avec remises */}
-        {todayTransactions.length > 0 && (
-          <Card sx={{ 
-            mb: 3, 
-            border: '2px solid #ff9800',
-            backgroundColor: '#fffbf0'
-          }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                <Discount sx={{ color: '#ff9800', fontSize: 28 }} />
-                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
-                  Détail des Transactions avec Remises
-                </Typography>
-              </Box>
-              
-              <Divider sx={{ mb: 2 }} />
-              
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {todayTransactions.map((transaction, txIndex) => (
+        {/* Tickets de la journée */}
+        <Card sx={{ 
+          mb: 3, 
+          border: '2px solid #1976d2',
+          backgroundColor: '#f8fbff'
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                📋 Tickets de la Journée
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ mb: 2 }} />
+            
+            {/* Sélecteur de date */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                Date :
+              </Typography>
+              <input 
+                type="date" 
+                value={selectedDate} 
+                onChange={(e) => setSelectedDate(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              />
+              <Button 
+                size="small" 
+                variant="outlined" 
+                onClick={() => setSelectedDate(new Date().toISOString().slice(0, 10))}
+              >
+                Aujourd'hui
+              </Button>
+            </Box>
+            
+            {/* Liste des tickets */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {selectedDateTransactions.length > 0 ? (
+                selectedDateTransactions.map((transaction) => (
                   <Box key={transaction.id} sx={{ 
                     p: 2, 
-                    backgroundColor: '#fff8e1', 
+                    backgroundColor: '#fff', 
                     borderRadius: 1,
-                    border: '1px solid #ffcc02'
-                  }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                      Transaction #{transaction.id.slice(-6)} - {new Date(transaction.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - {formatPrice(transaction.total)}
-                    </Typography>
-                    
-                    {transaction.items && Array.isArray(transaction.items) && transaction.items.map((item, itemIndex) => {
-                      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                      const originalTotal = originalPrice * item.quantity;
-                      
-                      // Calculer le montant final avec remises
-                      let finalTotal = originalTotal;
-                      let discountAmount = 0;
-                      
-                      if (transaction.itemDiscounts && transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
-                        const discount = transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
-                        if (discount.type === 'euro') {
-                          finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
-                          discountAmount = originalTotal - finalTotal;
-                        } else if (discount.type === 'percent') {
-                          finalTotal = originalTotal * (1 - discount.value / 100);
-                          discountAmount = originalTotal - finalTotal;
-                        } else if (discount.type === 'price') {
-                          finalTotal = discount.value * item.quantity;
-                          discountAmount = originalTotal - finalTotal;
-                        }
-                      }
-                      
-                      return (
-                        <Box key={`${item.product.id}-${item.selectedVariation?.id || 'main'}`} sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center',
-                          pl: 2,
-                          py: 0.5
+                    border: '1px solid #e0e0e0',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                      borderColor: '#1976d2'
+                    }
+                  }}
+                  onClick={() => showTicketDetails(transaction)}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Typography variant="subtitle1" sx={{ 
+                          fontWeight: 'bold', 
+                          color: '#1976d2',
+                          fontFamily: 'monospace'
                         }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
-                            <Typography variant="body2" sx={{ minWidth: 30, textAlign: 'right', fontFamily: 'monospace' }}>
-                              {item.quantity}
-                            </Typography>
-                            <Typography variant="body2">×</Typography>
-                            <Typography variant="body2" sx={{ flex: 1 }}>
-                              {item.product.name}
-                            </Typography>
-                          </Box>
-                          
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {discountAmount > 0 && (
-                              <>
-                                <Typography variant="body2" sx={{ color: '#f44336', fontWeight: 'bold' }}>
-                                  -{formatPrice(discountAmount)}
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: '#666' }}>
-                                  / ({formatPrice(originalTotal)})
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                                  / {formatPrice(finalTotal)}
-                                </Typography>
-                              </>
-                            )}
-                            {discountAmount === 0 && (
-                              <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                                {formatPrice(finalTotal)}
-                              </Typography>
-                            )}
-                          </Box>
-                        </Box>
-                      );
-                    })}
+                          #{transaction.id.slice(-6)}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#666' }}>
+                          {new Date(transaction.timestamp).toLocaleTimeString('fr-FR', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Typography variant="body2" sx={{ color: '#666' }}>
+                          {transaction.items ? transaction.items.reduce((sum, item) => sum + item.quantity, 0) : 0} articles
+                        </Typography>
+                        <Typography variant="h6" sx={{ 
+                          fontWeight: 'bold', 
+                          color: '#1976d2',
+                          fontFamily: 'monospace'
+                        }}>
+                          {formatPrice(transaction.total)}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        )}
+                ))
+              ) : (
+                <Box sx={{ 
+                  p: 3, 
+                  textAlign: 'center', 
+                  color: 'text.secondary',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: 1
+                }}>
+                  <Typography variant="body1">
+                    Aucun ticket trouvé pour le {new Date(selectedDate).toLocaleDateString('fr-FR')}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
 
         {/* Placeholder pour les prochains points */}
         <Box sx={{ 
@@ -465,6 +500,177 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         </Button>
       </DialogActions>
     </Dialog>
+
+    {/* Modale de détails du ticket */}
+    {showTicketModal && selectedTicket && (
+      <Dialog 
+        open={showTicketModal} 
+        onClose={() => setShowTicketModal(false)}
+        maxWidth="md" 
+        fullWidth
+      >
+        <DialogTitle sx={{ 
+          backgroundColor: '#1976d2', 
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              TICKET DE CAISSE
+            </Typography>
+            <Typography variant="body2">
+              #{selectedTicket.id.slice(-6)} - {new Date(selectedTicket.timestamp).toLocaleDateString('fr-FR')} - {new Date(selectedTicket.timestamp).toLocaleTimeString('fr-FR')} · Klick {APP_VERSION}
+            </Typography>
+          </Box>
+          <IconButton 
+            onClick={() => setShowTicketModal(false)}
+            sx={{ color: 'white' }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent sx={{ p: 3 }}>
+          {/* Articles du ticket */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
+            {selectedTicket.items && Array.isArray(selectedTicket.items) && selectedTicket.items.map((item: any) => {
+              const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+              const originalTotal = originalPrice * item.quantity;
+              
+              // Calculer le montant final avec remises
+              let finalPrice = originalPrice;
+              let finalTotal = originalTotal;
+              let discountAmount = 0;
+              
+              if (selectedTicket.itemDiscounts && selectedTicket.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
+                const discount = selectedTicket.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
+                if (discount.type === 'euro') {
+                  finalPrice = Math.max(0, originalPrice - discount.value);
+                  finalTotal = finalPrice * item.quantity;
+                  discountAmount = originalTotal - finalTotal;
+                } else if (discount.type === 'percent') {
+                  finalPrice = originalPrice * (1 - discount.value / 100);
+                  finalTotal = finalPrice * item.quantity;
+                  discountAmount = originalTotal - finalTotal;
+                } else if (discount.type === 'price') {
+                  finalPrice = discount.value;
+                  finalTotal = finalPrice * item.quantity;
+                  discountAmount = originalTotal - finalTotal;
+                }
+              }
+              
+              return (
+                <Box key={`${item.product.id}-${item.selectedVariation?.id || 'main'}`} sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  py: 0.5,
+                  borderBottom: '1px solid #f0f0f0'
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+                    <Typography variant="body1" sx={{ 
+                      fontFamily: 'monospace',
+                      minWidth: 50,
+                      textAlign: 'right'
+                    }}>
+                      {item.quantity}
+                    </Typography>
+                    <Typography variant="body1">×</Typography>
+                    <Typography variant="body1" sx={{ flex: 1, fontFamily: 'monospace' }}>
+                      {item.product.name}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {discountAmount > 0 && (
+                      <>
+                        <Typography variant="body1" sx={{ 
+                          color: '#f44336', 
+                          fontWeight: 'bold',
+                          fontFamily: 'monospace'
+                        }}>
+                          -{formatPrice(discountAmount)}
+                        </Typography>
+                        <Typography variant="body1" sx={{ 
+                          color: '#666',
+                          fontFamily: 'monospace'
+                        }}>
+                          / ({formatPrice(originalTotal)})
+                        </Typography>
+                        <Typography variant="body1" sx={{ 
+                          color: '#1976d2', 
+                          fontWeight: 'bold',
+                          fontFamily: 'monospace'
+                        }}>
+                          / {formatPrice(finalTotal)}
+                        </Typography>
+                      </>
+                    )}
+                    {discountAmount === 0 && (
+                      <Typography variant="body1" sx={{ 
+                        fontWeight: 'bold', 
+                        color: '#1976d2',
+                        fontFamily: 'monospace'
+                      }}>
+                        {formatPrice(finalTotal)}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+          
+          {/* Total */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            p: 2,
+            backgroundColor: '#f5f5f5',
+            borderRadius: 1,
+            border: '2px solid #1976d2'
+          }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              TOTAL
+            </Typography>
+            <Typography variant="h5" sx={{ 
+              fontWeight: 'bold', 
+              color: '#1976d2',
+              fontFamily: 'monospace'
+            }}>
+              {formatPrice(selectedTicket.total)}
+            </Typography>
+          </Box>
+          
+          {/* Méthode de paiement */}
+          {selectedTicket.paymentMethod && (
+            <Box sx={{ 
+              mt: 2, 
+              p: 1, 
+              backgroundColor: '#e8f5e8', 
+              borderRadius: 1,
+              textAlign: 'center'
+            }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                Paiement : {selectedTicket.paymentMethod}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 2, backgroundColor: '#f5f5f5' }}>
+          <Button 
+            onClick={() => setShowTicketModal(false)} 
+            variant="contained"
+          >
+            Fermer
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )}
   );
 };
 
