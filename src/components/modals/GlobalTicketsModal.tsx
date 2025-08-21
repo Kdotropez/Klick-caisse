@@ -201,7 +201,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                setShowDiscountDetails(!showDiscountDetails);
              }}
            >
-             Détails remises
+             Détails remises ({showDiscountDetails ? 'ON' : 'OFF'})
            </Button>
         </Box>
 
@@ -386,27 +386,32 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                 {/* Détails de la transaction */}
                 {isEx && (
                   <Box sx={{ mt: 1, ml: 2, width: '100%' }}>
-                    {/* Total des remises pour cette transaction */}
-                    {showDiscountDetails && (() => {
-                      let totalDiscountForTx = 0;
-                      if (t.items && Array.isArray(t.items)) {
-                        t.items.forEach((item: any) => {
-                          const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                          const originalTotal = originalPrice * item.quantity;
-                          if (t.itemDiscounts && t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
-                            const discount = t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
-                            let finalTotal = originalTotal;
-                            if (discount.type === 'euro') {
-                              finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
-                            } else if (discount.type === 'percent') {
-                              finalTotal = originalTotal * (1 - discount.value / 100);
-                            } else if (discount.type === 'price') {
-                              finalTotal = discount.value * item.quantity;
-                            }
-                            totalDiscountForTx += (originalTotal - finalTotal);
-                          }
-                        });
-                      }
+                                         {/* Total des remises pour cette transaction */}
+                     {showDiscountDetails && (() => {
+                       console.log('showDiscountDetails is true, checking transaction:', t.id);
+                       console.log('Transaction itemDiscounts:', t.itemDiscounts);
+                       let totalDiscountForTx = 0;
+                       if (t.items && Array.isArray(t.items)) {
+                         t.items.forEach((item: any) => {
+                           const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                           const originalTotal = originalPrice * item.quantity;
+                           const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+                           console.log('Checking total discount for key:', discountKey);
+                           if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
+                             const discount = t.itemDiscounts[discountKey];
+                             console.log('Found discount for total:', discount);
+                             let finalTotal = originalTotal;
+                             if (discount.type === 'euro') {
+                               finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+                             } else if (discount.type === 'percent') {
+                               finalTotal = originalTotal * (1 - discount.value / 100);
+                             } else if (discount.type === 'price') {
+                               finalTotal = discount.value * item.quantity;
+                             }
+                             totalDiscountForTx += (originalTotal - finalTotal);
+                           }
+                         });
+                       }
                       
                       if (totalDiscountForTx > 0) {
                         return (
