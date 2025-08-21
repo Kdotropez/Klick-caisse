@@ -22,7 +22,7 @@ interface LicenseModalProps {
 const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid }) => {
   const [licenseCode, setLicenseCode] = useState('');
   const [validationResult, setValidationResult] = useState<LicenseInfo | null>(null);
-  const [showTodayCode, setShowTodayCode] = useState(false);
+
   const [attempts, setAttempts] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,7 +31,6 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid }) => 
     if (open) {
       setLicenseCode('');
       setValidationResult(null);
-      setShowTodayCode(false);
       setAttempts(0);
     }
   }, [open]);
@@ -71,9 +70,7 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid }) => 
     }
   };
 
-  const toggleShowTodayCode = () => {
-    setShowTodayCode(!showTodayCode);
-  };
+
 
   return (
     <Dialog 
@@ -81,7 +78,6 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid }) => 
       maxWidth="sm" 
       fullWidth
       disableEscapeKeyDown
-      disableBackdropClick
     >
       <DialogTitle sx={{ 
         backgroundColor: '#1976d2', 
@@ -118,33 +114,16 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ open, onLicenseValid }) => 
             value={licenseCode}
             onChange={(e) => setLicenseCode(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ex: 20250815-45"
+            placeholder="Code à 4 chiffres"
             disabled={isLoading}
             sx={{ mb: 2 }}
           />
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={toggleShowTodayCode}
-              disabled={isLoading}
-            >
-              {showTodayCode ? 'Masquer' : 'Voir'} le code du jour
-            </Button>
-            
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              Tentatives: {attempts}/5
-            </Typography>
-          </Box>
-
-          {showTodayCode && (
-            <Alert severity="warning" sx={{ mt: 2 }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
-                Code du jour: {getTodayCode()}
-              </Typography>
-            </Alert>
-          )}
+                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+               Tentatives: {attempts}/5
+             </Typography>
+           </Box>
         </Box>
 
         {validationResult && (

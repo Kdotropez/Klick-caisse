@@ -11,23 +11,12 @@ export interface LicenseInfo {
 // Fonction pour générer le code du jour
 export function generateDailyCode(): string {
   const today = new Date();
-  const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const day = today.getDate();
   
   // Algorithme de génération du code
-  // Format: YYYYMMDD + checksum
-  const baseCode = `${year}${month.toString().padStart(2, '0')}${day.toString().padStart(2, '0')}`;
-  
-  // Calcul du checksum simple
-  let checksum = 0;
-  for (let i = 0; i < baseCode.length; i++) {
-    checksum += parseInt(baseCode[i]) * (i + 1);
-  }
-  checksum = checksum % 100;
-  
-  // Code final: YYYYMMDD-XX (XX = checksum)
-  return `${baseCode}-${checksum.toString().padStart(2, '0')}`;
+  // Format: JJMM (jour-mois) - 4 chiffres seulement
+  return `${day.toString().padStart(2, '0')}${month.toString().padStart(2, '0')}`;
 }
 
 // Fonction pour valider un code
@@ -65,24 +54,15 @@ export function isCodeExpired(inputCode: string): boolean {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   
-  const year = yesterday.getFullYear();
   const month = yesterday.getMonth() + 1;
   const day = yesterday.getDate();
   
-  const baseCode = `${year}${month.toString().padStart(2, '0')}${day.toString().padStart(2, '0')}`;
-  
-  let checksum = 0;
-  for (let i = 0; i < baseCode.length; i++) {
-    checksum += parseInt(baseCode[i]) * (i + 1);
-  }
-  checksum = checksum % 100;
-  
-  const yesterdayCode = `${baseCode}-${checksum.toString().padStart(2, '0')}`;
+  const yesterdayCode = `${day.toString().padStart(2, '0')}${month.toString().padStart(2, '0')}`;
   
   return inputCode === yesterdayCode;
 }
 
 // Fonction pour afficher le format attendu
 export function getExpectedFormat(): string {
-  return 'Format: YYYYMMDD-XX (ex: 20250815-45)';
+  return 'Code à 4 chiffres';
 }
