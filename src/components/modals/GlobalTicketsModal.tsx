@@ -459,10 +459,12 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                            finalPrice = discount.value;
                            finalTotal = finalPrice * it.quantity;
                            discountAmount = originalTotal - finalTotal;
-                         }
-                      }
-                      
-                      return (
+                                                  }
+                       }
+                       
+                       console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01);
+                       
+                       return (
                         <Box key={it.product.id} sx={{ 
                           display: 'flex', 
                           flexDirection: 'column', 
@@ -521,12 +523,11 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                               )}
                             </Box>
                           )}
-                                                 </Box>
+                                                                          </Box>
                        );
                      })}
-                     
-                     {console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01)}
-                  </Box>
+                   </Box>
+                   </Box>
                 )}
               </ListItem>
             );
