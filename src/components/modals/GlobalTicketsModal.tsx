@@ -523,12 +523,11 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                               )}
                             </Box>
                           )}
-                                                                          </Box>
+                                                                                                   </Box>
                        );
                      })}
                    </Box>
-                   </Box>
-                )}
+                 )}
               </ListItem>
             );
           })}
