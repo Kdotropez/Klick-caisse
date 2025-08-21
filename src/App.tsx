@@ -17,6 +17,7 @@ const App: React.FC = () => {
   const [currentCashier, setCurrentCashier] = useState<Cashier | null>(null);
   const [isLicenseValid, setIsLicenseValid] = useState<boolean>(false);
   const [showLicenseModal, setShowLicenseModal] = useState<boolean>(true);
+  const [lastValidatedDate, setLastValidatedDate] = useState<string>('');
 
   const [rootSize, setRootSize] = useState<{ width: string; height: string }>({ width: '1280px', height: '880px' });
   const [currentStoreCode, setCurrentStoreCode] = useState<string>(StorageService.getCurrentStoreCode());
@@ -261,6 +262,17 @@ const App: React.FC = () => {
   const handleLicenseValid = () => {
     setIsLicenseValid(true);
     setShowLicenseModal(false);
+    setLastValidatedDate(new Date().toLocaleDateString('fr-FR'));
+  };
+
+  // Vérifier si la licence est toujours valide (même date)
+  const checkLicenseValidity = () => {
+    const today = new Date().toLocaleDateString('fr-FR');
+    if (lastValidatedDate !== today) {
+      setIsLicenseValid(false);
+      setShowLicenseModal(true);
+      setLastValidatedDate('');
+    }
   };
 
   useEffect(() => {
@@ -274,6 +286,29 @@ const App: React.FC = () => {
       window.removeEventListener('orientationchange', handleResize);
     };
   }, []);
+
+  // Vérifier la validité de la licence toutes les minutes et au focus
+  useEffect(() => {
+    if (isLicenseValid) {
+      const interval = setInterval(() => {
+        checkLicenseValidity();
+      }, 60000); // Vérifier toutes les minutes
+
+      // Vérifier aussi quand la fenêtre reprend le focus
+      const handleFocus = () => {
+        checkLicenseValidity();
+      };
+
+      window.addEventListener('focus', handleFocus);
+      document.addEventListener('visibilitychange', handleFocus);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('focus', handleFocus);
+        document.removeEventListener('visibilitychange', handleFocus);
+      };
+    }
+  }, [isLicenseValid, lastValidatedDate]);
 
   const rootWidthPx = parseInt(rootSize.width);
   const rootHeightPx = parseInt(rootSize.height);
