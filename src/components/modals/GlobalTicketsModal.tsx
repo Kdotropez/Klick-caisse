@@ -305,16 +305,47 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                              </Typography>
                            </Box>
                            {showDiscountDetails && Math.abs(discountAmount) > 0.01 && (
-                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
-                               <Typography variant="caption" sx={{ color: '#f44336', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                             <Box sx={{ 
+                               display: 'flex', 
+                               justifyContent: 'flex-end', 
+                               alignItems: 'center', 
+                               pl: 1,
+                               backgroundColor: '#ffebee',
+                               p: 0.5,
+                               borderRadius: 0.5,
+                               border: '1px solid #f44336',
+                               minHeight: '20px'
+                             }}>
+                               <Typography variant="caption" sx={{ 
+                                 color: '#f44336', 
+                                 fontFamily: 'monospace', 
+                                 fontWeight: 'bold',
+                                 fontSize: '12px',
+                                 lineHeight: 1.2
+                               }}>
                                  -{discountAmount.toFixed(2)}€ / ({originalTotal.toFixed(2)}€) / {finalTotal.toFixed(2)}€
                                </Typography>
                              </Box>
                            )}
                            {console.log('Rendering discount line for', it.product.name, 'showDiscountDetails:', showDiscountDetails, 'discountAmount:', discountAmount, 'condition:', showDiscountDetails && Math.abs(discountAmount) > 0.01)}
                            {showDiscountDetails && Math.abs(discountAmount) <= 0.01 && (
-                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', pl: 1 }}>
-                               <Typography variant="caption" sx={{ color: '#666', fontFamily: 'monospace' }}>
+                             <Box sx={{ 
+                               display: 'flex', 
+                               justifyContent: 'flex-end', 
+                               alignItems: 'center', 
+                               pl: 1,
+                               backgroundColor: '#f5f5f5',
+                               p: 0.5,
+                               borderRadius: 0.5,
+                               border: '1px solid #ccc',
+                               minHeight: '20px'
+                             }}>
+                               <Typography variant="caption" sx={{ 
+                                 color: '#666', 
+                                 fontFamily: 'monospace',
+                                 fontSize: '12px',
+                                 lineHeight: 1.2
+                               }}>
                                  Pas de remise
                                </Typography>
                              </Box>
