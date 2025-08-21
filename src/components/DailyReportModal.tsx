@@ -434,7 +434,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                       
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Typography variant="body2" sx={{ color: '#666' }}>
-                          {transaction.items ? transaction.items.reduce((sum, item) => sum + item.quantity, 0) : 0} articles
+                          {transaction.items ? transaction.items.reduce((sum: number, item: any) => sum + item.quantity, 0) : 0} articles
                         </Typography>
                         <Typography variant="h6" sx={{ 
                           fontWeight: 'bold', 
