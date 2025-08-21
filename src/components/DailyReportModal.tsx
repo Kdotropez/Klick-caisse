@@ -11,10 +11,11 @@ import {
   CardContent,
   Divider
 } from '@mui/material';
-import { Close, TrendingUp, Euro } from '@mui/icons-material';
+import { Close, TrendingUp, Euro, Discount } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { CartItem } from '../types/Product';
 import { APP_VERSION } from '../version';
+import { StorageService } from '../services/StorageService';
 
 interface DailyReportModalProps {
   open: boolean;
@@ -27,6 +28,8 @@ interface DailyStats {
   totalItems: number;
   totalTransactions: number;
   averageTransactionValue: number;
+  totalDiscounts: number;
+  totalOriginalAmount: number;
 }
 
 const DailyReportModal: React.FC<DailyReportModalProps> = ({
@@ -38,29 +41,69 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     totalSales: 0,
     totalItems: 0,
     totalTransactions: 0,
-    averageTransactionValue: 0
+    averageTransactionValue: 0,
+    totalDiscounts: 0,
+    totalOriginalAmount: 0
   });
 
   // Calculer les statistiques quotidiennes
   useEffect(() => {
-    if (cartItems.length > 0) {
+    // Charger les transactions du jour
+    const todayTransactions = StorageService.loadTodayTransactions();
+    
+    if (todayTransactions.length > 0) {
+      let totalSales = 0;
+      let totalItems = 0;
+      let totalOriginalAmount = 0;
+      let totalDiscounts = 0;
+
+      todayTransactions.forEach(transaction => {
+        // Montant final de la transaction
+        totalSales += transaction.total || 0;
+        
+        // Calculer le montant original et les remises
+        if (transaction.items && Array.isArray(transaction.items)) {
+          transaction.items.forEach(item => {
+            const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+            const originalTotal = originalPrice * item.quantity;
+            totalOriginalAmount += originalTotal;
+            totalItems += item.quantity;
+          });
+        }
+      });
+
+      // Calculer les remises totales
+      totalDiscounts = totalOriginalAmount - totalSales;
+      
+      const totalTransactions = todayTransactions.length;
+      const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
+
+      setDailyStats({
+        totalSales,
+        totalItems,
+        totalTransactions,
+        averageTransactionValue,
+        totalDiscounts,
+        totalOriginalAmount
+      });
+    } else {
+      // Si pas de transactions, utiliser le panier actuel
       const totalSales = cartItems.reduce((sum, item) => {
         const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
         return sum + (price * item.quantity);
       }, 0);
 
       const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-      
-      // Pour l'instant, on considère que chaque panier = 1 transaction
-      // Plus tard, on pourra améliorer avec un vrai système de transactions
-      const totalTransactions = 1;
-      const averageTransactionValue = totalSales / totalTransactions;
+      const totalTransactions = cartItems.length > 0 ? 1 : 0;
+      const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
 
       setDailyStats({
         totalSales,
         totalItems,
         totalTransactions,
-        averageTransactionValue
+        averageTransactionValue,
+        totalDiscounts: 0,
+        totalOriginalAmount: totalSales
       });
     }
   }, [cartItems]);
@@ -152,7 +195,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               </Box>
 
               {/* Détails */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
                 <Card sx={{ backgroundColor: '#f5f5f5' }}>
                   <CardContent sx={{ p: 2, textAlign: 'center' }}>
                     <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#666' }}>
@@ -164,6 +207,21 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                       fontFamily: 'monospace'
                     }}>
                       {dailyStats.totalItems}
+                    </Typography>
+                  </CardContent>
+                </Card>
+
+                <Card sx={{ backgroundColor: '#f5f5f5' }}>
+                  <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#666' }}>
+                      Transactions
+                    </Typography>
+                    <Typography variant="h4" sx={{ 
+                      fontWeight: 'bold', 
+                      color: '#ff9800',
+                      fontFamily: 'monospace'
+                    }}>
+                      {dailyStats.totalTransactions}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -184,6 +242,38 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                 </Card>
               </Box>
 
+              {/* Remises appliquées */}
+              {dailyStats.totalDiscounts > 0 && (
+                <Box sx={{ 
+                  p: 2, 
+                  backgroundColor: '#fff3e0', 
+                  borderRadius: 1,
+                  border: '1px solid #ff9800'
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Discount sx={{ color: '#ff9800', fontSize: 20 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+                      Remises Appliquées
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      Total des remises
+                    </Typography>
+                    <Typography variant="h5" sx={{ 
+                      fontWeight: 'bold', 
+                      color: '#f57c00',
+                      fontFamily: 'monospace'
+                    }}>
+                      -{formatPrice(dailyStats.totalDiscounts)}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: '#666', mt: 1 }}>
+                    Montant original : {formatPrice(dailyStats.totalOriginalAmount)} → Final : {formatPrice(dailyStats.totalSales)}
+                  </Typography>
+                </Box>
+              )}
+
               {/* Résumé */}
               <Box sx={{ 
                 p: 2, 
@@ -193,6 +283,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               }}>
                 <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                   📊 Résumé : {dailyStats.totalItems} articles vendus pour un total de {formatPrice(dailyStats.totalSales)}
+                  {dailyStats.totalDiscounts > 0 && ` (remises : -${formatPrice(dailyStats.totalDiscounts)})`}
                 </Typography>
               </Box>
             </Box>
