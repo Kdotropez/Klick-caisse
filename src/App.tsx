@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import WindowManager from './components/WindowManager';
+import LicenseModal from './components/LicenseModal';
 
 import { Product, Category, CartItem, ProductVariation } from './types';
 import { Cashier } from './types/Cashier';
@@ -14,6 +15,8 @@ const App: React.FC = () => {
   const [isLayoutLocked] = useState<boolean>(false);
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
   const [currentCashier, setCurrentCashier] = useState<Cashier | null>(null);
+  const [isLicenseValid, setIsLicenseValid] = useState<boolean>(false);
+  const [showLicenseModal, setShowLicenseModal] = useState<boolean>(true);
 
   const [rootSize, setRootSize] = useState<{ width: string; height: string }>({ width: '1280px', height: '880px' });
   const [currentStoreCode, setCurrentStoreCode] = useState<string>(StorageService.getCurrentStoreCode());
@@ -254,6 +257,12 @@ const App: React.FC = () => {
     height: typeof window !== 'undefined' ? window.innerHeight : 880,
   });
 
+  // Gestion de la licence
+  const handleLicenseValid = () => {
+    setIsLicenseValid(true);
+    setShowLicenseModal(false);
+  };
+
   useEffect(() => {
     const handleResize = () => {
       setViewportSize({ width: window.innerWidth, height: window.innerHeight });
@@ -273,6 +282,16 @@ const App: React.FC = () => {
     : 1;
   const baseScale = compactMode ? 0.9 : 1;
   const finalScale = Math.min(baseScale, fitScale);
+
+  // Si la licence n'est pas valide, afficher seulement la modale de licence
+  if (!isLicenseValid) {
+    return (
+      <LicenseModal 
+        open={showLicenseModal} 
+        onLicenseValid={handleLicenseValid} 
+      />
+    );
+  }
 
   return (
     <Box sx={{
