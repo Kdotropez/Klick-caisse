@@ -499,10 +499,9 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           Fermer
         </Button>
       </DialogActions>
-    </Dialog>
 
-    {/* Modale de détails du ticket */}
-    {showTicketModal && selectedTicket && (
+      {/* Modale de détails du ticket */}
+      {showTicketModal && selectedTicket && (
       <Dialog 
         open={showTicketModal} 
         onClose={() => setShowTicketModal(false)}
@@ -670,7 +669,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    )}
+      )}
+    </Dialog>
   );
 };
 
