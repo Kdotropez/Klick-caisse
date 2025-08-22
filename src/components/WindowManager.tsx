@@ -534,8 +534,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         keyToInfo[key] = { unit, qty: it.quantity || 0 };
       }
       // Cibles de compensation: catégories "seau" et "vasque(s)"
-      // Créer des lignes séparées pour chaque unité de seau/vasque pour permettre les compensations multiples
-      const targetLineInfos: Array<{ key: string; subtotal: number; qty: number }> = [];
+      // Créer des lignes groupées par produit pour permettre les compensations multiples
+      const targetLineInfos: Array<{ key: string; subtotal: number; qty: number; availableSlots: number }> = [];
       let totalTargetQty = 0;
       for (const it of cartItems) {
         const catNorm = normalizeKey(it.product.category || '');
@@ -544,10 +544,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
           const qty = it.quantity || 0;
           
-          // Créer une ligne séparée pour chaque unité
-          for (let i = 0; i < qty; i++) {
-            targetLineInfos.push({ key, subtotal: unit, qty: 1 });
-          }
+          // Créer une ligne avec le nombre de slots disponibles égal à la quantité
+          targetLineInfos.push({ key, subtotal: unit * qty, qty, availableSlots: qty });
           totalTargetQty += qty;
         }
       }
@@ -962,46 +960,57 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Seaux - limiter le nombre de seaux cibles
         const limitedSeauTargets = seauTargets.slice(0, seauComps.length);
         distribute(seauComps, limitedSeauTargets);
-        // Packs -> Seaux (compensation nette) - appliquer sur des seaux différents
+        // Packs -> Seaux (compensation nette) - appliquer sur des seaux avec slots disponibles
         if (packBasedComps.length > 0 && seauTargets.length > 0) {
           console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
           console.log(`[DEBUG] packBasedComps:`, packBasedComps);
-          console.log(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty })));
+          console.log(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty, availableSlots: t.availableSlots })));
           
-          // Limiter le nombre de compensations au nombre de seaux disponibles
-          const maxComps = Math.min(packBasedComps.length, seauTargets.length);
-          const limitedComps = packBasedComps.slice(0, maxComps);
+          let compIndex = 0;
           
-          console.log(`[DEBUG] maxComps: ${maxComps}, limitedComps:`, limitedComps);
-          
-          // Appliquer chaque compensation sur un seau différent
-          for (let i = 0; i < limitedComps.length && i < seauTargets.length; i++) {
-            const seauTarget = seauTargets[i];
-            const compAmount = limitedComps[i];
-            const perUnitEuro = seauTarget.qty > 0 ? (compAmount / seauTarget.qty) : 0;
-            if (perUnitEuro > 0) {
-              // Si plusieurs seaux ont la même clé, additionner les compensations
-              if (next[seauTarget.key] && next[seauTarget.key].type === 'euro') {
-                next[seauTarget.key].value += perUnitEuro;
-                console.log(`[DEBUG] Compensation ajoutée sur seau ${i+1}: +${perUnitEuro.toFixed(2)}€ (total: ${next[seauTarget.key].value.toFixed(2)}€)`);
-              } else {
-                next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
-                console.log(`[DEBUG] Compensation appliquée sur seau ${i+1}: ${perUnitEuro.toFixed(2)}€ par unité`);
+          // Appliquer les compensations en utilisant les slots disponibles
+          for (const seauTarget of seauTargets) {
+            if (compIndex >= packBasedComps.length) break;
+            
+            // Calculer combien de compensations peuvent être appliquées sur ce seau
+            const slotsToUse = Math.min(seauTarget.availableSlots, packBasedComps.length - compIndex);
+            
+            if (slotsToUse > 0) {
+              // Calculer la compensation totale pour ce seau
+              let totalComp = 0;
+              for (let i = 0; i < slotsToUse; i++) {
+                totalComp += packBasedComps[compIndex + i];
               }
+              
+              const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
+              if (perUnitEuro > 0) {
+                next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+                console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+              }
+              
+              compIndex += slotsToUse;
             }
           }
         }
-        // Nouvelles règles vasque (2 packs), (1 pack + 6 verres), (12 verres mélangés) - seulement pour les vasques sans compensation existante
+        // Nouvelles règles vasque (2 packs), (1 pack + 6 verres), (12 verres mélangés) - seulement si les packs ne sont pas déjà utilisés pour les seaux
         const extraVasque = [...vasqueFromPackPairs, ...vasqueFromPackPlusSix, ...vasqueFromMixedTwelve];
         if (extraVasque.length > 0 && vasqueTargets.length > 0) {
-          const availableVasqueTargets = vasqueTargets.filter(t => {
-            const hasExistingDiscount = next[t.key] && next[t.key].type === 'euro';
-            return !hasExistingDiscount;
-          });
-          if (availableVasqueTargets.length > 0) {
-            const limitQty = availableVasqueTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0);
-            const limited = extraVasque.slice(0, limitQty);
-            distribute(limited, availableVasqueTargets, { singleTarget: true });
+          // Vérifier si des compensations pack→seau ont été appliquées
+          const packsUsedForSeaux = packBasedComps.length > 0;
+          
+          if (!packsUsedForSeaux) {
+            // Seulement appliquer les compensations vasque si les packs ne sont pas utilisés pour les seaux
+            const availableVasqueTargets = vasqueTargets.filter(t => {
+              const hasExistingDiscount = next[t.key] && next[t.key].type === 'euro';
+              return !hasExistingDiscount;
+            });
+            if (availableVasqueTargets.length > 0) {
+              const limitQty = availableVasqueTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0);
+              const limited = extraVasque.slice(0, limitQty);
+              distribute(limited, availableVasqueTargets, { singleTarget: true });
+            }
+          } else {
+            console.log(`[DEBUG] Compensations vasque ignorées car ${packBasedComps.length} packs déjà utilisés pour les seaux`);
           }
         }
       }
