@@ -293,8 +293,24 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Réinitialiser les compensations quand le panier change
   useEffect(() => {
-    // Réinitialiser les compensations pour forcer le recalcul
-    setItemDiscounts({});
+    // Ne réinitialiser que les compensations pack→seau/vasque, pas les remises automatiques
+    const currentDiscounts = { ...itemDiscounts };
+    
+    // Supprimer seulement les compensations pack→seau/vasque
+    Object.keys(currentDiscounts).forEach(key => {
+      const item = cartItems.find(item => `${item.product.id}-${item.selectedVariation?.id || 'main'}` === key);
+      if (item) {
+        const isSeau = item.product.category?.toLowerCase().includes('seau');
+        const isVasque = item.product.category?.toLowerCase().includes('vasque');
+        
+        // Si c'est un seau ou une vasque avec une remise, c'est probablement une compensation
+        if ((isSeau || isVasque) && currentDiscounts[key]?.type === 'euro') {
+          delete currentDiscounts[key];
+        }
+      }
+    });
+    
+    setItemDiscounts(currentDiscounts);
     setPendingCompensations(null);
     setShowCompensationChoiceModal(false);
   }, [cartItems]);
