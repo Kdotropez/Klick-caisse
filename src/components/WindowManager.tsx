@@ -1100,26 +1100,35 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           
           console.log(`[DEBUG] Vérification choix: packBasedComps=${packBasedComps.length}, seauTargets=${seauTargets.length}, hasVasqueTargets=${hasVasqueTargets}`);
           
-          // Si il y a des choix possibles (seaux ET vasques), demander à l'utilisateur
-          if (seauTargets.length > 0 && hasVasqueTargets) {
-            console.log(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux, 1 vasque`);
+          // Vérifier s'il y a vraiment des choix multiples
+          const totalSeauSlots = seauTargets.reduce((sum, target) => sum + target.availableSlots, 0);
+          const totalVasqueSlots = hasVasqueTargets ? vasqueTargets[0].availableSlots : 0;
+          const totalAvailableSlots = totalSeauSlots + totalVasqueSlots;
+          
+          // La modale ne s'affiche que s'il y a des choix multiples ET des slots disponibles
+          if (seauTargets.length > 0 && hasVasqueTargets && packBasedComps.length > 0 && totalAvailableSlots > 0) {
+            console.log(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux (${totalSeauSlots} slots), 1 vasque (${totalVasqueSlots} slots)`);
             
             // Préparer les choix disponibles
             const choices: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string, selected: boolean}> = [];
             
             // Générer toutes les combinaisons possibles
             for (let i = 0; i < packBasedComps.length; i++) {
-              // Option 1: Pack vers seau
-              for (const seauTarget of seauTargets) {
-                choices.push({
-                  packId: `pack-${i}`,
-                  targetType: 'seau',
-                  targetId: seauTarget.key,
-                  selected: false
-                });
+              // Option 1: Pack vers seau (seulement si des slots seau sont disponibles)
+              if (totalSeauSlots > 0) {
+                for (const seauTarget of seauTargets) {
+                  if (seauTarget.availableSlots > 0) {
+                    choices.push({
+                      packId: `pack-${i}`,
+                      targetType: 'seau',
+                      targetId: seauTarget.key,
+                      selected: false
+                    });
+                  }
+                }
               }
-              // Option 2: Pack vers vasque
-              if (hasVasqueTargets) {
+              // Option 2: Pack vers vasque (seulement si des slots vasque sont disponibles)
+              if (totalVasqueSlots > 0) {
                 choices.push({
                   packId: `pack-${i}`,
                   targetType: 'vasque',
@@ -1129,33 +1138,36 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               }
             }
             
-            setCompensationChoices({ packComps: choices });
-            setPendingCompensations({ packBasedComps, seauTargets, vasqueTargets });
-            setShowCompensationChoiceModal(true);
-            
-            // Pour l'instant, appliquer automatiquement sur les seaux (comportement par défaut)
-            let compIndex = 0;
-            for (const seauTarget of seauTargets) {
-              if (compIndex >= packBasedComps.length) break;
-              
-              const slotsToUse = Math.min(seauTarget.availableSlots, packBasedComps.length - compIndex);
-              
-              if (slotsToUse > 0) {
-                let totalComp = 0;
-                for (let i = 0; i < slotsToUse; i++) {
-                  totalComp += packBasedComps[compIndex + i];
-                }
+            // Ne montrer la modale que s'il y a vraiment des choix multiples (plus d'options que de packs)
+            if (choices.length > packBasedComps.length) {
+              setCompensationChoices({ packComps: choices });
+              setPendingCompensations({ packBasedComps, seauTargets, vasqueTargets });
+              setShowCompensationChoiceModal(true);
+            } else {
+              console.log(`[DEBUG] Pas de choix multiples - appliquer automatiquement sur seaux`);
+              // Appliquer automatiquement sur les seaux
+              let compIndex = 0;
+              for (const seauTarget of seauTargets) {
+                if (compIndex >= packBasedComps.length) break;
                 
-                const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
-                if (perUnitEuro > 0) {
-                  next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
-                  console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
-                }
+                const slotsToUse = Math.min(seauTarget.availableSlots, packBasedComps.length - compIndex);
                 
-                compIndex += slotsToUse;
-              }
-            }
-          } else {
+                if (slotsToUse > 0) {
+                  let totalComp = 0;
+                  for (let i = 0; i < slotsToUse; i++) {
+                    totalComp += packBasedComps[compIndex + i];
+                  }
+                  
+                  const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
+                  if (perUnitEuro > 0) {
+                    next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+                    console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+                  }
+                  
+                  compIndex += slotsToUse;
+                }
+                           }
+           } else {
             // Pas de choix nécessaire, appliquer automatiquement
             console.log(`[DEBUG] Pas de choix nécessaire - appliquer automatiquement`);
             console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
