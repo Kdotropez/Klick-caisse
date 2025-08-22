@@ -212,10 +212,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Réinitialiser les compensations
     const next = { ...itemDiscounts };
     
+    // Créer un mapping des packs utilisés
+    const packUsage = new Map<number, boolean>();
+    
     // Appliquer les compensations selon les choix
-    selectedChoices.forEach((choice, index) => {
-      if (index < packBasedComps.length) {
-        const compAmount = packBasedComps[index];
+    selectedChoices.forEach((choice) => {
+      // Extraire l'index du pack depuis packId (format: "pack-0", "pack-1", etc.)
+      const packIndex = parseInt(choice.packId.replace('pack-', ''));
+      
+      if (packIndex >= 0 && packIndex < packBasedComps.length && !packUsage.get(packIndex)) {
+        const compAmount = packBasedComps[packIndex];
+        packUsage.set(packIndex, true); // Marquer ce pack comme utilisé
         
         if (choice.targetType === 'seau') {
           const target = seauTargets.find(t => t.key === choice.targetId);
@@ -223,7 +230,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
             if (perUnitEuro > 0) {
               next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
             }
           }
         } else if (choice.targetType === 'vasque') {
@@ -232,7 +239,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
             if (perUnitEuro > 0) {
               next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
             }
           }
         }
@@ -3678,10 +3685,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
              </Typography>
              
              {compensationChoices.packComps.map((choice, index) => {
-               const pack = cartItems.find(item => 
+               // Extraire l'index du pack
+               const packIndex = parseInt(choice.packId.replace('pack-', ''));
+               
+               // Trouver le pack correspondant
+               const packItems = cartItems.filter(item => 
                  item.product.category?.toLowerCase().includes('pack') && 
                  item.product.category?.toLowerCase().includes('verre')
                );
+               const pack = packItems[packIndex];
+               
+               // Trouver la cible
                const target = choice.targetType === 'seau' 
                  ? cartItems.find(item => item.product.category?.toLowerCase().includes('seau'))
                  : cartItems.find(item => item.product.category?.toLowerCase().includes('vasque'));
@@ -3728,7 +3742,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      </Box>
                      <Box>
                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                         Pack {Math.floor(index / (pendingCompensations?.seauTargets.length || 1)) + 1} → {choice.targetType === 'seau' ? 'Seau' : 'Vasque'}
+                         Pack {packIndex + 1} → {choice.targetType === 'seau' ? 'Seau' : 'Vasque'}
                        </Typography>
                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                          {pack?.product.name} → {target?.product.name}
