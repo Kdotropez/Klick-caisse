@@ -919,18 +919,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           }
         }
 
-        // Réappliquer les compensations verrouillées existantes
-        for (const [key, amount] of Object.entries(lockedCompensations.seau)) {
-          const target = targetLineInfos.find(t => t.key === key);
-          if (target && target.qty > 0) {
-            next[key] = { type: 'euro', value: amount / target.qty };
-          }
+        // Supprimer toutes les compensations verrouillées si les conditions ne sont plus remplies
+        const hasValidSeauConditions = seauComps.length > 0 || packBasedComps.length > 0;
+        const hasValidVasqueConditions = vasqueComps.length > 0 || vasqueFromPackPairs.length > 0 || vasqueFromPackPlusSix.length > 0 || vasqueFromMixedTwelve.length > 0;
+        
+        if (!hasValidSeauConditions && Object.keys(lockedCompensations.seau).length > 0) {
+          setLockedCompensations(prev => ({ ...prev, seau: {} }));
         }
-        for (const [key, amount] of Object.entries(lockedCompensations.vasque)) {
-          const target = targetLineInfos.find(t => t.key === key);
-          if (target && target.qty > 0) {
-            next[key] = { type: 'euro', value: amount / target.qty };
-          }
+        if (!hasValidVasqueConditions && Object.keys(lockedCompensations.vasque).length > 0) {
+          setLockedCompensations(prev => ({ ...prev, vasque: {} }));
         }
 
         const distribute = (amounts: number[], targets: Array<{key:string; subtotal:number; qty:number}>, options?: {singleTarget?: boolean}, compensationType?: 'seau' | 'vasque') => {
