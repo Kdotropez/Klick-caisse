@@ -1069,6 +1069,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const hasVasqueTargets = vasqueTargets.length > 0;
           const totalTargets = seauTargets.length + (hasVasqueTargets ? 1 : 0);
           
+          console.log(`[DEBUG] Vérification choix: packBasedComps=${packBasedComps.length}, seauTargets=${seauTargets.length}, hasVasqueTargets=${hasVasqueTargets}`);
+          
           // Si il y a des choix possibles (seaux ET vasques), demander à l'utilisateur
           if (seauTargets.length > 0 && hasVasqueTargets) {
             console.log(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux, 1 vasque`);
@@ -1126,6 +1128,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             }
           } else {
             // Pas de choix nécessaire, appliquer automatiquement
+            console.log(`[DEBUG] Pas de choix nécessaire - appliquer automatiquement`);
             console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
             console.log(`[DEBUG] packBasedComps:`, packBasedComps);
             console.log(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty, availableSlots: t.availableSlots })));
