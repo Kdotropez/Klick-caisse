@@ -7,7 +7,7 @@ import { StorageService } from '../services/StorageService';
 import { APP_VERSION } from '../version';
 
 // Import de la nouvelle base de données
-import newBaseData from '../components/base complete 15 aout.nested.json';
+import newBaseData from '../../base complete 15 aout.nested.json';
 
 // Debug: vérifier les données source
 console.log('🔍 Debug des données source:');
