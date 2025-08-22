@@ -534,6 +534,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         keyToInfo[key] = { unit, qty: it.quantity || 0 };
       }
       // Cibles de compensation: catégories "seau" et "vasque(s)"
+      // Créer des lignes séparées pour chaque unité de seau/vasque pour permettre les compensations multiples
       const targetLineInfos: Array<{ key: string; subtotal: number; qty: number }> = [];
       let totalTargetQty = 0;
       for (const it of cartItems) {
@@ -542,7 +543,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const key = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
           const unit = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
           const qty = it.quantity || 0;
-          targetLineInfos.push({ key, subtotal: unit * qty, qty });
+          
+          // Créer une ligne séparée pour chaque unité
+          for (let i = 0; i < qty; i++) {
+            targetLineInfos.push({ key, subtotal: unit, qty: 1 });
+          }
           totalTargetQty += qty;
         }
       }
@@ -975,8 +980,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const compAmount = limitedComps[i];
             const perUnitEuro = seauTarget.qty > 0 ? (compAmount / seauTarget.qty) : 0;
             if (perUnitEuro > 0) {
-              next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur seau ${i+1}: ${perUnitEuro.toFixed(2)}€ par unité`);
+              // Si plusieurs seaux ont la même clé, additionner les compensations
+              if (next[seauTarget.key] && next[seauTarget.key].type === 'euro') {
+                next[seauTarget.key].value += perUnitEuro;
+                console.log(`[DEBUG] Compensation ajoutée sur seau ${i+1}: +${perUnitEuro.toFixed(2)}€ (total: ${next[seauTarget.key].value.toFixed(2)}€)`);
+              } else {
+                next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+                console.log(`[DEBUG] Compensation appliquée sur seau ${i+1}: ${perUnitEuro.toFixed(2)}€ par unité`);
+              }
             }
           }
         }
