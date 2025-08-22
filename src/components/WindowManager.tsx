@@ -189,6 +189,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       return { seau: newSeau, vasque: newVasque };
     });
     
+    // Réinitialiser toutes les compensations pour forcer le recalcul
+    setItemDiscounts({});
+    setPendingCompensations(null);
+    setShowCompensationChoiceModal(false);
+    
     // Supprimer l'article
     onRemoveItem(productId, variationId);
   };
@@ -285,6 +290,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setShowCompensationChoiceModal(false);
     setPendingCompensations(null);
   };
+
+  // Réinitialiser les compensations quand le panier change
+  useEffect(() => {
+    // Réinitialiser les compensations pour forcer le recalcul
+    setItemDiscounts({});
+    setPendingCompensations(null);
+    setShowCompensationChoiceModal(false);
+  }, [cartItems]);
 
   // Initialiser automatiquement les barèmes PACK → Seau si absents
   useEffect(() => {
