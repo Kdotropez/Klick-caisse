@@ -864,13 +864,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Cette compensation s'applique même si aucune remise verres (percent) n'a été appliquée sur des lignes "verre"
         const packBasedComps: number[] = [];
         console.log(`[DEBUG] Recherche de packs dans ${cartItems.length} articles, ${seauTargets.length} seaux disponibles`);
+        console.log(`[DEBUG] Tous les articles:`, cartItems.map(it => ({
+          name: it.product.name,
+          category: it.product.category,
+          normalized: normalizeKey(it.product.category || '')
+        })));
         
         if (seauTargets.length > 0) {
           for (const it of cartItems) {
             const catNorm = normalizeKey(it.product.category || '');
             console.log(`[DEBUG] Article: ${it.product.name}, Catégorie: ${it.product.category}, Normalisée: ${catNorm}`);
             if (!(catNorm.includes('pack') && catNorm.includes('verre'))) {
-              console.log(`[DEBUG] Ignoré: pas un pack verre`);
+              console.log(`[DEBUG] Ignoré: pas un pack verre (${catNorm} ne contient pas 'pack' ET 'verre')`);
               continue;
             }
 
