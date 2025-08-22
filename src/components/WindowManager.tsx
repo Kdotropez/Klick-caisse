@@ -1203,8 +1203,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   
                   compIndex += slotsToUse;
                 }
-                           }
-           } else {
+              }
+            }
+          } else {
             // Pas de choix nécessaire, appliquer automatiquement
             console.log(`[DEBUG] Pas de choix nécessaire - appliquer automatiquement`);
             console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
