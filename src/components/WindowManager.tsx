@@ -165,6 +165,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     vasque: Record<string, number>; // key -> montant compensé
   }>({ seau: {}, vasque: {} });
 
+  // État pour le choix des compensations
+  const [showCompensationChoiceModal, setShowCompensationChoiceModal] = useState(false);
+  const [compensationChoices, setCompensationChoices] = useState<{
+    packComps: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string}>
+  }>({ packComps: [] });
+
   // Fonction wrapper pour onRemoveItem qui gère aussi les compensations verrouillées
   const handleRemoveItem = (productId: string, variationId: string | null) => {
     const key = `${productId}-${variationId || 'main'}`;
@@ -960,35 +966,93 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Seaux - limiter le nombre de seaux cibles
         const limitedSeauTargets = seauTargets.slice(0, seauComps.length);
         distribute(seauComps, limitedSeauTargets);
-        // Packs -> Seaux (compensation nette) - appliquer sur des seaux avec slots disponibles
-        if (packBasedComps.length > 0 && seauTargets.length > 0) {
-          console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
-          console.log(`[DEBUG] packBasedComps:`, packBasedComps);
-          console.log(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty, availableSlots: t.availableSlots })));
+        // Packs -> Seaux/Vasques (compensation nette) - avec choix utilisateur si nécessaire
+        if (packBasedComps.length > 0) {
+          const hasVasqueTargets = vasqueTargets.length > 0;
+          const totalTargets = seauTargets.length + (hasVasqueTargets ? 1 : 0);
           
-          let compIndex = 0;
-          
-          // Appliquer les compensations en utilisant les slots disponibles
-          for (const seauTarget of seauTargets) {
-            if (compIndex >= packBasedComps.length) break;
+          // Si il y a des choix possibles (seaux ET vasques), demander à l'utilisateur
+          if (seauTargets.length > 0 && hasVasqueTargets && packBasedComps.length > 1) {
+            console.log(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux, 1 vasque`);
             
-            // Calculer combien de compensations peuvent être appliquées sur ce seau
-            const slotsToUse = Math.min(seauTarget.availableSlots, packBasedComps.length - compIndex);
+            // Préparer les choix disponibles
+            const choices: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string}> = [];
             
-            if (slotsToUse > 0) {
-              // Calculer la compensation totale pour ce seau
-              let totalComp = 0;
-              for (let i = 0; i < slotsToUse; i++) {
-                totalComp += packBasedComps[compIndex + i];
+            // Générer toutes les combinaisons possibles
+            for (let i = 0; i < packBasedComps.length; i++) {
+              // Option 1: Pack vers seau
+              for (const seauTarget of seauTargets) {
+                choices.push({
+                  packId: `pack-${i}`,
+                  targetType: 'seau',
+                  targetId: seauTarget.key
+                });
               }
-              
-              const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
-              if (perUnitEuro > 0) {
-                next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
-                console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+              // Option 2: Pack vers vasque
+              if (hasVasqueTargets) {
+                choices.push({
+                  packId: `pack-${i}`,
+                  targetType: 'vasque',
+                  targetId: vasqueTargets[0].key
+                });
               }
+            }
+            
+            setCompensationChoices({ packComps: choices });
+            setShowCompensationChoiceModal(true);
+            
+            // Pour l'instant, appliquer automatiquement sur les seaux (comportement par défaut)
+            let compIndex = 0;
+            for (const seauTarget of seauTargets) {
+              if (compIndex >= packBasedComps.length) break;
               
-              compIndex += slotsToUse;
+              const slotsToUse = Math.min(seauTarget.availableSlots, packBasedComps.length - compIndex);
+              
+              if (slotsToUse > 0) {
+                let totalComp = 0;
+                for (let i = 0; i < slotsToUse; i++) {
+                  totalComp += packBasedComps[compIndex + i];
+                }
+                
+                const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
+                if (perUnitEuro > 0) {
+                  next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+                  console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+                }
+                
+                compIndex += slotsToUse;
+              }
+            }
+          } else {
+            // Pas de choix nécessaire, appliquer automatiquement
+            console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
+            console.log(`[DEBUG] packBasedComps:`, packBasedComps);
+            console.log(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty, availableSlots: t.availableSlots })));
+            
+            let compIndex = 0;
+            
+            // Appliquer les compensations en utilisant les slots disponibles
+            for (const seauTarget of seauTargets) {
+              if (compIndex >= packBasedComps.length) break;
+              
+              // Calculer combien de compensations peuvent être appliquées sur ce seau
+              const slotsToUse = Math.min(seauTarget.availableSlots, packBasedComps.length - compIndex);
+              
+              if (slotsToUse > 0) {
+                // Calculer la compensation totale pour ce seau
+                let totalComp = 0;
+                for (let i = 0; i < slotsToUse; i++) {
+                  totalComp += packBasedComps[compIndex + i];
+                }
+                
+                const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
+                if (perUnitEuro > 0) {
+                  next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+                  console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+                }
+                
+                compIndex += slotsToUse;
+              }
             }
           }
         }
@@ -3497,6 +3561,62 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          products={products}
          onUpdateSubcategories={handleUpdateSubcategories}
        />
+
+       {/* Modale de choix des compensations */}
+       <Dialog
+         open={showCompensationChoiceModal}
+         onClose={() => setShowCompensationChoiceModal(false)}
+         maxWidth="md"
+         fullWidth
+       >
+         <DialogTitle>
+           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+             Choix des Compensations
+           </Typography>
+           <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+             Choisissez où appliquer les compensations pack→seau/vasque
+           </Typography>
+         </DialogTitle>
+         <DialogContent>
+           <Box sx={{ mt: 2 }}>
+             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
+               Options disponibles :
+             </Typography>
+             
+             {compensationChoices.packComps.map((choice, index) => {
+               const pack = cartItems.find(item => 
+                 item.product.category?.toLowerCase().includes('pack') && 
+                 item.product.category?.toLowerCase().includes('verre')
+               );
+               const target = choice.targetType === 'seau' 
+                 ? cartItems.find(item => item.product.category?.toLowerCase().includes('seau'))
+                 : cartItems.find(item => item.product.category?.toLowerCase().includes('vasque'));
+               
+               return (
+                 <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                     Pack {index + 1} → {choice.targetType === 'seau' ? 'Seau' : 'Vasque'}
+                   </Typography>
+                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                     {pack?.product.name} → {target?.product.name}
+                   </Typography>
+                 </Box>
+               );
+             })}
+           </Box>
+         </DialogContent>
+         <DialogActions>
+           <Button onClick={() => setShowCompensationChoiceModal(false)}>
+             Appliquer automatiquement
+           </Button>
+           <Button 
+             variant="contained" 
+             onClick={() => setShowCompensationChoiceModal(false)}
+           >
+             Confirmer les choix
+           </Button>
+         </DialogActions>
+       </Dialog>
 
        {/* Notification permanente du mode édition */}
        {showEditModeNotification && (
