@@ -245,33 +245,52 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
       });
     } else {
-      // Plusieurs packs - appliquer selon les choix
-      selectedChoices.forEach((choice) => {
+      // Plusieurs packs - appliquer selon les choix, mais un pack ne peut être utilisé qu'une fois
+      console.log(`[DEBUG] ${packBasedComps.length} packs détectés - application avec règles strictes`);
+      
+      // Créer un mapping des packs par type de cible
+      const packSeauUsage = new Map<number, boolean>();
+      const packVasqueUsage = new Map<number, boolean>();
+      
+      // Appliquer d'abord les choix seau
+      selectedSeauChoices.forEach((choice) => {
+        const packIndex = parseInt(choice.packId.replace('pack-', ''));
+        
+        if (packIndex >= 0 && packIndex < packBasedComps.length && !packSeauUsage.get(packIndex)) {
+          const compAmount = packBasedComps[packIndex];
+          packSeauUsage.set(packIndex, true);
+          packUsage.set(packIndex, true); // Marquer comme utilisé globalement
+          
+          const target = seauTargets.find(t => t.key === choice.targetId);
+          if (target) {
+            const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
+            if (perUnitEuro > 0) {
+              next[choice.targetId] = { type: 'euro', value: perUnitEuro };
+              console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+            }
+          }
+        }
+      });
+      
+      // Appliquer ensuite les choix vasque (seulement pour les packs non utilisés)
+      selectedVasqueChoices.forEach((choice) => {
         const packIndex = parseInt(choice.packId.replace('pack-', ''));
         
         if (packIndex >= 0 && packIndex < packBasedComps.length && !packUsage.get(packIndex)) {
           const compAmount = packBasedComps[packIndex];
+          packVasqueUsage.set(packIndex, true);
           packUsage.set(packIndex, true);
           
-          if (choice.targetType === 'seau') {
-            const target = seauTargets.find(t => t.key === choice.targetId);
-            if (target) {
-              const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
-              if (perUnitEuro > 0) {
-                next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-                console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
-              }
-            }
-          } else if (choice.targetType === 'vasque') {
-            const target = vasqueTargets.find(t => t.key === choice.targetId);
-            if (target) {
-              const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
-              if (perUnitEuro > 0) {
-                next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-                console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
-              }
+          const target = vasqueTargets.find(t => t.key === choice.targetId);
+          if (target) {
+            const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
+            if (perUnitEuro > 0) {
+              next[choice.targetId] = { type: 'euro', value: perUnitEuro };
+              console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
             }
           }
+        } else if (packUsage.get(packIndex)) {
+          console.log(`[DEBUG] Pack ${packIndex + 1} déjà utilisé, ignoré pour vasque`);
         }
       });
     }
@@ -3787,6 +3806,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
            </Typography>
            <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
              Choisissez si les compensations s'appliquent sur les seaux ou la vasque
+           </Typography>
+           <Typography variant="body2" sx={{ mt: 1, color: 'warning.main', fontWeight: 'bold' }}>
+             ⚠️ Chaque pack ne peut être utilisé qu'une seule fois
            </Typography>
          </DialogTitle>
          <DialogContent>
