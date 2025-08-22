@@ -105,11 +105,23 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
         }
       } catch {}
 
-      // Synchroniser automatiquement les sous-catégories
-      StorageService.syncSubcategoriesFromProducts();
-
-      console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories)`);
-      return { products: savedProducts, categories: savedCategories };
+      // Vérifier si les sous-catégories sont présentes
+      const subcats = StorageService.loadSubcategories();
+      if (subcats.length === 0) {
+        console.log('⚠️ Aucune sous-catégorie trouvée, rechargement depuis les données intégrées...');
+        // Forcer le rechargement depuis les données intégrées
+        StorageService.saveProducts(products);
+        StorageService.saveCategories(categories);
+        const extracted = extractSubcategoriesFromProducts(products);
+        StorageService.saveSubcategories(extracted);
+        console.log(`✅ Données intégrées restaurées (${products.length} produits, ${categories.length} catégories, ${extracted.length} sous-catégories)`);
+        return { products, categories };
+      } else {
+        // Synchroniser automatiquement les sous-catégories
+        StorageService.syncSubcategoriesFromProducts();
+        console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories, ${subcats.length} sous-catégories)`);
+        return { products: savedProducts, categories: savedCategories };
+      }
     }
     
     // 2) Sinon, utiliser les nouvelles données par défaut (intégrées)
@@ -145,20 +157,6 @@ export const saveProductionData = async (
 export const resetToEmbeddedBase = (): void => {
   try {
     console.log('🔄 Début de la réinitialisation vers la base intégrée...');
-    
-    // Debug: vérifier les produits intégrés
-    console.log('🔍 Debug des produits intégrés:');
-    console.log(`   - Nombre de produits: ${products.length}`);
-    const withAssociatedCats = products.filter(p => p.associatedCategories && p.associatedCategories.length > 0);
-    console.log(`   - Produits avec associatedCategories: ${withAssociatedCats.length}`);
-    
-    if (withAssociatedCats.length > 0) {
-      console.log('   - Exemples de associatedCategories:');
-      const uniqueCats = [...new Set(withAssociatedCats.flatMap(p => p.associatedCategories))];
-      uniqueCats.slice(0, 5).forEach(cat => {
-        console.log(`     * "${cat}"`);
-      });
-    }
     
     // Forcer la sauvegarde des produits intégrés
     StorageService.saveProducts(products);
