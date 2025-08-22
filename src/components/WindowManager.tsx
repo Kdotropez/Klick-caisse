@@ -220,36 +220,61 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Créer un mapping des packs utilisés
     const packUsage = new Map<number, boolean>();
     
-    // Appliquer les compensations selon les choix
-    selectedChoices.forEach((choice) => {
-      // Extraire l'index du pack depuis packId (format: "pack-0", "pack-1", etc.)
-      const packIndex = parseInt(choice.packId.replace('pack-', ''));
-      
-      if (packIndex >= 0 && packIndex < packBasedComps.length && !packUsage.get(packIndex)) {
-        const compAmount = packBasedComps[packIndex];
-        packUsage.set(packIndex, true); // Marquer ce pack comme utilisé
-        
-        if (choice.targetType === 'seau') {
+    // Vérifier les règles métier avant d'appliquer
+    const selectedSeauChoices = selectedChoices.filter(choice => choice.targetType === 'seau');
+    const selectedVasqueChoices = selectedChoices.filter(choice => choice.targetType === 'vasque');
+    
+    // Règle : 1 pack = compensation seau uniquement
+    if (packBasedComps.length === 1) {
+      console.log(`[DEBUG] 1 pack détecté - compensation seau uniquement`);
+      // Ignorer les choix vasque et appliquer seulement sur seau
+      selectedSeauChoices.forEach((choice) => {
+        const packIndex = parseInt(choice.packId.replace('pack-', ''));
+        if (packIndex >= 0 && packIndex < packBasedComps.length && !packUsage.get(packIndex)) {
+          const compAmount = packBasedComps[packIndex];
+          packUsage.set(packIndex, true);
+          
           const target = seauTargets.find(t => t.key === choice.targetId);
           if (target) {
             const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
             if (perUnitEuro > 0) {
               next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
-            }
-          }
-        } else if (choice.targetType === 'vasque') {
-          const target = vasqueTargets.find(t => t.key === choice.targetId);
-          if (target) {
-            const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
-            if (perUnitEuro > 0) {
-              next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              console.log(`[DEBUG] Compensation appliquée sur seau (1 pack): ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
             }
           }
         }
-      }
-    });
+      });
+    } else {
+      // Plusieurs packs - appliquer selon les choix
+      selectedChoices.forEach((choice) => {
+        const packIndex = parseInt(choice.packId.replace('pack-', ''));
+        
+        if (packIndex >= 0 && packIndex < packBasedComps.length && !packUsage.get(packIndex)) {
+          const compAmount = packBasedComps[packIndex];
+          packUsage.set(packIndex, true);
+          
+          if (choice.targetType === 'seau') {
+            const target = seauTargets.find(t => t.key === choice.targetId);
+            if (target) {
+              const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
+              if (perUnitEuro > 0) {
+                next[choice.targetId] = { type: 'euro', value: perUnitEuro };
+                console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              }
+            }
+          } else if (choice.targetType === 'vasque') {
+            const target = vasqueTargets.find(t => t.key === choice.targetId);
+            if (target) {
+              const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
+              if (perUnitEuro > 0) {
+                next[choice.targetId] = { type: 'euro', value: perUnitEuro };
+                console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              }
+            }
+          }
+        }
+      });
+    }
     
     setItemDiscounts(next);
     setShowCompensationChoiceModal(false);
@@ -1175,8 +1200,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               }
             }
             
-            // Ne montrer la modale que s'il y a vraiment des choix multiples (plus d'options que de packs)
-            if (choices.length > packBasedComps.length) {
+            // Ne montrer la modale que s'il y a vraiment des choix multiples
+            // Il faut avoir au moins 2 packs ET des slots disponibles sur seaux ET vasques
+            const hasMultiplePacks = packBasedComps.length > 1;
+            const hasSeauAndVasqueSlots = totalSeauSlots > 0 && totalVasqueSlots > 0;
+            
+            if (hasMultiplePacks && hasSeauAndVasqueSlots) {
               setCompensationChoices({ packComps: choices });
               setPendingCompensations({ packBasedComps, seauTargets, vasqueTargets });
               setShowCompensationChoiceModal(true);
