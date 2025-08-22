@@ -218,6 +218,34 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           height: '100%',
           fontSize: getScaledFontSize('0.5rem'),
           fontWeight: 'bold',
+          backgroundColor: '#4caf50',
+          '&:hover': { backgroundColor: '#388e3c' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            StorageService.syncSubcategoriesFromProducts();
+            const subcats = StorageService.loadSubcategories();
+            alert(`Synchronisation réussie ! ${subcats.length} sous-catégories disponibles.`);
+          } catch (e) { 
+            alert('Erreur lors de la synchronisation des sous-catégories'); 
+          }
+        }}
+      >
+        Sync Sous-catégories
+      </Button>
+
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
           backgroundColor: '#673ab7',
           '&:hover': { backgroundColor: '#5e35b1' },
           boxSizing: 'border-box',

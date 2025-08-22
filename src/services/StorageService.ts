@@ -167,10 +167,16 @@ export class StorageService {
       const data = localStorage.getItem(this.SUBCATEGORIES_KEY);
       const parsed: unknown = data ? JSON.parse(data) : [];
       const fromStorage = Array.isArray(parsed) ? (parsed as string[]) : [];
-      // Fusionner avec le registre par défaut (restauré)
+      
+      // Synchroniser automatiquement avec les produits chargés
+      const products = this.loadProducts();
+      const productSubcategories = this.extractSubcategoriesFromProducts(products);
+      
+      // Fusionner avec le registre par défaut et les sous-catégories des produits
       const merged = Array.from(new Set([
         ...defaultSubcategoriesRegistry,
-        ...fromStorage
+        ...fromStorage,
+        ...productSubcategories
       ]
         .map((s: string) => this.sanitizeLabel(s))
         .map((s: string) => s.trim())
@@ -181,10 +187,62 @@ export class StorageService {
           return alnum.length >= 2;
         })
       )).sort();
+      
+      // Sauvegarder automatiquement les sous-catégories synchronisées
+      if (productSubcategories.length > 0) {
+        this.saveSubcategories(merged);
+      }
+      
       return merged;
     } catch (error) {
       console.error('Erreur lors du chargement des sous-catégories:', error);
       return [];
+    }
+  }
+
+  // Extraire les sous-catégories des produits
+  static extractSubcategoriesFromProducts(products: Product[]): string[] {
+    try {
+      const subcategories = new Set<string>();
+      
+      products.forEach(product => {
+        if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
+          product.associatedCategories.forEach(category => {
+            if (category && typeof category === 'string') {
+              const clean = this.sanitizeLabel(category).trim();
+              if (clean) {
+                subcategories.add(clean);
+              }
+            }
+          });
+        }
+      });
+      
+      return Array.from(subcategories);
+    } catch (error) {
+      console.error('Erreur lors de l\'extraction des sous-catégories:', error);
+      return [];
+    }
+  }
+
+  // Synchroniser automatiquement les sous-catégories
+  static syncSubcategoriesFromProducts(): void {
+    try {
+      const products = this.loadProducts();
+      const productSubcategories = this.extractSubcategoriesFromProducts(products);
+      
+      if (productSubcategories.length > 0) {
+        const currentSubcategories = this.loadSubcategories();
+        const merged = Array.from(new Set([
+          ...currentSubcategories,
+          ...productSubcategories
+        ])).sort();
+        
+        this.saveSubcategories(merged);
+        console.log(`Synchronisation automatique: ${productSubcategories.length} nouvelles sous-catégories détectées`);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la synchronisation des sous-catégories:', error);
     }
   }
 

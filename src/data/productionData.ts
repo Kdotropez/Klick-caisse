@@ -98,20 +98,15 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
 
         if (changed) {
           StorageService.saveProducts(migratedProducts);
-          // Mettre à jour le registre des sous-catégories à partir des produits migrés
-          try { StorageService.saveSubcategories(extractSubcategoriesFromProducts(migratedProducts)); } catch {}
+          // Synchroniser automatiquement les sous-catégories
+          StorageService.syncSubcategoriesFromProducts();
           console.log(`🛠 Migration appliquée: sous-catégories restaurées pour ${migratedProducts.length} produits`);
           return { products: migratedProducts, categories: savedCategories };
         }
       } catch {}
 
-      // Si aucune migration, s'assurer que le registre des sous-catégories est peuplé
-      try {
-        const existing = StorageService.loadSubcategories();
-        if (!existing || existing.length === 0) {
-          StorageService.saveSubcategories(extractSubcategoriesFromProducts(savedProducts));
-        }
-      } catch {}
+      // Synchroniser automatiquement les sous-catégories
+      StorageService.syncSubcategoriesFromProducts();
 
       console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories)`);
       return { products: savedProducts, categories: savedCategories };
@@ -122,8 +117,8 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
     // Sauvegarder automatiquement les nouvelles données par défaut
     StorageService.saveProducts(products);
     StorageService.saveCategories(categories);
-    // Initialiser le registre des sous-catégories à partir de la base intégrée
-    try { StorageService.saveSubcategories(extractSubcategoriesFromProducts(products)); } catch {}
+    // Synchroniser automatiquement les sous-catégories
+    StorageService.syncSubcategoriesFromProducts();
     
     return { products, categories };
   } catch (error) {
@@ -151,7 +146,7 @@ export const resetToEmbeddedBase = (): void => {
   try {
     StorageService.saveProducts(products);
     StorageService.saveCategories(categories);
-    try { StorageService.saveSubcategories(extractSubcategoriesFromProducts(products)); } catch {}
+    StorageService.syncSubcategoriesFromProducts();
     console.log('🔁 Base intégrée restaurée (produits, catégories, sous-catégories)');
   } catch (e) {
     console.error('Erreur resetToEmbeddedBase:', e);
