@@ -124,9 +124,9 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
     StorageService.saveSubcategories(extracted);
     console.log(`✅ Données intégrées restaurées (${products.length} produits, ${categories.length} catégories, ${extracted.length} sous-catégories)`);
     return { products, categories };
-    }
-    
-    // 2) Sinon, utiliser les nouvelles données par défaut (intégrées)
+  }
+  
+  // 2) Sinon, utiliser les nouvelles données par défaut (intégrées)
     console.log(`Chargement des données par défaut (${products.length} produits, ${categories.length} catégories)`);
     // Sauvegarder automatiquement les nouvelles données par défaut
     StorageService.saveProducts(products);
