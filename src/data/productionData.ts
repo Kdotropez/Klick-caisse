@@ -9,17 +9,7 @@ import { APP_VERSION } from '../version';
 // Import de la nouvelle base de données
 import newBaseData from '../base complete 15 aout.nested.json';
 
-// Debug: vérifier les données source
-console.log('🔍 Debug des données source:');
-console.log(`   - Nombre d'éléments dans newBaseData: ${newBaseData.length}`);
-const withSubcats = newBaseData.filter((item: any) => item.sousCategorie && item.sousCategorie.trim());
-console.log(`   - Éléments avec sousCategorie: ${withSubcats.length}`);
-if (withSubcats.length > 0) {
-  console.log('   - Exemples de sousCategorie:');
-  withSubcats.slice(0, 5).forEach((item: any) => {
-    console.log(`     * ${item.nom}: "${item.sousCategorie}"`);
-  });
-}
+
 
 export const products: Product[] = newBaseData.map((item: any) => ({
   id: item.productId,
@@ -84,7 +74,6 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
     
     // Vérifier si les sous-catégories sont présentes
     const subcats = StorageService.loadSubcategories();
-    console.log(`🔍 Vérification: ${subcats.length} sous-catégories trouvées dans le localStorage`);
     
     if (savedProducts.length > 0 && savedCategories.length > 0 && subcats.length > 0) {
       // Migration automatique: réinjecter les sous-catégories manquantes depuis la base intégrée
@@ -123,18 +112,15 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
 
       // Synchroniser automatiquement les sous-catégories
       StorageService.syncSubcategoriesFromProducts();
-      console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories, ${subcats.length} sous-catégories)`);
       return { products: savedProducts, categories: savedCategories };
     }
     
     // Si pas de données complètes, utiliser les données intégrées
-    console.log('⚠️ Données incomplètes, rechargement depuis les données intégrées...');
     // Forcer le rechargement depuis les données intégrées
     StorageService.saveProducts(products);
     StorageService.saveCategories(categories);
     const extracted = extractSubcategoriesFromProducts(products);
     StorageService.saveSubcategories(extracted);
-    console.log(`✅ Données intégrées restaurées (${products.length} produits, ${categories.length} catégories, ${extracted.length} sous-catégories)`);
     return { products, categories };
   } catch (error) {
     console.error('❌ Erreur lors du chargement des données:', error);
@@ -159,37 +145,19 @@ export const saveProductionData = async (
 // Utilitaire: forcer la réinitialisation immédiate vers la base intégrée
 export const resetToEmbeddedBase = (): void => {
   try {
-    console.log('🔄 Début de la réinitialisation vers la base intégrée...');
-    
     // Forcer la sauvegarde des produits intégrés
     StorageService.saveProducts(products);
-    console.log(`✅ ${products.length} produits sauvegardés`);
-    
     StorageService.saveCategories(categories);
-    console.log(`✅ ${categories.length} catégories sauvegardées`);
     
     // Extraire directement les sous-catégories depuis les produits intégrés
-    console.log('🔍 Extraction des sous-catégories depuis les produits intégrés...');
     const extracted = extractSubcategoriesFromProducts(products);
-    console.log(`✅ ${extracted.length} sous-catégories extraites`);
     
     // Sauvegarder les sous-catégories extraites
     StorageService.saveSubcategories(extracted);
-    console.log('✅ Sous-catégories sauvegardées');
     
     // Vérifier le résultat final
     const finalSubcats = StorageService.loadSubcategories();
     console.log(`🔁 Base intégrée restaurée (${products.length} produits, ${categories.length} catégories, ${finalSubcats.length} sous-catégories)`);
-    
-    if (finalSubcats.length > 0) {
-      console.log('📋 Sous-catégories disponibles:');
-      finalSubcats.slice(0, 10).forEach(subcat => {
-        console.log(`   - "${subcat}"`);
-      });
-      if (finalSubcats.length > 10) {
-        console.log(`   ... et ${finalSubcats.length - 10} autres`);
-      }
-    }
   } catch (e) {
     console.error('❌ Erreur resetToEmbeddedBase:', e);
   }

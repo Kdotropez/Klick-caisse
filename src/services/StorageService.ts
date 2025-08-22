@@ -205,22 +205,7 @@ export class StorageService {
     try {
       const subcategories = new Set<string>();
       
-      console.log(`🔍 Extraction des sous-catégories depuis ${products.length} produits...`);
-      
-      // Debug: vérifier les premiers produits
-      console.log('🔍 Debug des 3 premiers produits:');
-      products.slice(0, 3).forEach((product, index) => {
-        console.log(`   Produit ${index + 1}:`, {
-          id: product.id,
-          name: product.name,
-          associatedCategories: product.associatedCategories,
-          hasAssociatedCategories: Array.isArray(product.associatedCategories),
-          associatedCategoriesLength: product.associatedCategories ? product.associatedCategories.length : 0,
-          sousCategorie: (product as any).sousCategorie
-        });
-      });
-      
-      products.forEach((product, index) => {
+      products.forEach((product) => {
         // Vérifier associatedCategories (format actuel)
         if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
           product.associatedCategories.forEach(category => {
@@ -228,7 +213,6 @@ export class StorageService {
               const clean = this.sanitizeLabel(category).trim();
               if (clean) {
                 subcategories.add(clean);
-                if (index < 5) console.log(`   - associatedCategories: "${category}" -> "${clean}"`);
               }
             }
           });
@@ -239,18 +223,11 @@ export class StorageService {
           const clean = this.sanitizeLabel((product as any).sousCategorie).trim();
           if (clean) {
             subcategories.add(clean);
-            if (index < 5) console.log(`   - sousCategorie: "${(product as any).sousCategorie}" -> "${clean}"`);
           }
         }
       });
       
-      const result = Array.from(subcategories).sort();
-      console.log(`✅ Extraction terminée: ${result.length} sous-catégories trouvées`);
-      if (result.length > 0) {
-        console.log(`   - Exemples: ${result.slice(0, 5).join(', ')}`);
-      }
-      
-      return result;
+      return Array.from(subcategories).sort();
     } catch (error) {
       console.error('Erreur lors de l\'extraction des sous-catégories:', error);
       return [];
