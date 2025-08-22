@@ -1070,7 +1070,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const totalTargets = seauTargets.length + (hasVasqueTargets ? 1 : 0);
           
           // Si il y a des choix possibles (seaux ET vasques), demander à l'utilisateur
-          if (seauTargets.length > 0 && hasVasqueTargets && packBasedComps.length > 1) {
+          if (seauTargets.length > 0 && hasVasqueTargets) {
             console.log(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux, 1 vasque`);
             
             // Préparer les choix disponibles
@@ -3672,16 +3672,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
        >
          <DialogTitle>
            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-             Choix des Compensations
+             Attribution des Compensations
            </Typography>
            <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-             Choisissez où appliquer les compensations pack→seau/vasque
+             Choisissez si les compensations s'appliquent sur les seaux ou la vasque
            </Typography>
          </DialogTitle>
          <DialogContent>
            <Box sx={{ mt: 2 }}>
              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-               Options disponibles (cliquez pour sélectionner) :
+               Attributions possibles (cliquez pour sélectionner) :
              </Typography>
              
              {compensationChoices.packComps.map((choice, index) => {
@@ -3742,7 +3742,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                      </Box>
                      <Box>
                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                         Pack {packIndex + 1} → {choice.targetType === 'seau' ? 'Seau' : 'Vasque'}
+                         {choice.targetType === 'seau' ? 'Attribution sur Seau' : 'Attribution sur Vasque'}
                        </Typography>
                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                          {pack?.product.name} → {target?.product.name}
@@ -3756,14 +3756,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          </DialogContent>
          <DialogActions>
            <Button onClick={applyAutomaticCompensations}>
-             Appliquer automatiquement
+             Priorité Seaux (automatique)
            </Button>
            <Button 
              variant="contained" 
              onClick={applyCompensationChoices}
              disabled={!compensationChoices.packComps.some(choice => choice.selected)}
            >
-             Confirmer les choix ({compensationChoices.packComps.filter(c => c.selected).length} sélectionnés)
+             Appliquer mes choix ({compensationChoices.packComps.filter(c => c.selected).length} sélectionnés)
            </Button>
          </DialogActions>
        </Dialog>
