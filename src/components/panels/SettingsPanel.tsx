@@ -234,7 +234,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             const subcats = StorageService.loadSubcategories();
             alert(`Synchronisation réussie ! ${subcats.length} sous-catégories disponibles.`);
           } catch (e) { 
-            alert('Erreur lors de la synchronisation des sous-catégories: ' + e.message); 
+            const errorMessage = e instanceof Error ? e.message : String(e);
+            alert('Erreur lors de la synchronisation des sous-catégories: ' + errorMessage); 
           }
         }}
       >
