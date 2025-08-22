@@ -9,6 +9,18 @@ import { APP_VERSION } from '../version';
 // Import de la nouvelle base de données
 import newBaseData from '../components/base complete 15 aout.nested.json';
 
+// Debug: vérifier les données source
+console.log('🔍 Debug des données source:');
+console.log(`   - Nombre d'éléments dans newBaseData: ${newBaseData.length}`);
+const withSubcats = newBaseData.filter((item: any) => item.sousCategorie && item.sousCategorie.trim());
+console.log(`   - Éléments avec sousCategorie: ${withSubcats.length}`);
+if (withSubcats.length > 0) {
+  console.log('   - Exemples de sousCategorie:');
+  withSubcats.slice(0, 5).forEach((item: any) => {
+    console.log(`     * ${item.nom}: "${item.sousCategorie}"`);
+  });
+}
+
 export const products: Product[] = newBaseData.map((item: any) => ({
   id: item.productId,
   name: item.nom,
@@ -22,14 +34,14 @@ export const products: Product[] = newBaseData.map((item: any) => ({
   salesCount: 0,
   position: 0,
   remisable: true,
-  variations: item.variants.map((v: any) => ({
+  variations: item.variants ? item.variants.map((v: any) => ({
     id: v.declinaisonId,
     ean13: v.ean13,
     reference: '',
     attributes: v.attributs,
     priceImpact: 0,
     finalPrice: parseFloat(v.prixTTC.replace(',', '.'))
-  }))
+  })) : []
 }));
 
 // Extraire les catégories uniques
