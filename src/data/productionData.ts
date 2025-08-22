@@ -66,11 +66,15 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
   categories: Category[];
 }> => {
   try {
-    // 1) Charger depuis le localStorage d'abord (ne jamais écraser si des données utilisateur existent)
+    // 1) Charger depuis le localStorage d'abord
     const savedProducts = StorageService.loadProducts();
     const savedCategories = StorageService.loadCategories();
     
-    if (savedProducts.length > 0 && savedCategories.length > 0) {
+    // Vérifier si les sous-catégories sont présentes
+    const subcats = StorageService.loadSubcategories();
+    console.log(`🔍 Vérification: ${subcats.length} sous-catégories trouvées dans le localStorage`);
+    
+    if (savedProducts.length > 0 && savedCategories.length > 0 && subcats.length > 0) {
       // Migration automatique: réinjecter les sous-catégories manquantes depuis la base intégrée
       try {
         const refById = new Map<string, { categorie?: string; sousCategorie?: string }>();
@@ -105,23 +109,21 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
         }
       } catch {}
 
-      // Vérifier si les sous-catégories sont présentes
-      const subcats = StorageService.loadSubcategories();
-      if (subcats.length === 0) {
-        console.log('⚠️ Aucune sous-catégorie trouvée, rechargement depuis les données intégrées...');
-        // Forcer le rechargement depuis les données intégrées
-        StorageService.saveProducts(products);
-        StorageService.saveCategories(categories);
-        const extracted = extractSubcategoriesFromProducts(products);
-        StorageService.saveSubcategories(extracted);
-        console.log(`✅ Données intégrées restaurées (${products.length} produits, ${categories.length} catégories, ${extracted.length} sous-catégories)`);
-        return { products, categories };
-      } else {
-        // Synchroniser automatiquement les sous-catégories
-        StorageService.syncSubcategoriesFromProducts();
-        console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories, ${subcats.length} sous-catégories)`);
-        return { products: savedProducts, categories: savedCategories };
-      }
+      // Synchroniser automatiquement les sous-catégories
+      StorageService.syncSubcategoriesFromProducts();
+      console.log(`📦 Données chargées depuis localStorage (${savedProducts.length} produits, ${savedCategories.length} catégories, ${subcats.length} sous-catégories)`);
+      return { products: savedProducts, categories: savedCategories };
+    }
+    
+    // Si pas de données complètes, utiliser les données intégrées
+    console.log('⚠️ Données incomplètes, rechargement depuis les données intégrées...');
+    // Forcer le rechargement depuis les données intégrées
+    StorageService.saveProducts(products);
+    StorageService.saveCategories(categories);
+    const extracted = extractSubcategoriesFromProducts(products);
+    StorageService.saveSubcategories(extracted);
+    console.log(`✅ Données intégrées restaurées (${products.length} produits, ${categories.length} catégories, ${extracted.length} sous-catégories)`);
+    return { products, categories };
     }
     
     // 2) Sinon, utiliser les nouvelles données par défaut (intégrées)
