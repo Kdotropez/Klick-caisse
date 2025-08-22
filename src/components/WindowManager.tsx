@@ -863,10 +863,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // On détecte des lignes PACK VERRE et on mappe PACK X.Y -> "verre X.Y" pour utiliser SEAU_COMP_BY_SUB
         // Cette compensation s'applique même si aucune remise verres (percent) n'a été appliquée sur des lignes "verre"
         const packBasedComps: number[] = [];
+        console.log(`[DEBUG] Recherche de packs dans ${cartItems.length} articles, ${seauTargets.length} seaux disponibles`);
+        
         if (seauTargets.length > 0) {
           for (const it of cartItems) {
             const catNorm = normalizeKey(it.product.category || '');
-            if (!(catNorm.includes('pack') && catNorm.includes('verre'))) continue;
+            console.log(`[DEBUG] Article: ${it.product.name}, Catégorie: ${it.product.category}, Normalisée: ${catNorm}`);
+            if (!(catNorm.includes('pack') && catNorm.includes('verre'))) {
+              console.log(`[DEBUG] Ignoré: pas un pack verre`);
+              continue;
+            }
 
             // Tenter d'extraire "pack X" depuis sous-catégories associées puis depuis le nom
             let matchedSub: string | null = null;
@@ -948,9 +954,15 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         distribute(seauComps, limitedSeauTargets);
         // Packs -> Seaux (compensation nette) - appliquer sur des seaux différents
         if (packBasedComps.length > 0 && seauTargets.length > 0) {
+          console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
+          console.log(`[DEBUG] packBasedComps:`, packBasedComps);
+          console.log(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty })));
+          
           // Limiter le nombre de compensations au nombre de seaux disponibles
           const maxComps = Math.min(packBasedComps.length, seauTargets.length);
           const limitedComps = packBasedComps.slice(0, maxComps);
+          
+          console.log(`[DEBUG] maxComps: ${maxComps}, limitedComps:`, limitedComps);
           
           // Appliquer chaque compensation sur un seau différent
           for (let i = 0; i < limitedComps.length && i < seauTargets.length; i++) {
@@ -959,6 +971,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const perUnitEuro = seauTarget.qty > 0 ? (compAmount / seauTarget.qty) : 0;
             if (perUnitEuro > 0) {
               next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+              console.log(`[DEBUG] Compensation appliquée sur seau ${i+1}: ${perUnitEuro.toFixed(2)}€ par unité`);
             }
           }
         }
