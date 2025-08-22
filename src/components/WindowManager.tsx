@@ -168,8 +168,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // État pour le choix des compensations
   const [showCompensationChoiceModal, setShowCompensationChoiceModal] = useState(false);
   const [compensationChoices, setCompensationChoices] = useState<{
-    packComps: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string}>
+    packComps: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string, selected: boolean}>
   }>({ packComps: [] });
+  const [pendingCompensations, setPendingCompensations] = useState<{
+    packBasedComps: number[];
+    seauTargets: Array<{key: string, subtotal: number, qty: number, availableSlots: number}>;
+    vasqueTargets: Array<{key: string, subtotal: number, qty: number, availableSlots: number}>;
+  } | null>(null);
 
   // Fonction wrapper pour onRemoveItem qui gère aussi les compensations verrouillées
   const handleRemoveItem = (productId: string, variationId: string | null) => {
@@ -186,6 +191,92 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     
     // Supprimer l'article
     onRemoveItem(productId, variationId);
+  };
+
+  // Fonction pour gérer la sélection des choix de compensation
+  const handleCompensationChoiceToggle = (index: number) => {
+    setCompensationChoices(prev => ({
+      packComps: prev.packComps.map((choice, i) => 
+        i === index ? { ...choice, selected: !choice.selected } : choice
+      )
+    }));
+  };
+
+  // Fonction pour appliquer les compensations selon les choix utilisateur
+  const applyCompensationChoices = () => {
+    if (!pendingCompensations) return;
+
+    const { packBasedComps, seauTargets, vasqueTargets } = pendingCompensations;
+    const selectedChoices = compensationChoices.packComps.filter(choice => choice.selected);
+    
+    // Réinitialiser les compensations
+    const next = { ...itemDiscounts };
+    
+    // Appliquer les compensations selon les choix
+    selectedChoices.forEach((choice, index) => {
+      if (index < packBasedComps.length) {
+        const compAmount = packBasedComps[index];
+        
+        if (choice.targetType === 'seau') {
+          const target = seauTargets.find(t => t.key === choice.targetId);
+          if (target) {
+            const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
+            if (perUnitEuro > 0) {
+              next[choice.targetId] = { type: 'euro', value: perUnitEuro };
+              console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+            }
+          }
+        } else if (choice.targetType === 'vasque') {
+          const target = vasqueTargets.find(t => t.key === choice.targetId);
+          if (target) {
+            const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
+            if (perUnitEuro > 0) {
+              next[choice.targetId] = { type: 'euro', value: perUnitEuro };
+              console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+            }
+          }
+        }
+      }
+    });
+    
+    setItemDiscounts(next);
+    setShowCompensationChoiceModal(false);
+    setPendingCompensations(null);
+  };
+
+  // Fonction pour appliquer automatiquement (comportement par défaut)
+  const applyAutomaticCompensations = () => {
+    if (!pendingCompensations) return;
+
+    const { packBasedComps, seauTargets } = pendingCompensations;
+    const next = { ...itemDiscounts };
+    
+    // Appliquer automatiquement sur les seaux
+    let compIndex = 0;
+    for (const seauTarget of seauTargets) {
+      if (compIndex >= packBasedComps.length) break;
+      
+      const slotsToUse = Math.min(seauTarget.availableSlots, packBasedComps.length - compIndex);
+      
+      if (slotsToUse > 0) {
+        let totalComp = 0;
+        for (let i = 0; i < slotsToUse; i++) {
+          totalComp += packBasedComps[compIndex + i];
+        }
+        
+        const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
+        if (perUnitEuro > 0) {
+          next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+          console.log(`[DEBUG] Compensation automatique appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+        }
+        
+        compIndex += slotsToUse;
+      }
+    }
+    
+    setItemDiscounts(next);
+    setShowCompensationChoiceModal(false);
+    setPendingCompensations(null);
   };
 
   // Initialiser automatiquement les barèmes PACK → Seau si absents
@@ -976,7 +1067,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             console.log(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux, 1 vasque`);
             
             // Préparer les choix disponibles
-            const choices: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string}> = [];
+            const choices: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string, selected: boolean}> = [];
             
             // Générer toutes les combinaisons possibles
             for (let i = 0; i < packBasedComps.length; i++) {
@@ -985,7 +1076,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 choices.push({
                   packId: `pack-${i}`,
                   targetType: 'seau',
-                  targetId: seauTarget.key
+                  targetId: seauTarget.key,
+                  selected: false
                 });
               }
               // Option 2: Pack vers vasque
@@ -993,12 +1085,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 choices.push({
                   packId: `pack-${i}`,
                   targetType: 'vasque',
-                  targetId: vasqueTargets[0].key
+                  targetId: vasqueTargets[0].key,
+                  selected: false
                 });
               }
             }
             
             setCompensationChoices({ packComps: choices });
+            setPendingCompensations({ packBasedComps, seauTargets, vasqueTargets });
             setShowCompensationChoiceModal(true);
             
             // Pour l'instant, appliquer automatiquement sur les seaux (comportement par défaut)
@@ -3580,7 +3674,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
          <DialogContent>
            <Box sx={{ mt: 2 }}>
              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-               Options disponibles :
+               Options disponibles (cliquez pour sélectionner) :
              </Typography>
              
              {compensationChoices.packComps.map((choice, index) => {
@@ -3593,27 +3687,69 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                  : cartItems.find(item => item.product.category?.toLowerCase().includes('vasque'));
                
                return (
-                 <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
-                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                     Pack {index + 1} → {choice.targetType === 'seau' ? 'Seau' : 'Vasque'}
-                   </Typography>
-                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                     {pack?.product.name} → {target?.product.name}
-                   </Typography>
+                 <Box 
+                   key={index} 
+                   sx={{ 
+                     mb: 2, 
+                     p: 2, 
+                     border: choice.selected ? '2px solid #1976d2' : '1px solid #e0e0e0', 
+                     borderRadius: 1,
+                     backgroundColor: choice.selected ? '#e3f2fd' : 'transparent',
+                     cursor: 'pointer',
+                     '&:hover': {
+                       backgroundColor: choice.selected ? '#e3f2fd' : '#f5f5f5'
+                     }
+                   }}
+                   onClick={() => handleCompensationChoiceToggle(index)}
+                 >
+                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                     <Box
+                       sx={{
+                         width: 20,
+                         height: 20,
+                         borderRadius: '50%',
+                         border: '2px solid #1976d2',
+                         backgroundColor: choice.selected ? '#1976d2' : 'transparent',
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'center'
+                       }}
+                     >
+                       {choice.selected && (
+                         <Box
+                           sx={{
+                             width: 8,
+                             height: 8,
+                             borderRadius: '50%',
+                             backgroundColor: 'white'
+                           }}
+                         />
+                       )}
+                     </Box>
+                     <Box>
+                       <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                         Pack {Math.floor(index / (pendingCompensations?.seauTargets.length || 1)) + 1} → {choice.targetType === 'seau' ? 'Seau' : 'Vasque'}
+                       </Typography>
+                       <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                         {pack?.product.name} → {target?.product.name}
+                       </Typography>
+                     </Box>
+                   </Box>
                  </Box>
                );
              })}
            </Box>
          </DialogContent>
          <DialogActions>
-           <Button onClick={() => setShowCompensationChoiceModal(false)}>
+           <Button onClick={applyAutomaticCompensations}>
              Appliquer automatiquement
            </Button>
            <Button 
              variant="contained" 
-             onClick={() => setShowCompensationChoiceModal(false)}
+             onClick={applyCompensationChoices}
+             disabled={!compensationChoices.packComps.some(choice => choice.selected)}
            >
-             Confirmer les choix
+             Confirmer les choix ({compensationChoices.packComps.filter(c => c.selected).length} sélectionnés)
            </Button>
          </DialogActions>
        </Dialog>

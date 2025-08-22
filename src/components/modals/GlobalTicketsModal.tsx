@@ -64,13 +64,13 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   refreshTodayTransactions,
 }) => {
      // Charger toutes les transactions
-   const allClosures = StorageService.loadClosures();
-   const allTx: any[] = [];
+  const allClosures = StorageService.loadClosures();
+  const allTx: any[] = [];
    const seenIds = new Set<string>();
    
    // Ajouter les transactions des clôtures
-   for (const c of allClosures) {
-     const txs = Array.isArray(c.transactions) ? c.transactions : [];
+  for (const c of allClosures) {
+    const txs = Array.isArray(c.transactions) ? c.transactions : [];
      for (const t of txs) {
        const txId = String(t.id);
        if (!seenIds.has(txId)) {
@@ -81,7 +81,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
    }
    
    // Ajouter les transactions du jour
-   const todayTxs = StorageService.loadTodayTransactions();
+  const todayTxs = StorageService.loadTodayTransactions();
    for (const t of todayTxs) {
      const txId = String(t.id);
      if (!seenIds.has(txId)) {
@@ -91,13 +91,13 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
    }
    
    // Ajouter les transactions archivées par jour
-   try {
-     const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-     if (raw) {
-       const map = JSON.parse(raw) as Record<string, any[]>;
-       const todayStr = new Date().toISOString().slice(0,10);
-       Object.keys(map).forEach((day) => {
-         const list = Array.isArray(map[day]) ? map[day] : [];
+  try {
+    const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+    if (raw) {
+      const map = JSON.parse(raw) as Record<string, any[]>;
+      const todayStr = new Date().toISOString().slice(0,10);
+      Object.keys(map).forEach((day) => {
+        const list = Array.isArray(map[day]) ? map[day] : [];
          if (day !== todayStr) {
            list.forEach((t: any) => {
              const txId = String(t.id);
@@ -107,9 +107,9 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
              }
            });
          }
-       });
-          }
-   } catch {}
+      });
+    }
+  } catch {}
    
    console.log('Transactions chargées après déduplication:', allTx.length);
    
@@ -292,17 +292,17 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             size="small" 
             variant="outlined" 
             onClick={() => {
-              setFilterPayment('all');
-              setOnlyToday(false);
-              setAmountMin('');
-              setAmountMax('');
-              setAmountExact('');
-              setDateFrom('');
-              setDateTo('');
-              setTimeFrom('');
-              setTimeTo('');
-              setSelectedIds(() => new Set());
-              setExpandedIds(() => new Set());
+            setFilterPayment('all');
+            setOnlyToday(false);
+            setAmountMin('');
+            setAmountMax('');
+            setAmountExact('');
+            setDateFrom('');
+            setDateTo('');
+            setTimeFrom('');
+            setTimeTo('');
+            setSelectedIds(() => new Set());
+            setExpandedIds(() => new Set());
             }}
           >
             Réinitialiser filtres
@@ -312,32 +312,32 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             size="small" 
             variant="contained" 
             onClick={() => {
-              try {
-                const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+            try {
+              const raw = localStorage.getItem('klick_caisse_transactions_by_day');
                 if (!raw) { 
                   alert('Aucune sauvegarde de tickets trouvée.'); 
                   return; 
                 }
-                const map = JSON.parse(raw) as Record<string, any[]>;
-                const days = Object.keys(map)
-                  .filter(d => Array.isArray(map[d]) && map[d].length > 0)
-                  .sort();
+              const map = JSON.parse(raw) as Record<string, any[]>;
+              const days = Object.keys(map)
+                .filter(d => Array.isArray(map[d]) && map[d].length > 0)
+                .sort();
                 if (days.length === 0) { 
                   alert('Aucune date avec tickets trouvée.'); 
                   return; 
                 }
-                setOnlyToday(false);
-                setFilterPayment('all');
-                setAmountMin('');
-                setAmountMax('');
-                setAmountExact('');
-                setTimeFrom('');
-                setTimeTo('');
-                setDateFrom(days[0]);
-                setDateTo(days[days.length - 1]);
-              } catch {
-                alert('Erreur lors de la lecture des dates disponibles.');
-              }
+              setOnlyToday(false);
+              setFilterPayment('all');
+              setAmountMin('');
+              setAmountMax('');
+              setAmountExact('');
+              setTimeFrom('');
+              setTimeTo('');
+              setDateFrom(days[0]);
+              setDateTo(days[days.length - 1]);
+            } catch {
+              alert('Erreur lors de la lecture des dates disponibles.');
+            }
             }}
           >
             Charger dates
@@ -550,11 +550,11 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                              {finalTotal.toFixed(2)} €
                            </Typography>
                          </Box>
-                                                                                                   </Box>
+                      </Box>
                        );
                      })}
-                   </Box>
-                 )}
+                  </Box>
+                )}
               </ListItem>
             );
           })}
@@ -650,8 +650,8 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
         <Button 
           disabled={selectedIds.size !== 1} 
           onClick={() => {
-            const [tid] = Array.from(selectedIds);
-            onOpenEditor(tid);
+          const [tid] = Array.from(selectedIds);
+          onOpenEditor(tid);
           }}
         >
           Modifier
@@ -661,21 +661,21 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
           variant="contained" 
           disabled={selectedIds.size === 0} 
           onClick={() => {
-            const closures = StorageService.loadClosures();
-            const selected = new Set(selectedIds);
-            const updated = closures.map(c => {
-              const txs = Array.isArray(c.transactions) ? c.transactions : [];
-              const keep = txs.filter((t: any) => !selected.has(String(t.id)));
-              return { ...c, transactions: keep };
-            });
-            StorageService.saveAllClosures(updated);
+          const closures = StorageService.loadClosures();
+          const selected = new Set(selectedIds);
+          const updated = closures.map(c => {
+            const txs = Array.isArray(c.transactions) ? c.transactions : [];
+            const keep = txs.filter((t: any) => !selected.has(String(t.id)));
+            return { ...c, transactions: keep };
+          });
+          StorageService.saveAllClosures(updated);
             Array.from(selected).forEach((tid) => { 
               try { 
                 StorageService.deleteDailyTransaction(String(tid)); 
               } catch {} 
             });
-            refreshTodayTransactions();
-            setSelectedIds(() => new Set());
+          refreshTodayTransactions();
+          setSelectedIds(() => new Set());
           }}
         >
           Supprimer sélection
