@@ -863,7 +863,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // On détecte des lignes PACK VERRE et on mappe PACK X.Y -> "verre X.Y" pour utiliser SEAU_COMP_BY_SUB
         // Cette compensation s'applique même si aucune remise verres (percent) n'a été appliquée sur des lignes "verre"
         const packBasedComps: number[] = [];
-        let packSeauComps = 0; // Limiter les compensations pack→seau
         if (seauTargets.length > 0) {
           for (const it of cartItems) {
             const catNorm = normalizeKey(it.product.category || '');
@@ -898,11 +897,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
             console.log(`[COMPENSATION PACK→SEAU] Pack: ${matchedSub}, Barème: ${compConfigured}€, Remise auto pack: ${packAuto}€, Net: ${compNet.toFixed(2)}€`);
 
-            // Ajouter une compensation par quantité de packs (verrouillage global plus bas par nb de seaux)
+            // Ajouter une compensation par quantité de packs (limité par le nombre de seaux disponibles)
             const times = Math.max(1, it.quantity || 0);
-            for (let i = 0; i < times && packSeauComps < 1; i++) {
+            for (let i = 0; i < times; i++) {
               packBasedComps.push(compNet);
-              packSeauComps++;
             }
           }
         }
@@ -948,15 +946,20 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Seaux - limiter le nombre de seaux cibles
         const limitedSeauTargets = seauTargets.slice(0, seauComps.length);
         distribute(seauComps, limitedSeauTargets);
-        // Packs -> Seaux (compensation nette) - seulement pour les seaux sans compensation existante
+        // Packs -> Seaux (compensation nette) - appliquer sur des seaux différents
         if (packBasedComps.length > 0 && seauTargets.length > 0) {
-          const availableSeauTargets = seauTargets.filter(t => {
-            const hasExistingDiscount = next[t.key] && next[t.key].type === 'euro';
-            return !hasExistingDiscount;
-          });
-          if (availableSeauTargets.length > 0) {
-            const limited = packBasedComps.slice(0, availableSeauTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0));
-            distribute(limited, availableSeauTargets);
+          // Limiter le nombre de compensations au nombre de seaux disponibles
+          const maxComps = Math.min(packBasedComps.length, seauTargets.length);
+          const limitedComps = packBasedComps.slice(0, maxComps);
+          
+          // Appliquer chaque compensation sur un seau différent
+          for (let i = 0; i < limitedComps.length && i < seauTargets.length; i++) {
+            const seauTarget = seauTargets[i];
+            const compAmount = limitedComps[i];
+            const perUnitEuro = seauTarget.qty > 0 ? (compAmount / seauTarget.qty) : 0;
+            if (perUnitEuro > 0) {
+              next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
+            }
           }
         }
         // Nouvelles règles vasque (2 packs), (1 pack + 6 verres), (12 verres mélangés) - seulement pour les vasques sans compensation existante
