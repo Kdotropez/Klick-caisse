@@ -907,50 +907,25 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           }
         }
 
-        // Nettoyage des anciennes remises (sauf celles verrouillées)
+        // Nettoyage des anciennes remises compensatoires
         for (const { key } of targetLineInfos) {
           if (next[key] && next[key].type === 'euro') {
-            // Garder les compensations verrouillées
-            const isLockedSeau = lockedCompensations.seau[key] !== undefined;
-            const isLockedVasque = lockedCompensations.vasque[key] !== undefined;
-            if (!isLockedSeau && !isLockedVasque) {
-              delete next[key];
-            }
+            delete next[key];
           }
         }
 
-        // Supprimer toutes les compensations verrouillées si les conditions ne sont plus remplies
-        const hasValidSeauConditions = seauComps.length > 0 || packBasedComps.length > 0;
-        const hasValidVasqueConditions = vasqueComps.length > 0 || vasqueFromPackPairs.length > 0 || vasqueFromPackPlusSix.length > 0 || vasqueFromMixedTwelve.length > 0;
-        
-        if (!hasValidSeauConditions && Object.keys(lockedCompensations.seau).length > 0) {
-          setLockedCompensations(prev => ({ ...prev, seau: {} }));
-        }
-        if (!hasValidVasqueConditions && Object.keys(lockedCompensations.vasque).length > 0) {
-          setLockedCompensations(prev => ({ ...prev, vasque: {} }));
-        }
 
-        const distribute = (amounts: number[], targets: Array<{key:string; subtotal:number; qty:number}>, options?: {singleTarget?: boolean}, compensationType?: 'seau' | 'vasque') => {
+
+        const distribute = (amounts: number[], targets: Array<{key:string; subtotal:number; qty:number}>, options?: {singleTarget?: boolean}) => {
           const total = amounts.reduce((s,v)=>s+v,0);
           if (total <= 0 || targets.length === 0) return;
           
           if (options?.singleTarget) {
             const first = targets[0];
-            // Vérifier si déjà compensé
-            const isLocked = compensationType && lockedCompensations[compensationType][first.key] !== undefined;
-            if (isLocked) return; // Ne pas recalculer si déjà verrouillé
-            
             const apply = Math.min(total, first.subtotal);
             const perUnitEuro = first.qty > 0 ? (apply / first.qty) : 0;
             if (perUnitEuro > 0) {
               next[first.key] = { type: 'euro', value: perUnitEuro };
-              // Verrouiller cette compensation
-              if (compensationType) {
-                setLockedCompensations(prev => ({
-                  ...prev,
-                  [compensationType]: { ...prev[compensationType], [first.key]: apply }
-                }));
-              }
             }
             return;
           }
@@ -959,55 +934,42 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           for (const { key, subtotal, qty } of targets) {
             if (remaining <= 0) break;
             
-            // Vérifier si déjà compensé
-            const isLocked = compensationType && lockedCompensations[compensationType][key] !== undefined;
-            if (isLocked) continue; // Passer au suivant si déjà verrouillé
-            
             const apply = Math.min(remaining, subtotal);
             const perUnitEuro = qty > 0 ? (apply / qty) : 0;
             if (perUnitEuro > 0) {
               next[key] = { type: 'euro', value: perUnitEuro };
-              // Verrouiller cette compensation
-              if (compensationType) {
-                setLockedCompensations(prev => ({
-                  ...prev,
-                  [compensationType]: { ...prev[compensationType], [key]: apply }
-                }));
-              }
             }
             remaining -= apply;
           }
         };
 
         // Vasques: appliquer sur UNE SEULE vasque
-        distribute(vasqueComps, vasqueTargets, { singleTarget: true }, 'vasque');
+        distribute(vasqueComps, vasqueTargets, { singleTarget: true });
         // Seaux - limiter le nombre de seaux cibles
         const limitedSeauTargets = seauTargets.slice(0, seauComps.length);
-        distribute(seauComps, limitedSeauTargets, undefined, 'seau');
+        distribute(seauComps, limitedSeauTargets);
         // Packs -> Seaux (compensation nette) - seulement pour les seaux sans compensation existante
         if (packBasedComps.length > 0 && seauTargets.length > 0) {
           const availableSeauTargets = seauTargets.filter(t => {
-            const isLocked = lockedCompensations.seau[t.key] !== undefined;
             const hasExistingDiscount = next[t.key] && next[t.key].type === 'euro';
-            return !isLocked && !hasExistingDiscount;
+            return !hasExistingDiscount;
           });
           if (availableSeauTargets.length > 0) {
             const limited = packBasedComps.slice(0, availableSeauTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0));
-            distribute(limited, availableSeauTargets, undefined, 'seau');
+            distribute(limited, availableSeauTargets);
           }
         }
         // Nouvelles règles vasque (2 packs), (1 pack + 6 verres), (12 verres mélangés) - seulement pour les vasques sans compensation existante
         const extraVasque = [...vasqueFromPackPairs, ...vasqueFromPackPlusSix, ...vasqueFromMixedTwelve];
         if (extraVasque.length > 0 && vasqueTargets.length > 0) {
           const availableVasqueTargets = vasqueTargets.filter(t => {
-            const isLocked = lockedCompensations.vasque[t.key] !== undefined;
             const hasExistingDiscount = next[t.key] && next[t.key].type === 'euro';
-            return !isLocked && !hasExistingDiscount;
+            return !hasExistingDiscount;
           });
           if (availableVasqueTargets.length > 0) {
             const limitQty = availableVasqueTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0);
             const limited = extraVasque.slice(0, limitQty);
-            distribute(limited, availableVasqueTargets, { singleTarget: true }, 'vasque');
+            distribute(limited, availableVasqueTargets, { singleTarget: true });
           }
         }
       }
