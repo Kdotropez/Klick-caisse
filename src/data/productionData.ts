@@ -144,27 +144,38 @@ export const saveProductionData = async (
 // Utilitaire: forcer la réinitialisation immédiate vers la base intégrée
 export const resetToEmbeddedBase = (): void => {
   try {
+    console.log('🔄 Début de la réinitialisation vers la base intégrée...');
+    
     // Forcer la sauvegarde des produits intégrés
     StorageService.saveProducts(products);
+    console.log(`✅ ${products.length} produits sauvegardés`);
+    
     StorageService.saveCategories(categories);
+    console.log(`✅ ${categories.length} catégories sauvegardées`);
     
-    // Forcer la synchronisation des sous-catégories
-    StorageService.syncSubcategoriesFromProducts();
+    // Extraire directement les sous-catégories depuis les produits intégrés
+    console.log('🔍 Extraction des sous-catégories depuis les produits intégrés...');
+    const extracted = extractSubcategoriesFromProducts(products);
+    console.log(`✅ ${extracted.length} sous-catégories extraites`);
     
-    // Vérifier le résultat
-    const subcats = StorageService.loadSubcategories();
-    console.log(`🔁 Base intégrée restaurée (${products.length} produits, ${categories.length} catégories, ${subcats.length} sous-catégories)`);
+    // Sauvegarder les sous-catégories extraites
+    StorageService.saveSubcategories(extracted);
+    console.log('✅ Sous-catégories sauvegardées');
     
-    // Si aucune sous-catégorie, forcer l'extraction directe
-    if (subcats.length === 0) {
-      console.log('⚠️ Aucune sous-catégorie détectée, extraction forcée...');
-      const extracted = extractSubcategoriesFromProducts(products);
-      if (extracted.length > 0) {
-        StorageService.saveSubcategories(extracted);
-        console.log(`✅ Extraction forcée réussie: ${extracted.length} sous-catégories`);
+    // Vérifier le résultat final
+    const finalSubcats = StorageService.loadSubcategories();
+    console.log(`🔁 Base intégrée restaurée (${products.length} produits, ${categories.length} catégories, ${finalSubcats.length} sous-catégories)`);
+    
+    if (finalSubcats.length > 0) {
+      console.log('📋 Sous-catégories disponibles:');
+      finalSubcats.slice(0, 10).forEach(subcat => {
+        console.log(`   - "${subcat}"`);
+      });
+      if (finalSubcats.length > 10) {
+        console.log(`   ... et ${finalSubcats.length - 10} autres`);
       }
     }
   } catch (e) {
-    console.error('Erreur resetToEmbeddedBase:', e);
+    console.error('❌ Erreur resetToEmbeddedBase:', e);
   }
 };
