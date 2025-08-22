@@ -144,10 +144,26 @@ export const saveProductionData = async (
 // Utilitaire: forcer la réinitialisation immédiate vers la base intégrée
 export const resetToEmbeddedBase = (): void => {
   try {
+    // Forcer la sauvegarde des produits intégrés
     StorageService.saveProducts(products);
     StorageService.saveCategories(categories);
+    
+    // Forcer la synchronisation des sous-catégories
     StorageService.syncSubcategoriesFromProducts();
-    console.log('🔁 Base intégrée restaurée (produits, catégories, sous-catégories)');
+    
+    // Vérifier le résultat
+    const subcats = StorageService.loadSubcategories();
+    console.log(`🔁 Base intégrée restaurée (${products.length} produits, ${categories.length} catégories, ${subcats.length} sous-catégories)`);
+    
+    // Si aucune sous-catégorie, forcer l'extraction directe
+    if (subcats.length === 0) {
+      console.log('⚠️ Aucune sous-catégorie détectée, extraction forcée...');
+      const extracted = extractSubcategoriesFromProducts(products);
+      if (extracted.length > 0) {
+        StorageService.saveSubcategories(extracted);
+        console.log(`✅ Extraction forcée réussie: ${extracted.length} sous-catégories`);
+      }
+    }
   } catch (e) {
     console.error('Erreur resetToEmbeddedBase:', e);
   }
