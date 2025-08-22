@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
-import { CheckCircle } from '@mui/icons-material';
+import { CheckCircle, Update } from '@mui/icons-material';
 import { resetToEmbeddedBase } from '../../data/productionData';
 import { StorageService } from '../../services/StorageService';
+import { UpdateService } from '../../services/UpdateService';
+import { APP_VERSION } from '../../version';
 
 interface SettingsPanelProps {
   width: number;
@@ -37,6 +39,26 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onClearAllCategories,
   onOpenDiscountRules,
 }) => {
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+
+  const handleCheckUpdate = async () => {
+    setIsCheckingUpdate(true);
+    try {
+      const updateInfo = await UpdateService.checkForUpdates(APP_VERSION);
+      if (updateInfo) {
+        const message = `Nouvelle version disponible : ${updateInfo.version}\n\n${updateInfo.releaseNotes}`;
+        if (confirm(`${message}\n\nVoulez-vous rafraîchir l'application maintenant ?`)) {
+          window.location.reload();
+        }
+      } else {
+        alert('Aucune mise à jour disponible. Votre application est à jour !');
+      }
+    } catch (error) {
+      alert('Erreur lors de la vérification des mises à jour.');
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
   const gap = 2;
   const totalGapsWidth = 4;
   const totalGapsHeight = 6;
@@ -260,6 +282,28 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={onOpenSubcategoryManagement}
       >
         Gestion Sous-catégories
+      </Button>
+
+      <Button
+        variant="contained"
+        disabled={isCheckingUpdate}
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#ff9800',
+          '&:hover': { backgroundColor: '#f57c00' },
+          '&:disabled': { backgroundColor: '#ccc' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={handleCheckUpdate}
+      >
+        {isCheckingUpdate ? 'Vérification...' : `Vérifier MAJ (v${APP_VERSION})`}
       </Button>
 
       {isEditMode && (

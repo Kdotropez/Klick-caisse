@@ -7,6 +7,7 @@ import { Product, Category, CartItem, ProductVariation } from './types';
 import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
+import { UpdateService } from './services/UpdateService';
 import { useUISettings } from './context/UISettingsContext';
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -61,6 +62,9 @@ const App: React.FC = () => {
     };
     
     loadData();
+    
+    // Démarrer la vérification des mises à jour en arrière-plan
+    UpdateService.startBackgroundUpdateCheck(APP_VERSION, 30); // Vérifier toutes les 30 minutes
   }, []);
 
   // Persister l'ordre des catégories à chaque modification (drag & drop, ajout, import)
