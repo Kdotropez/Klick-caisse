@@ -293,27 +293,64 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Réinitialiser les compensations quand le panier change
   useEffect(() => {
-    // Ne réinitialiser que les compensations pack→seau/vasque, pas les remises automatiques
+    // Vérifier si les conditions pour les compensations sont encore remplies
     const currentDiscounts = { ...itemDiscounts };
+    let hasChanges = false;
     
-    // Supprimer seulement les compensations pack→seau/vasque
+    // Vérifier chaque compensation existante
     Object.keys(currentDiscounts).forEach(key => {
       const item = cartItems.find(item => `${item.product.id}-${item.selectedVariation?.id || 'main'}` === key);
       if (item) {
         const isSeau = item.product.category?.toLowerCase().includes('seau');
         const isVasque = item.product.category?.toLowerCase().includes('vasque');
         
-        // Si c'est un seau ou une vasque avec une remise, c'est probablement une compensation
+        // Si c'est un seau ou une vasque avec une remise, vérifier les conditions
         if ((isSeau || isVasque) && currentDiscounts[key]?.type === 'euro') {
-          delete currentDiscounts[key];
+          // Vérifier si les conditions pour cette compensation sont encore remplies
+          const conditionsMet = checkCompensationConditions(cartItems, isSeau ? 'seau' : 'vasque');
+          
+          if (!conditionsMet) {
+            console.log(`[DEBUG] Conditions non remplies pour ${isSeau ? 'seau' : 'vasque'} - suppression compensation`);
+            delete currentDiscounts[key];
+            hasChanges = true;
+          }
         }
       }
     });
     
-    setItemDiscounts(currentDiscounts);
+    if (hasChanges) {
+      setItemDiscounts(currentDiscounts);
+    }
+    
     setPendingCompensations(null);
     setShowCompensationChoiceModal(false);
   }, [cartItems]);
+
+  // Fonction pour vérifier si les conditions de compensation sont remplies
+  const checkCompensationConditions = (items: CartItem[], targetType: 'seau' | 'vasque'): boolean => {
+    // Vérifier s'il y a des verres ou des packs
+    const hasVerres = items.some(item => 
+      item.product.category?.toLowerCase().includes('verre') && 
+      !item.product.category?.toLowerCase().includes('pack')
+    );
+    
+    const hasPacks = items.some(item => 
+      item.product.category?.toLowerCase().includes('pack') && 
+      item.product.category?.toLowerCase().includes('verre')
+    );
+    
+    // Vérifier s'il y a des seaux ou vasques selon le type
+    const hasTargets = items.some(item => {
+      if (targetType === 'seau') {
+        return item.product.category?.toLowerCase().includes('seau');
+      } else {
+        return item.product.category?.toLowerCase().includes('vasque');
+      }
+    });
+    
+    // Les conditions sont remplies si on a (verres OU packs) ET (seaux OU vasques selon le type)
+    return (hasVerres || hasPacks) && hasTargets;
+  };
 
   // Initialiser automatiquement les barèmes PACK → Seau si absents
   useEffect(() => {
