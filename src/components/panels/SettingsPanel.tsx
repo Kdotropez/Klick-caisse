@@ -228,11 +228,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         }}
         onClick={() => {
           try {
-            StorageService.syncSubcategoriesFromProducts();
+            // Forcer la réinitialisation vers la base intégrée pour tester
+            const { resetToEmbeddedBase } = require('../../data/productionData');
+            resetToEmbeddedBase();
             const subcats = StorageService.loadSubcategories();
             alert(`Synchronisation réussie ! ${subcats.length} sous-catégories disponibles.`);
           } catch (e) { 
-            alert('Erreur lors de la synchronisation des sous-catégories'); 
+            alert('Erreur lors de la synchronisation des sous-catégories: ' + e.message); 
           }
         }}
       >

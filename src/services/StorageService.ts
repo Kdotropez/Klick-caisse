@@ -206,6 +206,7 @@ export class StorageService {
       const subcategories = new Set<string>();
       
       products.forEach(product => {
+        // Vérifier associatedCategories (format actuel)
         if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
           product.associatedCategories.forEach(category => {
             if (category && typeof category === 'string') {
@@ -215,6 +216,14 @@ export class StorageService {
               }
             }
           });
+        }
+        
+        // Vérifier sousCategorie (format JSON original)
+        if ((product as any).sousCategorie && typeof (product as any).sousCategorie === 'string') {
+          const clean = this.sanitizeLabel((product as any).sousCategorie).trim();
+          if (clean) {
+            subcategories.add(clean);
+          }
         }
       });
       
