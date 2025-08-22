@@ -146,6 +146,20 @@ export const resetToEmbeddedBase = (): void => {
   try {
     console.log('🔄 Début de la réinitialisation vers la base intégrée...');
     
+    // Debug: vérifier les produits intégrés
+    console.log('🔍 Debug des produits intégrés:');
+    console.log(`   - Nombre de produits: ${products.length}`);
+    const withAssociatedCats = products.filter(p => p.associatedCategories && p.associatedCategories.length > 0);
+    console.log(`   - Produits avec associatedCategories: ${withAssociatedCats.length}`);
+    
+    if (withAssociatedCats.length > 0) {
+      console.log('   - Exemples de associatedCategories:');
+      const uniqueCats = [...new Set(withAssociatedCats.flatMap(p => p.associatedCategories))];
+      uniqueCats.slice(0, 5).forEach(cat => {
+        console.log(`     * "${cat}"`);
+      });
+    }
+    
     // Forcer la sauvegarde des produits intégrés
     StorageService.saveProducts(products);
     console.log(`✅ ${products.length} produits sauvegardés`);

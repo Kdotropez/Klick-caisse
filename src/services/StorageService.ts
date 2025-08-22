@@ -207,6 +207,19 @@ export class StorageService {
       
       console.log(`🔍 Extraction des sous-catégories depuis ${products.length} produits...`);
       
+      // Debug: vérifier les premiers produits
+      console.log('🔍 Debug des 3 premiers produits:');
+      products.slice(0, 3).forEach((product, index) => {
+        console.log(`   Produit ${index + 1}:`, {
+          id: product.id,
+          name: product.name,
+          associatedCategories: product.associatedCategories,
+          hasAssociatedCategories: Array.isArray(product.associatedCategories),
+          associatedCategoriesLength: product.associatedCategories ? product.associatedCategories.length : 0,
+          sousCategorie: (product as any).sousCategorie
+        });
+      });
+      
       products.forEach((product, index) => {
         // Vérifier associatedCategories (format actuel)
         if (product.associatedCategories && Array.isArray(product.associatedCategories)) {
