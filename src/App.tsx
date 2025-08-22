@@ -8,6 +8,7 @@ import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
 import { UpdateService } from './services/UpdateService';
+import { APP_VERSION } from './version';
 import { useUISettings } from './context/UISettingsContext';
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);

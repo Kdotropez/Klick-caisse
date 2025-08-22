@@ -72,7 +72,7 @@ export class UpdateService {
     console.log(`[UPDATE] Rafraîchissement de l'application...`);
     
     // Afficher un message à l'utilisateur
-    if (confirm('Une nouvelle version est disponible. Voulez-vous rafraîchir l\'application maintenant ?')) {
+    if (window.confirm('Une nouvelle version est disponible. Voulez-vous rafraîchir l\'application maintenant ?')) {
       // Rafraîchir la page
       window.location.reload();
     }
@@ -112,7 +112,7 @@ export class UpdateService {
     }
     
     // Afficher une alerte
-    if (confirm(`${message}\n\nVoulez-vous rafraîchir l'application maintenant ?`)) {
+    if (window.confirm(`${message}\n\nVoulez-vous rafraîchir l'application maintenant ?`)) {
       this.refreshApplication();
     }
   }

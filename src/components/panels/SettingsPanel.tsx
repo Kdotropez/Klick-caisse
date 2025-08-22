@@ -47,14 +47,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       const updateInfo = await UpdateService.checkForUpdates(APP_VERSION);
       if (updateInfo) {
         const message = `Nouvelle version disponible : ${updateInfo.version}\n\n${updateInfo.releaseNotes}`;
-        if (confirm(`${message}\n\nVoulez-vous rafraîchir l'application maintenant ?`)) {
+        if (window.confirm(`${message}\n\nVoulez-vous rafraîchir l'application maintenant ?`)) {
           window.location.reload();
         }
       } else {
-        alert('Aucune mise à jour disponible. Votre application est à jour !');
+        window.alert('Aucune mise à jour disponible. Votre application est à jour !');
       }
     } catch (error) {
-      alert('Erreur lors de la vérification des mises à jour.');
+              window.alert('Erreur lors de la vérification des mises à jour.');
     } finally {
       setIsCheckingUpdate(false);
     }
