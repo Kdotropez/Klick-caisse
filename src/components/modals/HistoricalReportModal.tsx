@@ -93,29 +93,29 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     console.log(`[DEBUG] Date actuelle: ${today.toISOString()}, Année: ${currentYear}, Mois: ${currentMonth}`);
     
     switch (period) {
-      case 'current_month':
-        // CORRECTION: Utiliser le mois actuel (0-11) pour le calcul
-        const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
-        const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
-        const currentMonthDates = {
-          start: firstDayOfMonth.toISOString().split('T')[0],
-          end: lastDayOfMonth.toISOString().split('T')[0]
-        };
-        console.log(`[DEBUG] Mois en cours: ${currentMonthDates.start} - ${currentMonthDates.end}`);
-        console.log(`[DEBUG] Détail calcul: premier jour = ${firstDayOfMonth.toISOString()}, dernier jour = ${lastDayOfMonth.toISOString()}`);
-        console.log(`[DEBUG] Vérification: premier jour = ${firstDayOfMonth.getDate()}, dernier jour = ${lastDayOfMonth.getDate()}`);
-        return currentMonthDates;
-        
-      case 'last_month':
-        const firstDayOfLastMonth = new Date(currentYear, currentMonth - 1, 1);
-        const lastDayOfLastMonth = new Date(currentYear, currentMonth, 0);
-        const lastMonthDates = {
-          start: firstDayOfLastMonth.toISOString().split('T')[0],
-          end: lastDayOfLastMonth.toISOString().split('T')[0]
-        };
-        console.log(`[DEBUG] Mois précédent: ${lastMonthDates.start} - ${lastMonthDates.end}`);
-        console.log(`[DEBUG] Détail calcul: premier jour = ${firstDayOfLastMonth.toISOString()}, dernier jour = ${lastDayOfLastMonth.toISOString()}`);
-        return lastMonthDates;
+             case 'current_month':
+         // CORRECTION: Utiliser le mois actuel (0-11) pour le calcul
+         const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+         const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+         const currentMonthDates = {
+           start: firstDayOfMonth.toISOString().split('T')[0],
+           end: lastDayOfMonth.toISOString().split('T')[0]
+         };
+         console.log(`[DEBUG] Mois en cours: ${currentMonthDates.start} - ${currentMonthDates.end}`);
+         console.log(`[DEBUG] Détail calcul: premier jour = ${firstDayOfMonth.toISOString()}, dernier jour = ${lastDayOfMonth.toISOString()}`);
+         console.log(`[DEBUG] Vérification: premier jour = ${firstDayOfMonth.getDate()}, dernier jour = ${lastDayOfMonth.getDate()}`);
+         return currentMonthDates;
+         
+       case 'last_month':
+         const firstDayOfLastMonth = new Date(currentYear, currentMonth - 1, 1);
+         const lastDayOfLastMonth = new Date(currentYear, currentMonth - 1 + 1, 0);
+         const lastMonthDates = {
+           start: firstDayOfLastMonth.toISOString().split('T')[0],
+           end: lastDayOfLastMonth.toISOString().split('T')[0]
+         };
+         console.log(`[DEBUG] Mois précédent: ${lastMonthDates.start} - ${lastMonthDates.end}`);
+         console.log(`[DEBUG] Détail calcul: premier jour = ${firstDayOfLastMonth.toISOString()}, dernier jour = ${lastDayOfLastMonth.toISOString()}`);
+         return lastMonthDates;
         
       case 'current_year':
         const currentYearDates = {
