@@ -113,6 +113,8 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
   const filteredClosures = useMemo(() => {
     const { start, end } = getPeriodDates(selectedPeriod);
     
+    console.log(`[DEBUG] Période sélectionnée: ${selectedPeriod}, Dates: ${start} - ${end}`);
+    
     if (!start && !end) return allClosures;
     
     return allClosures.filter(closure => {
@@ -120,7 +122,10 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
       const startDate = start || '1900-01-01';
       const endDate = end || '2100-12-31';
       
-      return closureDate >= startDate && closureDate <= endDate;
+      const isInRange = closureDate >= startDate && closureDate <= endDate;
+      console.log(`[DEBUG] Clôture ${closure.zNumber} du ${closureDate}: ${isInRange ? 'INCLUSE' : 'EXCLUE'}`);
+      
+      return isInRange;
     });
   }, [allClosures, selectedPeriod, startDate, endDate]);
 
@@ -166,7 +171,17 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
         tx.items?.forEach((item: any) => {
           stats.totalItems += item.quantity || 0;
           
-          const productName = item.name || 'Produit inconnu';
+          // Debug pour voir la structure des items
+          console.log(`[DEBUG] Item structure:`, item);
+          
+          // Améliorer la gestion des noms de produits
+          let productName = item.name || item.productName || item.title || '';
+          if (!productName || productName.trim() === '') {
+            productName = item.id ? `Produit #${item.id}` : 'Produit sans nom';
+          }
+          
+          console.log(`[DEBUG] Nom du produit final: "${productName}"`);
+          
           const existing = productMap.get(productName);
           const itemTotal = (item.price || 0) * (item.quantity || 0);
           
