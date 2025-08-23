@@ -215,92 +215,63 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
                          paymentMethod.toLowerCase().includes('carte') || paymentMethod === 'card' ? 'Carte' : 'SumUp';
         stats.paymentMethods[methodKey] = (stats.paymentMethods[methodKey] || 0) + (tx.total || 0);
 
-                 // Articles vendus
+                 // Articles vendus - Utiliser la même logique que computeDailyProductSales
          tx.items?.forEach((item: any, itemIndex: number) => {
-           stats.totalItems += item.quantity || 0;
+           // Utiliser la structure standard des items comme dans computeDailyProductSales
+           const product = item.product;
+           const quantity = item.quantity || 0;
            
-           // Debug pour voir la structure des items
-           console.log(`[DEBUG] Item ${itemIndex + 1} structure complète:`, JSON.stringify(item, null, 2));
+           // Calculer le prix final comme dans computeDailyProductSales
+           const finalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : product?.finalPrice || 0;
+           const itemTotal = finalPrice * quantity;
            
-           // Récupérer le prix et la quantité
-           const quantity = parseFloat(item.quantity) || parseFloat(item.qty) || 1;
-           const price = parseFloat(item.price) || parseFloat(item.prix) || 0;
-           const itemTotal = quantity * price;
+           stats.totalItems += quantity;
            
-           console.log(`[DEBUG] Item ${itemIndex + 1} - quantity: ${quantity}, price: ${price}, total: ${itemTotal}`);
+           // Utiliser le nom du produit depuis l'objet product
+           const productName = product?.name || 'Produit sans nom';
+           const productId = product?.id || item.id || `item-${itemIndex}`;
            
-           // Améliorer la gestion des noms de produits - essayer toutes les propriétés possibles
-           let productName = '';
+           // Récupérer la catégorie et sous-catégorie depuis le produit
+           const category = product?.category?.name || product?.category || '';
+           const subcategory = product?.subcategory?.name || product?.subcategory || '';
            
-           // Essayer différentes propriétés pour le nom (s'assurer qu'elles sont des chaînes)
-           if (item.name && typeof item.name === 'string' && item.name.trim() !== '') productName = item.name;
-           else if (item.productName && typeof item.productName === 'string' && item.productName.trim() !== '') productName = item.productName;
-           else if (item.title && typeof item.title === 'string' && item.title.trim() !== '') productName = item.title;
-           else if (item.label && typeof item.label === 'string' && item.label.trim() !== '') productName = item.label;
-           else if (item.description && typeof item.description === 'string' && item.description.trim() !== '') productName = item.description;
-           else if (item.product && typeof item.product === 'string' && item.product.trim() !== '') productName = item.product;
+           console.log(`[DEBUG] Item ${itemIndex + 1}: ${productName} (ID: ${productId}) - Qté: ${quantity} - Prix: ${finalPrice}€ - Total: ${itemTotal}€`);
            
-           // Essayer d'autres propriétés possibles
-           if (!productName || productName.trim() === '') {
-             if (item.text && typeof item.text === 'string' && item.text.trim() !== '') productName = item.text;
-             else if (item.displayName && typeof item.displayName === 'string' && item.displayName.trim() !== '') productName = item.displayName;
-             else if (item.nom && typeof item.nom === 'string' && item.nom.trim() !== '') productName = item.nom;
-             else if (item.libelle && typeof item.libelle === 'string' && item.libelle.trim() !== '') productName = item.libelle;
+           const existing = productMap.get(productId);
+           
+           if (existing) {
+             existing.totalQuantity += quantity;
+             existing.totalRevenue += itemTotal;
+             existing.transactionsCount++;
+             existing.averagePrice = existing.totalRevenue / existing.totalQuantity;
+           } else {
+             productMap.set(productId, {
+               productName,
+               category,
+               subcategory,
+               totalQuantity: quantity,
+               totalRevenue: itemTotal,
+               averagePrice: finalPrice,
+               transactionsCount: 1
+             });
            }
            
-           // Si toujours pas de nom, essayer avec l'ID
-           if (!productName || productName.trim() === '') {
-             if (item.id) productName = `Produit #${item.id}`;
-             else if (item.productId) productName = `Produit #${item.productId}`;
-             else productName = 'Produit sans nom';
+           // Ajouter aux statistiques par catégorie
+           if (category) {
+             const existingCategory = stats.categories.get(category);
+             if (existingCategory) {
+               existingCategory.totalQuantity += quantity;
+               existingCategory.totalRevenue += itemTotal;
+               existingCategory.productsCount++;
+             } else {
+               stats.categories.set(category, {
+                 totalQuantity: quantity,
+                 totalRevenue: itemTotal,
+                 productsCount: 1
+               });
+             }
            }
-           
-           // S'assurer que productName est une chaîne
-           if (typeof productName !== 'string') {
-             productName = String(productName);
-           }
-          
-          // Récupérer la catégorie et sous-catégorie
-          const category = item.category || item.categorie || item.cat || '';
-          const subcategory = item.subcategory || item.sousCategorie || item.subcat || '';
-          
-          console.log(`[DEBUG] Nom du produit final: "${productName}" - Catégorie: "${category}" - Sous-catégorie: "${subcategory}"`);
-          
-          const existing = productMap.get(productName);
-          
-          if (existing) {
-            existing.totalQuantity += quantity;
-            existing.totalRevenue += itemTotal;
-            existing.transactionsCount++;
-            existing.averagePrice = existing.totalRevenue / existing.totalQuantity;
-          } else {
-            productMap.set(productName, {
-              productName,
-              category,
-              subcategory,
-              totalQuantity: quantity,
-              totalRevenue: itemTotal,
-              averagePrice: price,
-              transactionsCount: 1
-            });
-          }
-          
-          // Ajouter aux statistiques par catégorie
-          if (category) {
-            const existingCategory = stats.categories.get(category);
-            if (existingCategory) {
-              existingCategory.totalQuantity += quantity;
-              existingCategory.totalRevenue += itemTotal;
-              existingCategory.productsCount++;
-            } else {
-              stats.categories.set(category, {
-                totalQuantity: quantity,
-                totalRevenue: itemTotal,
-                productsCount: 1
-              });
-            }
-          }
-        });
+         });
       });
     });
 
