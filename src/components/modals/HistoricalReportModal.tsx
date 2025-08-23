@@ -68,7 +68,10 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
 
   // Charger toutes les clôtures
   const allClosures = useMemo(() => {
-    return StorageService.loadClosures() as ClosureData[];
+    const closures = StorageService.loadClosures() as ClosureData[];
+    console.log(`[DEBUG] Clôtures chargées:`, closures);
+    console.log(`[DEBUG] Nombre de clôtures:`, closures.length);
+    return closures;
   }, []);
 
   // Fonction pour calculer les dates selon la période sélectionnée
@@ -77,34 +80,51 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth();
     
+    console.log(`[DEBUG] Date actuelle: ${today.toISOString()}, Année: ${currentYear}, Mois: ${currentMonth}`);
+    
     switch (period) {
       case 'current_month':
         const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
         const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
-        return {
+        const currentMonthDates = {
           start: firstDayOfMonth.toISOString().split('T')[0],
           end: lastDayOfMonth.toISOString().split('T')[0]
         };
+        console.log(`[DEBUG] Mois en cours: ${currentMonthDates.start} - ${currentMonthDates.end}`);
+        return currentMonthDates;
+        
       case 'last_month':
         const firstDayOfLastMonth = new Date(currentYear, currentMonth - 1, 1);
         const lastDayOfLastMonth = new Date(currentYear, currentMonth, 0);
-        return {
+        const lastMonthDates = {
           start: firstDayOfLastMonth.toISOString().split('T')[0],
           end: lastDayOfLastMonth.toISOString().split('T')[0]
         };
+        console.log(`[DEBUG] Mois précédent: ${lastMonthDates.start} - ${lastMonthDates.end}`);
+        return lastMonthDates;
+        
       case 'current_year':
-        return {
+        const currentYearDates = {
           start: `${currentYear}-01-01`,
           end: `${currentYear}-12-31`
         };
+        console.log(`[DEBUG] Année en cours: ${currentYearDates.start} - ${currentYearDates.end}`);
+        return currentYearDates;
+        
       case 'last_year':
-        return {
+        const lastYearDates = {
           start: `${currentYear - 1}-01-01`,
           end: `${currentYear - 1}-12-31`
         };
+        console.log(`[DEBUG] Année précédente: ${lastYearDates.start} - ${lastYearDates.end}`);
+        return lastYearDates;
+        
       case 'all':
+        console.log(`[DEBUG] Toutes les clôtures sélectionnées`);
         return { start: '', end: '' };
+        
       default:
+        console.log(`[DEBUG] Période personnalisée: ${startDate} - ${endDate}`);
         return { start: startDate, end: endDate };
     }
   };
@@ -144,7 +164,12 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     const productMap = new Map<string, ProductSalesData>();
 
     filteredClosures.forEach(closure => {
-      closure.transactions.forEach((tx: any) => {
+      console.log(`[DEBUG] Traitement clôture Z${closure.zNumber} du ${closure.closedAt}`);
+      console.log(`[DEBUG] Nombre de transactions: ${closure.transactions.length}`);
+      
+      closure.transactions.forEach((tx: any, txIndex: number) => {
+        console.log(`[DEBUG] Transaction ${txIndex + 1}:`, tx);
+        
         // CA total
         stats.totalCA += tx.total || 0;
         stats.totalTransactions++;
@@ -174,13 +199,25 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
           // Debug pour voir la structure des items
           console.log(`[DEBUG] Item structure:`, item);
           
-          // Améliorer la gestion des noms de produits
-          let productName = item.name || item.productName || item.title || '';
+          // Améliorer la gestion des noms de produits - essayer toutes les propriétés possibles
+          let productName = '';
+          
+          // Essayer différentes propriétés pour le nom
+          if (item.name) productName = item.name;
+          else if (item.productName) productName = item.productName;
+          else if (item.title) productName = item.title;
+          else if (item.label) productName = item.label;
+          else if (item.description) productName = item.description;
+          else if (item.product) productName = item.product;
+          
+          // Si toujours pas de nom, essayer avec l'ID
           if (!productName || productName.trim() === '') {
-            productName = item.id ? `Produit #${item.id}` : 'Produit sans nom';
+            if (item.id) productName = `Produit #${item.id}`;
+            else if (item.productId) productName = `Produit #${item.productId}`;
+            else productName = 'Produit sans nom';
           }
           
-          console.log(`[DEBUG] Nom du produit final: "${productName}"`);
+          console.log(`[DEBUG] Nom du produit final: "${productName}" (propriétés testées: name=${item.name}, productName=${item.productName}, title=${item.title}, label=${item.label}, description=${item.description}, product=${item.product})`);
           
           const existing = productMap.get(productName);
           const itemTotal = (item.price || 0) * (item.quantity || 0);
