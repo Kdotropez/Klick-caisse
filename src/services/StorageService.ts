@@ -314,17 +314,26 @@ export class StorageService {
   static loadClosures(): any[] {
     try {
       const raw = localStorage.getItem(this.CLOSURES_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
+      console.log(`[DEBUG StorageService] loadClosures - raw:`, raw);
+      const closures = raw ? JSON.parse(raw) : [];
+      console.log(`[DEBUG StorageService] loadClosures - parsed:`, closures);
+      console.log(`[DEBUG StorageService] loadClosures - count:`, closures.length);
+      return closures;
+    } catch (error) {
+      console.error(`[DEBUG StorageService] loadClosures - error:`, error);
       return [];
     }
   }
 
   static saveClosure(closure: any): void {
     try {
+      console.log(`[DEBUG StorageService] saveClosure - closure:`, closure);
       const all = this.loadClosures();
+      console.log(`[DEBUG StorageService] saveClosure - existing closures:`, all.length);
       all.push(closure);
+      console.log(`[DEBUG StorageService] saveClosure - total after push:`, all.length);
       localStorage.setItem(this.CLOSURES_KEY, JSON.stringify(all));
+      console.log(`[DEBUG StorageService] saveClosure - saved successfully`);
     } catch (error) {
       console.error('Erreur lors de l\'archivage de la clôture:', error);
     }
