@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
-import { CheckCircle, Update } from '@mui/icons-material';
+import { CheckCircle, Update, Assessment } from '@mui/icons-material';
 import { resetToEmbeddedBase } from '../../data/productionData';
 import { StorageService } from '../../services/StorageService';
 import { UpdateService } from '../../services/UpdateService';
 import { APP_VERSION } from '../../version';
+import HistoricalReportModal from '../modals/HistoricalReportModal';
 
 interface SettingsPanelProps {
   width: number;
@@ -40,6 +41,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onOpenDiscountRules,
 }) => {
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [showHistoricalReport, setShowHistoricalReport] = useState(false);
 
   const handleCheckUpdate = async () => {
     setIsCheckingUpdate(true);
@@ -379,9 +381,10 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 3')}
+        onClick={() => setShowHistoricalReport(true)}
       >
-        Vide 3
+        <Assessment sx={{ fontSize: '1.2em', mr: 0.5 }} />
+        Rapport Historique
       </Button>
 
       <Button
@@ -483,6 +486,12 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       >
         Vide 8
       </Button>
+
+      {/* Modale Rapport Historique */}
+      <HistoricalReportModal
+        open={showHistoricalReport}
+        onClose={() => setShowHistoricalReport(false)}
+      />
     </Box>
   );
 };
