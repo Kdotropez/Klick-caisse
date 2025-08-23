@@ -44,6 +44,8 @@ interface ClosureData {
 
 interface ProductSalesData {
   productName: string;
+  category?: string;
+  subcategory?: string;
   totalQuantity: number;
   totalRevenue: number;
   averagePrice: number;
@@ -63,7 +65,7 @@ interface DailyStats {
 const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onClose }) => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [selectedReportType, setSelectedReportType] = useState<'summary' | 'products' | 'daily'>('summary');
+  const [selectedReportType, setSelectedReportType] = useState<'summary' | 'products' | 'categories' | 'daily'>('summary');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('custom');
 
   // Charger toutes les clôtures
@@ -177,7 +179,8 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
       totalDiscounts: 0,
       totalDays: filteredClosures.length,
       paymentMethods: {} as Record<string, number>,
-      topProducts: [] as ProductSalesData[]
+      topProducts: [] as ProductSalesData[],
+      categories: new Map<string, { totalQuantity: number; totalRevenue: number; productsCount: number }>()
     };
 
     const productMap = new Map<string, ProductSalesData>();
@@ -218,9 +221,13 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
            
            // Debug pour voir la structure des items
            console.log(`[DEBUG] Item ${itemIndex + 1} structure complète:`, JSON.stringify(item, null, 2));
-           console.log(`[DEBUG] Item ${itemIndex + 1} - quantity: ${item.quantity}, price: ${item.price}, total: ${(item.quantity || 0) * (item.price || 0)}`);
-           console.log(`[DEBUG] Types des propriétés: name=${typeof item.name}, productName=${typeof item.productName}, title=${typeof item.title}, label=${typeof item.label}, description=${typeof item.description}, product=${typeof item.product}`);
-           console.log(`[DEBUG] Valeurs des propriétés: name="${item.name}", productName="${item.productName}", title="${item.title}", label="${item.label}", description="${item.description}", product="${item.product}"`);
+           
+           // Récupérer le prix et la quantité
+           const quantity = parseFloat(item.quantity) || parseFloat(item.qty) || 1;
+           const price = parseFloat(item.price) || parseFloat(item.prix) || 0;
+           const itemTotal = quantity * price;
+           
+           console.log(`[DEBUG] Item ${itemIndex + 1} - quantity: ${quantity}, price: ${price}, total: ${itemTotal}`);
            
            // Améliorer la gestion des noms de produits - essayer toutes les propriétés possibles
            let productName = '';
@@ -253,24 +260,45 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
              productName = String(productName);
            }
           
-          console.log(`[DEBUG] Nom du produit final: "${productName}" (propriétés testées: name=${item.name}, productName=${item.productName}, title=${item.title}, label=${item.label}, description=${item.description}, product=${item.product})`);
+          // Récupérer la catégorie et sous-catégorie
+          const category = item.category || item.categorie || item.cat || '';
+          const subcategory = item.subcategory || item.sousCategorie || item.subcat || '';
+          
+          console.log(`[DEBUG] Nom du produit final: "${productName}" - Catégorie: "${category}" - Sous-catégorie: "${subcategory}"`);
           
           const existing = productMap.get(productName);
-          const itemTotal = (item.price || 0) * (item.quantity || 0);
           
           if (existing) {
-            existing.totalQuantity += item.quantity || 0;
+            existing.totalQuantity += quantity;
             existing.totalRevenue += itemTotal;
             existing.transactionsCount++;
             existing.averagePrice = existing.totalRevenue / existing.totalQuantity;
           } else {
             productMap.set(productName, {
               productName,
-              totalQuantity: item.quantity || 0,
+              category,
+              subcategory,
+              totalQuantity: quantity,
               totalRevenue: itemTotal,
-              averagePrice: item.price || 0,
+              averagePrice: price,
               transactionsCount: 1
             });
+          }
+          
+          // Ajouter aux statistiques par catégorie
+          if (category) {
+            const existingCategory = stats.categories.get(category);
+            if (existingCategory) {
+              existingCategory.totalQuantity += quantity;
+              existingCategory.totalRevenue += itemTotal;
+              existingCategory.productsCount++;
+            } else {
+              stats.categories.set(category, {
+                totalQuantity: quantity,
+                totalRevenue: itemTotal,
+                productsCount: 1
+              });
+            }
           }
         });
       });
@@ -387,15 +415,16 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth size="small">
                 <InputLabel>Type de rapport</InputLabel>
-                <Select
-                  value={selectedReportType}
-                  onChange={(e) => setSelectedReportType(e.target.value as any)}
-                  label="Type de rapport"
-                >
-                  <MenuItem value="summary">Résumé global</MenuItem>
-                  <MenuItem value="products">Détail produits</MenuItem>
-                  <MenuItem value="daily">Par jour</MenuItem>
-                </Select>
+                                 <Select
+                   value={selectedReportType}
+                   onChange={(e) => setSelectedReportType(e.target.value as any)}
+                   label="Type de rapport"
+                 >
+                   <MenuItem value="summary">Résumé global</MenuItem>
+                   <MenuItem value="products">Détail produits</MenuItem>
+                   <MenuItem value="categories">Par catégorie</MenuItem>
+                   <MenuItem value="daily">Par jour</MenuItem>
+                 </Select>
               </FormControl>
             </Grid>
 
@@ -698,51 +727,123 @@ if (recoveredClosures.length > 0) {
           </Box>
         )}
 
-        {/* Rapport Détail Produits */}
-        {selectedReportType === 'products' && (
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-              📦 Détail des Produits
-            </Typography>
-            
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Rang</TableCell>
-                    <TableCell>Produit</TableCell>
-                    <TableCell align="right">Quantité vendue</TableCell>
-                    <TableCell align="right">CA généré</TableCell>
-                    <TableCell align="right">Prix moyen</TableCell>
-                    <TableCell align="right">Nombre de transactions</TableCell>
-                    <TableCell align="right">% du CA total</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {globalStats.topProducts.map((product, index) => (
-                    <TableRow key={product.productName}>
-                      <TableCell>
-                        <Chip 
-                          label={`#${index + 1}`} 
-                          color={index < 3 ? "primary" : "default"}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>{product.productName}</TableCell>
-                      <TableCell align="right">{product.totalQuantity}</TableCell>
-                      <TableCell align="right">{formatCurrency(product.totalRevenue)}</TableCell>
-                      <TableCell align="right">{formatCurrency(product.averagePrice)}</TableCell>
-                      <TableCell align="right">{product.transactionsCount}</TableCell>
-                      <TableCell align="right">
-                        {((product.totalRevenue / globalStats.totalCA) * 100).toFixed(1)}%
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        )}
+                 {/* Rapport Détail Produits */}
+         {selectedReportType === 'products' && (
+           <Box>
+             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+               📦 Détail des Produits
+             </Typography>
+             
+             <TableContainer component={Paper}>
+               <Table>
+                 <TableHead>
+                   <TableRow>
+                     <TableCell>Rang</TableCell>
+                     <TableCell>Produit</TableCell>
+                     <TableCell>Catégorie</TableCell>
+                     <TableCell>Sous-catégorie</TableCell>
+                     <TableCell align="right">Quantité vendue</TableCell>
+                     <TableCell align="right">CA généré</TableCell>
+                     <TableCell align="right">Prix moyen</TableCell>
+                     <TableCell align="right">Nombre de transactions</TableCell>
+                     <TableCell align="right">% du CA total</TableCell>
+                   </TableRow>
+                 </TableHead>
+                 <TableBody>
+                   {globalStats.topProducts.map((product, index) => (
+                     <TableRow key={product.productName}>
+                       <TableCell>
+                         <Chip 
+                           label={`#${index + 1}`} 
+                           color={index < 3 ? "primary" : "default"}
+                           size="small"
+                         />
+                       </TableCell>
+                       <TableCell>
+                         <Box>
+                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                             {product.productName}
+                           </Typography>
+                         </Box>
+                       </TableCell>
+                       <TableCell>
+                         {product.category ? (
+                           <Chip label={product.category} size="small" color="secondary" variant="outlined" />
+                         ) : (
+                           <Typography variant="body2" color="text.secondary">-</Typography>
+                         )}
+                       </TableCell>
+                       <TableCell>
+                         {product.subcategory ? (
+                           <Chip label={product.subcategory} size="small" color="info" variant="outlined" />
+                         ) : (
+                           <Typography variant="body2" color="text.secondary">-</Typography>
+                         )}
+                       </TableCell>
+                       <TableCell align="right">{product.totalQuantity}</TableCell>
+                       <TableCell align="right">{formatCurrency(product.totalRevenue)}</TableCell>
+                       <TableCell align="right">{formatCurrency(product.averagePrice)}</TableCell>
+                       <TableCell align="right">{product.transactionsCount}</TableCell>
+                       <TableCell align="right">
+                         {((product.totalRevenue / globalStats.totalCA) * 100).toFixed(1)}%
+                       </TableCell>
+                     </TableRow>
+                   ))}
+                 </TableBody>
+               </Table>
+             </TableContainer>
+           </Box>
+         )}
+
+         {/* Rapport Par Catégorie */}
+         {selectedReportType === 'categories' && (
+           <Box>
+             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+               📊 Détail par Catégorie
+             </Typography>
+             
+             <TableContainer component={Paper}>
+               <Table>
+                 <TableHead>
+                   <TableRow>
+                     <TableCell>Rang</TableCell>
+                     <TableCell>Catégorie</TableCell>
+                     <TableCell align="right">Nombre de produits</TableCell>
+                     <TableCell align="right">Quantité vendue</TableCell>
+                     <TableCell align="right">CA généré</TableCell>
+                     <TableCell align="right">% du CA total</TableCell>
+                   </TableRow>
+                 </TableHead>
+                 <TableBody>
+                                       {Array.from(globalStats.categories.entries())
+                      .sort(([, a], [, b]) => b.totalRevenue - a.totalRevenue)
+                      .map(([category, data], index) => (
+                       <TableRow key={category}>
+                         <TableCell>
+                           <Chip 
+                             label={`#${index + 1}`} 
+                             color={index < 3 ? "primary" : "default"}
+                             size="small"
+                           />
+                         </TableCell>
+                         <TableCell>
+                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                             {category}
+                           </Typography>
+                         </TableCell>
+                         <TableCell align="right">{data.productsCount}</TableCell>
+                         <TableCell align="right">{data.totalQuantity}</TableCell>
+                         <TableCell align="right">{formatCurrency(data.totalRevenue)}</TableCell>
+                         <TableCell align="right">
+                           {((data.totalRevenue / globalStats.totalCA) * 100).toFixed(1)}%
+                         </TableCell>
+                       </TableRow>
+                     ))}
+                 </TableBody>
+               </Table>
+             </TableContainer>
+           </Box>
+         )}
 
         {/* Rapport Par Jour */}
         {selectedReportType === 'daily' && (
