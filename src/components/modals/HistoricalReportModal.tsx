@@ -399,15 +399,111 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
               </FormControl>
             </Grid>
 
-            {/* Nombre de clôtures */}
-            <Grid item xs={12} sm={4}>
-              <Chip 
-                label={`${filteredClosures.length} clôture(s)`}
-                color="primary"
-                variant="outlined"
-                sx={{ height: '40px', fontSize: '0.9rem' }}
-              />
-            </Grid>
+                         {/* Nombre de clôtures */}
+             <Grid item xs={12} sm={3}>
+               <Chip 
+                 label={`${filteredClosures.length} clôture(s)`}
+                 color="primary"
+                 variant="outlined"
+                 sx={{ height: '40px', fontSize: '0.9rem' }}
+               />
+             </Grid>
+             
+             {/* Bouton de récupération */}
+             <Grid item xs={12} sm={3}>
+               <Button
+                 variant="outlined"
+                 color="warning"
+                 size="small"
+                 onClick={() => {
+                   if (window.confirm('Récupérer les clôtures depuis les transactions ? Cette action va analyser les transactions quotidiennes et créer des clôtures.')) {
+                     // Exécuter le script de récupération
+                     const script = `
+// Script pour récupérer les clôtures depuis les transactions quotidiennes
+console.log('=== RÉCUPÉRATION DEPUIS LES TRANSACTIONS ===');
+
+// Fonction pour analyser les transactions par jour et créer des clôtures
+function recoverClosuresFromTransactions() {
+  try {
+    // Récupérer les transactions par jour
+    const transactionsByDayRaw = localStorage.getItem('klick_caisse_transactions_by_day');
+    console.log('📊 Transactions par jour trouvées:', !!transactionsByDayRaw);
+    
+    if (!transactionsByDayRaw) {
+      console.log('❌ Aucune transaction par jour trouvée');
+      return [];
+    }
+    
+    const transactionsByDay = JSON.parse(transactionsByDayRaw);
+    console.log('📅 Jours avec transactions:', Object.keys(transactionsByDay));
+    
+    const recoveredClosures = [];
+    let zNumber = 1;
+    
+    // Parcourir chaque jour
+    Object.entries(transactionsByDay).forEach(([dateKey, transactions]) => {
+      if (Array.isArray(transactions) && transactions.length > 0) {
+        console.log(\`📅 Jour \${dateKey}: \${transactions.length} transactions\`);
+        
+        // Calculer le total CA
+        const totalCA = transactions.reduce((sum, tx) => sum + (tx.total || 0), 0);
+        
+        // Créer une clôture
+        const closure = {
+          zNumber: zNumber++,
+          closedAt: dateKey,
+          transactions: transactions,
+          totalCA: totalCA,
+          totalTransactions: transactions.length
+        };
+        
+        recoveredClosures.push(closure);
+        console.log(\`✅ Clôture Z\${closure.zNumber - 1} créée pour \${dateKey}: \${totalCA.toFixed(2)} €\`);
+      }
+    });
+    
+    return recoveredClosures;
+    
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération:', error);
+    return [];
+  }
+}
+
+// Exécuter la récupération
+const recoveredClosures = recoverClosuresFromTransactions();
+
+if (recoveredClosures.length > 0) {
+  // Sauvegarder dans localStorage
+  localStorage.setItem('klick_caisse_closures', JSON.stringify(recoveredClosures));
+  
+  // Vérifier la sauvegarde
+  const saved = localStorage.getItem('klick_caisse_closures');
+  const parsed = JSON.parse(saved);
+  console.log(\`✅ \${parsed.length} clôtures sauvegardées\`);
+  
+  alert(\`✅ \${parsed.length} clôtures récupérées avec succès! Rechargez la page pour les voir.\`);
+  
+  // Forcer le rechargement des données
+  window.location.reload();
+} else {
+  alert('❌ Aucune clôture récupérée. Vérifiez les logs dans la console.');
+}
+`;
+                     
+                     try {
+                       eval(script);
+                     } catch (error) {
+                       console.error('Erreur lors de la récupération:', error);
+                       alert('Erreur lors de la récupération. Vérifiez la console.');
+                     }
+                   }
+                 }}
+                 sx={{ height: '40px', fontSize: '0.8rem' }}
+               >
+                 🔄 Récupérer
+               </Button>
+             </Grid>
 
             {/* Champs de date personnalisés (visible seulement si période personnalisée) */}
             {selectedPeriod === 'custom' && (
