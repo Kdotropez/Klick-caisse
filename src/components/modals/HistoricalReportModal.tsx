@@ -206,26 +206,32 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
         tx.items?.forEach((item: any) => {
           stats.totalItems += item.quantity || 0;
           
-          // Debug pour voir la structure des items
-          console.log(`[DEBUG] Item structure:`, item);
+                     // Debug pour voir la structure des items
+           console.log(`[DEBUG] Item structure:`, item);
+           console.log(`[DEBUG] Types des propriétés: name=${typeof item.name}, productName=${typeof item.productName}, title=${typeof item.title}, label=${typeof item.label}, description=${typeof item.description}, product=${typeof item.product}`);
           
-          // Améliorer la gestion des noms de produits - essayer toutes les propriétés possibles
-          let productName = '';
-          
-          // Essayer différentes propriétés pour le nom
-          if (item.name) productName = item.name;
-          else if (item.productName) productName = item.productName;
-          else if (item.title) productName = item.title;
-          else if (item.label) productName = item.label;
-          else if (item.description) productName = item.description;
-          else if (item.product) productName = item.product;
-          
-          // Si toujours pas de nom, essayer avec l'ID
-          if (!productName || productName.trim() === '') {
-            if (item.id) productName = `Produit #${item.id}`;
-            else if (item.productId) productName = `Produit #${item.productId}`;
-            else productName = 'Produit sans nom';
-          }
+                     // Améliorer la gestion des noms de produits - essayer toutes les propriétés possibles
+           let productName = '';
+           
+           // Essayer différentes propriétés pour le nom (s'assurer qu'elles sont des chaînes)
+           if (item.name && typeof item.name === 'string') productName = item.name;
+           else if (item.productName && typeof item.productName === 'string') productName = item.productName;
+           else if (item.title && typeof item.title === 'string') productName = item.title;
+           else if (item.label && typeof item.label === 'string') productName = item.label;
+           else if (item.description && typeof item.description === 'string') productName = item.description;
+           else if (item.product && typeof item.product === 'string') productName = item.product;
+           
+           // Si toujours pas de nom, essayer avec l'ID
+           if (!productName || (typeof productName === 'string' && productName.trim() === '')) {
+             if (item.id) productName = `Produit #${item.id}`;
+             else if (item.productId) productName = `Produit #${item.productId}`;
+             else productName = 'Produit sans nom';
+           }
+           
+           // S'assurer que productName est une chaîne
+           if (typeof productName !== 'string') {
+             productName = String(productName);
+           }
           
           console.log(`[DEBUG] Nom du produit final: "${productName}" (propriétés testées: name=${item.name}, productName=${item.productName}, title=${item.title}, label=${item.label}, description=${item.description}, product=${item.product})`);
           
