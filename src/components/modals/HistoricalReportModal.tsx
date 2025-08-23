@@ -64,24 +64,65 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [selectedReportType, setSelectedReportType] = useState<'summary' | 'products' | 'daily'>('summary');
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('custom');
 
   // Charger toutes les clôtures
   const allClosures = useMemo(() => {
     return StorageService.loadClosures() as ClosureData[];
   }, []);
 
+  // Fonction pour calculer les dates selon la période sélectionnée
+  const getPeriodDates = (period: string) => {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+    
+    switch (period) {
+      case 'current_month':
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+        const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+        return {
+          start: firstDayOfMonth.toISOString().split('T')[0],
+          end: lastDayOfMonth.toISOString().split('T')[0]
+        };
+      case 'last_month':
+        const firstDayOfLastMonth = new Date(currentYear, currentMonth - 1, 1);
+        const lastDayOfLastMonth = new Date(currentYear, currentMonth, 0);
+        return {
+          start: firstDayOfLastMonth.toISOString().split('T')[0],
+          end: lastDayOfLastMonth.toISOString().split('T')[0]
+        };
+      case 'current_year':
+        return {
+          start: `${currentYear}-01-01`,
+          end: `${currentYear}-12-31`
+        };
+      case 'last_year':
+        return {
+          start: `${currentYear - 1}-01-01`,
+          end: `${currentYear - 1}-12-31`
+        };
+      case 'all':
+        return { start: '', end: '' };
+      default:
+        return { start: startDate, end: endDate };
+    }
+  };
+
   // Filtrer les clôtures par période
   const filteredClosures = useMemo(() => {
-    if (!startDate && !endDate) return allClosures;
+    const { start, end } = getPeriodDates(selectedPeriod);
+    
+    if (!start && !end) return allClosures;
     
     return allClosures.filter(closure => {
       const closureDate = new Date(closure.closedAt).toISOString().split('T')[0];
-      const start = startDate || '1900-01-01';
-      const end = endDate || '2100-12-31';
+      const startDate = start || '1900-01-01';
+      const endDate = end || '2100-12-31';
       
-      return closureDate >= start && closureDate <= end;
+      return closureDate >= startDate && closureDate <= endDate;
     });
-  }, [allClosures, startDate, endDate]);
+  }, [allClosures, selectedPeriod, startDate, endDate]);
 
   // Calculer les statistiques globales
   const globalStats = useMemo(() => {
@@ -235,27 +276,27 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
         {/* Filtres */}
         <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={3}>
-              <TextField
-                label="Date de début"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                fullWidth
-                size="small"
-              />
+            {/* Période prédéfinie */}
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Période</InputLabel>
+                <Select
+                  value={selectedPeriod}
+                  onChange={(e) => setSelectedPeriod(e.target.value)}
+                  label="Période"
+                >
+                  <MenuItem value="all">Toutes les clôtures</MenuItem>
+                  <MenuItem value="current_month">Mois en cours</MenuItem>
+                  <MenuItem value="last_month">Mois précédent</MenuItem>
+                  <MenuItem value="current_year">Année en cours</MenuItem>
+                  <MenuItem value="last_year">Année précédente</MenuItem>
+                  <MenuItem value="custom">Période personnalisée</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField
-                label="Date de fin"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
+
+            {/* Type de rapport */}
+            <Grid item xs={12} sm={4}>
               <FormControl fullWidth size="small">
                 <InputLabel>Type de rapport</InputLabel>
                 <Select
@@ -269,13 +310,64 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={3}>
+
+            {/* Nombre de clôtures */}
+            <Grid item xs={12} sm={4}>
               <Chip 
                 label={`${filteredClosures.length} clôture(s)`}
                 color="primary"
                 variant="outlined"
+                sx={{ height: '40px', fontSize: '0.9rem' }}
               />
             </Grid>
+
+            {/* Champs de date personnalisés (visible seulement si période personnalisée) */}
+            {selectedPeriod === 'custom' && (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Date de début"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    fullWidth
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Date de fin"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    fullWidth
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+              </>
+            )}
+
+            {/* Affichage de la période sélectionnée */}
+            {selectedPeriod !== 'custom' && (
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Période sélectionnée :
+                  </Typography>
+                  <Chip 
+                    label={(() => {
+                      const { start, end } = getPeriodDates(selectedPeriod);
+                      if (!start && !end) return 'Toutes les clôtures';
+                      return `${formatDate(start)} - ${formatDate(end)}`;
+                    })()}
+                    color="secondary"
+                    size="small"
+                  />
+                </Box>
+              </Grid>
+            )}
           </Grid>
         </Box>
 
