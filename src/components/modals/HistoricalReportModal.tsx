@@ -71,6 +71,14 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     const closures = StorageService.loadClosures() as ClosureData[];
     console.log(`[DEBUG] Clôtures chargées:`, closures);
     console.log(`[DEBUG] Nombre de clôtures:`, closures.length);
+    
+    // Debug localStorage
+    console.log(`[DEBUG] localStorage.getItem('klick_caisse_closures'):`, localStorage.getItem('klick_caisse_closures'));
+    
+    // Vérifier toutes les clés localStorage
+    const allKeys = Object.keys(localStorage).filter(key => key.includes('klick_caisse'));
+    console.log(`[DEBUG] Toutes les clés klick_caisse:`, allKeys);
+    
     return closures;
   }, []);
 
@@ -91,6 +99,7 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
           end: lastDayOfMonth.toISOString().split('T')[0]
         };
         console.log(`[DEBUG] Mois en cours: ${currentMonthDates.start} - ${currentMonthDates.end}`);
+        console.log(`[DEBUG] Détail calcul: premier jour = ${firstDayOfMonth.toISOString()}, dernier jour = ${lastDayOfMonth.toISOString()}`);
         return currentMonthDates;
         
       case 'last_month':
@@ -101,6 +110,7 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
           end: lastDayOfLastMonth.toISOString().split('T')[0]
         };
         console.log(`[DEBUG] Mois précédent: ${lastMonthDates.start} - ${lastMonthDates.end}`);
+        console.log(`[DEBUG] Détail calcul: premier jour = ${firstDayOfLastMonth.toISOString()}, dernier jour = ${lastDayOfLastMonth.toISOString()}`);
         return lastMonthDates;
         
       case 'current_year':
