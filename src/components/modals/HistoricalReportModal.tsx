@@ -192,7 +192,7 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
         // Méthodes de paiement
         const paymentMethod = tx.paymentMethod || 'Inconnu';
         const methodKey = paymentMethod.toLowerCase().includes('esp') || paymentMethod === 'cash' ? 'Espèces' :
-                         paymentMethod.toLowerCase().includes('carte') || paymentMethod === 'card' ? 'SumUp';
+                         paymentMethod.toLowerCase().includes('carte') || paymentMethod === 'card' ? 'Carte' : 'SumUp';
         dayStats.paymentMethods[methodKey] = (dayStats.paymentMethods[methodKey] || 0) + (tx.total || 0);
 
         // Articles
