@@ -146,19 +146,26 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     const { start, end } = getPeriodDates(selectedPeriod);
     
     console.log(`[DEBUG] Période sélectionnée: ${selectedPeriod}, Dates: ${start} - ${end}`);
+    console.log(`[DEBUG] Nombre total de clôtures: ${allClosures.length}`);
     
-    if (!start && !end) return allClosures;
+    if (!start && !end) {
+      console.log(`[DEBUG] Aucun filtre de date - toutes les clôtures incluses`);
+      return allClosures;
+    }
     
-    return allClosures.filter(closure => {
+    const filtered = allClosures.filter(closure => {
       const closureDate = new Date(closure.closedAt).toISOString().split('T')[0];
       const startDate = start || '1900-01-01';
       const endDate = end || '2100-12-31';
       
       const isInRange = closureDate >= startDate && closureDate <= endDate;
-      console.log(`[DEBUG] Clôture ${closure.zNumber} du ${closureDate}: ${isInRange ? 'INCLUSE' : 'EXCLUE'}`);
+      console.log(`[DEBUG] Clôture Z${closure.zNumber} du ${closureDate}: ${isInRange ? 'INCLUSE' : 'EXCLUE'} (${startDate} <= ${closureDate} <= ${endDate})`);
       
       return isInRange;
     });
+    
+    console.log(`[DEBUG] Clôtures filtrées: ${filtered.length} sur ${allClosures.length}`);
+    return filtered;
   }, [allClosures, selectedPeriod, startDate, endDate]);
 
   // Calculer les statistiques globales
@@ -179,12 +186,13 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
       console.log(`[DEBUG] Traitement clôture Z${closure.zNumber} du ${closure.closedAt}`);
       console.log(`[DEBUG] Nombre de transactions: ${closure.transactions.length}`);
       
-      closure.transactions.forEach((tx: any, txIndex: number) => {
-        console.log(`[DEBUG] Transaction ${txIndex + 1}:`, tx);
-        
-        // CA total
-        stats.totalCA += tx.total || 0;
-        stats.totalTransactions++;
+             closure.transactions.forEach((tx: any, txIndex: number) => {
+         console.log(`[DEBUG] Transaction ${txIndex + 1}:`, tx);
+         console.log(`[DEBUG] Transaction ${txIndex + 1} - total: ${tx.total}, items: ${tx.items?.length || 0}`);
+         
+         // CA total
+         stats.totalCA += tx.total || 0;
+         stats.totalTransactions++;
         
         // Remises
         if (tx.globalDiscount) {
@@ -204,12 +212,13 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
                          paymentMethod.toLowerCase().includes('carte') || paymentMethod === 'card' ? 'Carte' : 'SumUp';
         stats.paymentMethods[methodKey] = (stats.paymentMethods[methodKey] || 0) + (tx.total || 0);
 
-        // Articles vendus
-        tx.items?.forEach((item: any) => {
-          stats.totalItems += item.quantity || 0;
-          
-                                // Debug pour voir la structure des items
-           console.log(`[DEBUG] Item structure:`, item);
+                 // Articles vendus
+         tx.items?.forEach((item: any, itemIndex: number) => {
+           stats.totalItems += item.quantity || 0;
+           
+           // Debug pour voir la structure des items
+           console.log(`[DEBUG] Item ${itemIndex + 1} structure complète:`, JSON.stringify(item, null, 2));
+           console.log(`[DEBUG] Item ${itemIndex + 1} - quantity: ${item.quantity}, price: ${item.price}, total: ${(item.quantity || 0) * (item.price || 0)}`);
            console.log(`[DEBUG] Types des propriétés: name=${typeof item.name}, productName=${typeof item.productName}, title=${typeof item.title}, label=${typeof item.label}, description=${typeof item.description}, product=${typeof item.product}`);
            console.log(`[DEBUG] Valeurs des propriétés: name="${item.name}", productName="${item.productName}", title="${item.title}", label="${item.label}", description="${item.description}", product="${item.product}"`);
            
