@@ -416,7 +416,21 @@ export class StorageService {
       const hh = String(d.getHours()).padStart(2, '0');
       const mi = String(d.getMinutes()).padStart(2, '0');
       const ss = String(d.getSeconds()).padStart(2, '0');
-      const filename = `klick-manual-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+      
+      // Nom plus explicite avec informations sur les clôtures
+      const closures = data.closures || [];
+      let filename = `klick-manual-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}`;
+      
+      if (closures.length > 0) {
+        const lastClosure = closures[closures.length - 1];
+        const closureDate = new Date(lastClosure.closedAt);
+        const closureDay = String(closureDate.getDate()).padStart(2, '0');
+        const closureMonth = String(closureDate.getMonth() + 1).padStart(2, '0');
+        filename += `-Z${lastClosure.zNumber}-${closureDay}${closureMonth}${closureDate.getFullYear()}`;
+      }
+      
+      filename += '.json';
+      
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
@@ -663,7 +677,21 @@ export class StorageService {
       const hh = String(d.getHours()).padStart(2, '0');
       const mi = String(d.getMinutes()).padStart(2, '0');
       const ss = String(d.getSeconds()).padStart(2, '0');
-      const filename = `klick-auto-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+      
+      // Nom plus explicite avec informations sur les clôtures
+      const closures = data.closures || [];
+      const lastClosure = closures[closures.length - 1];
+      let filename = `klick-auto-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}`;
+      
+      if (lastClosure) {
+        const closureDate = new Date(lastClosure.closedAt);
+        const closureDay = String(closureDate.getDate()).padStart(2, '0');
+        const closureMonth = String(closureDate.getMonth() + 1).padStart(2, '0');
+        filename += `-Z${lastClosure.zNumber}-${closureDay}${closureMonth}${closureDate.getFullYear()}`;
+      }
+      
+      filename += '.json';
+      
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
