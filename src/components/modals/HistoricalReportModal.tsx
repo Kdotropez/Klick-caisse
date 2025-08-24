@@ -189,10 +189,17 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     filteredClosures.forEach(closure => {
       console.log(`[DEBUG] Traitement clôture Z${closure.zNumber} du ${closure.closedAt}`);
       console.log(`[DEBUG] Nombre de transactions: ${closure.transactions.length}`);
+      console.log(`[DEBUG] Structure de la clôture:`, closure);
       
-             closure.transactions.forEach((tx: any, txIndex: number) => {
-         console.log(`[DEBUG] Transaction ${txIndex + 1}:`, tx);
-         console.log(`[DEBUG] Transaction ${txIndex + 1} - total: ${tx.total}, items: ${tx.items?.length || 0}`);
+      if (!closure.transactions || !Array.isArray(closure.transactions)) {
+        console.log(`[DEBUG] ❌ Clôture Z${closure.zNumber} n'a pas de transactions valides`);
+        return;
+      }
+      
+      closure.transactions.forEach((tx: any, txIndex: number) => {
+        console.log(`[DEBUG] Transaction ${txIndex + 1}:`, tx);
+        console.log(`[DEBUG] Transaction ${txIndex + 1} - total: ${tx.total}, items: ${tx.items?.length || 0}`);
+        console.log(`[DEBUG] Transaction ${txIndex + 1} - structure complète:`, JSON.stringify(tx, null, 2));
          
                  // Calculer le CA net (avec remises déduites)
         let transactionTotal = tx.total || 0;
