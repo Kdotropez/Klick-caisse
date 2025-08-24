@@ -5,6 +5,12 @@ export interface ImportResult {
   categories: Category[];
   success: boolean;
   message: string;
+  closures?: any[];
+  zCounter?: number;
+  settings?: any;
+  subcategories?: string[];
+  transactionsByDay?: any;
+  cashiers?: any[];
 }
 
 export class CSVImportService {
@@ -35,6 +41,25 @@ export class CSVImportService {
     try {
       const text = await file.text();
       const json = JSON.parse(text);
+      
+      // Vérifier si c'est un fichier de sauvegarde complet
+      if (json.schemaVersion && json.products && json.categories) {
+        // C'est un fichier de sauvegarde complet
+        return {
+          products: json.products || [],
+          categories: json.categories || [],
+          closures: json.closures || [],
+          zCounter: json.zCounter || 0,
+          settings: json.settings || {},
+          subcategories: json.subcategories || [],
+          transactionsByDay: json.transactionsByDay || {},
+          cashiers: json.cashiers || [],
+          success: true,
+          message: `Sauvegarde complète importée: ${json.products?.length || 0} produits, ${json.categories?.length || 0} catégories, ${json.closures?.length || 0} clôtures`,
+        };
+      }
+      
+      // Vérifier si c'est un tableau de produits (ancien format)
       if (!Array.isArray(json)) {
         return { products: [], categories: [], success: false, message: 'JSON invalide: tableau attendu' };
       }

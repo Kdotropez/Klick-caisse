@@ -2311,8 +2311,33 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Mettre à jour état + persistance
         onImportComplete(mergedProducts, mergedCategories);
         saveProductionData(mergedProducts, mergedCategories);
+        
+        // Importer aussi les clôtures si présentes
+        if (result.closures && Array.isArray(result.closures) && result.closures.length > 0) {
+          StorageService.saveAllClosures(result.closures);
+          if (result.zCounter) {
+            localStorage.setItem('klick_caisse_z_counter', String(result.zCounter));
+          }
+          console.log(`✅ ${result.closures.length} clôtures importées`);
+        }
+        
+        // Importer les autres données si présentes
+        if (result.settings) {
+          StorageService.saveSettings(result.settings);
+        }
+        if (result.subcategories && Array.isArray(result.subcategories)) {
+          StorageService.saveSubcategories(result.subcategories);
+        }
+        if (result.transactionsByDay) {
+          localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(result.transactionsByDay));
+        }
+        if (result.cashiers && Array.isArray(result.cashiers)) {
+          StorageService.saveCashiers(result.cashiers);
+        }
+        
         setImportStatus('success');
-        setImportMessage(`Import JSON réussi : ${mergedProducts.length} produits, ${mergedCategories.length} catégories`);
+        const closureMessage = result.closures ? `, ${result.closures.length} clôtures` : '';
+        setImportMessage(`Import JSON réussi : ${mergedProducts.length} produits, ${mergedCategories.length} catégories${closureMessage}`);
         setTimeout(() => { setImportStatus('idle'); setImportMessage(''); }, 1200);
         return;
       }

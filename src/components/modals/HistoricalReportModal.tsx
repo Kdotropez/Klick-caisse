@@ -194,27 +194,35 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
          console.log(`[DEBUG] Transaction ${txIndex + 1}:`, tx);
          console.log(`[DEBUG] Transaction ${txIndex + 1} - total: ${tx.total}, items: ${tx.items?.length || 0}`);
          
-         // CA total
-         stats.totalCA += tx.total || 0;
-         stats.totalTransactions++;
+                 // Calculer le CA net (avec remises déduites)
+        let transactionTotal = tx.total || 0;
+        let transactionDiscounts = 0;
         
-        // Remises
+        // Remises globales
         if (tx.globalDiscount) {
-          stats.totalDiscounts += tx.globalDiscount;
+          transactionDiscounts += tx.globalDiscount;
         }
+        
+        // Remises par article
         if (tx.itemDiscounts) {
           Object.values(tx.itemDiscounts).forEach((discount: any) => {
             if (discount.type === 'euro') {
-              stats.totalDiscounts += (discount.value || 0) * (tx.items?.length || 0);
+              transactionDiscounts += (discount.value || 0) * (tx.items?.length || 0);
             }
           });
         }
+        
+        // CA net = CA brut - remises
+        const netCA = transactionTotal - transactionDiscounts;
+        stats.totalCA += netCA;
+        stats.totalDiscounts += transactionDiscounts;
+        stats.totalTransactions++;
 
-        // Méthodes de paiement
+        // Méthodes de paiement (utiliser le CA net)
         const paymentMethod = tx.paymentMethod || 'Inconnu';
         const methodKey = paymentMethod.toLowerCase().includes('esp') || paymentMethod === 'cash' ? 'Espèces' :
                          paymentMethod.toLowerCase().includes('carte') || paymentMethod === 'card' ? 'Carte' : 'SumUp';
-        stats.paymentMethods[methodKey] = (stats.paymentMethods[methodKey] || 0) + (tx.total || 0);
+        stats.paymentMethods[methodKey] = (stats.paymentMethods[methodKey] || 0) + netCA;
 
                  // Articles vendus - Utiliser la même logique que computeDailyProductSales
          tx.items?.forEach((item: any, itemIndex: number) => {
@@ -303,26 +311,35 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
       };
 
       closure.transactions.forEach((tx: any) => {
-        dayStats.totalCA += tx.total || 0;
-        dayStats.totalTransactions++;
+        // Calculer le CA net (avec remises déduites)
+        let transactionTotal = tx.total || 0;
+        let transactionDiscounts = 0;
         
-        // Remises
+        // Remises globales
         if (tx.globalDiscount) {
-          dayStats.totalDiscounts += tx.globalDiscount;
+          transactionDiscounts += tx.globalDiscount;
         }
+        
+        // Remises par article
         if (tx.itemDiscounts) {
           Object.values(tx.itemDiscounts).forEach((discount: any) => {
             if (discount.type === 'euro') {
-              dayStats.totalDiscounts += (discount.value || 0) * (tx.items?.length || 0);
+              transactionDiscounts += (discount.value || 0) * (tx.items?.length || 0);
             }
           });
         }
+        
+        // CA net = CA brut - remises
+        const netCA = transactionTotal - transactionDiscounts;
+        dayStats.totalCA += netCA;
+        dayStats.totalDiscounts += transactionDiscounts;
+        dayStats.totalTransactions++;
 
-        // Méthodes de paiement
+        // Méthodes de paiement (utiliser le CA net)
         const paymentMethod = tx.paymentMethod || 'Inconnu';
         const methodKey = paymentMethod.toLowerCase().includes('esp') || paymentMethod === 'cash' ? 'Espèces' :
                          paymentMethod.toLowerCase().includes('carte') || paymentMethod === 'card' ? 'Carte' : 'SumUp';
-        dayStats.paymentMethods[methodKey] = (dayStats.paymentMethods[methodKey] || 0) + (tx.total || 0);
+        dayStats.paymentMethods[methodKey] = (dayStats.paymentMethods[methodKey] || 0) + netCA;
 
         // Articles
         tx.items?.forEach((item: any) => {
