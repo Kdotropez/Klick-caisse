@@ -400,6 +400,45 @@ export class StorageService {
     };
   }
 
+  // Sauvegarde manuelle immédiate (pour protection contre coupure)
+  static saveImmediateBackup(): void {
+    try {
+      const data = this.exportFullBackup();
+      if (!data) return;
+      
+      const content = JSON.stringify(data, null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      const filename = `klick-manual-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log(`✅ Sauvegarde manuelle créée: ${filename}`);
+      
+      // Afficher une notification
+      if (typeof window !== 'undefined' && window.alert) {
+        window.alert(`✅ Sauvegarde créée: ${filename}`);
+      }
+    } catch (e) {
+      console.error('Erreur sauvegarde manuelle:', e);
+      if (typeof window !== 'undefined' && window.alert) {
+        window.alert('❌ Erreur lors de la sauvegarde');
+      }
+    }
+  }
+
   // Importer les données
   static importData(data: { products: Product[], categories: Category[], settings?: any }): void {
     this.saveProducts(data.products);
@@ -603,8 +642,39 @@ export class StorageService {
       list.unshift(entry);
       const LIMITED = list.slice(0, 10); // garder les 10 dernières
       localStorage.setItem(this.AUTO_BACKUPS_KEY, JSON.stringify(LIMITED));
+      
+      // Sauvegarde JSON automatique pour récupération en cas de coupure
+      this.downloadAutoBackup(data);
     } catch (e) {
       console.error('Erreur sauvegarde auto:', e);
+    }
+  }
+
+  // Sauvegarde automatique JSON pour récupération
+  static downloadAutoBackup(data: any): void {
+    try {
+      const content = JSON.stringify(data, null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      const filename = `klick-auto-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log(`✅ Sauvegarde automatique créée: ${filename}`);
+    } catch (e) {
+      console.error('Erreur sauvegarde auto JSON:', e);
     }
   }
 

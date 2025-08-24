@@ -1,0 +1,1051 @@
+
+// Script de récupération des clôtures depuis les transactions
+console.log('=== RÉCUPÉRATION DES CLÔTURES ===');
+
+// Clôtures récupérées depuis les transactions
+const recoveredClosures = [
+  {
+    "zNumber": 1,
+    "closedAt": "2025-08-11T23:59:59.000Z",
+    "transactions": [
+      {
+        "id": "1754923625495",
+        "items": [
+          {
+            "product": {
+              "id": "6050",
+              "name": "ICE TROPEZ PECHE LITRE",
+              "reference": "6050",
+              "ean13": "3760004440796",
+              "category": "ICE TROPEZ",
+              "associatedCategories": [
+                "ICE",
+                "ICE TROPEZ"
+              ],
+              "wholesalePrice": 3.25,
+              "finalPrice": 6.5,
+              "crossedPrice": 6.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 2
+          }
+        ],
+        "total": 13,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T14:47:05.495Z"
+      },
+      {
+        "id": "1754923884845",
+        "items": [
+          {
+            "product": {
+              "id": "7876",
+              "name": "VERTICAL BEACH OPTIQUE TROPEZ",
+              "reference": "7876",
+              "ean13": "2052323213870",
+              "category": "VERRE",
+              "associatedCategories": [
+                "VERRE",
+                "VERRES 10"
+              ],
+              "wholesalePrice": 2.85,
+              "finalPrice": 8.5,
+              "crossedPrice": 8.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 2
+          }
+        ],
+        "total": 17,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T14:51:24.845Z"
+      },
+      {
+        "id": "1754923984345",
+        "items": [
+          {
+            "product": {
+              "id": "7175",
+              "name": "FOUTA TROPEZ FUSHIA",
+              "reference": "7175",
+              "ean13": "5282214719366",
+              "category": "SERVIETTE",
+              "associatedCategories": [
+                "SERVIETTE",
+                "Serviettes"
+              ],
+              "wholesalePrice": 9.5,
+              "finalPrice": 25,
+              "crossedPrice": 25,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 25,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T14:53:04.345Z"
+      },
+      {
+        "id": "1754925553801",
+        "items": [
+          {
+            "product": {
+              "id": "6434",
+              "name": "PACK 6 VN CLEAR VILLAGE",
+              "reference": "6434",
+              "ean13": "2022060508942",
+              "category": "PACK VERRE",
+              "associatedCategories": [
+                "PACK 39",
+                "Pack de verres",
+                "PACK VERRE",
+                "PACK VN"
+              ],
+              "wholesalePrice": 9.48,
+              "finalPrice": 37.5,
+              "crossedPrice": 39,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 37.5,
+        "paymentMethod": "Espèces",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T15:19:13.801Z"
+      },
+      {
+        "id": "1754926145894",
+        "items": [
+          {
+            "product": {
+              "id": "6792",
+              "name": "LIGHT TOWEL AQUA MAXIME NEW 2025",
+              "reference": "6792",
+              "ean13": "2076970417344",
+              "category": "SERVIETTE",
+              "associatedCategories": [],
+              "wholesalePrice": 18.05,
+              "finalPrice": 39,
+              "crossedPrice": 39,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 39,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T15:29:05.894Z"
+      },
+      {
+        "id": "1754943742097",
+        "items": [
+          {
+            "product": {
+              "id": "7179",
+              "name": "PASTIS  PETANQUE je pointe",
+              "reference": "7179",
+              "ean13": "3770008238169",
+              "category": "PASTIS",
+              "associatedCategories": [
+                "PASTIS",
+                "TRIO CUSTOM"
+              ],
+              "wholesalePrice": 15.5,
+              "finalPrice": 28,
+              "crossedPrice": 28,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 28,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:22:22.097Z"
+      },
+      {
+        "id": "1754943807038",
+        "items": [
+          {
+            "product": {
+              "id": "5858",
+              "name": "VN BLANC ISSAMBRE",
+              "reference": "5858",
+              "ean13": "2054228608874",
+              "category": "VERRE",
+              "associatedCategories": [
+                "COMPOSITION CUSTOM",
+                "VERRE",
+                "VERRES 6.50",
+                "Verres Pied",
+                "VN"
+              ],
+              "wholesalePrice": 1.69,
+              "finalPrice": 6.5,
+              "crossedPrice": 6.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "5860",
+              "name": "VN BLANC LAVANDOU",
+              "reference": "5860",
+              "ean13": "2059828236588",
+              "category": "VERRE",
+              "associatedCategories": [
+                "COMPOSITION CUSTOM",
+                "VERRE",
+                "VERRES 6.50",
+                "Verres Pied",
+                "VN"
+              ],
+              "wholesalePrice": 1.69,
+              "finalPrice": 6.5,
+              "crossedPrice": 6.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 13,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:23:27.038Z"
+      },
+      {
+        "id": "1754944079176",
+        "items": [
+          {
+            "product": {
+              "id": "6438",
+              "name": "PACK 6 FLUTES VILLAGE 83",
+              "reference": "6438",
+              "ean13": "2017410096972",
+              "category": "PACK VERRE",
+              "associatedCategories": [
+                "PACK 39",
+                "PACK FLUTE",
+                "PACK VERRE"
+              ],
+              "wholesalePrice": 8.64,
+              "finalPrice": 37.5,
+              "crossedPrice": 39,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "7875",
+              "name": "LIGHT TOWEL VICHY ORANGE TROPEZ",
+              "reference": "7875",
+              "ean13": "2085965785412",
+              "category": "SERVIETTE",
+              "associatedCategories": [
+                "SERVIETTE",
+                "Serviettes"
+              ],
+              "wholesalePrice": 18.05,
+              "finalPrice": 45,
+              "crossedPrice": 45,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "6373",
+              "name": "LIGHT TOWEL VICHY ROSE TROPEZ",
+              "reference": "6373",
+              "ean13": "3442672205890",
+              "category": "SERVIETTE",
+              "associatedCategories": [
+                "SERVIETTE",
+                "Serviettes"
+              ],
+              "wholesalePrice": 17.99,
+              "finalPrice": 45,
+              "crossedPrice": 45,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "6584",
+              "name": "PACK 6 AIR BEACH CLEAR TROPEZ",
+              "reference": "6584",
+              "ean13": "2074459484047",
+              "category": "PACK VERRE",
+              "associatedCategories": [
+                "PACK 60",
+                "PACK BALLOON",
+                "Pack de verres",
+                "PACK VERRE"
+              ],
+              "wholesalePrice": 16.14,
+              "finalPrice": 57,
+              "crossedPrice": 60,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "7508",
+              "name": "SAC POIGNEE KDO PETIT MEDIUM",
+              "reference": "7508",
+              "ean13": "2044253105844",
+              "category": "EMBALLAGE",
+              "associatedCategories": [
+                "EMBALLAGE"
+              ],
+              "wholesalePrice": 0.86,
+              "finalPrice": 1.5,
+              "crossedPrice": 1.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "7022",
+              "name": "CARTON 12 ICE TROPEZ PECHE  NO ALCOOL",
+              "reference": "7022",
+              "ean13": "3760004441915",
+              "category": "ICE TROPEZ",
+              "associatedCategories": [
+                "ICE",
+                "ICE TROPEZ"
+              ],
+              "wholesalePrice": 13.92,
+              "finalPrice": 27.5,
+              "crossedPrice": 27.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 2
+          }
+        ],
+        "total": 241,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:27:59.176Z"
+      },
+      {
+        "id": "1754944274424",
+        "items": [
+          {
+            "product": {
+              "id": "7678",
+              "name": "CALICE METALISE",
+              "reference": "7678",
+              "ean13": "2066523448949",
+              "category": "VERRE",
+              "associatedCategories": [
+                "CALICE METAL",
+                "VERRE",
+                "VERRES 12",
+                "Verres Pied"
+              ],
+              "wholesalePrice": 3.4,
+              "finalPrice": 12,
+              "crossedPrice": 12,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": [
+                {
+                  "id": "3052",
+                  "ean13": "2061199600233",
+                  "reference": "7678_3052",
+                  "attributes": "OR ROSE",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3047",
+                  "ean13": "2002951062142",
+                  "reference": "7678_3047",
+                  "attributes": "OR",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3055",
+                  "ean13": "2084746282720",
+                  "reference": "7678_3055",
+                  "attributes": "VIOLET",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3053",
+                  "ean13": "2064378345215",
+                  "reference": "7678_3053",
+                  "attributes": "SILVER",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3054",
+                  "ean13": "2007771244020",
+                  "reference": "7678_3054",
+                  "attributes": "PINK",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3334",
+                  "ean13": "2073828385992",
+                  "reference": "7678_3334",
+                  "attributes": "BLEU",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                }
+              ]
+            },
+            "quantity": 1,
+            "selectedVariation": {
+              "id": "3055",
+              "ean13": "2084746282720",
+              "reference": "7678_3055",
+              "attributes": "VIOLET",
+              "priceImpact": 0,
+              "finalPrice": 12
+            }
+          }
+        ],
+        "total": 12,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:31:14.424Z"
+      },
+      {
+        "id": "1754944406803",
+        "items": [
+          {
+            "product": {
+              "id": "7153",
+              "name": "SEAU NICE TROPEZ +6 VN TROPEZ",
+              "reference": "7153",
+              "ean13": "2040025545139",
+              "category": "COMPOSITION VASQUE",
+              "associatedCategories": [
+                "COMPOSITION CANNES",
+                "COMPOSITION CAVALAIRE",
+                "COMPOSITION MAXIME",
+                "COMPOSITION PORT GRIMAUD",
+                "COMPOSITION TROPEZ",
+                "COMPOSITION VASQUE"
+              ],
+              "wholesalePrice": 18.06,
+              "finalPrice": 59,
+              "crossedPrice": 78,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "7761",
+              "name": "BRACELET F/H 2000-87",
+              "reference": "7761",
+              "ean13": "2009954231926",
+              "category": "BIJOUX",
+              "associatedCategories": [
+                "BIJOUX"
+              ],
+              "wholesalePrice": 7.45,
+              "finalPrice": 20,
+              "crossedPrice": 20,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "7060",
+              "name": "CHOPE NEW 52 CL TROPEZ",
+              "reference": "7060",
+              "ean13": "2088710615835",
+              "category": "VERRE",
+              "associatedCategories": [
+                "VERRE",
+                "VERRE BIERE",
+                "VERRES 12"
+              ],
+              "wholesalePrice": 5,
+              "finalPrice": 12,
+              "crossedPrice": 12,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 91,
+        "paymentMethod": "Espèces",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:33:26.803Z"
+      },
+      {
+        "id": "1754944443117",
+        "items": [
+          {
+            "product": {
+              "id": "7699",
+              "name": "TRIO 2 ICE MIXTE MAXIME/TROPEZ",
+              "reference": "7699",
+              "ean13": "2081801212012",
+              "category": "TRIO PACK",
+              "associatedCategories": [
+                "TRIO MAXIME",
+                "TRIO PACK"
+              ],
+              "wholesalePrice": 6.52,
+              "finalPrice": 20.8,
+              "crossedPrice": 20.8,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 2
+          }
+        ],
+        "total": 41.6,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:34:03.117Z"
+      },
+      {
+        "id": "1754944476958",
+        "items": [
+          {
+            "product": {
+              "id": "7803",
+              "name": "NEW COFFRET 12X12 COUCHER DE SOLEIL",
+              "reference": "7803",
+              "ean13": "3770018359281",
+              "category": "PASTIS",
+              "associatedCategories": [
+                "PASTIS"
+              ],
+              "wholesalePrice": 25.5,
+              "finalPrice": 44,
+              "crossedPrice": 44,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 44,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:34:36.958Z"
+      },
+      {
+        "id": "1754944543369",
+        "items": [
+          {
+            "product": {
+              "id": "6165",
+              "name": "CASQUETTE  VICHY ROSE CLOCHER",
+              "reference": "6165",
+              "ean13": "6808592230366",
+              "category": "CASQUETTE",
+              "associatedCategories": [
+                "CASQUETTE"
+              ],
+              "wholesalePrice": 6.79,
+              "finalPrice": 20,
+              "crossedPrice": 20,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 20,
+        "paymentMethod": "Espèces",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:35:43.369Z"
+      },
+      {
+        "id": "1754944711983",
+        "items": [
+          {
+            "product": {
+              "id": "6017",
+              "name": "VASQUE VICTORIA TROPEZ",
+              "reference": "6017",
+              "ean13": "2027023494744",
+              "category": "VASQUE ET SEAU",
+              "associatedCategories": [
+                "COMPOSITION CUSTOM",
+                "Seau & Vasques",
+                "VASQUE ET SEAU"
+              ],
+              "wholesalePrice": 15.37,
+              "finalPrice": 55,
+              "crossedPrice": 55,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 55,
+        "paymentMethod": "Espèces",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:38:31.983Z"
+      },
+      {
+        "id": "1754945038105",
+        "items": [
+          {
+            "product": {
+              "id": "6051",
+              "name": "ICE TROPEZ PECHE LITRE NO ALCOOL",
+              "reference": "6051",
+              "ean13": "3760004440802",
+              "category": "ICE TROPEZ",
+              "associatedCategories": [
+                "ICE",
+                "ICE TROPEZ"
+              ],
+              "wholesalePrice": 3.15,
+              "finalPrice": 6.2,
+              "crossedPrice": 6.2,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "6155",
+              "name": "BT BLONDE 33 CL",
+              "reference": "6155",
+              "ean13": "3770004393008",
+              "category": "BIERE BT",
+              "associatedCategories": [
+                "BIERE BT",
+                "TRIO CUSTOM"
+              ],
+              "wholesalePrice": 2.79,
+              "finalPrice": 5.9,
+              "crossedPrice": 5.9,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 12.100000000000001,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:43:58.105Z"
+      },
+      {
+        "id": "1754945312860",
+        "items": [
+          {
+            "product": {
+              "id": "5935",
+              "name": "COCKTAIL MAXIME",
+              "reference": "5935",
+              "ean13": "2053543558857",
+              "category": "VERRE",
+              "associatedCategories": [
+                "COCKTAIL",
+                "VERRE",
+                "VERRES 6.50",
+                "Verres sans pied"
+              ],
+              "wholesalePrice": 1.45,
+              "finalPrice": 6.5,
+              "crossedPrice": 6.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 6.5,
+        "paymentMethod": "Espèces",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T20:48:32.860Z"
+      },
+      {
+        "id": "1754946187145",
+        "items": [
+          {
+            "product": {
+              "id": "7784",
+              "name": "TRIO WHITE MAXIME/TROPEZ",
+              "reference": "7784",
+              "ean13": "2042599656655",
+              "category": "TRIO PACK",
+              "associatedCategories": [
+                "TRIO MAXIME",
+                "TRIO PACK"
+              ],
+              "wholesalePrice": 8.7,
+              "finalPrice": 28,
+              "crossedPrice": 28,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 28,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T21:03:07.145Z"
+      },
+      {
+        "id": "1754946235953",
+        "items": [
+          {
+            "product": {
+              "id": "7767",
+              "name": "BAGUE ACIER 1000-80",
+              "reference": "7767",
+              "ean13": "2029892945952",
+              "category": "BIJOUX",
+              "associatedCategories": [
+                "BIJOUX"
+              ],
+              "wholesalePrice": 5.45,
+              "finalPrice": 15,
+              "crossedPrice": 15,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 15,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T21:03:55.953Z"
+      },
+      {
+        "id": "1754946816709",
+        "items": [
+          {
+            "product": {
+              "id": "6050",
+              "name": "ICE TROPEZ PECHE LITRE",
+              "reference": "6050",
+              "ean13": "3760004440796",
+              "category": "ICE TROPEZ",
+              "associatedCategories": [
+                "ICE",
+                "ICE TROPEZ"
+              ],
+              "wholesalePrice": 3.25,
+              "finalPrice": 6.5,
+              "crossedPrice": 6.5,
+              "salesCount": 2,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 6.5,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T21:13:36.709Z"
+      },
+      {
+        "id": "1754946908663",
+        "items": [
+          {
+            "product": {
+              "id": "7143",
+              "name": "BK VERRE COULEUR ORANGE TROPEZ",
+              "reference": "7143",
+              "ean13": "2083112534111",
+              "category": "VERRE",
+              "associatedCategories": [
+                "BK",
+                "COMPOSITION CUSTOM",
+                "TRIO CUSTOM",
+                "VERRE",
+                "VERRES 8.50",
+                "Verres Pied"
+              ],
+              "wholesalePrice": 2.94,
+              "finalPrice": 8.5,
+              "crossedPrice": 8.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 8.5,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T21:15:08.663Z"
+      },
+      {
+        "id": "1754947245838",
+        "items": [
+          {
+            "product": {
+              "id": "7678",
+              "name": "CALICE METALISE",
+              "reference": "7678",
+              "ean13": "2066523448949",
+              "category": "VERRE",
+              "associatedCategories": [
+                "CALICE METAL",
+                "VERRE",
+                "VERRES 12",
+                "Verres Pied"
+              ],
+              "wholesalePrice": 3.4,
+              "finalPrice": 12,
+              "crossedPrice": 12,
+              "salesCount": 1,
+              "position": 0,
+              "remisable": true,
+              "variations": [
+                {
+                  "id": "3052",
+                  "ean13": "2061199600233",
+                  "reference": "7678_3052",
+                  "attributes": "OR ROSE",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3047",
+                  "ean13": "2002951062142",
+                  "reference": "7678_3047",
+                  "attributes": "OR",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3055",
+                  "ean13": "2084746282720",
+                  "reference": "7678_3055",
+                  "attributes": "VIOLET",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3053",
+                  "ean13": "2064378345215",
+                  "reference": "7678_3053",
+                  "attributes": "SILVER",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3054",
+                  "ean13": "2007771244020",
+                  "reference": "7678_3054",
+                  "attributes": "PINK",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                },
+                {
+                  "id": "3334",
+                  "ean13": "2073828385992",
+                  "reference": "7678_3334",
+                  "attributes": "BLEU",
+                  "priceImpact": 0,
+                  "finalPrice": 12
+                }
+              ]
+            },
+            "quantity": 1,
+            "selectedVariation": {
+              "id": "3053",
+              "ean13": "2064378345215",
+              "reference": "7678_3053",
+              "attributes": "SILVER",
+              "priceImpact": 0,
+              "finalPrice": 12
+            }
+          }
+        ],
+        "total": 12,
+        "paymentMethod": "Espèces",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T21:20:45.838Z"
+      },
+      {
+        "id": "1754947303169",
+        "items": [
+          {
+            "product": {
+              "id": "7699",
+              "name": "TRIO 2 ICE MIXTE MAXIME/TROPEZ",
+              "reference": "7699",
+              "ean13": "2081801212012",
+              "category": "TRIO PACK",
+              "associatedCategories": [
+                "TRIO MAXIME",
+                "TRIO PACK"
+              ],
+              "wholesalePrice": 6.52,
+              "finalPrice": 20.8,
+              "crossedPrice": 20.8,
+              "salesCount": 2,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 1
+          }
+        ],
+        "total": 20.8,
+        "paymentMethod": "Carte",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T21:21:43.169Z"
+      },
+      {
+        "id": "1754947706932",
+        "items": [
+          {
+            "product": {
+              "id": "5851",
+              "name": "VN BLANC TROPEZ",
+              "reference": "5851",
+              "ean13": "2058462400577",
+              "category": "VERRE",
+              "associatedCategories": [
+                "COMPOSITION CUSTOM",
+                "TRIO CUSTOM",
+                "VERRE",
+                "VERRES 6.50",
+                "Verres Pied",
+                "VN"
+              ],
+              "wholesalePrice": 1.69,
+              "finalPrice": 6.5,
+              "crossedPrice": 6.5,
+              "salesCount": 0,
+              "position": 0,
+              "remisable": true,
+              "variations": []
+            },
+            "quantity": 4
+          }
+        ],
+        "total": 26,
+        "paymentMethod": "Espèces",
+        "cashierName": "Caissier",
+        "timestamp": "2025-08-11T21:28:26.932Z"
+      }
+    ],
+    "totalCA": 812.5,
+    "totalTransactions": 23
+  }
+];
+
+console.log('📊 Clôtures à récupérer:', recoveredClosures.length);
+
+// Sauvegarder les clôtures
+if (recoveredClosures.length > 0) {
+  localStorage.setItem('klick_caisse_closures', JSON.stringify(recoveredClosures));
+  console.log('✅ Clôtures sauvegardées');
+  
+  // Afficher les détails
+  recoveredClosures.forEach(closure => {
+    console.log(`Z${closure.zNumber}: ${closure.transactions.length} transactions, CA: ${closure.totalCA.toFixed(2)} €`);
+  });
+}
+
+// Vérifier la sauvegarde
+const savedClosures = localStorage.getItem('klick_caisse_closures');
+console.log('📊 Vérification:');
+console.log('  Clôtures sauvegardées:', savedClosures ? JSON.parse(savedClosures).length : 0);
+
+alert(`✅ Récupération terminée! ${recoveredClosures.length} clôtures récupérées. Rechargez la page pour voir les clôtures.`);

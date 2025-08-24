@@ -394,17 +394,24 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           height: '100%',
           fontSize: getScaledFontSize('0.5rem'),
           fontWeight: 'bold',
-          backgroundColor: '#9e9e9e',
-          '&:hover': { backgroundColor: '#757575' },
+          backgroundColor: '#4caf50',
+          '&:hover': { backgroundColor: '#388e3c' },
           boxSizing: 'border-box',
           overflow: 'hidden',
           textTransform: 'none',
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 4')}
+        onClick={() => {
+          try {
+            StorageService.saveImmediateBackup();
+          } catch (e) {
+            console.error('Erreur sauvegarde manuelle:', e);
+            alert('❌ Erreur lors de la sauvegarde');
+          }
+        }}
       >
-        Vide 4
+        💾 Sauvegarde
       </Button>
 
       <Button
