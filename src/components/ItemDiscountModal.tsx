@@ -108,11 +108,16 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
   };
 
   const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity < 1) return;
+    if (newQuantity < 1) {
+      setQuantity(1); // Remettre à 1 si la quantité est invalide
+      return;
+    }
     setQuantity(newQuantity);
     if (onUpdateQuantity) {
       onUpdateQuantity(item.product.id, item.selectedVariation?.id || null, newQuantity);
     }
+    // Fermer la fenêtre après avoir modifié la quantité
+    onClose();
   };
 
   const handleClose = () => {
@@ -201,12 +206,24 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
                 type="number"
                 value={quantity}
                 onChange={(e) => {
-                  const newQty = parseInt(e.target.value) || 1;
-                  if (newQty >= 1) {
-                    setQuantity(newQty);
+                  const inputValue = e.target.value;
+                  // Permettre de vider le champ ou de saisir 0 temporairement
+                  if (inputValue === '' || inputValue === '0') {
+                    setQuantity(0);
+                  } else {
+                    const newQty = parseInt(inputValue);
+                    if (!isNaN(newQty) && newQty >= 0) {
+                      setQuantity(newQty);
+                    }
                   }
                 }}
-                inputProps={{ min: 1, step: 1 }}
+                onBlur={(e) => {
+                  // Au focus perdu, s'assurer qu'on a au moins 1
+                  if (quantity < 1) {
+                    setQuantity(1);
+                  }
+                }}
+                inputProps={{ min: 0, step: 1 }}
                 sx={{ width: 120 }}
                 size="small"
               />
@@ -217,7 +234,14 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
                 disabled={quantity === item.quantity}
                 size="small"
               >
-                Appliquer
+                Appliquer & Fermer
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={onClose}
+                size="small"
+              >
+                Fermer
               </Button>
               <Typography variant="body2" color="text.secondary">
                 Quantité actuelle: {item.quantity}
