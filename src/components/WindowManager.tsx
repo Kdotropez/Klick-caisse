@@ -1315,7 +1315,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             });
             if (availableVasqueTargets.length > 0) {
               const limitQty = availableVasqueTargets.reduce((s,t)=>s + Math.max(0, t.qty), 0);
-              const limited = extraVasque.slice(0, limitQty);
+          const limited = extraVasque.slice(0, limitQty);
               distribute(limited, availableVasqueTargets, { singleTarget: true });
             }
           } else {

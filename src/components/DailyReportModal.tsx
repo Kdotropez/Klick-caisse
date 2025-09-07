@@ -49,6 +49,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [showTicketModal, setShowTicketModal] = useState(false);
+  const [showTicketsSection, setShowTicketsSection] = useState(false);
 
   // Charger les transactions du jour
   const todayTransactions = StorageService.loadTodayTransactions();
@@ -369,98 +370,118 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                 📋 Tickets de la Journée
               </Typography>
-            </Box>
-            
-            <Divider sx={{ mb: 2 }} />
-            
-            {/* Sélecteur de date */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                Date :
-              </Typography>
-              <input 
-                type="date" 
-                value={selectedDate} 
-                onChange={(e) => setSelectedDate(e.target.value)}
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  fontSize: '14px'
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setShowTicketsSection(!showTicketsSection)}
+                sx={{ 
+                  ml: 'auto',
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1976d2',
+                    color: 'white'
+                  }
                 }}
-              />
-              <Button 
-                size="small" 
-                variant="outlined" 
-                onClick={() => setSelectedDate(new Date().toISOString().slice(0, 10))}
               >
-                Aujourd'hui
+                {showTicketsSection ? '🔼 Réduire' : '🔽 Développer'}
               </Button>
             </Box>
             
-            {/* Liste des tickets */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {selectedDateTransactions.length > 0 ? (
-                selectedDateTransactions.map((transaction) => (
-                  <Box key={transaction.id} sx={{ 
-                    p: 2, 
-                    backgroundColor: '#fff', 
-                    borderRadius: 1,
-                    border: '1px solid #e0e0e0',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      backgroundColor: '#f5f5f5',
-                      borderColor: '#1976d2'
-                    }
-                  }}
-                  onClick={() => showTicketDetails(transaction)}
+            {showTicketsSection && (
+              <>
+                <Divider sx={{ mb: 2 }} />
+                
+                {/* Sélecteur de date */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    Date :
+                  </Typography>
+                  <input 
+                    type="date" 
+                    value={selectedDate} 
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    onClick={() => setSelectedDate(new Date().toISOString().slice(0, 10))}
                   >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="subtitle1" sx={{ 
-                          fontWeight: 'bold', 
-                          color: '#1976d2',
-                          fontFamily: 'monospace'
-                        }}>
-                          #{transaction.id.slice(-6)}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#666' }}>
-                          {new Date(transaction.timestamp).toLocaleTimeString('fr-FR', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
-                        </Typography>
+                    Aujourd'hui
+                  </Button>
+                </Box>
+                
+                {/* Liste des tickets */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {selectedDateTransactions.length > 0 ? (
+                    selectedDateTransactions.map((transaction) => (
+                      <Box key={transaction.id} sx={{ 
+                        p: 2, 
+                        backgroundColor: '#fff', 
+                        borderRadius: 1,
+                        border: '1px solid #e0e0e0',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: '#f5f5f5',
+                          borderColor: '#1976d2'
+                        }
+                      }}
+                      onClick={() => showTicketDetails(transaction)}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="subtitle1" sx={{ 
+                              fontWeight: 'bold', 
+                              color: '#1976d2',
+                              fontFamily: 'monospace'
+                            }}>
+                              #{transaction.id.slice(-6)}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#666' }}>
+                              {new Date(transaction.timestamp).toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </Typography>
+                          </Box>
+                          
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="body2" sx={{ color: '#666' }}>
+                              {transaction.items ? transaction.items.reduce((sum: number, item: any) => sum + item.quantity, 0) : 0} articles
+                            </Typography>
+                            <Typography variant="h6" sx={{ 
+                              fontWeight: 'bold', 
+                              color: '#1976d2',
+                              fontFamily: 'monospace'
+                            }}>
+                              {formatPrice(transaction.total)}
+                            </Typography>
+                          </Box>
+                        </Box>
                       </Box>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="body2" sx={{ color: '#666' }}>
-                          {transaction.items ? transaction.items.reduce((sum: number, item: any) => sum + item.quantity, 0) : 0} articles
-                        </Typography>
-                        <Typography variant="h6" sx={{ 
-                          fontWeight: 'bold', 
-                          color: '#1976d2',
-                          fontFamily: 'monospace'
-                        }}>
-                          {formatPrice(transaction.total)}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                ))
-              ) : (
+                    ))
+                  ) : (
         <Box sx={{ 
           p: 3, 
-                  textAlign: 'center', 
-                  color: 'text.secondary',
+                      textAlign: 'center', 
+                      color: 'text.secondary',
           backgroundColor: '#f9f9f9', 
-                  borderRadius: 1
-                }}>
-                  <Typography variant="body1">
-                    Aucun ticket trouvé pour le {new Date(selectedDate).toLocaleDateString('fr-FR')}
-                  </Typography>
+                      borderRadius: 1
+                    }}>
+                      <Typography variant="body1">
+                        Aucun ticket trouvé pour le {new Date(selectedDate).toLocaleDateString('fr-FR')}
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
-              )}
-            </Box>
+              </>
+            )}
           </CardContent>
         </Card>
 
