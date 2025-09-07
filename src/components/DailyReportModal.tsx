@@ -486,7 +486,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               
               selectedDateTransactions.forEach(transaction => {
                 if (transaction.items && Array.isArray(transaction.items)) {
-                  transaction.items.forEach(item => {
+                  transaction.items.forEach((item: any) => {
                     const categoryName = item.product.category || 'Non classé';
                     const existing = categoryStats.get(categoryName) || { name: categoryName, totalSales: 0, totalItems: 0, transactions: 0 };
                     
@@ -677,7 +677,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                 let transactionOriginal = 0;
                 
                 if (transaction.items && Array.isArray(transaction.items)) {
-                  transaction.items.forEach(item => {
+                  transaction.items.forEach((item: any) => {
                     const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
                     const originalTotal = originalPrice * item.quantity;
                     transactionOriginal += originalTotal;
@@ -799,6 +799,202 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                   ) : (
                     <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
                       <Typography variant="body1">Aucune remise appliquée</Typography>
+                    </Box>
+                  )}
+                </Box>
+              );
+            })()}
+          </CardContent>
+        </Card>
+
+        {/* POINT 5: LISTING DÉTAILLÉ DES ARTICLES VENDUS */}
+        <Card sx={{ 
+          mb: 3, 
+          border: '2px solid #e91e63',
+          backgroundColor: '#fce4ec'
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#e91e63' }}>
+                📋 Point 5: Listing Détaillé des Articles Vendus
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ mb: 2 }} />
+            
+            {(() => {
+              // Calculer les statistiques par article
+              const articleStats = new Map<string, { 
+                name: string, 
+                category: string,
+                totalQty: number, 
+                totalAmount: number, 
+                transactions: number,
+                percentage: number
+              }>();
+              
+              selectedDateTransactions.forEach(transaction => {
+                if (transaction.items && Array.isArray(transaction.items)) {
+                  transaction.items.forEach((item: any) => {
+                    const articleKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+                    const articleName = item.selectedVariation ? 
+                      `${item.product.name} (${item.selectedVariation.name})` : 
+                      item.product.name;
+                    const categoryName = item.product.category || 'Non classé';
+                    
+                    const existing = articleStats.get(articleKey) || { 
+                      name: articleName, 
+                      category: categoryName,
+                      totalQty: 0, 
+                      totalAmount: 0, 
+                      transactions: 0,
+                      percentage: 0
+                    };
+                    
+                    const unitPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                    const itemTotal = unitPrice * item.quantity;
+                    
+                    existing.totalQty += item.quantity;
+                    existing.totalAmount += itemTotal;
+                    existing.transactions += 1;
+                    
+                    articleStats.set(articleKey, existing);
+                  });
+                }
+              });
+              
+              // Calculer les pourcentages
+              const totalCA = Array.from(articleStats.values()).reduce((sum, stat) => sum + stat.totalAmount, 0);
+              articleStats.forEach(stat => {
+                stat.percentage = totalCA > 0 ? (stat.totalAmount / totalCA) * 100 : 0;
+              });
+              
+              const sortedArticles = Array.from(articleStats.values())
+                .sort((a, b) => b.totalAmount - a.totalAmount);
+              
+              return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {/* Résumé */}
+                  <Box sx={{ 
+                    p: 2, 
+                    backgroundColor: '#f8bbd9', 
+                    borderRadius: 1,
+                    border: '1px solid #e91e63'
+                  }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#e91e63', textAlign: 'center' }}>
+                      📊 {sortedArticles.length} articles différents vendus
+                    </Typography>
+                  </Box>
+                  
+                  {/* Liste des articles */}
+                  {sortedArticles.length > 0 ? (
+                    <Box sx={{ 
+                      maxHeight: '400px', 
+                      overflowY: 'auto',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1
+                    }}>
+                      {sortedArticles.map((article, index) => (
+                        <Box key={`${article.name}-${index}`} sx={{ 
+                          p: 2, 
+                          backgroundColor: index % 2 === 0 ? '#fff' : '#f9f9f9',
+                          borderBottom: index < sortedArticles.length - 1 ? '1px solid #e0e0e0' : 'none',
+                          '&:hover': {
+                            backgroundColor: '#fce4ec'
+                          }
+                        }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="h6" sx={{ 
+                                fontWeight: 'bold', 
+                                color: index < 3 ? '#e91e63' : '#333',
+                                fontSize: '1rem'
+                              }}>
+                                {index < 3 && '🏆 '}{article.name}
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#666', fontSize: '0.85rem' }}>
+                                {article.category}
+                              </Typography>
+                            </Box>
+                            <Typography variant="h5" sx={{ 
+                              fontWeight: 'bold', 
+                              color: '#e91e63',
+                              fontFamily: 'monospace',
+                              fontSize: '1.2rem'
+                            }}>
+                              {formatPrice(article.totalAmount)}
+                            </Typography>
+                          </Box>
+                          
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box sx={{ display: 'flex', gap: 3 }}>
+                              <Typography variant="body2" sx={{ color: '#666' }}>
+                                <strong>Quantité:</strong> {article.totalQty}
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#666' }}>
+                                <strong>Transactions:</strong> {article.transactions}
+                              </Typography>
+                            </Box>
+                            <Typography variant="body2" sx={{ 
+                              color: '#e91e63', 
+                              fontWeight: 'bold',
+                              backgroundColor: '#fce4ec',
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1
+                            }}>
+                              {article.percentage.toFixed(1)}% du CA
+                            </Typography>
+                          </Box>
+                          
+                          {/* Barre de progression */}
+                          <Box sx={{ 
+                            width: '100%', 
+                            height: 6, 
+                            backgroundColor: '#e0e0e0', 
+                            borderRadius: 3, 
+                            mt: 1,
+                            overflow: 'hidden'
+                          }}>
+                            <Box sx={{ 
+                              width: `${article.percentage}%`, 
+                              height: '100%', 
+                              backgroundColor: index < 3 ? '#e91e63' : '#f06292',
+                              transition: 'width 0.3s ease'
+                            }} />
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
+                      <Typography variant="body1">Aucun article vendu</Typography>
+                    </Box>
+                  )}
+                  
+                  {/* Top 3 articles */}
+                  {sortedArticles.length >= 3 && (
+                    <Box sx={{ 
+                      p: 2, 
+                      backgroundColor: '#fce4ec', 
+                      borderRadius: 1,
+                      border: '1px solid #e91e63'
+                    }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#e91e63', mb: 1 }}>
+                        🏆 Top 3 des Articles
+                      </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {sortedArticles.slice(0, 3).map((article, index) => (
+                          <Box key={`top-${index}`} sx={{ textAlign: 'center', flex: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#e91e63' }}>
+                              {index + 1}. {article.name}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#666', fontSize: '0.85rem' }}>
+                              {article.totalQty} unités • {formatPrice(article.totalAmount)}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
                     </Box>
                   )}
                 </Box>
