@@ -71,7 +71,7 @@ export interface Transaction {
   id: string;
   items: CartItem[];
   total: number;
-  paymentMethod: 'cash' | 'card' | 'sumup';
+  paymentMethod: 'cash' | 'card' | 'check' | 'sumup';
   cashierName: string;
   timestamp: Date;
   itemDiscounts?: Record<string, { type: 'euro' | 'percent' | 'price'; value: number }>;
