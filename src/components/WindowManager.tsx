@@ -156,8 +156,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null);
   const [itemDiscounts, setItemDiscounts] = useState<{[key: string]: {type: 'euro' | 'percent' | 'price', value: number}}>({});
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
-  const [autoGlassDiscountEnabled, setAutoGlassDiscountEnabled] = useState<boolean>(true);
-  const [autoAssocDiscountEnabled, setAutoAssocDiscountEnabled] = useState<boolean>(true);
+  const [autoGlassDiscountEnabled, setAutoGlassDiscountEnabled] = useState<boolean>(() => {
+    try {
+      const settings = StorageService.loadSettings() || {};
+      return settings.autoGlassDiscountEnabled !== false; // true par défaut
+    } catch {
+      return true;
+    }
+  });
+  const [autoAssocDiscountEnabled, setAutoAssocDiscountEnabled] = useState<boolean>(() => {
+    try {
+      const settings = StorageService.loadSettings() || {};
+      return settings.autoAssocDiscountEnabled !== false; // true par défaut
+    } catch {
+      return true;
+    }
+  });
   
   // État pour mémoriser les compensations déjà appliquées (verrouillage)
   const [lockedCompensations, setLockedCompensations] = useState<{
@@ -2979,9 +2993,27 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
             promoBanner={null}
             autoGlassDiscountEnabled={autoGlassDiscountEnabled}
-            onToggleAutoGlassDiscount={() => setAutoGlassDiscountEnabled(v => !v)}
+            onToggleAutoGlassDiscount={() => {
+              const newValue = !autoGlassDiscountEnabled;
+              setAutoGlassDiscountEnabled(newValue);
+              // Sauvegarder le paramètre
+              try {
+                const settings = StorageService.loadSettings() || {};
+                settings.autoGlassDiscountEnabled = newValue;
+                StorageService.saveSettings(settings);
+              } catch {}
+            }}
             autoAssocDiscountEnabled={autoAssocDiscountEnabled}
-            onToggleAutoAssocDiscount={() => setAutoAssocDiscountEnabled(v => !v)}
+            onToggleAutoAssocDiscount={() => {
+              const newValue = !autoAssocDiscountEnabled;
+              setAutoAssocDiscountEnabled(newValue);
+              // Sauvegarder le paramètre
+              try {
+                const settings = StorageService.loadSettings() || {};
+                settings.autoAssocDiscountEnabled = newValue;
+                StorageService.saveSettings(settings);
+              } catch {}
+            }}
           />
         );
 
