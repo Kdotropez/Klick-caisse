@@ -448,11 +448,11 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                   </Box>
                 ))
               ) : (
-                <Box sx={{ 
-                  p: 3, 
+        <Box sx={{ 
+          p: 3, 
                   textAlign: 'center', 
                   color: 'text.secondary',
-                  backgroundColor: '#f9f9f9',
+          backgroundColor: '#f9f9f9', 
                   borderRadius: 1
                 }}>
                   <Typography variant="body1">
@@ -464,27 +464,348 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           </CardContent>
         </Card>
 
-        {/* Placeholder pour les prochains points */}
-        <Box sx={{ 
-          p: 3, 
-          backgroundColor: '#f9f9f9', 
-          borderRadius: 2,
-          border: '2px dashed #ccc',
-          textAlign: 'center'
+        {/* POINT 2: RÉPARTITION PAR CATÉGORIE */}
+        <Card sx={{ 
+          mb: 3, 
+          border: '2px solid #4caf50',
+          backgroundColor: '#f8fff8'
         }}>
-          <Typography variant="h6" color="text.secondary">
-            📋 Prochains points à venir...
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <TrendingUp sx={{ color: '#4caf50', fontSize: 32 }} />
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
+                Point 2: Répartition par Catégorie
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ mb: 2 }} />
+            
+            {(() => {
+              // Calculer les statistiques par catégorie
+              const categoryStats = new Map<string, { name: string, totalSales: number, totalItems: number, transactions: number }>();
+              
+              selectedDateTransactions.forEach(transaction => {
+                if (transaction.items && Array.isArray(transaction.items)) {
+                  transaction.items.forEach(item => {
+                    const categoryName = item.product.category || 'Non classé';
+                    const existing = categoryStats.get(categoryName) || { name: categoryName, totalSales: 0, totalItems: 0, transactions: 0 };
+                    
+                    existing.totalSales += (item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice) * item.quantity;
+                    existing.totalItems += item.quantity;
+                    existing.transactions += 1;
+                    
+                    categoryStats.set(categoryName, existing);
+                  });
+                }
+              });
+              
+              const sortedCategories = Array.from(categoryStats.values())
+                .sort((a, b) => b.totalSales - a.totalSales);
+              
+              return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {sortedCategories.length > 0 ? (
+                    sortedCategories.map((category, index) => (
+                      <Box key={category.name} sx={{ 
+                        p: 2, 
+                        backgroundColor: index === 0 ? '#e8f5e8' : '#f5f5f5', 
+                        borderRadius: 1,
+                        border: index === 0 ? '2px solid #4caf50' : '1px solid #e0e0e0'
+                      }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: index === 0 ? '#2e7d32' : '#333' }}>
+                            {index === 0 && '🏆 '}{category.name}
+                          </Typography>
+                          <Typography variant="h5" sx={{ 
+                            fontWeight: 'bold', 
+                            color: index === 0 ? '#2e7d32' : '#4caf50',
+                            fontFamily: 'monospace'
+                          }}>
+                            {formatPrice(category.totalSales)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ color: '#666' }}>
+                            {category.totalItems} articles • {category.transactions} transactions
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#666' }}>
+                            {((category.totalSales / dailyStats.totalSales) * 100).toFixed(1)}% du CA total
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))
+                  ) : (
+                    <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
+                      <Typography variant="body1">Aucune donnée de catégorie disponible</Typography>
+                    </Box>
+                  )}
+                </Box>
+              );
+            })()}
+          </CardContent>
+        </Card>
+
+        {/* POINT 3: MÉTHODES DE PAIEMENT */}
+        <Card sx={{ 
+          mb: 3, 
+          border: '2px solid #ff9800',
+          backgroundColor: '#fff8f0'
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Euro sx={{ color: '#ff9800', fontSize: 32 }} />
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#ff9800' }}>
+                Point 3: Méthodes de Paiement
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ mb: 2 }} />
+            
+            {(() => {
+              // Calculer les statistiques par méthode de paiement
+              const paymentStats = new Map<string, { name: string, total: number, count: number, percentage: number }>();
+              
+              selectedDateTransactions.forEach(transaction => {
+                const method = transaction.paymentMethod || 'cash';
+                const methodName = method === 'cash' ? '💵 Espèces' : 
+                                 method === 'card' ? '💳 Carte' : 
+                                 method === 'check' ? '📝 Chèque' : 
+                                 method === 'sumup' ? '📱 SumUp' : method;
+                
+                const existing = paymentStats.get(methodName) || { name: methodName, total: 0, count: 0, percentage: 0 };
+                existing.total += transaction.total || 0;
+                existing.count += 1;
+                paymentStats.set(methodName, existing);
+              });
+              
+              // Calculer les pourcentages
+              const totalCA = Array.from(paymentStats.values()).reduce((sum, stat) => sum + stat.total, 0);
+              paymentStats.forEach(stat => {
+                stat.percentage = totalCA > 0 ? (stat.total / totalCA) * 100 : 0;
+              });
+              
+              const sortedPayments = Array.from(paymentStats.values())
+                .sort((a, b) => b.total - a.total);
+              
+              return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {sortedPayments.length > 0 ? (
+                    sortedPayments.map((payment, index) => (
+                      <Box key={payment.name} sx={{ 
+                        p: 2, 
+                        backgroundColor: '#fff', 
+                        borderRadius: 1,
+                        border: '1px solid #e0e0e0'
+                      }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                            {payment.name}
+                          </Typography>
+                          <Typography variant="h5" sx={{ 
+                            fontWeight: 'bold', 
+                            color: '#ff9800',
+                            fontFamily: 'monospace'
+                          }}>
+                            {formatPrice(payment.total)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ color: '#666' }}>
+                            {payment.count} transaction{payment.count > 1 ? 's' : ''}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#666' }}>
+                            {payment.percentage.toFixed(1)}% du CA total
+                          </Typography>
+                        </Box>
+                        {/* Barre de progression */}
+                        <Box sx={{ 
+                          width: '100%', 
+                          height: 8, 
+                          backgroundColor: '#e0e0e0', 
+                          borderRadius: 4, 
+                          mt: 1,
+                          overflow: 'hidden'
+                        }}>
+                          <Box sx={{ 
+                            width: `${payment.percentage}%`, 
+                            height: '100%', 
+                            backgroundColor: '#ff9800',
+                            transition: 'width 0.3s ease'
+                          }} />
+                        </Box>
+                      </Box>
+                    ))
+                  ) : (
+                    <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
+                      <Typography variant="body1">Aucune donnée de paiement disponible</Typography>
+                    </Box>
+                  )}
+                </Box>
+              );
+            })()}
+          </CardContent>
+        </Card>
+
+        {/* POINT 4: REMISES APPLIQUÉES */}
+        <Card sx={{ 
+          mb: 3, 
+          border: '2px solid #9c27b0',
+          backgroundColor: '#faf5ff'
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Discount sx={{ color: '#9c27b0', fontSize: 32 }} />
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+                Point 4: Remises Appliquées
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ mb: 2 }} />
+            
+            {(() => {
+              // Analyser les remises appliquées
+              const discountStats = {
+                totalDiscounts: 0,
+                totalOriginalAmount: 0,
+                transactionsWithDiscounts: 0,
+                discountTypes: new Map<string, { count: number, total: number }>()
+              };
+              
+              selectedDateTransactions.forEach(transaction => {
+                let hasDiscounts = false;
+                let transactionDiscounts = 0;
+                let transactionOriginal = 0;
+                
+                if (transaction.items && Array.isArray(transaction.items)) {
+                  transaction.items.forEach(item => {
+                    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                    const originalTotal = originalPrice * item.quantity;
+                    transactionOriginal += originalTotal;
+                    
+                    // Vérifier les remises sur articles
+                    if (transaction.itemDiscounts && transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
+                      const discount = transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
+                      hasDiscounts = true;
+                      
+                      let discountAmount = 0;
+                      if (discount.type === 'euro') {
+                        discountAmount = discount.value * item.quantity;
+                      } else if (discount.type === 'percent') {
+                        discountAmount = originalTotal * (discount.value / 100);
+                      } else if (discount.type === 'price') {
+                        discountAmount = originalTotal - (discount.value * item.quantity);
+                      }
+                      
+                      transactionDiscounts += discountAmount;
+                      
+                      // Compter les types de remises
+                      const typeKey = `${discount.type} (${discount.value}${discount.type === 'percent' ? '%' : '€'})`;
+                      const existing = discountStats.discountTypes.get(typeKey) || { count: 0, total: 0 };
+                      existing.count += 1;
+                      existing.total += discountAmount;
+                      discountStats.discountTypes.set(typeKey, existing);
+                    }
+                  });
+                }
+                
+                // Vérifier les remises globales
+                if (transaction.globalDiscount) {
+                  hasDiscounts = true;
+                  const discount = transaction.globalDiscount;
+                  let discountAmount = 0;
+                  
+                  if (discount.type === 'euro') {
+                    discountAmount = discount.value;
+                  } else if (discount.type === 'percent') {
+                    discountAmount = transactionOriginal * (discount.value / 100);
+                  }
+                  
+                  transactionDiscounts += discountAmount;
+                  
+                  // Compter les types de remises globales
+                  const typeKey = `Global ${discount.type} (${discount.value}${discount.type === 'percent' ? '%' : '€'})`;
+                  const existing = discountStats.discountTypes.get(typeKey) || { count: 0, total: 0 };
+                  existing.count += 1;
+                  existing.total += discountAmount;
+                  discountStats.discountTypes.set(typeKey, existing);
+                }
+                
+                if (hasDiscounts) {
+                  discountStats.transactionsWithDiscounts += 1;
+                  discountStats.totalDiscounts += transactionDiscounts;
+                }
+                discountStats.totalOriginalAmount += transactionOriginal;
+              });
+              
+              return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {/* Résumé des remises */}
+                  <Box sx={{ 
+                    p: 2, 
+                    backgroundColor: '#f3e5f5', 
+                    borderRadius: 1,
+                    border: '1px solid #9c27b0'
+                  }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+                        Total des Remises
+                      </Typography>
+                      <Typography variant="h4" sx={{ 
+                        fontWeight: 'bold', 
+                        color: '#7b1fa2',
+                        fontFamily: 'monospace'
+                      }}>
+                        -{formatPrice(discountStats.totalDiscounts)}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: '#666' }}>
+                      {discountStats.transactionsWithDiscounts} transaction{discountStats.transactionsWithDiscounts > 1 ? 's' : ''} avec remises
+                    </Typography>
+                  </Box>
+                  
+                  {/* Types de remises */}
+                  {discountStats.discountTypes.size > 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+                        Types de Remises Appliquées
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Point 2: Répartition par catégorie
+                      {Array.from(discountStats.discountTypes.entries())
+                        .sort((a, b) => b[1].total - a[1].total)
+                        .map(([type, stats]) => (
+                        <Box key={type} sx={{ 
+                          p: 2, 
+                          backgroundColor: '#fff', 
+                          borderRadius: 1,
+                          border: '1px solid #e0e0e0'
+                        }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                              {type}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Point 3: Méthodes de paiement
+                            <Typography variant="h6" sx={{ 
+                              fontWeight: 'bold', 
+                              color: '#9c27b0',
+                              fontFamily: 'monospace'
+                            }}>
+                              -{formatPrice(stats.total)}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Point 4: Remises appliquées
+                          </Box>
+                          <Typography variant="body2" sx={{ color: '#666' }}>
+                            {stats.count} application{stats.count > 1 ? 's' : ''}
           </Typography>
         </Box>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
+                      <Typography variant="body1">Aucune remise appliquée</Typography>
+                    </Box>
+                  )}
+                </Box>
+              );
+            })()}
+          </CardContent>
+        </Card>
       </DialogContent>
 
       <DialogActions sx={{ p: 3, backgroundColor: '#f5f5f5' }}>
