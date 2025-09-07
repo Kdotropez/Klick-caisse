@@ -22,6 +22,7 @@ interface ItemDiscountModalProps {
   onClose: () => void;
   item: CartItem;
   onApplyDiscount: (itemId: string, variationId: string | null, discountType: 'euro' | 'percent' | 'price', value: number) => void;
+  onUpdateQuantity?: (productId: string, variationId: string | null, quantity: number) => void;
 }
 
 const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
@@ -29,12 +30,14 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
   onClose,
   item,
   onApplyDiscount,
+  onUpdateQuantity,
 }) => {
   const [mode, setMode] = useState<'unit' | 'total'>('unit');
   const [discountType, setDiscountType] = useState<'euro' | 'percent' | 'price'>('percent');
   const [discountValue, setDiscountValue] = useState<number>(0); // euro ou percent selon type
   const [newUnitPrice, setNewUnitPrice] = useState<number>(0);
   const [newTotal, setNewTotal] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(item.quantity);
 
   const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
   const originalTotal = originalPrice * item.quantity;
@@ -104,12 +107,21 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
     onClose();
   };
 
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity < 1) return;
+    setQuantity(newQuantity);
+    if (onUpdateQuantity) {
+      onUpdateQuantity(item.product.id, item.selectedVariation?.id || null, newQuantity);
+    }
+  };
+
   const handleClose = () => {
     setMode('unit');
     setDiscountType('percent');
     setDiscountValue(0);
     setNewUnitPrice(0);
     setNewTotal(0);
+    setQuantity(item.quantity); // Reset quantity to original
     onClose();
   };
 
@@ -176,6 +188,43 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
             Total actuel: {originalTotal.toFixed(2)} €
           </Typography>
         </Paper>
+
+        {/* Modification de la quantité */}
+        {onUpdateQuantity && (
+          <Paper sx={{ p: 2, mb: 3, backgroundColor: '#e3f2fd' }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
+              📦 Modifier la quantité
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <TextField
+                label="Quantité"
+                type="number"
+                value={quantity}
+                onChange={(e) => {
+                  const newQty = parseInt(e.target.value) || 1;
+                  if (newQty >= 1) {
+                    setQuantity(newQty);
+                  }
+                }}
+                inputProps={{ min: 1, step: 1 }}
+                sx={{ width: 120 }}
+                size="small"
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleQuantityChange(quantity)}
+                disabled={quantity === item.quantity}
+                size="small"
+              >
+                Appliquer
+              </Button>
+              <Typography variant="body2" color="text.secondary">
+                Quantité actuelle: {item.quantity}
+              </Typography>
+            </Box>
+          </Paper>
+        )}
 
         {/* Type de remise */}
         <FormControl fullWidth sx={{ mb: 3 }}>

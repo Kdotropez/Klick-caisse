@@ -3602,6 +3602,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onClose={() => setShowDiscountModal(false)}
             item={selectedItemForDiscount}
             onApplyDiscount={applyItemDiscount}
+            onUpdateQuantity={onUpdateQuantity}
           />
         )}
 
