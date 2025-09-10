@@ -429,9 +429,96 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 5')}
+        onClick={() => {
+          try {
+            // Créer un input file pour sélectionner le fichier de sauvegarde
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = async (event) => {
+              const file = (event.target as HTMLInputElement).files?.[0];
+              if (!file) return;
+              
+              try {
+                console.log('📁 Lecture du fichier:', file.name);
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                console.log('📊 Contenu du fichier:', {
+                  products: data.products?.length || 0,
+                  categories: data.categories?.length || 0,
+                  closures: data.closures?.length || 0,
+                  zCounter: data.zCounter || 0,
+                  hasSettings: !!data.settings,
+                  hasSubcategories: !!data.subcategories,
+                  hasTransactions: !!data.transactionsByDay
+                });
+                
+                // Restaurer les données
+                if (data.products) {
+                  localStorage.setItem('klick_caisse_products', JSON.stringify(data.products));
+                  console.log('✅ Produits restaurés:', data.products.length);
+                }
+                
+                if (data.categories) {
+                  localStorage.setItem('klick_caisse_categories', JSON.stringify(data.categories));
+                  console.log('✅ Catégories restaurées:', data.categories.length);
+                }
+                
+                if (data.settings) {
+                  localStorage.setItem('klick_caisse_settings', JSON.stringify(data.settings));
+                  console.log('✅ Paramètres restaurés');
+                }
+                
+                if (data.subcategories) {
+                  localStorage.setItem('klick_caisse_subcategories', JSON.stringify(data.subcategories));
+                  console.log('✅ Sous-catégories restaurées:', data.subcategories.length);
+                }
+                
+                if (data.closures) {
+                  localStorage.setItem('klick_caisse_closures', JSON.stringify(data.closures));
+                  console.log('✅ Clôtures restaurées:', data.closures.length);
+                }
+                
+                if (data.zCounter !== undefined) {
+                  localStorage.setItem('klick_caisse_z_counter', String(data.zCounter));
+                  console.log('✅ Compteur Z restauré:', data.zCounter);
+                }
+                
+                if (data.transactionsByDay) {
+                  localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(data.transactionsByDay));
+                  console.log('✅ Transactions restaurées');
+                }
+                
+                if (data.cashiers) {
+                  localStorage.setItem('klick_caisse_cashiers', JSON.stringify(data.cashiers));
+                  console.log('✅ Caissiers restaurés:', data.cashiers.length);
+                }
+                
+                const message = `✅ Restauration terminée avec succès !\n\n` +
+                               `📦 ${data.products?.length || 0} produits\n` +
+                               `📂 ${data.categories?.length || 0} catégories\n` +
+                               `🔒 ${data.closures?.length || 0} clôtures\n` +
+                               `💰 Z${data.zCounter || 0}\n\n` +
+                               `Rechargez la page pour voir les changements.`;
+                
+                alert(message);
+                
+              } catch (error) {
+                console.error('❌ Erreur lors de la restauration:', error);
+                alert('❌ Erreur lors de la restauration: ' + (error as Error).message);
+              }
+            };
+            
+            input.click();
+          } catch (e) {
+            console.error('Erreur restauration:', e);
+            alert('❌ Erreur lors de la restauration');
+          }
+        }}
       >
-        Vide 5
+        🔄 Restaurer
       </Button>
 
       <Button
