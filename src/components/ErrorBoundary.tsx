@@ -30,6 +30,41 @@ class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('❌ ErrorBoundary a capturé une erreur:', error, errorInfo);
     
+    // Vérifier si c'est une erreur insertBefore et forcer la récupération
+    if (error.message.includes('insertBefore') || error.name === 'NotFoundError') {
+      console.log('🚨 ErrorBoundary: Erreur insertBefore détectée, déclenchement immédiat de la récupération');
+      
+      // Déclencher immédiatement le redémarrage après 2 secondes
+      setTimeout(() => {
+        console.log('🔄 Redémarrage forcé par ErrorBoundary');
+        window.location.reload();
+      }, 2000);
+      
+      // Afficher un message à l'utilisateur
+      document.body.style.backgroundColor = '#ffebee';
+      const alertDiv = document.createElement('div');
+      alertDiv.innerHTML = `
+        <div style="
+          position: fixed; 
+          top: 20px; 
+          left: 50%; 
+          transform: translateX(-50%); 
+          background: #f44336; 
+          color: white; 
+          padding: 15px 25px; 
+          border-radius: 8px; 
+          font-family: Arial, sans-serif;
+          font-size: 16px;
+          font-weight: bold;
+          z-index: 10000;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        ">
+          🔄 Erreur détectée - Redémarrage automatique en cours...
+        </div>
+      `;
+      document.body.appendChild(alertDiv);
+    }
+    
     this.setState({
       error,
       errorInfo

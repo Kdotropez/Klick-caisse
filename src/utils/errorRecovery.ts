@@ -93,6 +93,7 @@ export class InsertBeforeErrorDetector {
 export function setupGlobalErrorHandler(): void {
   // Intercepter les erreurs non capturées
   window.addEventListener('error', (event) => {
+    console.log('🔍 Erreur globale détectée:', event.error);
     if (event.error && InsertBeforeErrorDetector.isInsertBeforeError(event.error)) {
       console.error('🔥 Erreur insertBefore non capturée:', event.error);
       event.preventDefault();
@@ -102,12 +103,27 @@ export function setupGlobalErrorHandler(): void {
 
   // Intercepter les promesses rejetées
   window.addEventListener('unhandledrejection', (event) => {
+    console.log('🔍 Promise rejetée détectée:', event.reason);
     if (event.reason instanceof Error && InsertBeforeErrorDetector.isInsertBeforeError(event.reason)) {
       console.error('🔥 Promise rejetée avec erreur insertBefore:', event.reason);
       event.preventDefault();
       InsertBeforeErrorDetector.handleError(event.reason);
     }
   });
+
+  // Intercepter spécifiquement les erreurs React DOM
+  const originalConsoleError = console.error;
+  console.error = (...args) => {
+    const errorMessage = args.join(' ');
+    if (errorMessage.includes('insertBefore') || errorMessage.includes('NotFoundError')) {
+      console.log('🔥 Erreur insertBefore détectée dans console.error');
+      // Créer un objet Error pour le gestionnaire
+      const syntheticError = new Error(errorMessage);
+      syntheticError.name = 'NotFoundError';
+      InsertBeforeErrorDetector.handleError(syntheticError);
+    }
+    originalConsoleError.apply(console, args);
+  };
 
   console.log('🛡️ Gestionnaire global d\'erreurs insertBefore activé');
 }
