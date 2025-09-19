@@ -22,6 +22,7 @@ const renderApp = () => {
   } catch (error) {
     console.error('❌ Erreur critique React DOM:', error);
     // Afficher un message d'erreur simple
+    const errorMessage = error instanceof Error ? error.toString() : String(error);
     document.body.innerHTML = `
       <div style="padding: 20px; font-family: Arial, sans-serif; text-align: center;">
         <h2>⚠️ Erreur de chargement</h2>
@@ -32,7 +33,7 @@ const renderApp = () => {
         <details style="margin-top: 20px; text-align: left;">
           <summary>Détails techniques</summary>
           <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto;">
-${error.toString()}
+${errorMessage}
           </pre>
         </details>
       </div>
