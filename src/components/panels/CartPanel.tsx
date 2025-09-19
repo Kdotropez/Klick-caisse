@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -65,12 +65,38 @@ const CartPanel: React.FC<CartPanelProps> = ({
   const total = getTotalWithGlobalDiscount();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Protection contre les états incohérents avec stabilisation
+  const safeCartItems = useMemo(() => {
+    if (!Array.isArray(cartItems)) return [];
+    
+    return cartItems.filter(item => 
+      item && 
+      item.product && 
+      typeof item.product.id === 'string' &&
+      typeof item.quantity === 'number' &&
+      item.quantity > 0
+    );
+  }, [cartItems]);
+
+  // Callbacks stables pour éviter les re-rendus
+  const handleUpdateQuantity = useCallback((productId: string, variationId: string | null, quantity: number) => {
+    onUpdateQuantity(productId, variationId, quantity);
+  }, [onUpdateQuantity]);
+
+  const handleRemoveItem = useCallback((productId: string, variationId: string | null) => {
+    onRemoveItem(productId, variationId);
+  }, [onRemoveItem]);
+
+  const handleOpenDiscountModal = useCallback((item: CartItem) => {
+    onOpenDiscountModal(item);
+  }, [onOpenDiscountModal]);
+
   // Auto-scroll vers le bas quand de nouveaux articles sont ajoutés
   useEffect(() => {
-    if (scrollContainerRef.current && cartItems.length > 0) {
+    if (scrollContainerRef.current && safeCartItems.length > 0) {
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
-  }, [cartItems.length]);
+  }, [safeCartItems.length]);
 
   return (
     <Paper
@@ -94,27 +120,13 @@ const CartPanel: React.FC<CartPanelProps> = ({
       </Box>
 
       <Box ref={scrollContainerRef} sx={{ flexGrow: 1, overflow: 'auto', p: 0.5 }}>
-        {/* Protection contre les états incohérents */}
-        {(() => {
-          const safeCartItems = Array.isArray(cartItems) ? cartItems.filter(item => 
-            item && 
-            item.product && 
-            typeof item.product.id === 'string' &&
-            typeof item.quantity === 'number' &&
-            item.quantity > 0
-          ) : [];
-
-          if (safeCartItems.length === 0) {
-            return (
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
-                Panier vide
-              </Typography>
-            );
-          }
-
-          return (
-            <List dense>
-              {safeCartItems.map((item, index) => {
+        {safeCartItems.length === 0 ? (
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
+            Panier vide
+          </Typography>
+        ) : (
+          <List dense>
+            {safeCartItems.map((item, index) => {
               const variationId = item.selectedVariation?.id || null;
               const discountKey = `${item.product.id}-${variationId || 'main'}`;
               const discount = itemDiscounts[discountKey];
@@ -257,13 +269,12 @@ const CartPanel: React.FC<CartPanelProps> = ({
                       }
                     />
                   </ListItem>
-                  {index < cartItems.length - 1 && <Divider />}
+                  {index < safeCartItems.length - 1 && <Divider />}
                 </React.Fragment>
               );
             })}
           </List>
-          );
-        })()}
+        )}
       </Box>
 
       <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>

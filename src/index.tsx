@@ -4,20 +4,30 @@ import './index.css';
 import App from './App';
 import { UISettingsProvider } from './context/UISettingsContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import ErrorRecovery from './components/ErrorRecovery';
+import { setupGlobalErrorHandler, checkEmergencyRecovery } from './utils/errorRecovery';
+
+// Configurer la récupération d'erreur globale
+setupGlobalErrorHandler();
+checkEmergencyRecovery();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 // Protection contre les erreurs React DOM
 const renderApp = () => {
   try {
     root.render(
-      // StrictMode désactivé temporairement pour éviter le double appel d'effets en dev
-      <ErrorBoundary>
-        <UISettingsProvider>
-          <App />
-        </UISettingsProvider>
-      </ErrorBoundary>
+      <React.StrictMode>
+        <ErrorRecovery>
+          <ErrorBoundary>
+            <UISettingsProvider>
+              <App />
+            </UISettingsProvider>
+          </ErrorBoundary>
+        </ErrorRecovery>
+      </React.StrictMode>
     );
   } catch (error) {
     console.error('❌ Erreur critique React DOM:', error);
