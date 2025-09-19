@@ -94,13 +94,27 @@ const CartPanel: React.FC<CartPanelProps> = ({
       </Box>
 
       <Box ref={scrollContainerRef} sx={{ flexGrow: 1, overflow: 'auto', p: 0.5 }}>
-        {cartItems.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
-            Panier vide
-          </Typography>
-        ) : (
-          <List dense>
-            {cartItems.map((item, index) => {
+        {/* Protection contre les états incohérents */}
+        {(() => {
+          const safeCartItems = Array.isArray(cartItems) ? cartItems.filter(item => 
+            item && 
+            item.product && 
+            typeof item.product.id === 'string' &&
+            typeof item.quantity === 'number' &&
+            item.quantity > 0
+          ) : [];
+
+          if (safeCartItems.length === 0) {
+            return (
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
+                Panier vide
+              </Typography>
+            );
+          }
+
+          return (
+            <List dense>
+              {safeCartItems.map((item, index) => {
               const variationId = item.selectedVariation?.id || null;
               const discountKey = `${item.product.id}-${variationId || 'main'}`;
               const discount = itemDiscounts[discountKey];
@@ -248,7 +262,8 @@ const CartPanel: React.FC<CartPanelProps> = ({
               );
             })}
           </List>
-        )}
+          );
+        })()}
       </Box>
 
       <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>

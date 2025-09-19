@@ -103,7 +103,7 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
               {draft.items.map((it: any, idx: number) => {
                 const unitPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
                 return (
-                  <ListItem key={it.product.id + '-' + idx} sx={{ py: 0.25 }}
+                  <ListItem key={`${it.product.id}-${it.selectedVariation?.id || 'main'}-${idx}`} sx={{ py: 0.25 }}
                     secondaryAction={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <IconButton size="small" onClick={() => setDraft((prev: any) => {

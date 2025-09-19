@@ -123,8 +123,8 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
                 </Box>
                 {expandedDayTicketIds.has(String(t.id)) && (
                   <Box sx={{ mt: 0.5, ml: 1 }}>
-                    {(Array.isArray(t.items)?t.items:[]).map((it:any) => (
-                      <Box key={it.product.id} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, pl: 1 }}>
+                    {(Array.isArray(t.items)?t.items:[]).map((it:any, itemIndex: number) => (
+                      <Box key={`${t.id}-${it.product.id}-${it.selectedVariation?.id || 'main'}-${itemIndex}`} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, pl: 1 }}>
                         <Typography variant="caption" sx={{ minWidth: 48, textAlign: 'right', fontFamily: 'monospace' }}>{it.quantity}</Typography>
                         <Typography variant="caption">x</Typography>
                         <Typography variant="caption" sx={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product.name}</Typography>
