@@ -31,9 +31,34 @@ export class StorageService {
   static loadProducts(): Product[] {
     try {
       const data = localStorage.getItem(this.PRODUCTS_KEY);
-      return data ? JSON.parse(data) : [];
+      if (!data) return [];
+      
+      const parsed = JSON.parse(data);
+      
+      // Vérification de la structure des données
+      if (!Array.isArray(parsed)) {
+        console.warn('⚠️ Données produits corrompues (pas un tableau), réinitialisation');
+        localStorage.removeItem(this.PRODUCTS_KEY);
+        return [];
+      }
+      
+      // Vérifier que chaque produit a les propriétés essentielles
+      const validProducts = parsed.filter(product => {
+        return product && 
+               typeof product === 'object' && 
+               typeof product.id === 'string' && 
+               typeof product.name === 'string';
+      });
+      
+      if (validProducts.length !== parsed.length) {
+        console.warn(`⚠️ ${parsed.length - validProducts.length} produits corrompus ignorés`);
+      }
+      
+      return validProducts;
     } catch (error) {
-      console.error('Erreur lors du chargement des produits:', error);
+      console.error('❌ Erreur lors du chargement des produits:', error);
+      // En cas d'erreur, supprimer les données corrompues
+      localStorage.removeItem(this.PRODUCTS_KEY);
       return [];
     }
   }
@@ -51,9 +76,34 @@ export class StorageService {
   static loadCategories(): Category[] {
     try {
       const data = localStorage.getItem(this.CATEGORIES_KEY);
-      return data ? JSON.parse(data) : [];
+      if (!data) return [];
+      
+      const parsed = JSON.parse(data);
+      
+      // Vérification de la structure des données
+      if (!Array.isArray(parsed)) {
+        console.warn('⚠️ Données catégories corrompues (pas un tableau), réinitialisation');
+        localStorage.removeItem(this.CATEGORIES_KEY);
+        return [];
+      }
+      
+      // Vérifier que chaque catégorie a les propriétés essentielles
+      const validCategories = parsed.filter(category => {
+        return category && 
+               typeof category === 'object' && 
+               typeof category.id === 'string' && 
+               typeof category.name === 'string';
+      });
+      
+      if (validCategories.length !== parsed.length) {
+        console.warn(`⚠️ ${parsed.length - validCategories.length} catégories corrompues ignorées`);
+      }
+      
+      return validCategories;
     } catch (error) {
-      console.error('Erreur lors du chargement des catégories:', error);
+      console.error('❌ Erreur lors du chargement des catégories:', error);
+      // En cas d'erreur, supprimer les données corrompues
+      localStorage.removeItem(this.CATEGORIES_KEY);
       return [];
     }
   }

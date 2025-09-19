@@ -64,8 +64,8 @@ const App: React.FC = () => {
     
     loadData();
     
-    // Démarrer la vérification des mises à jour en arrière-plan
-    UpdateService.startBackgroundUpdateCheck(APP_VERSION, 30); // Vérifier toutes les 30 minutes
+    // Désactiver temporairement la vérification des mises à jour (erreur 404 GitHub)
+    // UpdateService.startBackgroundUpdateCheck(APP_VERSION, 30); // Vérifier toutes les 30 minutes
   }, []);
 
   // Persister l'ordre des catégories à chaque modification (drag & drop, ajout, import)
