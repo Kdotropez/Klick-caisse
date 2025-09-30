@@ -536,9 +536,104 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 6')}
+        onClick={() => {
+          try {
+            console.log('🔍 Récupération des clôtures manquantes...');
+            
+            // 1. Récupérer les clôtures actuelles
+            let currentClosures = [];
+            try {
+              const current = localStorage.getItem('klick_caisse_closures');
+              if (current) {
+                currentClosures = JSON.parse(current);
+              }
+            } catch (e) {
+              console.error('❌ Erreur lecture clôtures actuelles:', e);
+            }
+            
+            console.log(`📋 Clôtures actuelles : ${currentClosures.length}`);
+            
+            // 2. Identifier les gaps
+            const zNumbers = currentClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
+            const gaps = [];
+            for (let i = 0; i < zNumbers.length - 1; i++) {
+              const current = zNumbers[i];
+              const next = zNumbers[i + 1];
+              if (next - current > 1) {
+                for (let missing = current + 1; missing < next; missing++) {
+                  gaps.push(missing);
+                }
+              }
+            }
+            
+            console.log(`🕳️ Clôtures manquantes détectées : Z${gaps.join(', Z')}`);
+            
+            // 3. Récupérer toutes les sauvegardes automatiques
+            let allBackups = [];
+            try {
+              const autoBackups = localStorage.getItem('klick_caisse_auto_backups');
+              if (autoBackups) {
+                allBackups = JSON.parse(autoBackups);
+              }
+            } catch (e) {
+              console.error('❌ Erreur lecture sauvegardes:', e);
+            }
+            
+            console.log(`💾 Sauvegardes disponibles : ${allBackups.length}`);
+            
+            // 4. Chercher les clôtures manquantes dans les sauvegardes
+            let recoveredClosures = [];
+            let foundGaps = new Set();
+            
+            allBackups.forEach((backup: any, index: number) => {
+              if (backup.data && backup.data.closures) {
+                const backupDate = new Date(backup.ts).toLocaleString('fr-FR');
+                console.log(`🔍 Analyse sauvegarde ${index + 1} (${backupDate})`);
+                
+                backup.data.closures.forEach((closure: any) => {
+                  if (gaps.includes(closure.zNumber) && !foundGaps.has(closure.zNumber)) {
+                    console.log(`  ✅ Clôture Z${closure.zNumber} récupérée ! (${closure.totalTransactions} tickets, ${closure.totalCA}€)`);
+                    recoveredClosures.push(closure);
+                    foundGaps.add(closure.zNumber);
+                  }
+                });
+              }
+            });
+            
+            // 5. Afficher le résultat
+            console.log(`🎯 Récupération : ${recoveredClosures.length}/${gaps.length} clôtures manquantes trouvées`);
+            
+            if (recoveredClosures.length > 0) {
+              // 6. Fusionner avec les clôtures actuelles
+              const allClosures = [...currentClosures, ...recoveredClosures];
+              allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
+              
+              // 7. Sauvegarder
+              localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
+              console.log(`✅ ${allClosures.length} clôtures sauvegardées au total`);
+              
+              // Afficher la séquence complète
+              const finalZNumbers = allClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
+              console.log(`📈 Séquence Z complète : ${finalZNumbers.join(' → ')}`);
+              
+              const message = `🎉 Récupération réussie !\n\n` +
+                             `📊 ${recoveredClosures.length} clôtures récupérées\n` +
+                             `📋 Total : ${allClosures.length} clôtures\n` +
+                             `📈 Séquence : ${finalZNumbers.join(' → ')}\n\n` +
+                             `Rechargez la page pour voir les changements.`;
+              
+              alert(message);
+            } else {
+              alert(`❌ Aucune clôture manquante trouvée dans les sauvegardes.\n\nGaps détectés : Z${gaps.join(', Z')}\n\nCes clôtures ont peut-être été définitivement perdues.`);
+            }
+            
+          } catch (e) {
+            console.error('❌ Erreur récupération clôtures:', e);
+            alert('❌ Erreur lors de la récupération des clôtures : ' + (e as Error).message);
+          }
+        }}
       >
-        Vide 6
+        🔍 Récupérer Clôtures
       </Button>
 
       <Button

@@ -704,7 +704,7 @@ export class StorageService {
       const list: Array<{ ts: string; data: any }> = raw ? JSON.parse(raw) : [];
       const entry = { ts: new Date().toISOString(), data };
       list.unshift(entry);
-      const LIMITED = list.slice(0, 10); // garder les 10 dernières
+      const LIMITED = list.slice(0, 30); // garder les 30 dernières (augmenté pour éviter les pertes)
       localStorage.setItem(this.AUTO_BACKUPS_KEY, JSON.stringify(LIMITED));
       
       // Sauvegarde JSON automatique pour récupération en cas de coupure
