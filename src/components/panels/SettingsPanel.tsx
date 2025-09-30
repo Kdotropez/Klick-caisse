@@ -538,94 +538,107 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         }}
         onClick={() => {
           try {
-            console.log('🔍 Récupération des clôtures manquantes...');
+            console.log('🔍 Recherche des clôtures manquantes dans les fichiers de sauvegarde...');
             
-            // 1. Récupérer les clôtures actuelles
-            let currentClosures: any[] = [];
-            try {
-              const current = localStorage.getItem('klick_caisse_closures');
-              if (current) {
-                currentClosures = JSON.parse(current);
-              }
-            } catch (e) {
-              console.error('❌ Erreur lecture clôtures actuelles:', e);
-            }
+            // Créer un input file pour sélectionner un fichier de sauvegarde
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.multiple = true; // Permettre plusieurs fichiers
             
-            console.log(`📋 Clôtures actuelles : ${currentClosures.length}`);
-            
-            // 2. Identifier les gaps
-            const zNumbers = currentClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
-            const gaps: number[] = [];
-            for (let i = 0; i < zNumbers.length - 1; i++) {
-              const current = zNumbers[i];
-              const next = zNumbers[i + 1];
-              if (next - current > 1) {
-                for (let missing = current + 1; missing < next; missing++) {
-                  gaps.push(missing);
-                }
-              }
-            }
-            
-            console.log(`🕳️ Clôtures manquantes détectées : Z${gaps.join(', Z')}`);
-            
-            // 3. Récupérer toutes les sauvegardes automatiques
-            let allBackups: any[] = [];
-            try {
-              const autoBackups = localStorage.getItem('klick_caisse_auto_backups');
-              if (autoBackups) {
-                allBackups = JSON.parse(autoBackups);
-              }
-            } catch (e) {
-              console.error('❌ Erreur lecture sauvegardes:', e);
-            }
-            
-            console.log(`💾 Sauvegardes disponibles : ${allBackups.length}`);
-            
-            // 4. Chercher les clôtures manquantes dans les sauvegardes
-            let recoveredClosures: any[] = [];
-            let foundGaps = new Set<number>();
-            
-            allBackups.forEach((backup: any, index: number) => {
-              if (backup.data && backup.data.closures) {
-                const backupDate = new Date(backup.ts).toLocaleString('fr-FR');
-                console.log(`🔍 Analyse sauvegarde ${index + 1} (${backupDate})`);
-                
-                backup.data.closures.forEach((closure: any) => {
-                  if (gaps.includes(closure.zNumber) && !foundGaps.has(closure.zNumber)) {
-                    console.log(`  ✅ Clôture Z${closure.zNumber} récupérée ! (${closure.totalTransactions} tickets, ${closure.totalCA}€)`);
-                    recoveredClosures.push(closure);
-                    foundGaps.add(closure.zNumber);
+            input.onchange = async (event) => {
+              const files = Array.from((event.target as HTMLInputElement).files || []);
+              if (files.length === 0) return;
+              
+              try {
+                // 1. Récupérer les clôtures actuelles
+                let currentClosures: any[] = [];
+                try {
+                  const current = localStorage.getItem('klick_caisse_closures');
+                  if (current) {
+                    currentClosures = JSON.parse(current);
                   }
-                });
+                } catch (e) {
+                  console.error('❌ Erreur lecture clôtures actuelles:', e);
+                }
+                
+                console.log(`📋 Clôtures actuelles : ${currentClosures.length}`);
+                
+                // 2. Identifier les gaps
+                const zNumbers = currentClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
+                const gaps: number[] = [];
+                for (let i = 0; i < zNumbers.length - 1; i++) {
+                  const current = zNumbers[i];
+                  const next = zNumbers[i + 1];
+                  if (next - current > 1) {
+                    for (let missing = current + 1; missing < next; missing++) {
+                      gaps.push(missing);
+                    }
+                  }
+                }
+                
+                console.log(`🕳️ Clôtures manquantes détectées : Z${gaps.join(', Z')}`);
+                
+                // 3. Analyser tous les fichiers de sauvegarde
+                let recoveredClosures: any[] = [];
+                let foundGaps = new Set<number>();
+                
+                for (const file of files) {
+                  try {
+                    console.log(`🔍 Analyse du fichier : ${file.name}`);
+                    const text = await file.text();
+                    const backupData = JSON.parse(text);
+                    
+                    if (backupData.closures && Array.isArray(backupData.closures)) {
+                      console.log(`  📊 ${backupData.closures.length} clôtures trouvées dans ${file.name}`);
+                      
+                      backupData.closures.forEach((closure: any) => {
+                        if (gaps.includes(closure.zNumber) && !foundGaps.has(closure.zNumber)) {
+                          console.log(`    ✅ Clôture Z${closure.zNumber} récupérée ! (${closure.totalTransactions} tickets, ${closure.totalCA}€)`);
+                          recoveredClosures.push(closure);
+                          foundGaps.add(closure.zNumber);
+                        }
+                      });
+                    }
+                  } catch (e) {
+                    console.error(`❌ Erreur lecture fichier ${file.name}:`, e);
+                  }
+                }
+                
+                // 4. Afficher le résultat
+                console.log(`🎯 Récupération : ${recoveredClosures.length}/${gaps.length} clôtures manquantes trouvées`);
+                
+                if (recoveredClosures.length > 0) {
+                  // 5. Fusionner avec les clôtures actuelles
+                  const allClosures = [...currentClosures, ...recoveredClosures];
+                  allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
+                  
+                  // 6. Sauvegarder
+                  localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
+                  console.log(`✅ ${allClosures.length} clôtures sauvegardées au total`);
+                  
+                  // Afficher la séquence complète
+                  const finalZNumbers = allClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
+                  console.log(`📈 Séquence Z complète : ${finalZNumbers.join(' → ')}`);
+                  
+                  const message = `🎉 Récupération réussie !\n\n` +
+                                 `📊 ${recoveredClosures.length} clôtures récupérées\n` +
+                                 `📋 Total : ${allClosures.length} clôtures\n` +
+                                 `📈 Séquence : ${finalZNumbers.join(' → ')}\n\n` +
+                                 `Rechargez la page pour voir les changements.`;
+                  
+                  alert(message);
+                } else {
+                  alert(`❌ Aucune clôture manquante trouvée dans les fichiers sélectionnés.\n\nGaps détectés : Z${gaps.join(', Z')}\n\nEssayez avec d'autres fichiers de sauvegarde.`);
+                }
+                
+              } catch (e) {
+                console.error('❌ Erreur récupération clôtures:', e);
+                alert('❌ Erreur lors de la récupération des clôtures : ' + (e as Error).message);
               }
-            });
+            };
             
-            // 5. Afficher le résultat
-            console.log(`🎯 Récupération : ${recoveredClosures.length}/${gaps.length} clôtures manquantes trouvées`);
-            
-            if (recoveredClosures.length > 0) {
-              // 6. Fusionner avec les clôtures actuelles
-              const allClosures = [...currentClosures, ...recoveredClosures];
-              allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
-              
-              // 7. Sauvegarder
-              localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
-              console.log(`✅ ${allClosures.length} clôtures sauvegardées au total`);
-              
-              // Afficher la séquence complète
-              const finalZNumbers = allClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
-              console.log(`📈 Séquence Z complète : ${finalZNumbers.join(' → ')}`);
-              
-              const message = `🎉 Récupération réussie !\n\n` +
-                             `📊 ${recoveredClosures.length} clôtures récupérées\n` +
-                             `📋 Total : ${allClosures.length} clôtures\n` +
-                             `📈 Séquence : ${finalZNumbers.join(' → ')}\n\n` +
-                             `Rechargez la page pour voir les changements.`;
-              
-              alert(message);
-            } else {
-              alert(`❌ Aucune clôture manquante trouvée dans les sauvegardes.\n\nGaps détectés : Z${gaps.join(', Z')}\n\nCes clôtures ont peut-être été définitivement perdues.`);
-            }
+            input.click();
             
           } catch (e) {
             console.error('❌ Erreur récupération clôtures:', e);
