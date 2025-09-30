@@ -541,7 +541,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             console.log('🔍 Récupération des clôtures manquantes...');
             
             // 1. Récupérer les clôtures actuelles
-            let currentClosures = [];
+            let currentClosures: any[] = [];
             try {
               const current = localStorage.getItem('klick_caisse_closures');
               if (current) {
@@ -555,7 +555,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             
             // 2. Identifier les gaps
             const zNumbers = currentClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
-            const gaps = [];
+            const gaps: number[] = [];
             for (let i = 0; i < zNumbers.length - 1; i++) {
               const current = zNumbers[i];
               const next = zNumbers[i + 1];
@@ -569,7 +569,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             console.log(`🕳️ Clôtures manquantes détectées : Z${gaps.join(', Z')}`);
             
             // 3. Récupérer toutes les sauvegardes automatiques
-            let allBackups = [];
+            let allBackups: any[] = [];
             try {
               const autoBackups = localStorage.getItem('klick_caisse_auto_backups');
               if (autoBackups) {
@@ -582,8 +582,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             console.log(`💾 Sauvegardes disponibles : ${allBackups.length}`);
             
             // 4. Chercher les clôtures manquantes dans les sauvegardes
-            let recoveredClosures = [];
-            let foundGaps = new Set();
+            let recoveredClosures: any[] = [];
+            let foundGaps = new Set<number>();
             
             allBackups.forEach((backup: any, index: number) => {
               if (backup.data && backup.data.closures) {
