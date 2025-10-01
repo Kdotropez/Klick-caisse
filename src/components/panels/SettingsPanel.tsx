@@ -1003,17 +1003,71 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           height: '100%',
           fontSize: getScaledFontSize('0.5rem'),
           fontWeight: 'bold',
-          backgroundColor: '#3f51b5',
-          '&:hover': { backgroundColor: '#303f9f' },
+          backgroundColor: '#f44336',
+          '&:hover': { backgroundColor: '#d32f2f' },
           boxSizing: 'border-box',
           overflow: 'hidden',
           textTransform: 'none',
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 8')}
+        onClick={() => {
+          try {
+            console.log('🧹 Nettoyage des doublons de clôtures...');
+            
+            const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+            console.log(`📊 Avant nettoyage: ${currentClosures.length} clôtures`);
+            
+            // Supprimer les doublons en gardant la première occurrence de chaque Z
+            const uniqueClosures: any[] = [];
+            const seenZNumbers = new Set<number>();
+            let duplicatesRemoved = 0;
+            
+            currentClosures.forEach((closure: any) => {
+              if (!seenZNumbers.has(closure.zNumber)) {
+                seenZNumbers.add(closure.zNumber);
+                uniqueClosures.push(closure);
+              } else {
+                duplicatesRemoved++;
+                console.log(`🗑️ Doublon Z${closure.zNumber} supprimé`);
+              }
+            });
+            
+            // Trier par numéro Z
+            uniqueClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
+            
+            // Sauvegarder les clôtures nettoyées
+            localStorage.setItem('klick_caisse_closures', JSON.stringify(uniqueClosures));
+            
+            // Mettre à jour le compteur Z
+            const maxZ = Math.max(...uniqueClosures.map((c: any) => c.zNumber));
+            localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+            
+            const zNumbers = uniqueClosures.map((c: any) => c.zNumber);
+            
+            console.log(`✅ Nettoyage terminé !`);
+            console.log(`📊 ${duplicatesRemoved} doublons supprimés`);
+            console.log(`📋 ${uniqueClosures.length} clôtures uniques restantes`);
+            console.log(`📈 Séquence Z: ${zNumbers.join(' → ')}`);
+            
+            // Forcer le rafraîchissement
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+            
+            alert(`🧹 Nettoyage des doublons terminé !\n\n` +
+                  `🗑️ ${duplicatesRemoved} doublons supprimés\n` +
+                  `📋 ${uniqueClosures.length} clôtures uniques restantes\n` +
+                  `📈 Séquence: ${zNumbers.join(' → ')}\n\n` +
+                  `La page va se recharger dans 2 secondes...`);
+            
+          } catch (e) {
+            console.error('❌ Erreur nettoyage:', e);
+            alert('❌ Erreur lors du nettoyage: ' + (e as Error).message);
+          }
+        }}
       >
-        Vide 8
+        🧹 Nettoyer Doublons
       </Button>
 
       {/* Modale Rapport Historique */}
