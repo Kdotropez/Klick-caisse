@@ -29,6 +29,131 @@ interface SettingsPanelProps {
   onOpenDiscountRules?: () => void; // nouveau
 }
 
+// Fonction pour reconstruire à partir des fichiers JSON
+const reconstructFromFiles = async (files: File[]) => {
+  console.log('📁 Reconstruction à partir des fichiers JSON...');
+  
+  const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+  const existingZNumbers = new Set(currentClosures.map((c: any) => c.zNumber));
+  const missingZNumbers = [];
+  
+  for (let z = 1; z <= 50; z++) {
+    if (!existingZNumbers.has(z)) {
+      missingZNumbers.push(z);
+    }
+  }
+  
+  console.log(`🕳️ Z manquants détectés: ${missingZNumbers.join(', ')}`);
+  
+  const reconstructedClosures: any[] = [];
+  
+  // Analyser chaque fichier pour extraire les transactions par jour
+  for (const file of files) {
+    try {
+      console.log(`🔍 Analyse du fichier : ${file.name}`);
+      const text = await file.text();
+      const backupData = JSON.parse(text);
+      
+      if (backupData.closures && Array.isArray(backupData.closures)) {
+        // Extraire les transactions de chaque clôture
+        backupData.closures.forEach((closure: any) => {
+          if (closure.transactions && Array.isArray(closure.transactions)) {
+            // Grouper les transactions par jour
+            const transactionsByDay: { [key: string]: any[] } = {};
+            
+            closure.transactions.forEach((tx: any) => {
+              const day = new Date(tx.timestamp).toISOString().split('T')[0];
+              if (!transactionsByDay[day]) {
+                transactionsByDay[day] = [];
+              }
+              transactionsByDay[day].push(tx);
+            });
+            
+            // Reconstruire les clôtures manquantes pour chaque jour
+            Object.keys(transactionsByDay).forEach((day, index) => {
+              const dayTransactions = transactionsByDay[day];
+              const missingZ = missingZNumbers[index];
+              
+              if (missingZ && dayTransactions.length > 0) {
+                const totalCA = dayTransactions.reduce((sum, tx) => sum + (tx.total || 0), 0);
+                const totalTransactions = dayTransactions.length;
+                
+                // Calculer les remises
+                let totalDiscounts = 0;
+                dayTransactions.forEach((tx: any) => {
+                  if (tx.globalDiscount) {
+                    totalDiscounts += tx.globalDiscount;
+                  }
+                  if (tx.itemDiscounts) {
+                    Object.values(tx.itemDiscounts).forEach((discount: any) => {
+                      if (discount.type === 'euro') {
+                        totalDiscounts += (discount.value || 0) * (tx.items?.length || 0);
+                      }
+                    });
+                  }
+                });
+                
+                const netCA = totalCA - totalDiscounts;
+                
+                const reconstructedClosure = {
+                  zNumber: missingZ,
+                  closedAt: new Date(day + 'T23:59:59.000Z').toISOString(),
+                  transactions: dayTransactions,
+                  totalCA: netCA,
+                  totalTransactions: totalTransactions,
+                  totalDiscounts: totalDiscounts,
+                  reconstructed: true,
+                  source: file.name
+                };
+                
+                reconstructedClosures.push(reconstructedClosure);
+                console.log(`✅ Z${missingZ} reconstruit pour le ${day} depuis ${file.name}: ${totalTransactions} tickets, ${netCA}€`);
+              }
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.error(`❌ Erreur lecture fichier ${file.name}:`, e);
+    }
+  }
+  
+  if (reconstructedClosures.length > 0) {
+    // Fusionner avec les clôtures existantes
+    const allClosures = [...currentClosures, ...reconstructedClosures];
+    allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
+    
+    // Sauvegarder
+    localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
+    
+    // Mettre à jour le compteur Z
+    const maxZ = Math.max(...allClosures.map((c: any) => c.zNumber));
+    localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+    
+    console.log(`🎉 Reconstruction terminée !`);
+    console.log(`📊 ${reconstructedClosures.length} clôtures reconstruites`);
+    console.log(`📋 Total: ${allClosures.length} clôtures`);
+    
+    const zNumbers = allClosures.map((c: any) => c.zNumber);
+    console.log(`📈 Séquence Z: ${zNumbers.join(' → ')}`);
+    
+    // Forcer le rafraîchissement
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
+    
+    alert(`🎉 Reconstruction réussie depuis les fichiers !\n\n` +
+          `📊 ${reconstructedClosures.length} clôtures reconstruites\n` +
+          `📋 Total: ${allClosures.length} clôtures\n` +
+          `📈 Séquence: ${zNumbers.join(' → ')}\n\n` +
+          `Les clôtures ont été reconstruites à partir des fichiers JSON.\n` +
+          `La page va se recharger dans 2 secondes...`);
+    
+  } else {
+    alert('❌ Aucune clôture reconstruite depuis les fichiers sélectionnés.');
+  }
+};
+
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
   width,
   height,
@@ -710,10 +835,41 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           try {
             console.log('🔧 Reconstruction des clôtures Z manquantes...');
             
-            // 1. Récupérer toutes les transactions archivées
+            // Demander à l'utilisateur s'il veut utiliser les fichiers JSON ou le localStorage
+            const useFiles = window.confirm(
+              'Choisissez la source de reconstruction :\n\n' +
+              '✅ OK = Analyser les fichiers JSON de sauvegarde\n' +
+              '❌ Annuler = Utiliser les transactions du localStorage'
+            );
+            
+            if (useFiles) {
+              // Créer un input file pour sélectionner les fichiers JSON
+              const input = document.createElement('input');
+              input.type = 'file';
+              input.accept = '.json';
+              input.multiple = true;
+              
+              input.onchange = async (event) => {
+                const files = Array.from((event.target as HTMLInputElement).files || []);
+                if (files.length === 0) return;
+                
+                try {
+                  // Analyser les fichiers JSON pour reconstruire
+                  await reconstructFromFiles(files);
+                } catch (e) {
+                  console.error('❌ Erreur reconstruction depuis fichiers:', e);
+                  alert('❌ Erreur lors de la reconstruction: ' + (e as Error).message);
+                }
+              };
+              
+              input.click();
+              return;
+            }
+            
+            // 1. Récupérer toutes les transactions archivées du localStorage
             const transactionsByDay = localStorage.getItem('klick_caisse_transactions_by_day');
             if (!transactionsByDay) {
-              alert('❌ Aucune transaction archivée trouvée pour reconstruire les clôtures.');
+              alert('❌ Aucune transaction archivée trouvée dans le localStorage.\n\nEssayez avec les fichiers JSON de sauvegarde.');
               return;
             }
             
