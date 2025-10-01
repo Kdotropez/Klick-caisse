@@ -706,9 +706,138 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           lineHeight: 1.0,
           padding: '1px',
         }}
-        onClick={() => console.log('Vide 7')}
+        onClick={() => {
+          try {
+            console.log('🔧 Reconstruction des clôtures Z manquantes...');
+            
+            // 1. Récupérer toutes les transactions archivées
+            const transactionsByDay = localStorage.getItem('klick_caisse_transactions_by_day');
+            if (!transactionsByDay) {
+              alert('❌ Aucune transaction archivée trouvée pour reconstruire les clôtures.');
+              return;
+            }
+            
+            const txMap = JSON.parse(transactionsByDay);
+            const allTransactions = [];
+            
+            // Parcourir tous les jours
+            Object.keys(txMap).forEach(day => {
+              if (Array.isArray(txMap[day])) {
+                txMap[day].forEach((tx: any) => {
+                  allTransactions.push({ ...tx, day: day });
+                });
+              }
+            });
+            
+            console.log(`📊 ${allTransactions.length} transactions archivées trouvées`);
+            
+            // 2. Identifier les gaps
+            const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+            const existingZNumbers = new Set(currentClosures.map((c: any) => c.zNumber));
+            const missingZNumbers = [];
+            
+            for (let z = 1; z <= 50; z++) {
+              if (!existingZNumbers.has(z)) {
+                missingZNumbers.push(z);
+              }
+            }
+            
+            console.log(`🕳️ Z manquants détectés: ${missingZNumbers.join(', ')}`);
+            
+            // 3. Grouper les transactions par jour
+            const transactionsByDayGrouped: { [key: string]: any[] } = {};
+            allTransactions.forEach((tx: any) => {
+              if (!transactionsByDayGrouped[tx.day]) {
+                transactionsByDayGrouped[tx.day] = [];
+              }
+              transactionsByDayGrouped[tx.day].push(tx);
+            });
+            
+            // 4. Reconstruire les clôtures manquantes
+            const reconstructedClosures: any[] = [];
+            const days = Object.keys(transactionsByDayGrouped).sort();
+            
+            missingZNumbers.forEach((zNumber, index) => {
+              const day = days[index];
+              if (day && transactionsByDayGrouped[day]) {
+                const dayTransactions = transactionsByDayGrouped[day];
+                const totalCA = dayTransactions.reduce((sum, tx) => sum + (tx.total || 0), 0);
+                const totalTransactions = dayTransactions.length;
+                
+                // Calculer les remises
+                let totalDiscounts = 0;
+                dayTransactions.forEach((tx: any) => {
+                  if (tx.globalDiscount) {
+                    totalDiscounts += tx.globalDiscount;
+                  }
+                  if (tx.itemDiscounts) {
+                    Object.values(tx.itemDiscounts).forEach((discount: any) => {
+                      if (discount.type === 'euro') {
+                        totalDiscounts += (discount.value || 0) * (tx.items?.length || 0);
+                      }
+                    });
+                  }
+                });
+                
+                const netCA = totalCA - totalDiscounts;
+                
+                const reconstructedClosure = {
+                  zNumber: zNumber,
+                  closedAt: new Date(day + 'T23:59:59.000Z').toISOString(),
+                  transactions: dayTransactions,
+                  totalCA: netCA,
+                  totalTransactions: totalTransactions,
+                  totalDiscounts: totalDiscounts,
+                  reconstructed: true // Marquer comme reconstruite
+                };
+                
+                reconstructedClosures.push(reconstructedClosure);
+                console.log(`✅ Z${zNumber} reconstruit pour le ${day}: ${totalTransactions} tickets, ${netCA}€`);
+              }
+            });
+            
+            if (reconstructedClosures.length > 0) {
+              // 5. Fusionner avec les clôtures existantes
+              const allClosures = [...currentClosures, ...reconstructedClosures];
+              allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
+              
+              // 6. Sauvegarder
+              localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
+              
+              // Mettre à jour le compteur Z
+              const maxZ = Math.max(...allClosures.map((c: any) => c.zNumber));
+              localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+              
+              console.log(`🎉 Reconstruction terminée !`);
+              console.log(`📊 ${reconstructedClosures.length} clôtures reconstruites`);
+              console.log(`📋 Total: ${allClosures.length} clôtures`);
+              
+              const zNumbers = allClosures.map((c: any) => c.zNumber);
+              console.log(`📈 Séquence Z: ${zNumbers.join(' → ')}`);
+              
+              // Forcer le rafraîchissement
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+              
+              alert(`🎉 Reconstruction réussie !\n\n` +
+                    `📊 ${reconstructedClosures.length} clôtures reconstruites\n` +
+                    `📋 Total: ${allClosures.length} clôtures\n` +
+                    `📈 Séquence: ${zNumbers.join(' → ')}\n\n` +
+                    `Les clôtures ont été reconstruites à partir des transactions archivées.\n` +
+                    `La page va se recharger dans 2 secondes...`);
+              
+            } else {
+              alert('ℹ️ Aucune clôture manquante détectée ou aucune transaction archivée disponible.');
+            }
+            
+          } catch (e) {
+            console.error('❌ Erreur reconstruction:', e);
+            alert('❌ Erreur lors de la reconstruction: ' + (e as Error).message);
+          }
+        }}
       >
-        Vide 7
+        🔧 Reconstruire Z
       </Button>
 
       <Button
