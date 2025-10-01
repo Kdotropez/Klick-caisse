@@ -646,15 +646,28 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
                   console.log(`✅ ${allClosures.length} clôtures sauvegardées au total`);
                   
+                  // Mettre à jour le compteur Z si nécessaire
+                  const maxZ = Math.max(...allClosures.map((c: any) => c.zNumber));
+                  const currentCounter = parseInt(localStorage.getItem('klick_caisse_z_counter') || '0');
+                  if (maxZ > currentCounter) {
+                    localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+                    console.log(`🔢 Compteur Z mis à jour : ${maxZ}`);
+                  }
+                  
                   // Afficher la séquence complète
                   const finalZNumbers = allClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
                   console.log(`📈 Séquence Z complète : ${finalZNumbers.join(' → ')}`);
+                  
+                  // Forcer le rafraîchissement de l'interface
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
                   
                   const message = `🎉 Récupération réussie !\n\n` +
                                  `📊 ${recoveredClosures.length} clôtures récupérées\n` +
                                  `📋 Total : ${allClosures.length} clôtures\n` +
                                  `📈 Séquence : ${finalZNumbers.join(' → ')}\n\n` +
-                                 `Rechargez la page pour voir les changements.`;
+                                 `La page va se recharger automatiquement dans 2 secondes...`;
                   
                   alert(message);
                 } else {
