@@ -35,7 +35,7 @@ const reconstructFromFiles = async (files: File[]) => {
   
   const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
   const existingZNumbers = new Set(currentClosures.map((c: any) => c.zNumber));
-  const missingZNumbers = [];
+  const missingZNumbers: number[] = [];
   
   for (let z = 1; z <= 50; z++) {
     if (!existingZNumbers.has(z)) {
@@ -890,7 +890,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             // 2. Identifier les gaps
             const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
             const existingZNumbers = new Set(currentClosures.map((c: any) => c.zNumber));
-            const missingZNumbers = [];
+            const missingZNumbers: number[] = [];
             
             for (let z = 1; z <= 50; z++) {
               if (!existingZNumbers.has(z)) {
