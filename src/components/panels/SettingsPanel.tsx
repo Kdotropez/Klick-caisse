@@ -1070,6 +1070,77 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         🧹 Nettoyer Doublons
       </Button>
 
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#d32f2f',
+          '&:hover': { backgroundColor: '#b71c1c' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+            const zCounter = parseInt(localStorage.getItem('klick_caisse_z_counter') || '0');
+            
+            if (currentClosures.length === 0) {
+              alert('ℹ️ Aucune clôture Z en mémoire à supprimer.');
+              return;
+            }
+            
+            const confirmMessage = `⚠️ ATTENTION : Suppression de TOUTES les clôtures Z en mémoire\n\n` +
+                                 `📋 Clôtures actuelles : ${currentClosures.length}\n` +
+                                 `📈 Dernière clôture : Z${zCounter}\n` +
+                                 `🗑️ Cette action supprimera :\n` +
+                                 `   • Toutes les clôtures archivées\n` +
+                                 `   • Le compteur Z (remis à 0)\n\n` +
+                                 `❌ Cette action est IRRÉVERSIBLE !\n\n` +
+                                 `Êtes-vous sûr de vouloir continuer ?`;
+            
+            if (!window.confirm(confirmMessage)) {
+              return;
+            }
+            
+            // Double confirmation
+            if (!window.confirm('🚨 DERNIÈRE CONFIRMATION 🚨\n\n' +
+                               `Vous allez supprimer ${currentClosures.length} clôtures Z.\n` +
+                               'Cette action est IRRÉVERSIBLE !\n\n' +
+                               'Cliquez sur OK pour confirmer la suppression.')) {
+              return;
+            }
+            
+            // Supprimer toutes les clôtures
+            localStorage.removeItem('klick_caisse_closures');
+            localStorage.removeItem('klick_caisse_z_counter');
+            
+            console.log('🗑️ Toutes les clôtures Z supprimées de la mémoire');
+            
+            alert(`✅ Suppression terminée !\n\n` +
+                  `🗑️ ${currentClosures.length} clôtures Z supprimées\n` +
+                  `📈 Compteur Z remis à 0\n\n` +
+                  `La page va se recharger automatiquement.`);
+            
+            // Recharger la page pour voir les changements
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+            
+          } catch (e) {
+            console.error('❌ Erreur suppression clôtures:', e);
+            alert('❌ Erreur lors de la suppression: ' + (e as Error).message);
+          }
+        }}
+      >
+        🗑️ Supprimer Toutes les Z
+      </Button>
+
       {/* Modale Rapport Historique */}
       <HistoricalReportModal
         open={showHistoricalReport}
