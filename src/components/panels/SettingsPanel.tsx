@@ -874,7 +874,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             }
             
             const txMap = JSON.parse(transactionsByDay);
-            const allTransactions = [];
+            const allTransactions: any[] = [];
             
             // Parcourir tous les jours
             Object.keys(txMap).forEach(day => {
