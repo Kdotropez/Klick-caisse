@@ -477,8 +477,32 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 }
                 
                 if (data.closures) {
-                  localStorage.setItem('klick_caisse_closures', JSON.stringify(data.closures));
-                  console.log('✅ Clôtures restaurées:', data.closures.length);
+                  // Fusionner intelligemment les clôtures au lieu de les remplacer
+                  const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                  const newClosures = data.closures;
+                  
+                  // Créer un Set des numéros Z existants pour éviter les doublons
+                  const existingZNumbers = new Set(currentClosures.map((c: any) => c.zNumber));
+                  
+                  // Ajouter seulement les clôtures qui n'existent pas déjà
+                  const mergedClosures = [...currentClosures];
+                  let addedCount = 0;
+                  
+                  newClosures.forEach((newClosure: any) => {
+                    if (!existingZNumbers.has(newClosure.zNumber)) {
+                      mergedClosures.push(newClosure);
+                      addedCount++;
+                      console.log(`  ✅ Clôture Z${newClosure.zNumber} ajoutée`);
+                    } else {
+                      console.log(`  ⚠️ Clôture Z${newClosure.zNumber} déjà présente, ignorée`);
+                    }
+                  });
+                  
+                  // Trier par numéro Z
+                  mergedClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
+                  
+                  localStorage.setItem('klick_caisse_closures', JSON.stringify(mergedClosures));
+                  console.log(`✅ Clôtures fusionnées: ${addedCount} nouvelles + ${currentClosures.length} existantes = ${mergedClosures.length} total`);
                 }
                 
                 if (data.zCounter !== undefined) {
@@ -496,10 +520,15 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   console.log('✅ Caissiers restaurés:', data.cashiers.length);
                 }
                 
+                // Calculer le nombre total de clôtures après fusion
+                const finalClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                const finalZNumbers = finalClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
+                
                 const message = `✅ Restauration terminée avec succès !\n\n` +
                                `📦 ${data.products?.length || 0} produits\n` +
                                `📂 ${data.categories?.length || 0} catégories\n` +
-                               `🔒 ${data.closures?.length || 0} clôtures\n` +
+                               `🔒 ${finalClosures.length} clôtures (fusion intelligente)\n` +
+                               `📈 Séquence Z: ${finalZNumbers.join(' → ')}\n` +
                                `💰 Z${data.zCounter || 0}\n\n` +
                                `Rechargez la page pour voir les changements.`;
                 
