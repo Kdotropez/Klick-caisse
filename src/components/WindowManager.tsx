@@ -5,6 +5,8 @@ import PaymentPanel from './panels/PaymentPanel';
 import SettingsPanel from './panels/SettingsPanel';
 import ImportPanel from './panels/ImportPanel';
 import StatsPanel from './panels/StatsPanel';
+import CustomerCreateModal from './modals/CustomerCreateModal';
+import { Customer } from '../types/Customer';
 import SubcategoriesPanel from './panels/SubcategoriesPanel';
 import FreePanel from './panels/FreePanel';
 import {
@@ -480,6 +482,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showSalesRecap, setShowSalesRecap] = useState(false);
   
   const [showPaymentRecap, setShowPaymentRecap] = useState(false);
+  // Clients
+  const [customers, setCustomers] = useState<Customer[]>(() => {
+    try { return StorageService.loadCustomers(); } catch { return []; }
+  });
+  const [showCustomerCreate, setShowCustomerCreate] = useState(false);
   const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
   const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
   const [showEndOfDay, setShowEndOfDay] = useState(false);
@@ -3431,6 +3438,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               onOpenClosures={() => { setClosures(StorageService.loadClosures()); setSelectedClosureIdx(null); setShowClosures(true); }}
               onOpenEndOfDay={() => setShowEndOfDay(true)}
               totalDailyDiscounts={totalDailyDiscounts}
+              onOpenCustomerCreate={() => setShowCustomerCreate(true)}
             />
           );
 
@@ -3829,6 +3837,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         transactions={todayTransactions}
         computeDailyProductSales={computeDailyProductSales}
         refreshToday={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+      />
+
+      {/* Modale création client */}
+      <CustomerCreateModal
+        open={showCustomerCreate}
+        onClose={() => setShowCustomerCreate(false)}
+        onCreate={(c)=>{
+          const created = StorageService.addCustomer(c as any);
+          try { setCustomers(StorageService.loadCustomers()); } catch {}
+          console.log('Client créé:', created);
+        }}
       />
 
       {/* Modale d'édition de ticket supprimée (remplacée par l'édition via Tickets jour) */}

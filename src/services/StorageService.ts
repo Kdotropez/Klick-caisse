@@ -1,4 +1,5 @@
 import { Product, Category, Transaction, Cashier } from '../types';
+import { Customer } from '../types/Customer';
 import { Store } from '../types/Store';
 import { getStoreByCode } from '../types/Store';
 import { defaultSubcategoriesRegistry } from '../data/subcategoriesRegistry';
@@ -13,6 +14,7 @@ export class StorageService {
   private static readonly Z_COUNTER_KEY = 'klick_caisse_z_counter';
   private static readonly CASHIERS_KEY = 'klick_caisse_cashiers';
   private static readonly AUTO_BACKUPS_KEY = 'klick_caisse_auto_backups';
+  private static readonly CUSTOMERS_KEY = 'klick_caisse_customers';
 
   private static getStoreKey(storeCode: string, key: string): string {
     return `klick_caisse_${storeCode}_${key}`;
@@ -25,6 +27,31 @@ export class StorageService {
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des produits:', error);
     }
+  }
+
+  // Clients
+  static loadCustomers(): Customer[] {
+    try {
+      const raw = localStorage.getItem(this.CUSTOMERS_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return (Array.isArray(arr) ? arr : []).map((c:any)=> ({ ...c, createdAt: new Date(c.createdAt) }));
+    } catch { return []; }
+  }
+
+  static saveCustomers(customers: Customer[]): void {
+    try {
+      localStorage.setItem(this.CUSTOMERS_KEY, JSON.stringify(customers));
+    } catch {}
+  }
+
+  static addCustomer(c: Omit<Customer,'id'|'createdAt'> & { id?: string }): Customer {
+    const customers = this.loadCustomers();
+    const id = c.id || `${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+    const customer: Customer = { ...c, id, createdAt: new Date() } as Customer;
+    customers.push(customer);
+    this.saveCustomers(customers);
+    return customer;
   }
 
   // Charger les produits
@@ -622,6 +649,7 @@ export class StorageService {
       const closures = this.loadClosures();
       const zCounter = this.getCurrentZNumber();
       const cashiers = this.loadCashiers();
+      const customers = this.loadCustomers();
       // Lire brut la map des transactions par jour
       const txRaw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
       const transactionsByDay = txRaw ? JSON.parse(txRaw) : {};
@@ -636,6 +664,7 @@ export class StorageService {
         closures,
         zCounter,
         cashiers,
+        customers,
       };
     } catch (e) {
       console.error('Erreur export backup:', e);
@@ -689,6 +718,8 @@ export class StorageService {
       if (Number.isFinite(Number(zCounter))) localStorage.setItem(this.Z_COUNTER_KEY, String(Number(zCounter)));
       const cashiers = (data as any).cashiers;
       if (Array.isArray(cashiers)) this.saveCashiers(cashiers);
+      const customers = (data as any).customers;
+      if (Array.isArray(customers)) this.saveCustomers(customers);
     } catch (e) {
       console.error('Erreur import backup:', e);
       throw e;
