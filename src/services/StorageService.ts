@@ -438,6 +438,65 @@ export class StorageService {
     }
   }
 
+  static deleteClosureByZ(zNumber: number): void {
+    try {
+      const closures = this.loadClosures();
+      const next = closures.filter((c: any) => Number(c?.zNumber) !== Number(zNumber));
+      this.saveAllClosures(next);
+    } catch (e) {
+      console.error('Erreur suppression clôture Z', zNumber, e);
+    }
+  }
+
+  static getMaxZNumber(): number {
+    const closures = this.loadClosures();
+    return closures.reduce((max: number, c: any) => Math.max(max, Number(c?.zNumber) || 0), 0);
+  }
+
+  // Reconstruire des clôtures à partir des transactionsByDay; merge=true conserve l'existant et ajoute les jours manquants
+  static recoverClosuresFromTransactionsByDay(merge: boolean = true): { created: number; merged: number } {
+    let created = 0;
+    try {
+      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      if (!raw) return { created: 0, merged: 0 };
+      const map = JSON.parse(raw) as Record<string, any[]>;
+      const existing = merge ? (this.loadClosures() || []) : [];
+      const byDay = new Map<string, any>(existing.map((c: any) => [new Date(c.closedAt).toISOString().slice(0,10), c]));
+      let nextZ = merge ? this.getMaxZNumber() + 1 : 1;
+      const days = Object.keys(map).sort();
+      for (const day of days) {
+        const txs = Array.isArray(map[day]) ? map[day] : [];
+        if (txs.length === 0) continue;
+        if (byDay.has(day)) {
+          // Déjà une clôture pour ce jour: fusionner transactions si besoin
+          const c = byDay.get(day);
+          const oldTxs = Array.isArray(c.transactions) ? c.transactions : [];
+          const mergedTxs = [...oldTxs, ...txs];
+          c.transactions = mergedTxs;
+          c.totalCA = mergedTxs.reduce((s: number, t: any) => s + (t.total || 0), 0);
+          byDay.set(day, c);
+        } else {
+          const totalCA = txs.reduce((s: number, t: any) => s + (t.total || 0), 0);
+          const closure = {
+            zNumber: nextZ++,
+            closedAt: `${day}T23:59:59.000Z`,
+            transactions: txs,
+            totalCA,
+            totalTransactions: txs.length
+          };
+          byDay.set(day, closure);
+          created++;
+        }
+      }
+      const result = Array.from(byDay.values()).sort((a: any, b: any) => new Date(a.closedAt).getTime() - new Date(b.closedAt).getTime());
+      this.saveAllClosures(result);
+      return { created, merged: result.length };
+    } catch (e) {
+      console.error('Erreur récupération clôtures:', e);
+      return { created: 0, merged: 0 };
+    }
+  }
+
   static getCurrentZNumber(): number {
     const raw = localStorage.getItem(this.Z_COUNTER_KEY);
     const n = raw ? parseInt(raw, 10) : 0;
@@ -733,10 +792,78 @@ export class StorageService {
       const cashiers = (data as any).cashiers;
       if (Array.isArray(cashiers)) this.saveCashiers(cashiers);
       const customers = (data as any).customers;
-      if (Array.isArray(customers)) this.saveCustomers(customers);
+      if (Array.isArray(customers)) {
+        this.saveCustomers(customers);
+      } else {
+        // Si absents, tenter une récupération rétroactive
+        this.recoverCustomersIfMissing();
+      }
     } catch (e) {
       console.error('Erreur import backup:', e);
       throw e;
+    }
+  }
+
+  // Reconstruire les clients à partir des transactions existantes (clôtures + transactionsByDay)
+  static recoverCustomersIfMissing(): void {
+    try {
+      const existing = this.loadCustomers();
+      if (existing.length > 0) return;
+      const recovered: Record<string, Customer> = {};
+      const pushCustomer = (id: string | undefined, name: string | undefined, ts?: any) => {
+        const safeName = (name || '').trim();
+        if (!safeName) return;
+        const parts = safeName.split(' ').filter(Boolean);
+        let lastName = safeName;
+        let firstName = '';
+        if (parts.length >= 2) {
+          lastName = parts[0];
+          firstName = parts.slice(1).join(' ');
+        }
+        const key = String(id || safeName).toLowerCase();
+        if (recovered[key]) return;
+        recovered[key] = {
+          id: String(id || `c-${Math.random().toString(36).slice(2,10)}`),
+          lastName,
+          firstName,
+          address: '',
+          postalCode: '',
+          city: '',
+          country: 'France',
+          email: '',
+          phone: '',
+          createdAt: ts ? new Date(ts) : new Date()
+        } as Customer;
+      };
+
+      const closures = this.loadClosures();
+      for (const c of closures) {
+        const txs = Array.isArray((c as any)?.transactions) ? (c as any).transactions : [];
+        for (const t of txs) {
+          pushCustomer((t as any)?.customerId, (t as any)?.customerName, (t as any)?.timestamp);
+        }
+      }
+
+      // transactionsByDay
+      try {
+        const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+        if (raw) {
+          const map = JSON.parse(raw) as Record<string, any[]>;
+          for (const day of Object.keys(map)) {
+            const list = Array.isArray(map[day]) ? map[day] : [];
+            for (const t of list) {
+              pushCustomer((t as any)?.customerId, (t as any)?.customerName, (t as any)?.timestamp);
+            }
+          }
+        }
+      } catch {}
+
+      const recList = Object.values(recovered);
+      if (recList.length > 0) {
+        this.saveCustomers(recList);
+      }
+    } catch (e) {
+      console.warn('recoverCustomersIfMissing error:', e);
     }
   }
 

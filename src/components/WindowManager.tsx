@@ -464,6 +464,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       }
     } catch {}
   }, []);
+
+  // Tenter de reconstruire les clients manquants au démarrage
+  useEffect(() => {
+    try {
+      const list = StorageService.loadCustomers();
+      if (!Array.isArray(list) || list.length === 0) {
+        StorageService.recoverCustomersIfMissing();
+        setCustomers(StorageService.loadCustomers());
+      }
+    } catch {}
+  }, []);
   const [showCategoryManagementModal, setShowCategoryManagementModal] = useState(false);
   const [showDailyReportModal, setShowDailyReportModal] = useState(false);
   const [showProductEditModal, setShowProductEditModal] = useState(false);
@@ -2837,6 +2848,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       const json = JSON.parse(text);
       StorageService.importFullBackup(json);
       setTodayTransactions(StorageService.loadTodayTransactions());
+      try { setCustomers(StorageService.loadCustomers()); } catch {}
       alert('Import terminé. Rechargez la page si nécessaire.');
     } catch (e) {
       alert('Fichier invalide ou erreur d\'import.');
@@ -2862,6 +2874,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         if (Number.isFinite(Number(zCounter))) {
           localStorage.setItem('klick_caisse_z_counter', String(Number(zCounter)));
         }
+        // Importer ou reconstruire les clients si présents/absents
+        const customers = (json as any).customers;
+        if (Array.isArray(customers)) {
+          StorageService.saveCustomers(customers);
+        } else {
+          StorageService.recoverCustomersIfMissing();
+        }
+        try { setCustomers(StorageService.loadCustomers()); } catch {}
       }
       setTodayTransactions(StorageService.loadTodayTransactions());
       alert('Import sélectif (tickets/clôtures) terminé.');

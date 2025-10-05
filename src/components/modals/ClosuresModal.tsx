@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { StorageService } from '../../services/StorageService';
 import { Transaction } from '../../types/Product';
 
 interface ClosuresModalProps {
@@ -81,6 +82,19 @@ const ClosuresModal: React.FC<ClosuresModalProps> = ({ open, onClose, closures, 
         )}
       </DialogContent>
       <DialogActions>
+        <Button onClick={() => {
+          if (selectedIdx === null) return onClose();
+          const c = closures[selectedIdx];
+          // eslint-disable-next-line no-alert
+          if (!window.confirm(`Supprimer la clôture Z${c.zNumber} du ${new Date(c.closedAt).toLocaleDateString('fr-FR')} ?`)) return;
+          StorageService.deleteClosureByZ(Number(c.zNumber));
+          // Mise à jour UI: retirer la clôture supprimée
+          const next = closures.filter((_:any, idx:number)=> idx!==selectedIdx);
+          // Astuce: onClose, l'appelant rechargera les closures
+          onClose();
+          // Optionnel: alerter
+          try { alert('Clôture supprimée. Rouvrez l\'historique pour rafraîchir.'); } catch {}
+        }} color="error">Supprimer Z</Button>
         <Button onClick={onClose}>Fermer</Button>
       </DialogActions>
     </Dialog>

@@ -56,24 +56,45 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
 
   // Charger les transactions du jour
   const todayTransactions = StorageService.loadTodayTransactions();
+  // Charger les clôtures pour fallback si transactions_by_day manquent
+  const allClosures = StorageService.loadClosures();
 
   // Charger les transactions pour la date sélectionnée
   const selectedDateTransactions = React.useMemo(() => {
-    if (selectedDate === new Date().toISOString().slice(0, 10)) {
-      return todayTransactions;
-    }
-    
-    // Charger depuis les transactions archivées par jour
-    try {
-      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-      if (raw) {
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const loadFromTxByDay = (dateKey: string): any[] => {
+      try {
+        const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+        if (!raw) return [];
         const map = JSON.parse(raw) as Record<string, any[]>;
-        return Array.isArray(map[selectedDate]) ? map[selectedDate] : [];
-      }
-    } catch {}
-    
-    return [];
-  }, [selectedDate, todayTransactions]);
+        return Array.isArray(map[dateKey]) ? map[dateKey] : [];
+      } catch { return []; }
+    };
+    const loadFromClosures = (dateKey: string): any[] => {
+      try {
+        const list: any[] = [];
+        (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
+          const d = new Date(c.closedAt).toISOString().slice(0,10);
+          if (d === dateKey) {
+            const txs = Array.isArray(c.transactions) ? c.transactions : [];
+            list.push(...txs);
+          }
+        });
+        return list;
+      } catch { return []; }
+    };
+    if (selectedDate === todayKey) {
+      // Priorité aux transactions du jour, sinon fallback sur clôtures d'aujourd'hui
+      if (Array.isArray(todayTransactions) && todayTransactions.length > 0) return todayTransactions;
+      const fromDay = loadFromTxByDay(todayKey);
+      if (fromDay.length > 0) return fromDay;
+      return loadFromClosures(todayKey);
+    }
+    // Date sélectionnée ≠ aujourd'hui: chercher transactions_by_day, sinon fallback sur clôtures
+    const fromDay = loadFromTxByDay(selectedDate);
+    if (fromDay.length > 0) return fromDay;
+    return loadFromClosures(selectedDate);
+  }, [selectedDate, todayTransactions, allClosures]);
 
   // Fonction pour afficher les détails d'un ticket
   const showTicketDetails = (transaction: any) => {
