@@ -31,6 +31,7 @@ interface GlobalTicketsModalProps {
   setShowDiscountDetails: (v: boolean) => void;
   onOpenEditor: (txId: string) => void;
   refreshTodayTransactions: () => void;
+  filterCustomerId?: string | null;
 }
 
 const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
@@ -62,6 +63,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   setShowDiscountDetails,
   onOpenEditor,
   refreshTodayTransactions,
+  filterCustomerId = null,
 }) => {
      // Charger toutes les transactions
   const allClosures = StorageService.loadClosures();
@@ -134,6 +136,8 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
     if (filterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
     if (filterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
     if (filterPayment === 'sumup' && m!=='sumup') return false;
+    // Filtre par client si demandé
+    if (filterCustomerId && String(t.customerId || '') !== String(filterCustomerId)) return false;
     
     // Filtre par montant
     const amount = t.total || 0;

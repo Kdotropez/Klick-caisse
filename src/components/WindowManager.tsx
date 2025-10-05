@@ -492,6 +492,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showCustomersList, setShowCustomersList] = useState(false);
   const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
+  const [filterCustomerForTickets, setFilterCustomerForTickets] = useState<string | null>(null);
   const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
   const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
   const [showEndOfDay, setShowEndOfDay] = useState(false);
@@ -3741,6 +3742,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           setShowGlobalEditor(true);
         }}
         refreshTodayTransactions={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+        filterCustomerId={filterCustomerForTickets}
       />
       {/* La modale inline précédente a été remplacée par GlobalTicketsModal */}
 
@@ -3867,6 +3869,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         customers={customers}
         onEdit={(c)=>{ setCustomerToEdit(c); setShowCustomersList(false); }}
         onPick={(c)=>{ setCurrentCustomer(c); setShowCustomersList(false); }}
+        onViewSales={(c)=>{
+          setShowCustomersList(false);
+          // Ouvrir Tickets globaux filtrés par client
+          setGlobalOnlyToday(false);
+          setGlobalFilterPayment('all');
+          // Petite attente pour garantir fermeture modal, puis ouvrir tickets
+          setTimeout(()=>{
+            setShowGlobalTickets(true);
+          }, 0);
+          // Marquer l'ID client dans un état local pour filtrer
+          setFilterCustomerForTickets(c.id);
+        }}
       />
 
       {/* Modale d'édition client */}

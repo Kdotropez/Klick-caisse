@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, Box, Typography, IconButton } from '@mui/material';
-import { Edit } from '@mui/icons-material';
+import { Edit, ListAlt } from '@mui/icons-material';
 import { Customer } from '../../types/Customer';
 
 interface CustomersListModalProps {
@@ -9,9 +9,10 @@ interface CustomersListModalProps {
   customers: Customer[];
   onEdit?: (customer: Customer) => void;
   onPick?: (customer: Customer) => void;
+  onViewSales?: (customer: Customer) => void;
 }
 
-const CustomersListModal: React.FC<CustomersListModalProps> = ({ open, onClose, customers, onEdit, onPick }) => {
+const CustomersListModal: React.FC<CustomersListModalProps> = ({ open, onClose, customers, onEdit, onPick, onViewSales }) => {
   const [q, setQ] = useState('');
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -32,13 +33,20 @@ const CustomersListModal: React.FC<CustomersListModalProps> = ({ open, onClose, 
           {filtered.map(c => (
             <ListItem key={c.id} sx={{ py: 0.5, borderBottom: '1px solid #eee', cursor: onPick ? 'pointer' : 'default' }}
               onClick={() => { if (onPick) { onPick(c); } }}
-              secondaryAction={
-                onEdit ? (
-                  <IconButton edge="end" aria-label="edit" onClick={() => onEdit(c)}>
-                    <Edit />
-                  </IconButton>
-                ) : undefined
-              }
+              secondaryAction={(
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {onViewSales && (
+                    <IconButton edge="end" aria-label="sales" onClick={(e) => { e.stopPropagation(); onViewSales(c); }}>
+                      <ListAlt />
+                    </IconButton>
+                  )}
+                  {onEdit && (
+                    <IconButton edge="end" aria-label="edit" onClick={(e) => { e.stopPropagation(); onEdit(c); }}>
+                      <Edit />
+                    </IconButton>
+                  )}
+                </Box>
+              )}
             >
               <Box sx={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', gap: 1, width: '100%' }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{c.lastName} {c.firstName}</Typography>
