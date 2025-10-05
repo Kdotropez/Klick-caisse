@@ -3014,6 +3014,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 StorageService.saveSettings(settings);
               } catch {}
             }}
+            onApplyItemDiscount={applyItemDiscount}
           />
         );
 

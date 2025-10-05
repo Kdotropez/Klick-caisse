@@ -1,6 +1,6 @@
-import React from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemText, Typography } from '@mui/material';
-import { Add, Remove } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemText, Typography, TextField } from '@mui/material';
+import { Add, Remove, Edit } from '@mui/icons-material';
 import { StorageService } from '../../services/StorageService';
 
 interface GlobalTicketEditorModalProps {
@@ -17,10 +17,13 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
   console.log('GlobalTicketEditorModal - draft:', draft);
   console.log('GlobalTicketEditorModal - paymentMethod:', draft?.paymentMethod);
   
+  // État pour la modification des prix
+  const [editingPrice, setEditingPrice] = useState<{ itemIndex: number; newPrice: string } | null>(null);
+  
   const recalcAndSave = () => {
     if (!draft) return;
     const total = (draft.items || []).reduce((s:number, it:any) => {
-      const up = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+      const up = getDisplayPrice(it); // Utiliser le prix personnalisé s'il existe
       return s + (up * (it.quantity||0));
     }, 0);
     const updated = { ...draft, total };
@@ -52,6 +55,61 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
       case 'sumup': return '📱 SumUp';
       default: return method;
     }
+  };
+
+  // Fonction pour démarrer l'édition du prix
+  const startPriceEdit = (itemIndex: number, currentPrice: number) => {
+    setEditingPrice({ itemIndex, newPrice: currentPrice.toFixed(2) });
+  };
+
+  // Fonction pour sauvegarder le nouveau prix
+  const savePriceEdit = () => {
+    if (!editingPrice || !draft) return;
+    
+    // Accepte la virgule comme séparateur décimal
+    const normalized = String(editingPrice.newPrice).replace(',', '.');
+    const newPrice = parseFloat(normalized);
+    if (isNaN(newPrice) || newPrice < 0) {
+      alert('❌ Prix invalide. Veuillez entrer un nombre positif.');
+      return;
+    }
+
+    setDraft((prev: any) => {
+      const updatedItems = [...prev.items];
+      const item = updatedItems[editingPrice.itemIndex];
+      
+      // Créer une copie de l'article avec le nouveau prix
+      const updatedItem = {
+        ...item,
+        customPrice: newPrice, // Marquer comme prix personnalisé
+        originalPrice: item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice // Sauvegarder le prix original
+      };
+      
+      updatedItems[editingPrice.itemIndex] = updatedItem;
+      // Recalcul immédiat du total pour retour visuel
+      const newTotal = (updatedItems || []).reduce((s:number, it:any) => {
+        const unit = it.customPrice !== undefined
+          ? it.customPrice
+          : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
+        return s + (unit * (it.quantity || 0));
+      }, 0);
+      return { ...prev, items: updatedItems, total: newTotal };
+    });
+    
+    setEditingPrice(null);
+  };
+
+  // Fonction pour annuler l'édition du prix
+  const cancelPriceEdit = () => {
+    setEditingPrice(null);
+  };
+
+  // Fonction pour obtenir le prix affiché d'un article
+  const getDisplayPrice = (item: any) => {
+    if (item.customPrice !== undefined) {
+      return item.customPrice;
+    }
+    return item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
   };
 
   return (
@@ -101,28 +159,117 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
             <Typography variant="h6" sx={{ mb: 1 }}>Articles du ticket</Typography>
             <List dense>
               {draft.items.map((it: any, idx: number) => {
-                const unitPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+                const unitPrice = getDisplayPrice(it);
+                const isEditing = editingPrice?.itemIndex === idx;
+                
                 return (
                   <ListItem key={`${it.product.id}-${it.selectedVariation?.id || 'main'}-${idx}`} sx={{ py: 0.25 }}
                     secondaryAction={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <IconButton size="small" onClick={() => setDraft((prev: any) => {
-                          const d = { ...prev, items: prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: Math.max(0, (x.quantity||0)-1) } : x) };
-                          return d;
+                          const newItems = prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: Math.max(0, (x.quantity||0)-1) } : x);
+                          const newTotal = (newItems || []).reduce((s:number, it:any) => {
+                            const unit = it.customPrice !== undefined
+                              ? it.customPrice
+                              : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
+                            return s + (unit * (it.quantity || 0));
+                          }, 0);
+                          return { ...prev, items: newItems, total: newTotal };
                         })}><Remove fontSize="small" /></IconButton>
                         <Typography variant="caption" sx={{ fontFamily: 'monospace', minWidth: 20, textAlign: 'center' }}>{it.quantity}</Typography>
                         <IconButton size="small" onClick={() => setDraft((prev: any) => {
-                          const d = { ...prev, items: prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: (x.quantity||0)+1 } : x) };
-                          return d;
+                          const newItems = prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: (x.quantity||0)+1 } : x);
+                          const newTotal = (newItems || []).reduce((s:number, it:any) => {
+                            const unit = it.customPrice !== undefined
+                              ? it.customPrice
+                              : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
+                            return s + (unit * (it.quantity || 0));
+                          }, 0);
+                          return { ...prev, items: newItems, total: newTotal };
                         })}><Add fontSize="small" /></IconButton>
                         <IconButton size="small" color="error" onClick={() => setDraft((prev:any) => {
-                          const d = { ...prev, items: prev.items.filter((_:any,i:number)=> i!==idx) };
-                          return d;
+                          const newItems = prev.items.filter((_:any,i:number)=> i!==idx);
+                          const newTotal = (newItems || []).reduce((s:number, it:any) => {
+                            const unit = it.customPrice !== undefined
+                              ? it.customPrice
+                              : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
+                            return s + (unit * (it.quantity || 0));
+                          }, 0);
+                          return { ...prev, items: newItems, total: newTotal };
                         })}>✕</IconButton>
                       </Box>
                     }
                   >
-                    <ListItemText primary={it.product.name} secondary={`${it.quantity} x ${unitPrice.toFixed(2)} € = ${(it.quantity*unitPrice).toFixed(2)} €`} />
+                    <ListItemText 
+                      primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2">{it.product.name}</Typography>
+                          {it.customPrice !== undefined && (
+                            <Typography variant="caption" color="warning.main" sx={{ fontStyle: 'italic' }}>
+                              (Prix modifié)
+                            </Typography>
+                          )}
+                        </Box>
+                      }
+                      secondary={
+                        isEditing ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                            <TextField
+                              size="small"
+                              type="text"
+                              value={editingPrice.newPrice}
+                              onChange={(e) => setEditingPrice({ ...editingPrice, newPrice: e.target.value })}
+                              placeholder="0,00"
+                              sx={{ width: 80 }}
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') { e.preventDefault(); savePriceEdit(); }
+                                if (e.key === 'Escape') { e.preventDefault(); cancelPriceEdit(); }
+                              }}
+                            />
+                            <Typography variant="caption">€</Typography>
+                            <Button size="small" variant="contained" color="primary" onClick={savePriceEdit}>
+                              ✓
+                            </Button>
+                            <Button size="small" variant="outlined" onClick={cancelPriceEdit}>
+                              ✕
+                            </Button>
+                          </Box>
+                        ) : (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2">
+                              {it.quantity} x 
+                            </Typography>
+                            <Typography 
+                              variant="body2" 
+                              onClick={() => startPriceEdit(idx, unitPrice)}
+                              sx={{ 
+                                cursor: 'pointer', 
+                                color: 'primary.main',
+                                textDecoration: 'underline',
+                                '&:hover': { backgroundColor: 'action.hover' },
+                                px: 0.5,
+                                borderRadius: 0.5
+                              }}
+                            >
+                              {unitPrice.toFixed(2)} €
+                            </Typography>
+                            <Typography variant="body2">
+                              = {(it.quantity * unitPrice).toFixed(2)} €
+                            </Typography>
+                            {!isEditing && (
+                              <IconButton 
+                                size="small" 
+                                onClick={() => startPriceEdit(idx, unitPrice)}
+                                sx={{ ml: 0.5 }}
+                              >
+                                <Edit fontSize="small" />
+                              </IconButton>
+                            )}
+                          </Box>
+                        )
+                      }
+                    />
                   </ListItem>
                 );
               })}
@@ -131,10 +278,18 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
               )}
             </List>
 
-            {/* Total du ticket */}
+            {/* Total du ticket (recalculé en direct) */}
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Typography variant="h6" align="right">
-                Total: {draft.total?.toFixed(2) || '0.00'} €
+                {(() => {
+                  const liveTotal = (draft.items || []).reduce((s:number, it:any) => {
+                    const unit = it.customPrice !== undefined
+                      ? it.customPrice
+                      : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
+                    return s + (unit * (it.quantity || 0));
+                  }, 0);
+                  return `Total: ${liveTotal.toFixed(2)} €`;
+                })()}
               </Typography>
               <Typography variant="body2" align="right" color="text.secondary">
                 Mode de règlement: {getPaymentMethodLabel(draft.paymentMethod || 'cash')}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import {
   Box,
   Paper,
@@ -10,8 +10,9 @@ import {
   ListItemText,
   Divider,
   Chip,
+  TextField,
 } from '@mui/material';
-import { Add, Remove } from '@mui/icons-material';
+import { Add, Remove, Edit } from '@mui/icons-material';
 import { CartItem } from '../../types/Product';
 import { APP_VERSION } from '../../version';
 
@@ -40,6 +41,7 @@ interface CartPanelProps {
   onToggleAutoGlassDiscount?: () => void;
   autoAssocDiscountEnabled?: boolean;
   onToggleAutoAssocDiscount?: () => void;
+  onApplyItemDiscount: (itemId: string, variationId: string | null, discountType: 'euro' | 'percent' | 'price', value: number) => void;
 }
 
 const CartPanel: React.FC<CartPanelProps> = ({
@@ -61,9 +63,11 @@ const CartPanel: React.FC<CartPanelProps> = ({
   onToggleAutoGlassDiscount,
   autoAssocDiscountEnabled = true,
   onToggleAutoAssocDiscount,
+  onApplyItemDiscount,
 }) => {
   const total = getTotalWithGlobalDiscount();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [editingPrice, setEditingPrice] = useState<{ key: string; value: string } | null>(null);
 
   // Protection contre les états incohérents avec stabilisation
   const safeCartItems = useMemo(() => {
@@ -178,9 +182,87 @@ const CartPanel: React.FC<CartPanelProps> = ({
                           >
                             ✕
                           </IconButton>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#666', ml: 'auto' }}>
-                            {originalPrice.toFixed(2)} €
-                          </Typography>
+                          {/* Zone prix unitaire (édition inline) */}
+                          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }} onClick={(e)=>e.stopPropagation()}>
+                            {editingPrice?.key === discountKey ? (
+                              <>
+                                <TextField
+                                  size="small"
+                                  type="text"
+                                  value={editingPrice.value}
+                                  onChange={(e) => setEditingPrice({ key: discountKey, value: e.target.value })}
+                                  placeholder="0,00"
+                                  sx={{ width: 90 }}
+                                  autoFocus
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      const normalized = editingPrice.value.replace(',', '.');
+                                      const val = parseFloat(normalized);
+                                      if (Number.isFinite(val) && val >= 0) {
+                                        onApplyItemDiscount(item.product.id, variationId, 'price', val);
+                                        setEditingPrice(null);
+                                      } else {
+                                        alert('Prix invalide');
+                                      }
+                                    }
+                                    if (e.key === 'Escape') {
+                                      setEditingPrice(null);
+                                    }
+                                  }}
+                                />
+                                <Typography variant="body2">€</Typography>
+                                <Button 
+                                  size="small" 
+                                  variant="contained"
+                                  onClick={() => {
+                                    const normalized = editingPrice.value.replace(',', '.');
+                                    const val = parseFloat(normalized);
+                                    if (Number.isFinite(val) && val >= 0) {
+                                      onApplyItemDiscount(item.product.id, variationId, 'price', val);
+                                      setEditingPrice(null);
+                                    } else {
+                                      alert('Prix invalide');
+                                    }
+                                  }}
+                                  sx={{ minWidth: 0, px: 1, py: 0.25 }}
+                                >
+                                  ✓
+                                </Button>
+                                <Button 
+                                  size="small" 
+                                  variant="outlined"
+                                  onClick={() => setEditingPrice(null)}
+                                  sx={{ minWidth: 0, px: 1, py: 0.25 }}
+                                >
+                                  ✕
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Typography 
+                                  variant="body2" 
+                                  sx={{ fontWeight: 'bold', color: discount?.type==='price' ? '#ef6c00' : '#666', textDecoration: discount?.type==='price' ? 'underline' : 'none' }}
+                                  onClick={() => {
+                                    const currentUnit = finalPrice; // prix actuel appliqué
+                                    setEditingPrice({ key: discountKey, value: currentUnit.toFixed(2).replace('.', ',') });
+                                  }}
+                                  title={discount?.type==='price' ? 'Prix modifié - cliquer pour changer' : 'Cliquer pour modifier le prix'}
+                                >
+                                  {(discount?.type==='price' ? finalPrice : originalPrice).toFixed(2)} €
+                                </Typography>
+                                <IconButton 
+                                  size="small" 
+                                  onClick={() => {
+                                    const currentUnit = finalPrice; 
+                                    setEditingPrice({ key: discountKey, value: currentUnit.toFixed(2).replace('.', ',') });
+                                  }}
+                                  sx={{ p: 0.5 }}
+                                >
+                                  <Edit fontSize="small" />
+                                </IconButton>
+                              </>
+                            )}
+                          </Box>
                         </Box>
                       }
                       secondary={
