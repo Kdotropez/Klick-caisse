@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, TextField, Typography } from '@mui/material';
+import CustomersListModal from './CustomersListModal';
 import { StorageService } from '../../services/StorageService';
 
 interface GlobalTicketsModalProps {
@@ -32,6 +33,7 @@ interface GlobalTicketsModalProps {
   onOpenEditor: (txId: string) => void;
   refreshTodayTransactions: () => void;
   filterCustomerId?: string | null;
+  setFilterCustomerId?: (id: string | null) => void;
 }
 
 const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
@@ -64,7 +66,9 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   onOpenEditor,
   refreshTodayTransactions,
   filterCustomerId = null,
+  setFilterCustomerId,
 }) => {
+  const [showCustomerPicker, setShowCustomerPicker] = React.useState(false);
      // Charger toutes les transactions
   const allClosures = StorageService.loadClosures();
   const allTx: any[] = [];
@@ -228,6 +232,27 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
            >
              Détails remises ({showDiscountDetails ? 'ON' : 'OFF'})
            </Button>
+        </Box>
+
+        {/* Filtre client */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Client:</Typography>
+          <Typography variant="body2" sx={{ color: filterCustomerId ? 'primary.main' : 'text.secondary' }}>
+            {(() => {
+              if (!filterCustomerId) return 'Tous';
+              try {
+                const list = StorageService.loadCustomers();
+                const found = list.find((c:any)=> String(c.id) === String(filterCustomerId));
+                return found ? `${found.lastName} ${found.firstName}` : '(inconnu)';
+              } catch { return '(inconnu)'; }
+            })()}
+          </Typography>
+          <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
+            <Button size="small" variant="outlined" onClick={()=> setShowCustomerPicker(true)}>Choisir</Button>
+            {filterCustomerId && (
+              <Button size="small" color="error" onClick={()=> setFilterCustomerId && setFilterCustomerId(null)}>Effacer</Button>
+            )}
+          </Box>
         </Box>
 
         {/* Champs de filtres */}
@@ -648,6 +673,15 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
           </Box>
         )}
       </DialogContent>
+      {/* Sélecteur client */}
+      <CustomersListModal
+        open={showCustomerPicker}
+        onClose={()=> setShowCustomerPicker(false)}
+        customers={(() => { try { return StorageService.loadCustomers(); } catch { return []; } })()}
+        onPick={(c:any)=>{ setFilterCustomerId && setFilterCustomerId(c.id); setShowCustomerPicker(false); }}
+        onEdit={undefined}
+        onViewSales={undefined}
+      />
       
       <DialogActions>
         <Button onClick={onClose}>Fermer</Button>

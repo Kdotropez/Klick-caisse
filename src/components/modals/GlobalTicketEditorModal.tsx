@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemText, Typography, TextField } from '@mui/material';
 import { Add, Remove, Edit } from '@mui/icons-material';
 import { StorageService } from '../../services/StorageService';
+import CustomersListModal from './CustomersListModal';
 
 interface GlobalTicketEditorModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
   
   // État pour la modification des prix
   const [editingPrice, setEditingPrice] = useState<{ itemIndex: number; newPrice: string } | null>(null);
+  const [showCustomerPicker, setShowCustomerPicker] = useState(false);
   
   const recalcAndSave = () => {
     if (!draft) return;
@@ -118,6 +120,20 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
       <DialogContent>
         {draft && (
           <Box>
+            {/* Client associé */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <Typography variant="h6" sx={{ mb: 0 }}>Client</Typography>
+              <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body2" sx={{ color: draft.customerName ? 'primary.main' : 'text.secondary' }}>
+                  {draft.customerName || 'Aucun'}
+                </Typography>
+                <Button size="small" variant="outlined" onClick={() => setShowCustomerPicker(true)}>Associer</Button>
+                {draft.customerId && (
+                  <Button size="small" color="error" onClick={() => setDraft((prev:any)=> ({ ...prev, customerId: undefined, customerName: undefined }))}>Effacer</Button>
+                )}
+              </Box>
+            </Box>
+
             {/* Sélection du mode de règlement */}
             <Typography variant="h6" sx={{ mb: 1 }}>Mode de règlement</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mb: 2 }}>
@@ -302,6 +318,19 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
         <Button onClick={onClose}>Annuler</Button>
         <Button variant="contained" onClick={recalcAndSave}>Enregistrer</Button>
       </DialogActions>
+      {/* Sélecteur client */}
+      <CustomersListModal
+        open={showCustomerPicker}
+        onClose={() => setShowCustomerPicker(false)}
+        customers={(() => {
+          try { return StorageService.loadCustomers(); } catch { return []; }
+        })()}
+        onPick={(c:any) => {
+          setDraft((prev:any) => ({ ...prev, customerId: c.id, customerName: `${c.lastName} ${c.firstName}` }));
+          setShowCustomerPicker(false);
+        }}
+        onEdit={undefined}
+      />
     </Dialog>
   );
 };

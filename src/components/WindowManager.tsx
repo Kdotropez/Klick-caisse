@@ -3743,6 +3743,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }}
         refreshTodayTransactions={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
         filterCustomerId={filterCustomerForTickets}
+        setFilterCustomerId={(id)=> setFilterCustomerForTickets(id)}
       />
       {/* La modale inline précédente a été remplacée par GlobalTicketsModal */}
 
