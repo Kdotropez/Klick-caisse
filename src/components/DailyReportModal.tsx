@@ -59,9 +59,16 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
   // Charger les clôtures pour fallback si transactions_by_day manquent
   const allClosures = StorageService.loadClosures();
 
+  const getLocalDateKey = (d: Date) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   // Charger les transactions pour la date sélectionnée
   const selectedDateTransactions = React.useMemo(() => {
-    const todayKey = new Date().toISOString().slice(0, 10);
+    const todayKey = getLocalDateKey(new Date());
     const loadFromTxByDay = (dateKey: string): any[] => {
       try {
         const raw = localStorage.getItem('klick_caisse_transactions_by_day');
@@ -74,8 +81,9 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
       try {
         const list: any[] = [];
         (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
-          const d = new Date(c.closedAt).toISOString().slice(0,10);
-          if (d === dateKey) {
+          const d = new Date(c.closedAt);
+          const key = getLocalDateKey(d);
+          if (key === dateKey) {
             const txs = Array.isArray(c.transactions) ? c.transactions : [];
             list.push(...txs);
           }
