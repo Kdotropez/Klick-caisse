@@ -491,6 +491,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showCustomerCreate, setShowCustomerCreate] = useState(false);
   const [showCustomersList, setShowCustomersList] = useState(false);
   const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
+  const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
   const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
   const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
   const [showEndOfDay, setShowEndOfDay] = useState(false);
@@ -1714,6 +1715,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       timestamp: new Date(),
       itemDiscounts: { ...itemDiscounts },
       globalDiscount: globalDiscount ? { ...globalDiscount } : null,
+      customerId: currentCustomer?.id,
+      customerName: currentCustomer ? `${currentCustomer.lastName} ${currentCustomer.firstName}` : undefined,
     };
     StorageService.addDailyTransaction(tx as any);
     // Sauvegarde automatique complète (silencieuse) + téléchargement JSON (obligatoire après encaissement)
@@ -3025,6 +3028,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               } catch {}
             }}
             onApplyItemDiscount={applyItemDiscount}
+            customerName={currentCustomer ? `${currentCustomer.lastName} ${currentCustomer.firstName}` : null}
+            onPickCustomer={() => setShowCustomersList(true)}
+            onClearCustomer={() => setCurrentCustomer(null)}
           />
         );
 
@@ -3860,6 +3866,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         onClose={() => setShowCustomersList(false)}
         customers={customers}
         onEdit={(c)=>{ setCustomerToEdit(c); setShowCustomersList(false); }}
+        onPick={(c)=>{ setCurrentCustomer(c); setShowCustomersList(false); }}
       />
 
       {/* Modale d'édition client */}

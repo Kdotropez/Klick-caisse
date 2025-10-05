@@ -76,4 +76,6 @@ export interface Transaction {
   timestamp: Date;
   itemDiscounts?: Record<string, { type: 'euro' | 'percent' | 'price'; value: number }>;
   globalDiscount?: { type: 'euro' | 'percent'; value: number } | null;
+  customerId?: string;
+  customerName?: string;
 }

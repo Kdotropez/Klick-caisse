@@ -291,13 +291,25 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
       });
     });
 
-    // Top produits
+    // Liste complète des produits (plus de limite top20)
     stats.topProducts = Array.from(productMap.values())
-      .sort((a, b) => b.totalRevenue - a.totalRevenue)
-      .slice(0, 20);
+      .sort((a, b) => b.totalRevenue - a.totalRevenue);
 
     return stats;
   }, [filteredClosures]);
+
+  // Tri pour Détail Produits
+  const [productsSortKey, setProductsSortKey] = useState<'productName' | 'category' | 'subcategory' | 'totalQuantity' | 'totalRevenue' | 'averagePrice' | 'transactionsCount' | 'percentage'>('totalRevenue');
+  const [productsSortDir, setProductsSortDir] = useState<'asc' | 'desc'>('desc');
+  const toggleProductsSort = (key: 'productName' | 'category' | 'subcategory' | 'totalQuantity' | 'totalRevenue' | 'averagePrice' | 'transactionsCount' | 'percentage') => {
+    if (productsSortKey === key) {
+      setProductsSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setProductsSortKey(key);
+      setProductsSortDir('desc');
+    }
+  };
+  const sortArrow = (key: typeof productsSortKey) => productsSortKey === key ? (productsSortDir === 'asc' ? ' ▲' : ' ▼') : '';
 
   // Calculer les statistiques par jour
   const dailyStats = useMemo(() => {
@@ -730,23 +742,35 @@ if (recoveredClosures.length > 0) {
                📦 Détail des Produits
              </Typography>
              
-             <TableContainer component={Paper}>
-               <Table>
-                 <TableHead>
-                   <TableRow>
-                     <TableCell>Rang</TableCell>
-                     <TableCell>Produit</TableCell>
-                     <TableCell>Catégorie</TableCell>
-                     <TableCell>Sous-catégorie</TableCell>
-                     <TableCell align="right">Quantité vendue</TableCell>
-                     <TableCell align="right">CA généré</TableCell>
-                     <TableCell align="right">Prix moyen</TableCell>
-                     <TableCell align="right">Nombre de transactions</TableCell>
-                     <TableCell align="right">% du CA total</TableCell>
-                   </TableRow>
-                 </TableHead>
-                 <TableBody>
-                   {globalStats.topProducts.map((product, index) => (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Rang</TableCell>
+                    <TableCell onClick={() => toggleProductsSort('productName')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Produit{sortArrow('productName')}</TableCell>
+                    <TableCell onClick={() => toggleProductsSort('category')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Catégorie{sortArrow('category')}</TableCell>
+                    <TableCell onClick={() => toggleProductsSort('subcategory')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Sous-catégorie{sortArrow('subcategory')}</TableCell>
+                    <TableCell align="right" onClick={() => toggleProductsSort('totalQuantity')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Quantité vendue{sortArrow('totalQuantity')}</TableCell>
+                    <TableCell align="right" onClick={() => toggleProductsSort('totalRevenue')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>CA généré{sortArrow('totalRevenue')}</TableCell>
+                    <TableCell align="right" onClick={() => toggleProductsSort('averagePrice')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Prix moyen{sortArrow('averagePrice')}</TableCell>
+                    <TableCell align="right" onClick={() => toggleProductsSort('transactionsCount')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Nombre de transactions{sortArrow('transactionsCount')}</TableCell>
+                    <TableCell align="right" onClick={() => toggleProductsSort('percentage')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>% du CA total{sortArrow('percentage')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {(() => {
+                    const rows = globalStats.topProducts.map(p => ({
+                      ...p,
+                      percentage: globalStats.totalCA > 0 ? (p.totalRevenue / globalStats.totalCA) * 100 : 0,
+                    }));
+                    rows.sort((a: any, b: any) => {
+                      const factor = productsSortDir === 'asc' ? 1 : -1;
+                      const va = a[productsSortKey];
+                      const vb = b[productsSortKey];
+                      if (typeof va === 'number' && typeof vb === 'number') return factor * (va - vb);
+                      return factor * String(va || '').localeCompare(String(vb || ''));
+                    });
+                    return rows.map((product, index) => (
                      <TableRow key={product.productName}>
                        <TableCell>
                          <Chip 
@@ -781,10 +805,11 @@ if (recoveredClosures.length > 0) {
                        <TableCell align="right">{formatCurrency(product.averagePrice)}</TableCell>
                        <TableCell align="right">{product.transactionsCount}</TableCell>
                        <TableCell align="right">
-                         {((product.totalRevenue / globalStats.totalCA) * 100).toFixed(1)}%
+                        {product.percentage.toFixed(1)}%
                        </TableCell>
                      </TableRow>
-                   ))}
+                    ));
+                  })()}
                  </TableBody>
                </Table>
              </TableContainer>

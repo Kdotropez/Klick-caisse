@@ -42,6 +42,9 @@ interface CartPanelProps {
   autoAssocDiscountEnabled?: boolean;
   onToggleAutoAssocDiscount?: () => void;
   onApplyItemDiscount: (itemId: string, variationId: string | null, discountType: 'euro' | 'percent' | 'price', value: number) => void;
+  customerName?: string | null;
+  onPickCustomer?: () => void;
+  onClearCustomer?: () => void;
 }
 
 const CartPanel: React.FC<CartPanelProps> = ({
@@ -64,6 +67,9 @@ const CartPanel: React.FC<CartPanelProps> = ({
   autoAssocDiscountEnabled = true,
   onToggleAutoAssocDiscount,
   onApplyItemDiscount,
+  customerName,
+  onPickCustomer,
+  onClearCustomer,
 }) => {
   const total = getTotalWithGlobalDiscount();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -124,6 +130,17 @@ const CartPanel: React.FC<CartPanelProps> = ({
       </Box>
 
       <Box ref={scrollContainerRef} sx={{ flexGrow: 1, overflow: 'auto', p: 0.5 }}>
+        {/* Client courant */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Client:</Typography>
+          <Typography variant="body2" sx={{ color: customerName ? '#1976d2' : '#666' }}>
+            {customerName || 'Aucun'}
+          </Typography>
+          <Button size="small" variant="outlined" onClick={onPickCustomer} sx={{ ml: 'auto' }}>Associer</Button>
+          {customerName && (
+            <Button size="small" color="error" onClick={onClearCustomer}>Effacer</Button>
+          )}
+        </Box>
         {safeCartItems.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
             Panier vide

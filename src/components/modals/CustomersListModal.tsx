@@ -8,9 +8,10 @@ interface CustomersListModalProps {
   onClose: () => void;
   customers: Customer[];
   onEdit?: (customer: Customer) => void;
+  onPick?: (customer: Customer) => void;
 }
 
-const CustomersListModal: React.FC<CustomersListModalProps> = ({ open, onClose, customers, onEdit }) => {
+const CustomersListModal: React.FC<CustomersListModalProps> = ({ open, onClose, customers, onEdit, onPick }) => {
   const [q, setQ] = useState('');
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -29,7 +30,8 @@ const CustomersListModal: React.FC<CustomersListModalProps> = ({ open, onClose, 
         <TextField fullWidth label="Rechercher" value={q} onChange={(e)=>setQ(e.target.value)} sx={{ mb: 2 }} />
         <List dense>
           {filtered.map(c => (
-            <ListItem key={c.id} sx={{ py: 0.5, borderBottom: '1px solid #eee' }}
+            <ListItem key={c.id} sx={{ py: 0.5, borderBottom: '1px solid #eee', cursor: onPick ? 'pointer' : 'default' }}
+              onClick={() => { if (onPick) { onPick(c); } }}
               secondaryAction={
                 onEdit ? (
                   <IconButton edge="end" aria-label="edit" onClick={() => onEdit(c)}>
