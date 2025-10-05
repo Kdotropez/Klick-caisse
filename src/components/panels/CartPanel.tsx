@@ -260,6 +260,17 @@ const CartPanel: React.FC<CartPanelProps> = ({
                                 >
                                   <Edit fontSize="small" />
                                 </IconButton>
+                                {discount?.type === 'price' && (
+                                  <Button 
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={() => onRemoveItemDiscount(discountKey)}
+                                    sx={{ minWidth: 0, px: 1, py: 0.25 }}
+                                    title="Réinitialiser prix (retour tarif)"
+                                  >
+                                    Réinit
+                                  </Button>
+                                )}
                               </>
                             )}
                           </Box>
