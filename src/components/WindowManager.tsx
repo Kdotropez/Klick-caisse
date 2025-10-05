@@ -6,6 +6,8 @@ import SettingsPanel from './panels/SettingsPanel';
 import ImportPanel from './panels/ImportPanel';
 import StatsPanel from './panels/StatsPanel';
 import CustomerCreateModal from './modals/CustomerCreateModal';
+import CustomersListModal from './modals/CustomersListModal';
+import CustomerEditModal from './modals/CustomerEditModal';
 import { Customer } from '../types/Customer';
 import SubcategoriesPanel from './panels/SubcategoriesPanel';
 import FreePanel from './panels/FreePanel';
@@ -487,6 +489,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     try { return StorageService.loadCustomers(); } catch { return []; }
   });
   const [showCustomerCreate, setShowCustomerCreate] = useState(false);
+  const [showCustomersList, setShowCustomersList] = useState(false);
+  const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
   const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
   const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
   const [showEndOfDay, setShowEndOfDay] = useState(false);
@@ -718,8 +722,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           // Chercher dans les sous-catégories associées
           for (const raw of assocList) {
             const n = normalizeKey(String(raw));
-            if (packMapEffective[n] !== undefined) { matchedPackKey = n; break; }
-          }
+            if (packMapEffective[n] !== undefined) matchedPackKey = n; break; }
           // Sinon tenter via le nom produit
           if (!matchedPackKey && (categoryNorm.includes('pack') || nameNorm.includes('pack'))) {
             const m = nameNorm.match(/pack\s*(\d+(?:\.\d+)?)/);
@@ -3439,6 +3442,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               onOpenEndOfDay={() => setShowEndOfDay(true)}
               totalDailyDiscounts={totalDailyDiscounts}
               onOpenCustomerCreate={() => setShowCustomerCreate(true)}
+              onOpenCustomersList={() => setShowCustomersList(true)}
             />
           );
 
@@ -3847,6 +3851,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const created = StorageService.addCustomer(c as any);
           try { setCustomers(StorageService.loadCustomers()); } catch {}
           console.log('Client créé:', created);
+        }}
+      />
+
+      {/* Modale liste clients */}
+      <CustomersListModal
+        open={showCustomersList}
+        onClose={() => setShowCustomersList(false)}
+        customers={customers}
+        onEdit={(c)=>{ setCustomerToEdit(c); setShowCustomersList(false); }}
+      />
+
+      {/* Modale d'édition client */}
+      <CustomerEditModal
+        open={!!customerToEdit}
+        onClose={() => setCustomerToEdit(null)}
+        customer={customerToEdit}
+        onSave={(c: Customer)=>{
+          StorageService.updateCustomer(c);
+          try { setCustomers(StorageService.loadCustomers()); } catch {}
+          setCustomerToEdit(null);
         }}
       />
 

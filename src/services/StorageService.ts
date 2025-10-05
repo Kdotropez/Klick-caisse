@@ -54,6 +54,20 @@ export class StorageService {
     return customer;
   }
 
+  static updateCustomer(updated: Customer): void {
+    const customers = this.loadCustomers();
+    const idx = customers.findIndex(c => c.id === updated.id);
+    if (idx === -1) return;
+    customers[idx] = { ...updated };
+    this.saveCustomers(customers);
+  }
+
+  static deleteCustomer(id: string): void {
+    const customers = this.loadCustomers();
+    const next = customers.filter(c => c.id !== id);
+    this.saveCustomers(next);
+  }
+
   // Charger les produits
   static loadProducts(): Product[] {
     try {

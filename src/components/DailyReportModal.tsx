@@ -50,6 +50,9 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [showTicketsSection, setShowTicketsSection] = useState(false);
+  // Tri des articles (détail produits)
+  const [productSortKey, setProductSortKey] = useState<'name'|'category'|'totalQty'|'transactions'|'totalAmount'|'percentage'>('totalAmount');
+  const [productSortDir, setProductSortDir] = useState<'asc'|'desc'>('desc');
 
   // Charger les transactions du jour
   const todayTransactions = StorageService.loadTodayTransactions();
@@ -890,8 +893,33 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                 stat.percentage = totalCA > 0 ? (stat.totalAmount / totalCA) * 100 : 0;
               });
               
-              const sortedArticles = Array.from(articleStats.values())
-                .sort((a, b) => b.totalAmount - a.totalAmount);
+              const articles = Array.from(articleStats.values());
+              const sortedArticles = articles.sort((a, b) => {
+                const factor = productSortDir === 'asc' ? 1 : -1;
+                const get = (x:any) => {
+                  switch (productSortKey) {
+                    case 'name': return (x.name||'').toLowerCase();
+                    case 'category': return (x.category||'').toLowerCase();
+                    case 'totalQty': return x.totalQty||0;
+                    case 'transactions': return x.transactions||0;
+                    case 'totalAmount': return x.totalAmount||0;
+                    case 'percentage': return x.percentage||0;
+                    default: return x.totalAmount||0;
+                  }
+                };
+                const va = get(a); const vb = get(b);
+                if (typeof va === 'number' && typeof vb === 'number') return factor * (va - vb);
+                return factor * String(va).localeCompare(String(vb));
+              });
+              const toggleSort = (key: typeof productSortKey) => {
+                if (productSortKey === key) {
+                  setProductSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+                } else {
+                  setProductSortKey(key);
+                  setProductSortDir('desc');
+                }
+              };
+              const arrow = (key: typeof productSortKey) => productSortKey === key ? (productSortDir==='asc'?' ▲':' ▼') : '';
               
               return (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -907,85 +935,31 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                     </Typography>
                   </Box>
                   
-                  {/* Liste des articles */}
+                  {/* Tableau des articles avec tri par colonnes */}
                   {sortedArticles.length > 0 ? (
-                    <Box sx={{ 
-                      maxHeight: '400px', 
-                      overflowY: 'auto',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 1
-                    }}>
-                      {sortedArticles.map((article, index) => (
-                        <Box key={`${article.name}-${index}`} sx={{ 
-                          p: 2, 
-                          backgroundColor: index % 2 === 0 ? '#fff' : '#f9f9f9',
-                          borderBottom: index < sortedArticles.length - 1 ? '1px solid #e0e0e0' : 'none',
-                          '&:hover': {
-                            backgroundColor: '#fce4ec'
-                          }
-                        }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                            <Box sx={{ flex: 1 }}>
-                              <Typography variant="h6" sx={{ 
-                                fontWeight: 'bold', 
-                                color: index < 3 ? '#e91e63' : '#333',
-                                fontSize: '1rem'
-                              }}>
-                                {index < 3 && '🏆 '}{article.name}
-                              </Typography>
-                              <Typography variant="body2" sx={{ color: '#666', fontSize: '0.85rem' }}>
-                                {article.category}
-                              </Typography>
-                            </Box>
-                            <Typography variant="h5" sx={{ 
-                              fontWeight: 'bold', 
-                              color: '#e91e63',
-                              fontFamily: 'monospace',
-                              fontSize: '1.2rem'
-                            }}>
-                              {formatPrice(article.totalAmount)}
-                            </Typography>
+                    <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, overflow: 'hidden' }}>
+                      {/* En-têtes */}
+                      <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 0.8fr 1fr 1.2fr 0.8fr', backgroundColor: '#f8bbd9', borderBottom: '1px solid #e0e0e0' }}>
+                        <Typography variant="body2" sx={{ p: 1, fontWeight: 'bold', cursor: 'pointer' }} onClick={()=>toggleSort('name')}>Produit{arrow('name')}</Typography>
+                        <Typography variant="body2" sx={{ p: 1, fontWeight: 'bold', cursor: 'pointer' }} onClick={()=>toggleSort('category')}>Catégorie{arrow('category')}</Typography>
+                        <Typography variant="body2" sx={{ p: 1, fontWeight: 'bold', textAlign: 'right', cursor: 'pointer' }} onClick={()=>toggleSort('totalQty')}>Qté{arrow('totalQty')}</Typography>
+                        <Typography variant="body2" sx={{ p: 1, fontWeight: 'bold', textAlign: 'right', cursor: 'pointer' }} onClick={()=>toggleSort('transactions')}>Transac.{arrow('transactions')}</Typography>
+                        <Typography variant="body2" sx={{ p: 1, fontWeight: 'bold', textAlign: 'right', cursor: 'pointer' }} onClick={()=>toggleSort('totalAmount')}>CA{arrow('totalAmount')}</Typography>
+                        <Typography variant="body2" sx={{ p: 1, fontWeight: 'bold', textAlign: 'right', cursor: 'pointer' }} onClick={()=>toggleSort('percentage')}>% CA{arrow('percentage')}</Typography>
+                      </Box>
+                      {/* Lignes */}
+                      <Box sx={{ maxHeight: '420px', overflowY: 'auto' }}>
+                        {sortedArticles.map((article, index) => (
+                          <Box key={`${article.name}-${index}`} sx={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 0.8fr 1fr 1.2fr 0.8fr', backgroundColor: index % 2 === 0 ? '#fff' : '#f9f9f9', borderBottom: '1px solid #eee', alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ p: 1 }}>{article.name}</Typography>
+                            <Typography variant="body2" sx={{ p: 1, color: '#666' }}>{article.category}</Typography>
+                            <Typography variant="body2" sx={{ p: 1, textAlign: 'right', fontFamily: 'monospace' }}>{article.totalQty}</Typography>
+                            <Typography variant="body2" sx={{ p: 1, textAlign: 'right', fontFamily: 'monospace' }}>{article.transactions}</Typography>
+                            <Typography variant="body2" sx={{ p: 1, textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold', color: '#e91e63' }}>{formatPrice(article.totalAmount)}</Typography>
+                            <Typography variant="body2" sx={{ p: 1, textAlign: 'right', fontFamily: 'monospace', color: '#e91e63' }}>{article.percentage.toFixed(1)}%</Typography>
                           </Box>
-                          
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Box sx={{ display: 'flex', gap: 3 }}>
-                              <Typography variant="body2" sx={{ color: '#666' }}>
-                                <strong>Quantité:</strong> {article.totalQty}
-                              </Typography>
-                              <Typography variant="body2" sx={{ color: '#666' }}>
-                                <strong>Transactions:</strong> {article.transactions}
-                              </Typography>
-                            </Box>
-                            <Typography variant="body2" sx={{ 
-                              color: '#e91e63', 
-                              fontWeight: 'bold',
-                              backgroundColor: '#fce4ec',
-                              px: 1,
-                              py: 0.5,
-                              borderRadius: 1
-                            }}>
-                              {article.percentage.toFixed(1)}% du CA
-                            </Typography>
-                          </Box>
-                          
-                          {/* Barre de progression */}
-                          <Box sx={{ 
-                            width: '100%', 
-                            height: 6, 
-                            backgroundColor: '#e0e0e0', 
-                            borderRadius: 3, 
-                            mt: 1,
-                            overflow: 'hidden'
-                          }}>
-                            <Box sx={{ 
-                              width: `${article.percentage}%`, 
-                              height: '100%', 
-                              backgroundColor: index < 3 ? '#e91e63' : '#f06292',
-                              transition: 'width 0.3s ease'
-                            }} />
-                          </Box>
-                        </Box>
-                      ))}
+                        ))}
+                      </Box>
                     </Box>
                   ) : (
                     <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>

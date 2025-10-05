@@ -12,6 +12,7 @@ interface StatsPanelProps {
   onOpenEndOfDay: () => void;
   totalDailyDiscounts?: number;
   onOpenCustomerCreate?: () => void;
+  onOpenCustomersList?: () => void;
 }
 
 const StatsPanel: React.FC<StatsPanelProps> = ({
@@ -25,6 +26,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
   onOpenEndOfDay,
   totalDailyDiscounts = 0,
   onOpenCustomerCreate,
+  onOpenCustomersList,
 }) => {
   const padding = 4;
   const gap = 2;
@@ -98,6 +100,9 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
       <Box sx={{ display: 'flex', gap: 0.25, flex: 1 }}>
         <Button variant="contained" sx={{ ...commonButtonSx, backgroundColor: '#795548', '&:hover': { backgroundColor: '#5d4037' } }} onClick={onOpenCustomerCreate}>
           Nouveau client
+        </Button>
+        <Button variant="contained" sx={{ ...commonButtonSx, backgroundColor: '#455a64', '&:hover': { backgroundColor: '#37474f' } }} onClick={onOpenCustomersList}>
+          Clients
         </Button>
       </Box>
     </Box>
