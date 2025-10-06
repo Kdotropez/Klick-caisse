@@ -110,77 +110,55 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     setShowTicketModal(true);
   };
 
-  // Calculer les statistiques quotidiennes
+  // Calculer les statistiques de la date sélectionnée (aligne avec la liste affichée)
   useEffect(() => {
-        
-        if (todayTransactions.length > 0) {
-          let totalSales = 0;
-          let totalItems = 0;
-          let totalOriginalAmount = 0;
-          let totalDiscounts = 0;
+    const txs = Array.isArray(selectedDateTransactions) ? selectedDateTransactions : [];
+    if (txs.length > 0) {
+      let totalSales = 0;
+      let totalItems = 0;
+      let totalOriginalAmount = 0;
+      let totalDiscounts = 0;
 
-          todayTransactions.forEach(transaction => {
-            // Montant final de la transaction
-            totalSales += transaction.total || 0;
-            
-            // Calculer le montant original et les remises
-            if (transaction.items && Array.isArray(transaction.items)) {
-              transaction.items.forEach(item => {
-                const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                const originalTotal = originalPrice * item.quantity;
-                
-                // Calculer le montant final avec remises
-                let finalTotal = originalTotal;
-                if (transaction.itemDiscounts && transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
-                  const discount = transaction.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
-                  if (discount.type === 'euro') {
-                    finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
-                  } else if (discount.type === 'percent') {
-                    finalTotal = originalTotal * (1 - discount.value / 100);
-                  } else if (discount.type === 'price') {
-                    finalTotal = discount.value * item.quantity;
-                  }
-                }
-                
-                totalOriginalAmount += originalTotal;
-                totalItems += item.quantity;
-                totalDiscounts += (originalTotal - finalTotal);
-              });
+      txs.forEach((transaction: any) => {
+        totalSales += transaction.total || 0;
+        if (transaction.items && Array.isArray(transaction.items)) {
+          transaction.items.forEach((item: any) => {
+            const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+            const originalTotal = originalPrice * (item.quantity || 0);
+            let finalTotal = originalTotal;
+            const key = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+            const discount = transaction.itemDiscounts?.[key];
+            if (discount) {
+              if (discount.type === 'euro') {
+                finalTotal = Math.max(0, originalTotal - (discount.value * (item.quantity || 0)));
+              } else if (discount.type === 'percent') {
+                finalTotal = originalTotal * (1 - discount.value / 100);
+              } else if (discount.type === 'price') {
+                finalTotal = (discount.value || 0) * (item.quantity || 0);
+              }
             }
+            totalOriginalAmount += originalTotal;
+            totalItems += (item.quantity || 0);
+            totalDiscounts += (originalTotal - finalTotal);
           });
-      
-      const totalTransactions = todayTransactions.length;
-      const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
-
-      setDailyStats({
-        totalSales,
-        totalItems,
-        totalTransactions,
-        averageTransactionValue,
-        totalDiscounts,
-        totalOriginalAmount
+        }
       });
-    } else {
-      // Si pas de transactions, utiliser le panier actuel
-      const totalSales = cartItems.reduce((sum, item) => {
-        const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-        return sum + (price * item.quantity);
-      }, 0);
-
-      const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-      const totalTransactions = cartItems.length > 0 ? 1 : 0;
+      const totalTransactions = txs.length;
       const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
-
-      setDailyStats({
-        totalSales,
-        totalItems,
-        totalTransactions,
-        averageTransactionValue,
-        totalDiscounts: 0,
-        totalOriginalAmount: totalSales
-      });
+      setDailyStats({ totalSales, totalItems, totalTransactions, averageTransactionValue, totalDiscounts, totalOriginalAmount });
+      return;
     }
-  }, [cartItems]);
+
+    // Fallback: utiliser le panier courant (aucune transaction affichable)
+    const totalSales = cartItems.reduce((sum, item) => {
+      const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+      return sum + (price * item.quantity);
+    }, 0);
+    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const totalTransactions = cartItems.length > 0 ? 1 : 0;
+    const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
+    setDailyStats({ totalSales, totalItems, totalTransactions, averageTransactionValue, totalDiscounts: 0, totalOriginalAmount: totalSales });
+  }, [selectedDateTransactions, cartItems]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
