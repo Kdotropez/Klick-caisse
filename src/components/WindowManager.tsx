@@ -2920,6 +2920,22 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const getTotalWithGlobalDiscount = () => {
     // Calculer le sous-total (prix originaux)
+    const settings = StorageService.loadSettings() || {};
+    const excludedCatsRaw: string[] = Array.isArray(settings.excludedDiscountCategories) ? settings.excludedDiscountCategories : [];
+    const excludedSubRaw: string[] = Array.isArray((settings as any).excludedDiscountSubcategories) ? (settings as any).excludedDiscountSubcategories : [];
+    const excludedProd: string[] = Array.isArray((settings as any).excludedDiscountProductIds) ? (settings as any).excludedDiscountProductIds : [];
+    const norm = (s: string) => StorageService.normalizeLabel(String(s||''));
+    const excludedCats = new Set(excludedCatsRaw.map(norm));
+    const excludedSub = new Set(excludedSubRaw.map(norm));
+    const isExcluded = (item: CartItem) => {
+      if (excludedProd.includes(item.product.id)) return true;
+      const cat = item.product?.category || '';
+      if (excludedCats.has(norm(cat))) return true;
+      // Vérifier sous-catégories associées
+      const subs: string[] = Array.isArray((item.product as any)?.associatedCategories) ? (item.product as any).associatedCategories : [];
+      return subs.some(s => excludedSub.has(norm(s)));
+    };
+
     const subtotal = cartItems.reduce((sum, item) => {
       const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
       return sum + (originalPrice * item.quantity);
@@ -2942,8 +2958,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
         const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
         const hasIndividualDiscount = itemDiscounts[discountKey];
-        
-        if (!hasIndividualDiscount) {
+        // Exclure aussi les catégories marquées exclues
+        if (!hasIndividualDiscount && !isExcluded(item)) {
           const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
           return sum + (originalPrice * item.quantity);
         }

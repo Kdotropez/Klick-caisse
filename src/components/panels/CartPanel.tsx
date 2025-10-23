@@ -15,6 +15,7 @@ import {
 import { Add, Remove, Edit } from '@mui/icons-material';
 import { CartItem } from '../../types/Product';
 import { APP_VERSION } from '../../version';
+import { StorageService } from '../../services/StorageService';
 
 export interface ItemDiscount {
   type: 'euro' | 'percent' | 'price';
@@ -148,6 +149,17 @@ const CartPanel: React.FC<CartPanelProps> = ({
         ) : (
           <List dense>
             {safeCartItems.map((item, index) => {
+              const settings = StorageService.loadSettings() || ({} as any);
+              const excludedCats: string[] = Array.isArray(settings.excludedDiscountCategories) ? settings.excludedDiscountCategories : [];
+              const excludedSub: string[] = Array.isArray(settings.excludedDiscountSubcategories) ? settings.excludedDiscountSubcategories : [];
+              const excludedProd: string[] = Array.isArray(settings.excludedDiscountProductIds) ? settings.excludedDiscountProductIds : [];
+              const isExcludedForDiscount = (() => {
+                if (excludedProd.includes(item.product.id)) return true;
+                const cat = item.product?.category || '';
+                if (excludedCats.includes(cat)) return true;
+                const subs: string[] = Array.isArray((item.product as any)?.associatedCategories) ? (item.product as any).associatedCategories : [];
+                return subs.some(s => excludedSub.includes(s));
+              })();
               const variationId = item.selectedVariation?.id || null;
               const discountKey = `${item.product.id}-${variationId || 'main'}`;
               const discount = itemDiscounts[discountKey];
@@ -166,19 +178,26 @@ const CartPanel: React.FC<CartPanelProps> = ({
                   <ListItem 
                     sx={{
                       py: 0.5,
-                      cursor: 'pointer',
+                      cursor: isExcludedForDiscount ? 'default' : 'pointer',
                       border: '1px solid #e0e0e0',
                       borderRadius: 1,
                       mb: 0.5,
-                      backgroundColor: '#fafafa'
+                      backgroundColor: '#fafafa',
+                      opacity: isExcludedForDiscount ? 0.7 : 1
                     }}
-                    onClick={() => onOpenDiscountModal(item)}
+                    onClick={() => { if (!isExcludedForDiscount) onOpenDiscountModal(item); }}
+                    title={isExcludedForDiscount ? 'Remise exclue pour cet article' : undefined}
                   >
                     <ListItemText
                       primary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                             {item.product.name}
+                            {isExcludedForDiscount && (
+                              <Typography component="span" variant="caption" sx={{ color: 'text.secondary', ml: 0.5 }}>
+                                (remise exclue)
+                              </Typography>
+                            )}
                             {item.selectedVariation && (
                               <Typography 
                                 component="span" 
@@ -389,10 +408,13 @@ const CartPanel: React.FC<CartPanelProps> = ({
 
       <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
         {(() => {
+          // Subtotal (toutes lignes)
           const subtotal = cartItems.reduce((sum, item) => {
             const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
             return sum + (originalPrice * item.quantity);
           }, 0);
+
+          // Remises individuelles (ligne)
           const individualDiscounts = cartItems.reduce((sum, item) => {
             const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
             const originalTotal = originalPrice * item.quantity;
@@ -400,12 +422,26 @@ const CartPanel: React.FC<CartPanelProps> = ({
             const finalTotal = finalPrice * item.quantity;
             return sum + (originalTotal - finalTotal);
           }, 0);
+
+          // Remise globale (ticket) en excluant catégories/sous-catégories/produits marqués exclus
           let globalDiscountAmount = 0;
           if (globalDiscount) {
+            const settings = StorageService.loadSettings() || ({} as any);
+            const norm = (s: string) => StorageService.normalizeLabel(String(s||''));
+            const excludedCats = new Set((Array.isArray(settings.excludedDiscountCategories)?settings.excludedDiscountCategories:[]).map(norm));
+            const excludedSub = new Set((Array.isArray(settings.excludedDiscountSubcategories)?settings.excludedDiscountSubcategories:[]).map(norm));
+            const excludedProd: string[] = Array.isArray(settings.excludedDiscountProductIds) ? settings.excludedDiscountProductIds : [];
+            const isExcluded = (it: typeof cartItems[number]) => {
+              if (excludedProd.includes(it.product.id)) return true;
+              const cat = it.product?.category || '';
+              if (excludedCats.has(norm(cat))) return true;
+              const subs: string[] = Array.isArray((it.product as any)?.associatedCategories) ? (it.product as any).associatedCategories : [];
+              return subs.some(s => excludedSub.has(norm(s)));
+            };
             const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
               const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
               const hasIndividualDiscount = itemDiscounts[discountKey];
-              if (!hasIndividualDiscount) {
+              if (!hasIndividualDiscount && !isExcluded(item)) {
                 const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
                 return sum + (originalPrice * item.quantity);
               }
@@ -415,6 +451,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
               ? Math.min(totalWithoutIndividualDiscount, globalDiscount.value)
               : totalWithoutIndividualDiscount * (globalDiscount.value / 100);
           }
+
           const totalDiscounts = individualDiscounts + globalDiscountAmount;
           return (
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'center', gap: 1, mb: 0.5 }}>

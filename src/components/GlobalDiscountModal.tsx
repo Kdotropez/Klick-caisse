@@ -126,9 +126,22 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
   };
 
   const calculateOriginalTotal = () => {
-    return cartItems.reduce((sum, item) => {
-      const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      return sum + (price * item.quantity);
+    const settings = StorageService.loadSettings() || ({} as any);
+    const norm = (s: string) => StorageService.normalizeLabel(String(s||''));
+    const excludedCats = new Set((Array.isArray(settings.excludedDiscountCategories)?settings.excludedDiscountCategories:[]).map(norm));
+    const excludedSub = new Set((Array.isArray(settings.excludedDiscountSubcategories)?settings.excludedDiscountSubcategories:[]).map(norm));
+    const excludedProd: string[] = Array.isArray(settings.excludedDiscountProductIds) ? settings.excludedDiscountProductIds : [];
+    const isExcluded = (it: CartItem) => {
+      if (excludedProd.includes(it.product.id)) return true;
+      const cat = it.product?.category || '';
+      if (excludedCats.has(norm(cat))) return true;
+      const subs: string[] = Array.isArray((it.product as any)?.associatedCategories) ? (it.product as any).associatedCategories : [];
+      return subs.some(s => excludedSub.has(norm(s)));
+    };
+    return cartItems.reduce((sum, it) => {
+      if (isExcluded(it)) return sum; // exclure de la base de remise globale
+      const price = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+      return sum + (price * it.quantity);
     }, 0);
   };
 
@@ -146,6 +159,28 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
   };
 
   const originalTotal = calculateOriginalTotal();
+
+  // Résumé exclusions (catégories/sous-catégories/produits)
+  const excludedSummary = useMemo(() => {
+    const settings = StorageService.loadSettings() || ({} as any);
+    const excludedCats: string[] = Array.isArray(settings.excludedDiscountCategories) ? settings.excludedDiscountCategories : [];
+    const excludedSub: string[] = Array.isArray(settings.excludedDiscountSubcategories) ? settings.excludedDiscountSubcategories : [];
+    const excludedProd: string[] = Array.isArray(settings.excludedDiscountProductIds) ? settings.excludedDiscountProductIds : [];
+    let count = 0;
+    let amount = 0;
+    for (const it of cartItems) {
+      const isProd = excludedProd.includes(it.product.id);
+      const isCat = excludedCats.includes(it.product?.category || '');
+      const subs: string[] = Array.isArray((it.product as any)?.associatedCategories) ? (it.product as any).associatedCategories : [];
+      const isSub = subs.some(s => excludedSub.includes(s));
+      if (isProd || isCat || isSub) {
+        count += it.quantity || 0;
+        const price = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+        amount += (price * (it.quantity || 0));
+      }
+    }
+    return { count, amount };
+  }, [cartItems]);
 
   // Promotions proposées (manuel): 6 easyclickchic, -1€ par article
   const easyclickPromo = useMemo(() => {
@@ -191,6 +226,13 @@ const GlobalDiscountModal: React.FC<GlobalDiscountModalProps> = ({
       </DialogTitle>
 
       <DialogContent sx={{ pt: 3 }}>
+        {excludedSummary.count > 0 && (
+          <Paper sx={{ p: 1, mb: 2, backgroundColor: '#fffde7', border: '1px solid #ffe082' }}>
+            <Typography variant="caption" sx={{ color: '#757575' }}>
+              {excludedSummary.count} article{excludedSummary.count>1?'s':''} exclus non impactés ({excludedSummary.amount.toFixed(2)} €)
+            </Typography>
+          </Paper>
+        )}
         {/* Promotions proposées (appliquer manuellement) */}
         {!hideEasyclickPromo && (
         <Paper sx={{ p: 2, mb: 2, backgroundColor: '#fffef5', border: '1px solid #ffe082' }}>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
+import ExcludeDiscountCategoriesModal from '../modals/ExcludeDiscountCategoriesModal';
 import { CheckCircle, Update, Assessment } from '@mui/icons-material';
 import { resetToEmbeddedBase } from '../../data/productionData';
 import { StorageService } from '../../services/StorageService';
@@ -167,6 +168,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 }) => {
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [showHistoricalReport, setShowHistoricalReport] = useState(false);
+  const [showExcludeCats, setShowExcludeCats] = useState(false);
 
   const handleCheckUpdate = async () => {
     setIsCheckingUpdate(true);
@@ -243,6 +245,16 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       >
         Importer JSON (nested)
       </Button>
+
+      <Button
+        variant="contained"
+        sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#795548', '&:hover': { backgroundColor: '#5d4037' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
+        onClick={() => setShowExcludeCats(true)}
+      >
+        Exclure catégories (remises)
+      </Button>
+
+      <ExcludeDiscountCategoriesModal open={showExcludeCats} onClose={() => setShowExcludeCats(false)} />
 
       {/* Diagnostics sous-catégories */}
       <Button
