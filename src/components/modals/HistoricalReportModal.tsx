@@ -382,7 +382,12 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     return Array.from(dailyMap.values()).sort((a, b) => b.date.localeCompare(a.date));
   }, [filteredClosures]);
 
-  const formatCurrency = (amount: number) => `${amount.toFixed(2)} €`;
+  const toNum = (v: any): number => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const formatCurrency = (amount: any) => `${toNum(amount).toFixed(2)} €`;
+  const formatPercent1 = (v: any) => `${toNum(v).toFixed(1)}%`;
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('fr-FR');
 
   return (
@@ -805,7 +810,7 @@ if (recoveredClosures.length > 0) {
                        <TableCell align="right">{formatCurrency(product.averagePrice)}</TableCell>
                        <TableCell align="right">{product.transactionsCount}</TableCell>
                        <TableCell align="right">
-                        {product.percentage.toFixed(1)}%
+                        {formatPercent1(product.percentage)}
                        </TableCell>
                      </TableRow>
                     ));
@@ -856,7 +861,12 @@ if (recoveredClosures.length > 0) {
                          <TableCell align="right">{data.totalQuantity}</TableCell>
                          <TableCell align="right">{formatCurrency(data.totalRevenue)}</TableCell>
                          <TableCell align="right">
-                           {((data.totalRevenue / globalStats.totalCA) * 100).toFixed(1)}%
+                           {(() => {
+                             const num = toNum(data.totalRevenue);
+                             const den = toNum(globalStats.totalCA);
+                             const p = den > 0 ? (num / den) * 100 : 0;
+                             return toNum(p).toFixed(1) + '%';
+                           })()}
                          </TableCell>
                        </TableRow>
                      ))}
