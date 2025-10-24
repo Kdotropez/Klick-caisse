@@ -744,13 +744,30 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   alert('Sélection invalide.');
                   return;
                 }
-                // Charger les clôtures locales
+                // Charger les clôtures locales et vérifier disponibilité du Z cible
                 const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
-                const exists = currentClosures.some(c => Number(c?.zNumber) === Number(selected.zNumber));
+                const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
                 const maxZ = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
-                if (exists) {
-                  selected = { ...selected, zNumber: maxZ + 1 };
+
+                const defaultTarget = used.has(Number(selected.zNumber)) ? (maxZ + 1) : Number(selected.zNumber) || (maxZ + 1);
+                const targetInput = window.prompt(
+                  `Numéro Z cible pour l'import (laisser vide pour Z${defaultTarget})`);
+
+                let targetZ: number = defaultTarget;
+                if (targetInput && targetInput.trim().length > 0) {
+                  const parsed = parseInt(targetInput.trim(), 10);
+                  if (!Number.isFinite(parsed) || parsed <= 0) {
+                    alert('Numéro Z invalide. Import annulé.');
+                    return;
+                  }
+                  if (used.has(parsed)) {
+                    alert(`Le Z${parsed} existe déjà. Choisissez un autre numéro. Import annulé.`);
+                    return;
+                  }
+                  targetZ = parsed;
                 }
+
+                selected = { ...selected, zNumber: targetZ };
                 const merged = [...currentClosures, selected].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
                 localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
                 const newCounter = Math.max(maxZ, Number(selected.zNumber) || 0);
