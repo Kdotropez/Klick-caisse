@@ -731,14 +731,42 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 const choice = window.prompt(
                   'Sélectionnez le Z à importer:\n' +
                   lines.join('\n') +
-                  '\n\nEntrez soit le numéro de Z (ex: 12), soit l\'index de ligne (ex: 3)'
+                  '\n\nEntrez soit le numéro de Z (ex: 12), soit l\'index de ligne (ex: 3).\n' +
+                  'S\'il y a plusieurs Z avec le même numéro, utilisez l\'index pour choisir précisément.'
                 );
                 if (!choice) return;
                 const num = parseInt(choice, 10);
                 let selected: any | null = null;
                 if (Number.isFinite(num)) {
-                  // Essayer par Z exact, sinon par index
-                  selected = closures.find(c => Number(c?.zNumber) === num) || closures[num - 1] || null;
+                  // Doublons potentiels: si plusieurs Z ont le même numéro, on privilégie l'index saisi
+                  const byIndex = closures[num - 1];
+                  if (byIndex) {
+                    selected = byIndex;
+                  } else {
+                    const same = closures.filter(c => Number(c?.zNumber) === num);
+                    if (same.length === 1) selected = same[0];
+                    else if (same.length > 1) {
+                      // Demander un sous-index parmi les doublons
+                      const subLines = same.map((c, i) => {
+                        const closedAt = c?.closedAt ? new Date(c.closedAt) : null;
+                        const dateStr = closedAt ? `${closedAt.toLocaleDateString()} ${closedAt.toLocaleTimeString()}` : '—';
+                        const txs = Array.isArray(c?.transactions) ? c.transactions : [];
+                        const ca = txs.reduce((s: number, t: any) => s + (Number(t?.total) || 0), 0);
+                        return `${i + 1}) Z${num} · ${dateStr} · ${txs.length} tickets · ${ca.toFixed(2)}€`;
+                      });
+                      const sub = window.prompt(
+                        `Plusieurs Z${num} trouvés. Choisissez parmi:\n` +
+                        subLines.join('\n') +
+                        `\n\nEntrez l\'index (1..${same.length})`
+                      );
+                      const subIdx = parseInt(sub || '', 10);
+                      if (!Number.isFinite(subIdx) || subIdx < 1 || subIdx > same.length) {
+                        alert('Index invalide. Import annulé.');
+                        return;
+                      }
+                      selected = same[subIdx - 1];
+                    }
+                  }
                 }
                 if (!selected) {
                   alert('Sélection invalide.');
