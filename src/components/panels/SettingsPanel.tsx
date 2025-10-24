@@ -687,6 +687,104 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         🔄 Restaurer
       </Button>
 
+      {/* Importer un seul Z depuis un backup JSON */}
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#8bc34a',
+          '&:hover': { backgroundColor: '#689f38' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,application/json';
+            input.onchange = async (event) => {
+              const file = (event.target as HTMLInputElement).files?.[0];
+              if (!file) return;
+              try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                const closures: any[] = Array.isArray(data?.closures) ? data.closures : [];
+                if (closures.length === 0) {
+                  alert('Aucune clôture (Z) trouvée dans ce fichier.');
+                  return;
+                }
+                // Construire une liste lisible
+                const lines = closures.map((c: any, i: number) => {
+                  const z = Number(c?.zNumber) || 0;
+                  const closedAt = c?.closedAt ? new Date(c.closedAt) : null;
+                  const dateStr = closedAt ? `${closedAt.toLocaleDateString()} ${closedAt.toLocaleTimeString()}` : '—';
+                  const txs = Array.isArray(c?.transactions) ? c.transactions : [];
+                  const ca = txs.reduce((s: number, t: any) => s + (Number(t?.total) || 0), 0);
+                  return `${i + 1}) Z${z} · ${dateStr} · ${txs.length} tickets · ${ca.toFixed(2)}€`;
+                });
+                const choice = window.prompt(
+                  'Sélectionnez le Z à importer:\n' +
+                  lines.join('\n') +
+                  '\n\nEntrez soit le numéro de Z (ex: 12), soit l\'index de ligne (ex: 3)'
+                );
+                if (!choice) return;
+                const num = parseInt(choice, 10);
+                let selected: any | null = null;
+                if (Number.isFinite(num)) {
+                  // Essayer par Z exact, sinon par index
+                  selected = closures.find(c => Number(c?.zNumber) === num) || closures[num - 1] || null;
+                }
+                if (!selected) {
+                  alert('Sélection invalide.');
+                  return;
+                }
+                // Charger les clôtures locales
+                const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                const exists = currentClosures.some(c => Number(c?.zNumber) === Number(selected.zNumber));
+                const maxZ = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
+                if (exists) {
+                  selected = { ...selected, zNumber: maxZ + 1 };
+                }
+                const merged = [...currentClosures, selected].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
+                localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
+                const newCounter = Math.max(maxZ, Number(selected.zNumber) || 0);
+                localStorage.setItem('klick_caisse_z_counter', String(newCounter));
+
+                // Fusionner transactionsByDay pour assurer la visibilité dans les rapports
+                const txs = Array.isArray(selected?.transactions) ? selected.transactions : [];
+                try {
+                  const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+                  const map: Record<string, any[]> = raw ? JSON.parse(raw) : {};
+                  for (const t of txs) {
+                    const d = new Date(t?.timestamp);
+                    const day = isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+                    if (!day) continue;
+                    if (!Array.isArray(map[day])) map[day] = [];
+                    map[day].push(t);
+                  }
+                  localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(map));
+                } catch {}
+
+                alert(`✅ Z importé: Z${selected.zNumber} (tickets: ${txs.length}).`);
+              } catch (e) {
+                alert('Erreur lors de la lecture du fichier ou de la sélection.');
+              }
+            };
+            input.click();
+          } catch (e) {
+            alert('Erreur: impossible d\'ouvrir le sélecteur de fichier.');
+          }
+        }}
+      >
+        ↗️ Importer un seul Z
+      </Button>
+
       <Button
         variant="contained"
         sx={{
