@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Checkbox, FormControlLabel, Divider } from '@mui/material';
 import ExcludeDiscountCategoriesModal from '../modals/ExcludeDiscountCategoriesModal';
 import { CheckCircle, Update, Assessment } from '@mui/icons-material';
 import { resetToEmbeddedBase } from '../../data/productionData';
@@ -169,6 +169,78 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [showHistoricalReport, setShowHistoricalReport] = useState(false);
   const [showExcludeCats, setShowExcludeCats] = useState(false);
+
+  // Prévisualisation import TOUS les Z
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewEntries, setPreviewEntries] = useState<Array<{ idx: number; z: number; dateStr: string; txCount: number; ca: number; raw: any }>>([]);
+  const [previewSelected, setPreviewSelected] = useState<Set<number>>(new Set());
+
+  const openPreview = (entries: Array<{ idx: number; z: number; dateStr: string; txCount: number; ca: number; raw: any }>) => {
+    setPreviewEntries(entries);
+    setPreviewSelected(new Set(entries.map(e => e.idx))); // tout coché par défaut
+    setPreviewOpen(true);
+  };
+
+  const togglePreviewItem = (idx: number) => {
+    setPreviewSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      return next;
+    });
+  };
+
+  const selectAllPreview = () => setPreviewSelected(new Set(previewEntries.map(e => e.idx)));
+  const deselectAllPreview = () => setPreviewSelected(new Set());
+
+  const importSelectedClosures = () => {
+    const selected = previewEntries.filter(e => previewSelected.has(e.idx));
+    if (selected.length === 0) {
+      alert('Aucune clôture sélectionnée.');
+      return;
+    }
+    // Fusion + renumérotation si conflit
+    const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+    const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
+    let maxZExisting = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
+    const findNextAvailable = (start: number) => {
+      let z = Math.max(1, Number(start) || 1);
+      while (used.has(z)) z++;
+      used.add(z);
+      return z;
+    };
+
+    const imported: any[] = [];
+    const mapping: Array<{ from?: number; to: number; count: number; ca: number }>=[];
+    const txMergeMap: Record<string, any[]> = (() => {
+      try { const raw = localStorage.getItem('klick_caisse_transactions_by_day'); return raw ? JSON.parse(raw) : {}; } catch { return {}; }
+    })();
+
+    for (const e of selected) {
+      const originalZ = Number(e.z) || 0;
+      const targetZ = used.has(originalZ) || originalZ <= 0 ? findNextAvailable(Math.max(originalZ, maxZExisting + 1)) : (used.add(originalZ), originalZ);
+      maxZExisting = Math.max(maxZExisting, targetZ);
+      const copy = { ...e.raw, zNumber: targetZ };
+      imported.push(copy);
+      mapping.push({ from: originalZ || undefined, to: targetZ, count: e.txCount, ca: e.ca });
+      const txs = Array.isArray(e.raw?.transactions) ? e.raw.transactions : [];
+      for (const t of txs) {
+        const d = new Date(t?.timestamp);
+        const day = isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+        if (!day) continue;
+        if (!Array.isArray(txMergeMap[day])) txMergeMap[day] = [];
+        txMergeMap[day].push(t);
+      }
+    }
+
+    const merged = [...currentClosures, ...imported].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
+    localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
+    localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(txMergeMap));
+    localStorage.setItem('klick_caisse_z_counter', String(maxZExisting));
+
+    const lines = mapping.sort((a,b)=>a.to-b.to).map(m=>`Z${m.from ?? '-'} → Z${m.to} · ${m.count} tickets · ${m.ca.toFixed(2)}€`);
+    alert(`✅ Import terminé: ${imported.length} clôtures ajoutées.\n\n${lines.join('\n')}`);
+    setPreviewOpen(false);
+  };
 
   const handleCheckUpdate = async () => {
     setIsCheckingUpdate(true);
@@ -1409,52 +1481,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     return z;
                   };
 
-                  // Renumérotation non destructive et fusion
-                  const importedClosures: any[] = [];
-                  const mapping: Array<{ from?: number; to: number; count: number; ca: number }> = [];
-                  let maxZExisting = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
-                  const txMergeMap: Record<string, any[]> = (() => {
-                    try {
-                      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-                      return raw ? JSON.parse(raw) : {};
-                    } catch { return {}; }
-                  })();
-
-                  for (const c of closures) {
-                    const originalZ = Number(c?.zNumber) || 0;
-                    const targetZ = used.has(originalZ) || originalZ <= 0 ? findNextAvailable(Math.max(originalZ, maxZExisting + 1)) : (used.add(originalZ), originalZ);
-                    maxZExisting = Math.max(maxZExisting, targetZ);
-                    const copy = { ...c, zNumber: targetZ };
-                    importedClosures.push(copy);
-
-                    // Stats mapping
+                  // Construire les entrées de prévisualisation et ouvrir la modale
+                  const entries = closures.map((c: any, i: number) => {
+                    const z = Number(c?.zNumber) || 0;
+                    const closedAt = c?.closedAt ? new Date(c.closedAt) : null;
+                    const dateStr = closedAt ? `${closedAt.toLocaleDateString()} ${closedAt.toLocaleTimeString()}` : '—';
                     const txs = Array.isArray(c?.transactions) ? c.transactions : [];
                     const ca = txs.reduce((s: number, t: any) => s + (Number(t?.total) || 0), 0);
-                    mapping.push({ from: originalZ || undefined, to: targetZ, count: txs.length, ca });
-
-                    // Fusionner transactionsByDay pour visibilité dans rapports
-                    for (const t of txs) {
-                      const d = new Date(t?.timestamp);
-                      const day = isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
-                      if (!day) continue;
-                      if (!Array.isArray(txMergeMap[day])) txMergeMap[day] = [];
-                      txMergeMap[day].push(t);
-                    }
-                  }
-
-                  const merged = [...currentClosures, ...importedClosures].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
-                  localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
-                  localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(txMergeMap));
-                  localStorage.setItem('klick_caisse_z_counter', String(maxZExisting));
-
-                  const lines = mapping
-                    .sort((a, b) => a.to - b.to)
-                    .map(m => `Z${m.from ?? '-'} → Z${m.to} · ${m.count} tickets · ${m.ca.toFixed(2)}€`);
-                  alert(
-                    `✅ Import terminé: ${importedClosures.length} clôtures ajoutées.\n\n` +
-                    lines.join('\n')
-                  );
-                  return;
+                    return { idx: i + 1, z, dateStr, txCount: txs.length, ca, raw: c };
+                  });
+                  openPreview(entries);
+                  return; // on sort et laisse la modale gérer l'import
                 }
                 const entries = closures.map((c: any, i: number) => {
                   const z = Number(c?.zNumber) || 0;
@@ -1531,6 +1568,36 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       >
         📄 Importer Z depuis fichier
       </Button>
+
+      {/* Modale de prévisualisation Import Z */}
+      <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Importer des clôtures (Z) depuis fichier</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Box>
+              <Button size="small" variant="outlined" onClick={selectAllPreview}>Tout sélectionner</Button>{' '}
+              <Button size="small" variant="outlined" onClick={deselectAllPreview}>Tout désélectionner</Button>
+            </Box>
+            <Typography variant="body2">{previewSelected.size} sélectionné(s) / {previewEntries.length}</Typography>
+          </Box>
+          <Divider sx={{ mb: 1 }} />
+          <Box sx={{ maxHeight: 420, overflowY: 'auto' }}>
+            {previewEntries.map(e => (
+              <Box key={e.idx} sx={{ display: 'grid', gridTemplateColumns: '32px 1fr 1fr 1fr 1fr', py: 0.5, borderBottom: '1px solid #eee', alignItems: 'center' }}>
+                <Checkbox checked={previewSelected.has(e.idx)} onChange={() => togglePreviewItem(e.idx)} />
+                <Typography variant="body2">Z{e.z}</Typography>
+                <Typography variant="body2">{e.dateStr}</Typography>
+                <Typography variant="body2">{e.txCount} tickets</Typography>
+                <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace' }}>{e.ca.toFixed(2)}€</Typography>
+              </Box>
+            ))}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPreviewOpen(false)}>Annuler</Button>
+          <Button variant="contained" onClick={importSelectedClosures}>Importer la sélection</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Modale Rapport Historique */}
       <HistoricalReportModal
