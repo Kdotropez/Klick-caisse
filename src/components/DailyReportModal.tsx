@@ -983,12 +983,17 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                         });
                       }
                     });
-                    const rows = Array.from(articleStats.values());
+                    const rows = Array.from(articleStats.entries()).map(([key, val]) => {
+                      const [productId, variationId] = key.split('-');
+                      return { ...val, productId, variationId: variationId || 'main' };
+                    });
                     const csv = [
-                      ['Produit','Catégorie','Quantité','Transactions','CA (€)'].join(';'),
+                      ['Produit','Catégorie','ID Produit','ID Variation','Quantité','Transactions','CA (€)'].join(';'),
                       ...rows.map(r => [
                         String(r.name).replace(/;/g, ','),
                         String(r.category||'').replace(/;/g, ','),
+                        String(r.productId||''),
+                        String(r.variationId||''),
                         String(r.totalQty||0),
                         String(r.transactions||0),
                         (Number(r.totalAmount)||0).toFixed(2)
