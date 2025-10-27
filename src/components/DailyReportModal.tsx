@@ -984,16 +984,24 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                       }
                     });
                     const rows = Array.from(articleStats.entries()).map(([key, val]) => {
-                      const [productId, variationId] = key.split('-');
-                      return { ...val, productId, variationId: variationId || 'main' };
+                      const [pid, vid] = key.split('__');
+                      return { 
+                        ...val, 
+                        productId: val.productId || pid, 
+                        variationId: val.variationId || (vid || 'main') 
+                      };
                     });
                     const csv = [
-                      ['Produit','Catégorie','ID Produit','ID Variation','Quantité','Transactions','CA (€)'].join(';'),
+                      ['Produit','Catégorie','ID Produit','ID Variation','EAN Produit','REF Produit','EAN Variation','REF Variation','Quantité','Transactions','CA (€)'].join(';'),
                       ...rows.map(r => [
                         String(r.name).replace(/;/g, ','),
                         String(r.category||'').replace(/;/g, ','),
                         String(r.productId||''),
                         String(r.variationId||''),
+                        String(r.productEAN||''),
+                        String(r.productRef||''),
+                        String(r.variationEAN||''),
+                        String(r.variationRef||''),
                         String(r.totalQty||0),
                         String(r.transactions||0),
                         (Number(r.totalAmount)||0).toFixed(2)
@@ -1027,6 +1035,13 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               const articleStats = new Map<string, { 
                 name: string, 
                 category: string,
+                productId: string,
+                productEAN?: string,
+                productRef?: string,
+                variationId?: string,
+                variationEAN?: string,
+                variationRef?: string,
+                variationLabel?: string,
                 totalQty: number, 
                 totalAmount: number, 
                 transactions: number,
@@ -1036,28 +1051,37 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               selectedDateTransactions.forEach(transaction => {
                 if (transaction.items && Array.isArray(transaction.items)) {
                   transaction.items.forEach((item: any) => {
-                    const articleKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-                    const articleName = item.selectedVariation ? 
-                      `${item.product.name} (${item.selectedVariation.name})` : 
-                      item.product.name;
-                    const categoryName = item.product.category || 'Non classé';
-                    
+                    const product = item.product || {};
+                    const variation = item.selectedVariation || null;
+                    const variationLabel = variation ? (variation.attributes || variation.reference || variation.id) : undefined;
+                    const articleKey = `${String(product.id)}__${variation ? String(variation.id) : 'main'}`;
+                    const articleName = variation ? `${String(product.name)} (${String(variationLabel)})` : String(product.name);
+                    const categoryName = product.category || 'Non classé';
+
                     const existing = articleStats.get(articleKey) || { 
                       name: articleName, 
                       category: categoryName,
+                      productId: String(product.id || ''),
+                      productEAN: product.ean13 || undefined,
+                      productRef: product.reference || undefined,
+                      variationId: variation ? String(variation.id || '') : undefined,
+                      variationEAN: variation ? variation.ean13 || undefined : undefined,
+                      variationRef: variation ? variation.reference || undefined : undefined,
+                      variationLabel: variation ? String(variationLabel || '') : undefined,
                       totalQty: 0, 
                       totalAmount: 0, 
                       transactions: 0,
                       percentage: 0
                     };
-                    
-                    const unitPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                    const itemTotal = unitPrice * item.quantity;
-                    
-                    existing.totalQty += item.quantity;
+
+                    const unitPrice = variation ? variation.finalPrice : product.finalPrice;
+                    const qty = Number(item.quantity) || 0;
+                    const itemTotal = (Number(unitPrice) || 0) * qty;
+
+                    existing.totalQty += qty;
                     existing.totalAmount += itemTotal;
                     existing.transactions += 1;
-                    
+
                     articleStats.set(articleKey, existing);
                   });
                 }
