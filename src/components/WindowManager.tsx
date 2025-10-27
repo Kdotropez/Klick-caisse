@@ -569,13 +569,23 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const computeDailyProductSales = (transactions: Transaction[]) => {
     const byProduct: Record<string, { product: Product; totalQty: number; totalAmount: number }> = {};
     for (const tx of transactions) {
+      const itemDiscounts = (tx as any)?.itemDiscounts || {};
       for (const item of tx.items) {
         const key = item.product.id;
-        const lineAmount = (item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice) * item.quantity;
+        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+        const originalUnit = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+        let unit = originalUnit;
+        const d = itemDiscounts[discountKey];
+        if (d) {
+          if (d.type === 'euro') unit = Math.max(0, originalUnit - d.value);
+          else if (d.type === 'percent') unit = originalUnit * (1 - d.value / 100);
+          else if (d.type === 'price') unit = d.value;
+        }
+        const lineAmount = unit * (item.quantity || 0);
         if (!byProduct[key]) {
           byProduct[key] = { product: item.product, totalQty: 0, totalAmount: 0 };
         }
-        byProduct[key].totalQty += item.quantity;
+        byProduct[key].totalQty += (item.quantity || 0);
         byProduct[key].totalAmount += lineAmount;
       }
     }
@@ -3851,32 +3861,51 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           )}
           {(() => {
             const loadRange = (): any[] => {
+              const seen = new Set<string>();
+              const out: any[] = [];
+              const from = new Date(`${recapRange.from}T00:00:00`);
+              const to = new Date(`${recapRange.to}T23:59:59`);
               try {
                 const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-                if (!raw) return [];
-                const map = JSON.parse(raw) as Record<string, any[]>;
-                const from = new Date(`${recapRange.from}T00:00:00`);
-                const to = new Date(`${recapRange.to}T23:59:59`);
-                const out: any[] = [];
-                Object.keys(map).forEach(day => {
-                  const d = new Date(`${day}T12:00:00`);
-                  if (d >= from && d <= to) {
-                    const list = Array.isArray(map[day]) ? map[day] : [];
-                    list.forEach((t:any)=> out.push({ ...t, timestamp: new Date(t.timestamp) }));
+                if (raw) {
+                  const map = JSON.parse(raw) as Record<string, any[]>;
+                  Object.keys(map).forEach(day => {
+                    const d = new Date(`${day}T12:00:00`);
+                    if (d >= from && d <= to) {
+                      const list = Array.isArray(map[day]) ? map[day] : [];
+                      list.forEach((t:any)=> {
+                        const id = String(t?.id);
+                        if (!seen.has(id)) { seen.add(id); out.push({ ...t, timestamp: new Date(t.timestamp) }); }
+                      });
+                    }
+                  });
+                }
+              } catch {}
+              // Ajouter les transactions issues des clôtures dont la date de clôture est dans l'intervalle
+              try {
+                const closures = StorageService.loadClosures() || [];
+                for (const c of closures) {
+                  const cd = new Date((c as any)?.closedAt);
+                  if (cd >= from && cd <= to) {
+                    const txs = Array.isArray((c as any)?.transactions) ? (c as any).transactions : [];
+                    for (const t of txs) {
+                      const id = String((t as any)?.id);
+                      if (!seen.has(id)) { seen.add(id); out.push({ ...t, timestamp: new Date(t.timestamp) }); }
+                    }
                   }
-                });
-                return out;
-              } catch { return []; }
+                }
+              } catch {}
+              return out;
             };
             const sourceTx = (recapPreset==='day')
               ? (() => { try { const raw=localStorage.getItem('klick_caisse_transactions_by_day'); if(!raw) return []; const map=JSON.parse(raw); const list = Array.isArray(map[recapDate]) ? map[recapDate] : []; return list.map((t:any)=>({ ...t, timestamp:new Date(t.timestamp) })); } catch { return todayTransactions; } })()
               : loadRange();
             const rows = computeDailyProductSales(sourceTx);
             if (rows.length === 0) {
-              return <Typography>Aucune vente aujourd'hui.</Typography>;
+              return <Typography>Aucune vente pour la période sélectionnée.</Typography>;
             }
             const totalQty = rows.reduce((a, r) => a + r.totalQty, 0);
-            const totalAmount = rows.reduce((a, r) => a + r.totalAmount, 0);
+            const totalAmount = sourceTx.reduce((a:number, t:any) => a + (Number(t?.total) || 0), 0);
             return (
               <Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, fontWeight: 'bold' }}>

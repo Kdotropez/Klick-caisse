@@ -110,30 +110,29 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     }
     // Agrégation sur intervalle
     try {
-      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
       const out: any[] = [];
+      const seen = new Set<string>();
+      const from = new Date(`${range.from}T00:00:00`);
+      const to = new Date(`${range.to}T23:59:59`);
+      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
       if (raw) {
         const map = JSON.parse(raw) as Record<string, any[]>;
-        const from = new Date(`${range.from}T00:00:00`);
-        const to = new Date(`${range.to}T23:59:59`);
         Object.keys(map).forEach(day => {
           const d = new Date(`${day}T12:00:00`);
           if (d >= from && d <= to) {
             const list = Array.isArray(map[day]) ? map[day] : [];
-            list.forEach(t => out.push(t));
+            list.forEach(t => { const id=String((t as any)?.id); if (!seen.has(id)) { seen.add(id); out.push(t); } });
           }
         });
       }
-      // Fallback: si rien via transactions_by_day, tenter via closures
-      if (out.length === 0) {
-        (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
-          const d = new Date(c.closedAt);
-          if (d >= new Date(`${range.from}T00:00:00`) && d <= new Date(`${range.to}T23:59:59`)) {
-            const txs = Array.isArray(c.transactions) ? c.transactions : [];
-            out.push(...txs);
-          }
-        });
-      }
+      // Ajouter aussi les tickets provenant des clôtures dont la date de clôture est dans la période, sans doublons
+      (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
+        const d = new Date(c.closedAt);
+        if (d >= from && d <= to) {
+          const txs = Array.isArray(c.transactions) ? c.transactions : [];
+          txs.forEach((t:any) => { const id=String(t?.id); if (!seen.has(id)) { seen.add(id); out.push(t); } });
+        }
+      });
       return out;
     } catch { return []; }
   }, [selectedDate, todayTransactions, allClosures, preset, range]);
@@ -154,7 +153,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
       let totalDiscounts = 0;
 
       txs.forEach((transaction: any) => {
-        totalSales += transaction.total || 0;
+        totalSales += Number(transaction.total) || 0;
         if (transaction.items && Array.isArray(transaction.items)) {
           transaction.items.forEach((item: any) => {
             const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
@@ -177,6 +176,17 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           });
         }
       });
+      // Éviter les doubles comptages si des tickets identiques proviennent de sources différentes
+      try {
+        const uniqueIds = new Set<string>();
+        const uniqueTxs: any[] = [];
+        for (const t of txs) {
+          const id = String(t?.id);
+          if (!uniqueIds.has(id)) { uniqueIds.add(id); uniqueTxs.push(t); }
+        }
+        // Recalculer totalSales sur base des tickets uniques uniquement
+        totalSales = uniqueTxs.reduce((s, t) => s + (Number(t?.total) || 0), 0);
+      } catch {}
       const totalTransactions = txs.length;
       const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
       setDailyStats({ totalSales, totalItems, totalTransactions, averageTransactionValue, totalDiscounts, totalOriginalAmount });
