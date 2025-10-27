@@ -492,6 +492,12 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   });
+  const [recapRange, setRecapRange] = useState<{ from: string; to: string }>(() => {
+    const d = new Date();
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return { from: key, to: key };
+  });
+  const [recapPreset, setRecapPreset] = useState<'day'|'range'|'month'|'lastMonth'|'year'>('day');
   const [showSalesRecap, setShowSalesRecap] = useState(false);
   
   const [showPaymentRecap, setShowPaymentRecap] = useState(false);
@@ -3823,21 +3829,49 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
       {/* Modale récapitulatif ventes du jour */}
       <Dialog open={showSalesRecap} onClose={() => setShowSalesRecap(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Récapitulatif des ventes du jour</DialogTitle>
+        <DialogTitle>Récapitulatif des ventes</DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 1 }}>
-            <input type="date" value={recapDate} onChange={(e)=> setRecapDate(e.target.value)} />
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 1, mb: 1 }}>
+            <button onClick={()=>{ setRecapPreset('day'); const d=new Date(); const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; setRecapDate(k); setRecapRange({ from: k, to: k }); }}>Jour</button>
+            <button onClick={()=>{ setRecapPreset('month'); const d=new Date(); const from=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; const to=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(new Date(d.getFullYear(), d.getMonth()+1, 0).getDate()).padStart(2,'0')}`; setRecapRange({ from, to }); }}>Mois courant</button>
+            <button onClick={()=>{ setRecapPreset('lastMonth'); const d=new Date(); const y=d.getFullYear(); const m=d.getMonth(); const first=new Date(y, m-1, 1); const last=new Date(y, m, 0); const from=`${first.getFullYear()}-${String(first.getMonth()+1).padStart(2,'0')}-01`; const to=`${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`; setRecapRange({ from, to }); }}>Mois précédent</button>
+            <button onClick={()=>{ setRecapPreset('year'); const d=new Date(); const from=`${d.getFullYear()}-01-01`; const to=`${d.getFullYear()}-12-31`; setRecapRange({ from, to }); }}>Année en cours</button>
+            <button onClick={()=>{ setRecapPreset('range'); }}>Période</button>
           </Box>
+          {recapPreset==='day' && (
+            <Box sx={{ mb: 1 }}>
+              <input type="date" value={recapDate} onChange={(e)=> { setRecapDate(e.target.value); setRecapRange({ from: e.target.value, to: e.target.value }); }} />
+            </Box>
+          )}
+          {recapPreset==='range' && (
+            <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+              <input type="date" value={recapRange.from} onChange={(e)=> setRecapRange(r=>({ ...r, from: e.target.value }))} />
+              <input type="date" value={recapRange.to} onChange={(e)=> setRecapRange(r=>({ ...r, to: e.target.value }))} />
+            </Box>
+          )}
           {(() => {
-            const rows = computeDailyProductSales((() => {
+            const loadRange = (): any[] => {
               try {
                 const raw = localStorage.getItem('klick_caisse_transactions_by_day');
                 if (!raw) return [];
-                const map = JSON.parse(raw);
-                const list = Array.isArray(map[recapDate]) ? map[recapDate] : [];
-                return list.map((t:any)=>({ ...t, timestamp: new Date(t.timestamp) }));
-              } catch { return todayTransactions; }
-            })());
+                const map = JSON.parse(raw) as Record<string, any[]>;
+                const from = new Date(`${recapRange.from}T00:00:00`);
+                const to = new Date(`${recapRange.to}T23:59:59`);
+                const out: any[] = [];
+                Object.keys(map).forEach(day => {
+                  const d = new Date(`${day}T12:00:00`);
+                  if (d >= from && d <= to) {
+                    const list = Array.isArray(map[day]) ? map[day] : [];
+                    list.forEach((t:any)=> out.push({ ...t, timestamp: new Date(t.timestamp) }));
+                  }
+                });
+                return out;
+              } catch { return []; }
+            };
+            const sourceTx = (recapPreset==='day')
+              ? (() => { try { const raw=localStorage.getItem('klick_caisse_transactions_by_day'); if(!raw) return []; const map=JSON.parse(raw); const list = Array.isArray(map[recapDate]) ? map[recapDate] : []; return list.map((t:any)=>({ ...t, timestamp:new Date(t.timestamp) })); } catch { return todayTransactions; } })()
+              : loadRange();
+            const rows = computeDailyProductSales(sourceTx);
             if (rows.length === 0) {
               return <Typography>Aucune vente aujourd'hui.</Typography>;
             }
