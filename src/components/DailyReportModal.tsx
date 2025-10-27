@@ -47,6 +47,12 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
   });
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
+  const [range, setRange] = useState<{ from: string; to: string }>(() => {
+    const d = new Date();
+    const key = new Date().toISOString().slice(0, 10);
+    return { from: key, to: key };
+  });
+  const [preset, setPreset] = useState<'day'|'range'|'month'|'lastMonth'|'year'>('day');
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [showTicketsSection, setShowTicketsSection] = useState(false);
@@ -91,18 +97,46 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         return list;
       } catch { return []; }
     };
-    if (selectedDate === todayKey) {
-      // Priorité aux transactions du jour, sinon fallback sur clôtures d'aujourd'hui
-      if (Array.isArray(todayTransactions) && todayTransactions.length > 0) return todayTransactions;
-      const fromDay = loadFromTxByDay(todayKey);
+    if (preset === 'day') {
+      if (selectedDate === todayKey) {
+        if (Array.isArray(todayTransactions) && todayTransactions.length > 0) return todayTransactions;
+        const fromDay = loadFromTxByDay(todayKey);
+        if (fromDay.length > 0) return fromDay;
+        return loadFromClosures(todayKey);
+      }
+      const fromDay = loadFromTxByDay(selectedDate);
       if (fromDay.length > 0) return fromDay;
-      return loadFromClosures(todayKey);
+      return loadFromClosures(selectedDate);
     }
-    // Date sélectionnée ≠ aujourd'hui: chercher transactions_by_day, sinon fallback sur clôtures
-    const fromDay = loadFromTxByDay(selectedDate);
-    if (fromDay.length > 0) return fromDay;
-    return loadFromClosures(selectedDate);
-  }, [selectedDate, todayTransactions, allClosures]);
+    // Agrégation sur intervalle
+    try {
+      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+      const out: any[] = [];
+      if (raw) {
+        const map = JSON.parse(raw) as Record<string, any[]>;
+        const from = new Date(`${range.from}T00:00:00`);
+        const to = new Date(`${range.to}T23:59:59`);
+        Object.keys(map).forEach(day => {
+          const d = new Date(`${day}T12:00:00`);
+          if (d >= from && d <= to) {
+            const list = Array.isArray(map[day]) ? map[day] : [];
+            list.forEach(t => out.push(t));
+          }
+        });
+      }
+      // Fallback: si rien via transactions_by_day, tenter via closures
+      if (out.length === 0) {
+        (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
+          const d = new Date(c.closedAt);
+          if (d >= new Date(`${range.from}T00:00:00`) && d <= new Date(`${range.to}T23:59:59`)) {
+            const txs = Array.isArray(c.transactions) ? c.transactions : [];
+            out.push(...txs);
+          }
+        });
+      }
+      return out;
+    } catch { return []; }
+  }, [selectedDate, todayTransactions, allClosures, preset, range]);
 
   // Fonction pour afficher les détails d'un ticket
   const showTicketDetails = (transaction: any) => {
@@ -190,7 +224,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TrendingUp sx={{ color: '#2196f3', fontSize: 28 }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
-          Rapport Journalier · Klick V{APP_VERSION}
+          Rapport · Klick V{APP_VERSION}
           </Typography>
         </Box>
         <IconButton onClick={onClose} size="small">
@@ -207,6 +241,43 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
             day: 'numeric' 
           })}
         </Typography>
+
+        {/* Filtres de période */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 1, mb: 2 }}>
+          <Button variant={preset==='day'?'contained':'outlined'} onClick={()=>{
+            setPreset('day');
+            const d=new Date();
+            const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            setSelectedDate(k);
+            setRange({ from: k, to: k });
+          }}>Jour</Button>
+          <Button variant={preset==='month'?'contained':'outlined'} onClick={()=>{
+            setPreset('month');
+            const d=new Date();
+            const from=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
+            const to=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(new Date(d.getFullYear(), d.getMonth()+1, 0).getDate()).padStart(2,'0')}`;
+            setRange({ from, to });
+          }}>Mois courant</Button>
+          <Button variant={preset==='lastMonth'?'contained':'outlined'} onClick={()=>{
+            setPreset('lastMonth');
+            const d=new Date();
+            const y=d.getFullYear();
+            const m=d.getMonth();
+            const first=new Date(y, m-1, 1);
+            const last=new Date(y, m, 0);
+            const from=`${first.getFullYear()}-${String(first.getMonth()+1).padStart(2,'0')}-01`;
+            const to=`${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`;
+            setRange({ from, to });
+          }}>Mois précédent</Button>
+          <Button variant={preset==='year'?'contained':'outlined'} onClick={()=>{
+            setPreset('year');
+            const d=new Date();
+            const from=`${d.getFullYear()}-01-01`;
+            const to=`${d.getFullYear()}-12-31`;
+            setRange({ from, to });
+          }}>Année</Button>
+          <Button variant={preset==='range'?'contained':'outlined'} onClick={()=>{ setPreset('range'); }}>Période</Button>
+        </Box>
 
         {/* POINT 1: TOTAL DES VENTES */}
         <Card sx={{ 
@@ -378,7 +449,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           <CardContent sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                📋 Tickets de la Journée
+                📋 Tickets
               </Typography>
               <Button
                 variant="outlined"
@@ -402,30 +473,64 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               <>
                 <Divider sx={{ mb: 2 }} />
                 
-                {/* Sélecteur de date */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    Date :
-                  </Typography>
-                  <input 
-                    type="date" 
-                    value={selectedDate} 
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    style={{
-                      padding: '8px 12px',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      fontSize: '14px'
-                    }}
-                  />
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    onClick={() => setSelectedDate(new Date().toISOString().slice(0, 10))}
-                  >
-                    Aujourd'hui
-                  </Button>
-                </Box>
+                {/* Sélecteurs de période */}
+                {preset==='day' && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      Date :
+                    </Typography>
+                    <input 
+                      type="date" 
+                      value={selectedDate} 
+                      onChange={(e) => { setSelectedDate(e.target.value); setRange({ from: e.target.value, to: e.target.value }); }}
+                      style={{
+                        padding: '8px 12px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      onClick={() => { const k=new Date().toISOString().slice(0, 10); setSelectedDate(k); setRange({ from: k, to: k }); }}
+                    >
+                      Aujourd'hui
+                    </Button>
+                  </Box>
+                )}
+                {preset==='range' && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      De :
+                    </Typography>
+                    <input 
+                      type="date" 
+                      value={range.from} 
+                      onChange={(e) => setRange(r=>({ ...r, from: e.target.value }))}
+                      style={{
+                        padding: '8px 12px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      À :
+                    </Typography>
+                    <input 
+                      type="date" 
+                      value={range.to} 
+                      onChange={(e) => setRange(r=>({ ...r, to: e.target.value }))}
+                      style={{
+                        padding: '8px 12px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </Box>
+                )}
                 
                 {/* Liste des tickets */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
