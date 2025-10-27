@@ -60,10 +60,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
   const [productSortKey, setProductSortKey] = useState<'name'|'category'|'totalQty'|'transactions'|'totalAmount'|'percentage'>('totalAmount');
   const [productSortDir, setProductSortDir] = useState<'asc'|'desc'>('desc');
 
-  // Charger les transactions du jour
-  const todayTransactions = StorageService.loadTodayTransactions();
-  // Charger les clôtures pour fallback si transactions_by_day manquent
-  const allClosures = StorageService.loadClosures();
+  // Les données seront lues à la volée dans les mémos pour éviter les dépendances instables
 
   const getLocalDateKey = (d: Date) => {
     const yyyy = d.getFullYear();
@@ -85,6 +82,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     };
     const loadFromClosures = (dateKey: string): any[] => {
       try {
+        const allClosures = StorageService.loadClosures();
         const list: any[] = [];
         (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
           const d = new Date(c.closedAt);
@@ -98,15 +96,9 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
       } catch { return []; }
     };
     if (preset === 'day') {
-      if (selectedDate === todayKey) {
-        if (Array.isArray(todayTransactions) && todayTransactions.length > 0) return todayTransactions;
-        const fromDay = loadFromTxByDay(todayKey);
-        if (fromDay.length > 0) return fromDay;
-        return loadFromClosures(todayKey);
-      }
-      const fromDay = loadFromTxByDay(selectedDate);
+      const fromDay = loadFromTxByDay(selectedDate === todayKey ? todayKey : selectedDate);
       if (fromDay.length > 0) return fromDay;
-      return loadFromClosures(selectedDate);
+      return loadFromClosures(selectedDate === todayKey ? todayKey : selectedDate);
     }
     // Agrégation sur intervalle
     try {
@@ -125,7 +117,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           }
         });
       }
-      // Ajouter aussi les tickets provenant des clôtures dont la date de clôture est dans la période, sans doublons
+      const allClosures = StorageService.loadClosures();
       (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
         const d = new Date(c.closedAt);
         if (d >= from && d <= to) {
@@ -135,7 +127,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
       });
       return out;
     } catch { return []; }
-  }, [selectedDate, todayTransactions, allClosures, preset, range]);
+  }, [selectedDate, preset, range]);
 
   // Fonction pour afficher les détails d'un ticket
   const showTicketDetails = (transaction: any) => {
