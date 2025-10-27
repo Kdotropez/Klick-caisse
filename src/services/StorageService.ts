@@ -541,6 +541,29 @@ export class StorageService {
     }
   }
 
+  // Supprime une transaction par son id dans toutes les journées archivées
+  static deleteTransactionFromAllDays(transactionId: string): void {
+    try {
+      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      if (!raw) return;
+      const map: Record<string, any[]> = JSON.parse(raw);
+      let changed = false;
+      for (const day of Object.keys(map)) {
+        const list = Array.isArray(map[day]) ? map[day] : [];
+        const filtered = list.filter((t: any) => t && String(t.id) !== String(transactionId));
+        if (filtered.length !== list.length) {
+          map[day] = filtered;
+          changed = true;
+        }
+      }
+      if (changed) {
+        localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(map));
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression (toutes journées):', error);
+    }
+  }
+
   // Exporter les données
   static exportData(): { products: Product[], categories: Category[], settings: any } {
     return {

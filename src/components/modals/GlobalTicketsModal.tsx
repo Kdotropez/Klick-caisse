@@ -710,6 +710,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             Array.from(selected).forEach((tid) => { 
               try { 
                 StorageService.deleteDailyTransaction(String(tid)); 
+                StorageService.deleteTransactionFromAllDays(String(tid));
               } catch {} 
             });
           refreshTodayTransactions();
