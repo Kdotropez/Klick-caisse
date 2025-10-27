@@ -999,7 +999,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                         (Number(r.totalAmount)||0).toFixed(2)
                       ].join(';'))
                     ].join('\n');
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const bom = '\uFEFF'; // BOM pour Excel (UTF-8)
+                    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
