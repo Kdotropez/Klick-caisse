@@ -85,12 +85,11 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         const allClosures = StorageService.loadClosures();
         const list: any[] = [];
         (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
-          const d = new Date(c.closedAt);
-          const key = getLocalDateKey(d);
-          if (key === dateKey) {
-            const txs = Array.isArray(c.transactions) ? c.transactions : [];
-            list.push(...txs);
-          }
+          const txs = Array.isArray(c.transactions) ? c.transactions : [];
+          txs.forEach((t:any) => {
+            const tk = getLocalDateKey(new Date(t.timestamp));
+            if (tk === dateKey) list.push(t);
+          });
         });
         return list;
       } catch { return []; }
@@ -119,11 +118,16 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
       }
       const allClosures = StorageService.loadClosures();
       (Array.isArray(allClosures) ? allClosures : []).forEach((c: any) => {
-        const d = new Date(c.closedAt);
-        if (d >= from && d <= to) {
-          const txs = Array.isArray(c.transactions) ? c.transactions : [];
-          txs.forEach((t:any) => { const id=String(t?.id); const ts = new Date(t?.timestamp).getTime(); const key = `${id}@${ts}`; if (!seen.has(key)) { seen.add(key); out.push(t); } });
-        }
+        const txs = Array.isArray(c.transactions) ? c.transactions : [];
+        txs.forEach((t:any) => {
+          const tsDate = new Date(t?.timestamp);
+          if (tsDate >= from && tsDate <= to) {
+            const id=String(t?.id);
+            const ts = tsDate.getTime();
+            const key = `${id}@${ts}`;
+            if (!seen.has(key)) { seen.add(key); out.push(t); }
+          }
+        });
       });
       return out;
     } catch { return []; }

@@ -3883,18 +3883,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   });
                 }
               } catch {}
-              // Ajouter les transactions issues des clôtures dont la date de clôture est dans l'intervalle
+              // Ajouter les transactions issues des clôtures dont la DATE DU TICKET est dans l'intervalle
               try {
                 const closures = StorageService.loadClosures() || [];
                 for (const c of closures) {
-                  const cd = new Date((c as any)?.closedAt);
-                  if (cd >= from && cd <= to) {
-                    const txs = Array.isArray((c as any)?.transactions) ? (c as any).transactions : [];
-                    for (const t of txs) {
+                  const txs = Array.isArray((c as any)?.transactions) ? (c as any).transactions : [];
+                  for (const t of txs) {
+                    const tDate = new Date((t as any)?.timestamp);
+                    if (tDate >= from && tDate <= to) {
                       const id = String((t as any)?.id);
-                      const ts = new Date(t?.timestamp).getTime();
+                      const ts = tDate.getTime();
                       const key = `${id}@${ts}`;
-                      if (!seen.has(key)) { seen.add(key); out.push({ ...t, timestamp: new Date(t.timestamp) }); }
+                      if (!seen.has(key)) { seen.add(key); out.push({ ...t, timestamp: tDate }); }
                     }
                   }
                 }
