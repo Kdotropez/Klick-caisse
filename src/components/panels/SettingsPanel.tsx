@@ -1296,6 +1296,70 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         🗑️ Supprimer Toutes les Z
       </Button>
 
+      {/* Purger les tickets archivés (transactions_by_day) */}
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#ad1457',
+          '&:hover': { backgroundColor: '#880e4f' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            if (!window.confirm('Supprimer TOUTES les archives de tickets (transactions_by_day) ?')) return;
+            localStorage.removeItem('klick_caisse_transactions_by_day');
+            try { StorageService.clearTodayTransactions(); } catch {}
+            alert('✅ Tickets archivés purgés.');
+          } catch (e) {
+            alert('❌ Erreur purge tickets archivés');
+          }
+        }}
+      >
+        🧹 Purger tickets archivés
+      </Button>
+
+      {/* Purge complète ventes (Z + tickets) */}
+      <Button
+        variant="contained"
+        sx={{
+          width: '100%',
+          height: '100%',
+          fontSize: getScaledFontSize('0.5rem'),
+          fontWeight: 'bold',
+          backgroundColor: '#9e9d24',
+          '&:hover': { backgroundColor: '#827717' },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          textTransform: 'none',
+          lineHeight: 1.0,
+          padding: '1px',
+        }}
+        onClick={() => {
+          try {
+            if (!window.confirm('Purge COMPLÈTE ventes (Z + tickets jour + archives) ?')) return;
+            // Clôtures
+            localStorage.removeItem('klick_caisse_closures');
+            localStorage.removeItem('klick_caisse_z_counter');
+            // Tickets jour + archives
+            try { StorageService.clearTodayTransactions(); } catch {}
+            localStorage.removeItem('klick_caisse_transactions_by_day');
+            alert('✅ Purge ventes effectuée.');
+          } catch (e) {
+            alert('❌ Erreur purge ventes');
+          }
+        }}
+      >
+        🧨 Purge complète ventes (Z + tickets)
+      </Button>
+
       {/* Importer un Z depuis un dossier de sauvegardes */}
       <Button
         variant="contained"
