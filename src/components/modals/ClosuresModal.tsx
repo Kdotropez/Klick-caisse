@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Typography, Checkbox } from '@mui/material';
 import { StorageService } from '../../services/StorageService';
 import { Transaction } from '../../types/Product';
 
@@ -13,6 +13,27 @@ interface ClosuresModalProps {
 }
 
 const ClosuresModal: React.FC<ClosuresModalProps> = ({ open, onClose, closures, selectedIdx, setSelectedIdx, computeDailyProductSales }) => {
+  const [selectedZs, setSelectedZs] = useState<Set<number>>(new Set());
+
+  const toggleZ = (z: number) => {
+    setSelectedZs(prev => {
+      const next = new Set(prev);
+      if (next.has(z)) next.delete(z); else next.add(z);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    const next = new Set<number>();
+    for (const c of closures) {
+      const z = Number((c as any)?.zNumber) || 0;
+      if (z > 0) next.add(z);
+    }
+    setSelectedZs(next);
+  };
+
+  const clearAll = () => setSelectedZs(new Set());
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Clôtures archivées</DialogTitle>
@@ -22,12 +43,25 @@ const ClosuresModal: React.FC<ClosuresModalProps> = ({ open, onClose, closures, 
         ) : (
           <Box sx={{ display: 'flex', gap: 2 }}>
             <Box sx={{ width: 260 }}>
+              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                <Button size="small" variant="outlined" onClick={selectAll}>Tout sélectionner</Button>
+                <Button size="small" onClick={clearAll}>Tout désélectionner</Button>
+              </Box>
               <List dense>
-                {closures.map((c, idx) => (
-                  <ListItem key={idx} button selected={selectedIdx===idx} onClick={() => setSelectedIdx(idx)}>
-                    <ListItemText primary={`Clôture Z${c.zNumber || '?' } — ${new Date(c.closedAt).toLocaleDateString('fr-FR')}`} secondary={new Date(c.closedAt).toLocaleTimeString('fr-FR')} />
-                  </ListItem>
-                ))}
+                {closures.map((c, idx) => {
+                  const z = Number((c as any)?.zNumber) || 0;
+                  const checked = selectedZs.has(z);
+                  return (
+                    <ListItem key={idx} selected={selectedIdx===idx} sx={{ cursor: 'pointer' }}
+                      onClick={() => setSelectedIdx(idx)}
+                      secondaryAction={
+                        <Checkbox edge="end" checked={checked} onChange={(e)=>{ e.stopPropagation(); toggleZ(z); }} />
+                      }
+                    >
+                      <ListItemText primary={`Clôture Z${c.zNumber || '?' } — ${new Date(c.closedAt).toLocaleDateString('fr-FR')}`} secondary={new Date(c.closedAt).toLocaleTimeString('fr-FR')} />
+                    </ListItem>
+                  );
+                })}
               </List>
             </Box>
             <Box sx={{ flex: 1 }}>
@@ -83,18 +117,26 @@ const ClosuresModal: React.FC<ClosuresModalProps> = ({ open, onClose, closures, 
       </DialogContent>
       <DialogActions>
         <Button onClick={() => {
-          if (selectedIdx === null) return onClose();
-          const c = closures[selectedIdx];
-          // eslint-disable-next-line no-alert
-          if (!window.confirm(`Supprimer la clôture Z${c.zNumber} du ${new Date(c.closedAt).toLocaleDateString('fr-FR')} ?`)) return;
-          StorageService.deleteClosureByZ(Number(c.zNumber));
-          // Mise à jour UI: retirer la clôture supprimée
-          const next = closures.filter((_:any, idx:number)=> idx!==selectedIdx);
-          // Astuce: onClose, l'appelant rechargera les closures
-          onClose();
-          // Optionnel: alerter
-          try { alert('Clôture supprimée. Rouvrez l\'historique pour rafraîchir.'); } catch {}
-        }} color="error">Supprimer Z</Button>
+          if (selectedZs.size === 0 && selectedIdx === null) return onClose();
+          if (selectedZs.size > 0) {
+            const list = Array.from(selectedZs).sort((a,b)=>a-b);
+            const label = list.map(z=>`Z${z}`).join(', ');
+            if (!window.confirm(`Supprimer ${list.length} clôture(s): ${label} ?`)) return;
+            for (const z of list) {
+              try { StorageService.deleteClosureByZ(Number(z)); } catch {}
+            }
+            onClose();
+            try { alert('Clôtures supprimées. Rouvrez l\'historique pour rafraîchir.'); } catch {}
+            return;
+          }
+          if (selectedIdx !== null) {
+            const c = closures[selectedIdx];
+            if (!window.confirm(`Supprimer la clôture Z${c.zNumber} du ${new Date(c.closedAt).toLocaleDateString('fr-FR')} ?`)) return;
+            StorageService.deleteClosureByZ(Number(c.zNumber));
+            onClose();
+            try { alert('Clôture supprimée. Rouvrez l\'historique pour rafraîchir.'); } catch {}
+          }
+        }} color="error">Supprimer sélection</Button>
         <Button onClick={onClose}>Fermer</Button>
       </DialogActions>
     </Dialog>
