@@ -121,7 +121,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
           const d = new Date(`${day}T12:00:00`);
           if (d >= from && d <= to) {
             const list = Array.isArray(map[day]) ? map[day] : [];
-            list.forEach(t => { const id=String((t as any)?.id); const dk = new Date(t?.timestamp).toISOString().slice(0,10); const key = `${id}@${dk}`; if (!seen.has(key)) { seen.add(key); out.push(t); } });
+            list.forEach(t => { const id=String((t as any)?.id); const ts = new Date(t?.timestamp).getTime(); const key = `${id}@${ts}`; if (!seen.has(key)) { seen.add(key); out.push(t); } });
           }
         });
       }
@@ -130,7 +130,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
         const d = new Date(c.closedAt);
         if (d >= from && d <= to) {
           const txs = Array.isArray(c.transactions) ? c.transactions : [];
-          txs.forEach((t:any) => { const id=String(t?.id); const dk = new Date(t?.timestamp).toISOString().slice(0,10); const key = `${id}@${dk}`; if (!seen.has(key)) { seen.add(key); out.push(t); } });
+          txs.forEach((t:any) => { const id=String(t?.id); const ts = new Date(t?.timestamp).getTime(); const key = `${id}@${ts}`; if (!seen.has(key)) { seen.add(key); out.push(t); } });
         }
       });
       return out;
