@@ -3875,7 +3875,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                       const list = Array.isArray(map[day]) ? map[day] : [];
                       list.forEach((t:any)=> {
                         const id = String(t?.id);
-                        if (!seen.has(id)) { seen.add(id); out.push({ ...t, timestamp: new Date(t.timestamp) }); }
+                        const dayKey = new Date(t?.timestamp).toISOString().slice(0,10);
+                        const key = `${id}@${dayKey}`;
+                        if (!seen.has(key)) { seen.add(key); out.push({ ...t, timestamp: new Date(t.timestamp) }); }
                       });
                     }
                   });
@@ -3890,7 +3892,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                     const txs = Array.isArray((c as any)?.transactions) ? (c as any).transactions : [];
                     for (const t of txs) {
                       const id = String((t as any)?.id);
-                      if (!seen.has(id)) { seen.add(id); out.push({ ...t, timestamp: new Date(t.timestamp) }); }
+                      const dayKey = new Date(t?.timestamp).toISOString().slice(0,10);
+                      const key = `${id}@${dayKey}`;
+                      if (!seen.has(key)) { seen.add(key); out.push({ ...t, timestamp: new Date(t.timestamp) }); }
                     }
                   }
                 }
