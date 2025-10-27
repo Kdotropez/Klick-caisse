@@ -1360,7 +1360,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         🧨 Purge complète ventes (Z + tickets)
       </Button>
 
-      {/* Importer un Z depuis un dossier de sauvegardes */}
+      {/* Importer un Z depuis un fichier de sauvegarde */}
       <Button
         variant="contained"
         sx={{
@@ -1381,41 +1381,92 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json,application/json';
-            (input as any).webkitdirectory = true; // sélection de dossier (Chrome/Edge)
-            input.multiple = true;
             input.onchange = async (event) => {
-              const files = Array.from((event.target as HTMLInputElement).files || [])
-                .filter(f => f.name.toLowerCase().endsWith('.json'));
-              if (files.length === 0) {
-                alert('Aucun fichier JSON trouvé dans ce dossier.');
-                return;
-              }
+              const file = (event.target as HTMLInputElement).files?.[0];
+              if (!file) return;
               try {
-                const entries: Array<{ file: File; idx: number; z: number; dateStr: string; txCount: number; ca: number; raw: any }>
-                  = [];
-                let globalIdx = 1;
-                for (const file of files) {
-                  try {
-                    const text = await file.text();
-                    const data = JSON.parse(text);
-                    const closures: any[] = Array.isArray(data?.closures) ? data.closures : [];
-                    for (const c of closures) {
-                      const z = Number(c?.zNumber) || 0;
-                      const closedAt = c?.closedAt ? new Date(c.closedAt) : null;
-                      const dateStr = closedAt ? `${closedAt.toLocaleDateString()} ${closedAt.toLocaleTimeString()}` : '—';
-                      const txs = Array.isArray(c?.transactions) ? c.transactions : [];
-                      const ca = txs.reduce((s: number, t: any) => s + (Number(t?.total) || 0), 0);
-                      entries.push({ file, idx: globalIdx++, z, dateStr, txCount: txs.length, ca, raw: c });
-                    }
-                  } catch {}
-                }
-                if (entries.length === 0) {
-                  alert('Aucune clôture Z trouvée dans ce dossier.');
+                const text = await file.text();
+                const data = JSON.parse(text);
+                const closures: any[] = Array.isArray(data?.closures) ? data.closures : [];
+                if (closures.length === 0) {
+                  alert('Aucune clôture (Z) trouvée dans ce fichier.');
                   return;
                 }
-                const lines = entries.map(e => `${e.idx}) ${e.file.name} · Z${e.z} · ${e.dateStr} · ${e.txCount} tickets · ${e.ca.toFixed(2)}€`);
+                // Option: importer tous les Z du fichier
+                const importAll = window.confirm(
+                  `Souhaitez-vous importer TOUS les Z de ce fichier ?\n\n` +
+                  `OK = importer les ${closures.length} clôtures\n` +
+                  `Annuler = choisir un seul Z à importer`
+                );
+                if (importAll) {
+                  // Charger clôtures existantes et préparer renumérotation si conflit
+                  const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                  const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
+                  const findNextAvailable = (start: number) => {
+                    let z = Math.max(1, Number(start) || 1);
+                    while (used.has(z)) z++;
+                    used.add(z);
+                    return z;
+                  };
+
+                  // Renumérotation non destructive et fusion
+                  const importedClosures: any[] = [];
+                  const mapping: Array<{ from?: number; to: number; count: number; ca: number }> = [];
+                  let maxZExisting = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
+                  const txMergeMap: Record<string, any[]> = (() => {
+                    try {
+                      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
+                      return raw ? JSON.parse(raw) : {};
+                    } catch { return {}; }
+                  })();
+
+                  for (const c of closures) {
+                    const originalZ = Number(c?.zNumber) || 0;
+                    const targetZ = used.has(originalZ) || originalZ <= 0 ? findNextAvailable(Math.max(originalZ, maxZExisting + 1)) : (used.add(originalZ), originalZ);
+                    maxZExisting = Math.max(maxZExisting, targetZ);
+                    const copy = { ...c, zNumber: targetZ };
+                    importedClosures.push(copy);
+
+                    // Stats mapping
+                    const txs = Array.isArray(c?.transactions) ? c.transactions : [];
+                    const ca = txs.reduce((s: number, t: any) => s + (Number(t?.total) || 0), 0);
+                    mapping.push({ from: originalZ || undefined, to: targetZ, count: txs.length, ca });
+
+                    // Fusionner transactionsByDay pour visibilité dans rapports
+                    for (const t of txs) {
+                      const d = new Date(t?.timestamp);
+                      const day = isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+                      if (!day) continue;
+                      if (!Array.isArray(txMergeMap[day])) txMergeMap[day] = [];
+                      txMergeMap[day].push(t);
+                    }
+                  }
+
+                  const merged = [...currentClosures, ...importedClosures].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
+                  localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
+                  localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(txMergeMap));
+                  localStorage.setItem('klick_caisse_z_counter', String(maxZExisting));
+
+                  const lines = mapping
+                    .sort((a, b) => a.to - b.to)
+                    .map(m => `Z${m.from ?? '-'} → Z${m.to} · ${m.count} tickets · ${m.ca.toFixed(2)}€`);
+                  alert(
+                    `✅ Import terminé: ${importedClosures.length} clôtures ajoutées.\n\n` +
+                    lines.join('\n')
+                  );
+                  return;
+                }
+                const entries = closures.map((c: any, i: number) => {
+                  const z = Number(c?.zNumber) || 0;
+                  const closedAt = c?.closedAt ? new Date(c.closedAt) : null;
+                  const dateStr = closedAt ? `${closedAt.toLocaleDateString()} ${closedAt.toLocaleTimeString()}` : '—';
+                  const txs = Array.isArray(c?.transactions) ? c.transactions : [];
+                  const ca = txs.reduce((s: number, t: any) => s + (Number(t?.total) || 0), 0);
+                  return { idx: i + 1, z, dateStr, txCount: txs.length, ca, raw: c };
+                });
+                const lines = entries.map(e => `${e.idx}) Z${e.z} · ${e.dateStr} · ${e.txCount} tickets · ${e.ca.toFixed(2)}€`);
                 const pick = window.prompt(
-                  'Sélectionnez le Z à importer (depuis dossier):\n' +
+                  'Sélectionnez le Z à importer (depuis fichier):\n' +
                   lines.join('\n') +
                   `\n\nEntrez l'index (1..${entries.length})`
                 );
@@ -1467,18 +1518,18 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(map));
                 } catch {}
 
-                alert(`✅ Z importé depuis dossier: Z${targetZ} (tickets: ${txs.length}).`);
+                alert(`✅ Z importé depuis fichier: Z${targetZ} (tickets: ${txs.length}).`);
               } catch (e) {
-                alert('Erreur lors de la lecture des fichiers du dossier.');
+                alert('Erreur lors de la lecture du fichier.');
               }
             };
             input.click();
           } catch (e) {
-            alert('Erreur: impossible d\'ouvrir le sélecteur de dossier.');
+            alert('Erreur: impossible d\'ouvrir le sélecteur de fichier.');
           }
         }}
       >
-        📁 Importer Z depuis dossier
+        📄 Importer Z depuis fichier
       </Button>
 
       {/* Modale Rapport Historique */}
