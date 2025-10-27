@@ -960,6 +960,58 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#e91e63' }}>
                 📋 Point 5: Listing Détaillé des Articles Vendus
               </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  try {
+                    // Reproduire les données du tableau trié pour export
+                    const articleStats = new Map();
+                    (Array.isArray(selectedDateTransactions) ? selectedDateTransactions : []).forEach((transaction:any) => {
+                      if (Array.isArray(transaction.items)) {
+                        transaction.items.forEach((item:any) => {
+                          const articleKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+                          const name = item.selectedVariation ? `${item.product.name} (${item.selectedVariation.name})` : item.product.name;
+                          const category = item.product.category || 'Non classé';
+                          const existing = articleStats.get(articleKey) || { name, category, totalQty: 0, totalAmount: 0, transactions: 0 };
+                          const unitPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                          const itemTotal = unitPrice * (item.quantity || 0);
+                          existing.totalQty += (item.quantity || 0);
+                          existing.totalAmount += itemTotal;
+                          existing.transactions += 1;
+                          articleStats.set(articleKey, existing);
+                        });
+                      }
+                    });
+                    const rows = Array.from(articleStats.values());
+                    const csv = [
+                      ['Produit','Catégorie','Quantité','Transactions','CA (€)'].join(';'),
+                      ...rows.map(r => [
+                        String(r.name).replace(/;/g, ','),
+                        String(r.category||'').replace(/;/g, ','),
+                        String(r.totalQty||0),
+                        String(r.transactions||0),
+                        (Number(r.totalAmount)||0).toFixed(2)
+                      ].join(';'))
+                    ].join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const labelFrom = preset==='day' ? selectedDate : range.from;
+                    const labelTo = preset==='day' ? selectedDate : range.to;
+                    a.download = `rapport-point5-${labelFrom}_au_${labelTo}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch (e) {
+                    alert('Erreur export CSV');
+                  }
+                }}
+              >
+                Export Excel (CSV)
+              </Button>
             </Box>
             
             <Divider sx={{ mb: 2 }} />
