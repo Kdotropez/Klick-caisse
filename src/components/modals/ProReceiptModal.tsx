@@ -110,6 +110,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
   }, [open]);
 
   const defaults = (settings && settings.professionalReceiptDefaults) || {};
+  const themeDefaults = (defaults && (defaults as any).theme) || (settings && (settings as any).professionalReceiptTheme) || {};
 
   const now = new Date();
   const [header, setHeader] = useState({
@@ -130,6 +131,21 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     paymentMethod: defaults.paymentMethod || '',
     siret: defaults.siret || '',
     customNote: defaults.customNote || '',
+  });
+
+  // Thème visuel
+  const [theme, setTheme] = useState<{
+    logoDataUrl?: string;
+    primaryColor: string;
+    borderColor: string;
+    fontFamily: string;
+    align: 'left' | 'center' | 'right';
+  }>({
+    logoDataUrl: themeDefaults.logoDataUrl || '',
+    primaryColor: themeDefaults.primaryColor || '#222222',
+    borderColor: themeDefaults.borderColor || '#444444',
+    fontFamily: themeDefaults.fontFamily || 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+    align: themeDefaults.align || 'center',
   });
 
   const [defaultTaxRate, setDefaultTaxRate] = useState<number>(
@@ -175,6 +191,15 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
       setGroupAsGift(Boolean(d.giftModeEnabled) || false);
       setGiftLabel(d.giftLabel || 'Cadeaux entreprise');
       setGiftTaxRate(Number.isFinite(Number(d.giftTaxRate)) ? Number(d.giftTaxRate) : (Number.isFinite(Number(d.taxRateDefault)) ? Number(d.taxRateDefault) : 20));
+      // Thème depuis defaults.theme (nouveau) ou ancien emplacement
+      const t = (d && (d as any).theme) || themeDefaults || {};
+      setTheme(prev => ({
+        logoDataUrl: t.logoDataUrl || prev.logoDataUrl || '',
+        primaryColor: t.primaryColor || prev.primaryColor || '#222222',
+        borderColor: t.borderColor || prev.borderColor || '#444444',
+        fontFamily: t.fontFamily || prev.fontFamily || 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        align: (t.align as any) || prev.align || 'center',
+      }));
     } catch {}
   }, [open]);
 
@@ -222,6 +247,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
         giftModeEnabled: groupAsGift,
         giftLabel: giftLabel,
         giftTaxRate: giftTaxRate,
+        theme: { ...theme },
       };
       StorageService.saveSettings({ ...s, professionalReceiptDefaults });
       alert('✅ En-tête/pied enregistrés comme défauts.');
@@ -292,6 +318,42 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
 
           <Grid item xs={12}>
             <Divider sx={{ my: 1 }} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Thème visuel</Typography>
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={6}>
+                <Button variant="outlined" component="label" size="small">
+                  Importer logo
+                  <input type="file" accept="image/*" hidden onChange={async (e) => {
+                    const f = e.target.files && e.target.files[0];
+                    if (!f) return;
+                    const reader = new FileReader();
+                    reader.onload = () => setTheme(t => ({ ...t, logoDataUrl: String(reader.result || '') }));
+                    reader.readAsDataURL(f);
+                  }} />
+                </Button>
+                {theme.logoDataUrl && (
+                  <Box sx={{ mt: 1 }}>
+                    <img src={theme.logoDataUrl} alt="logo" style={{ maxHeight: 48, maxWidth: 160 }} />
+                  </Box>
+                )}
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <TextField label="Couleur" type="color" fullWidth size="small" value={theme.primaryColor} onChange={e => setTheme(t => ({ ...t, primaryColor: e.target.value }))} />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <TextField label="Bordure" type="color" fullWidth size="small" value={theme.borderColor} onChange={e => setTheme(t => ({ ...t, borderColor: e.target.value }))} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField label="Police (CSS)" fullWidth size="small" value={theme.fontFamily} onChange={e => setTheme(t => ({ ...t, fontFamily: e.target.value }))} placeholder="Ex: 'Georgia', serif" />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField label="Alignement" fullWidth size="small" value={theme.align} onChange={e => setTheme(t => ({ ...t, align: (e.target.value as any) }))} placeholder="left | center | right" />
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Divider sx={{ my: 1 }} />
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Lignes du ticket</Typography>
             {!groupAsGift && items.map((it, idx) => (
               <Grid key={idx} container spacing={1} sx={{ mb: 0.5 }}>
@@ -330,9 +392,14 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
 
         {/* Aperçu imprimable */}
         <Box sx={{ mt: 2 }}>
-          <Paper ref={receiptRef} elevation={3} sx={{ p: 2, maxWidth: 520, mx: 'auto', border: '2px solid #444', borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }} className="receipt-paper">
-            <Box sx={{ textAlign: 'center', mb: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: 0.3 }}>{header.shopName || '—'}</Typography>
+          <Paper ref={receiptRef} elevation={3} sx={{ p: 2, maxWidth: 520, mx: 'auto', border: `2px solid ${theme.borderColor}`, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.12)', fontFamily: theme.fontFamily }} className="receipt-paper">
+            <Box sx={{ textAlign: theme.align, mb: 1 }}>
+              {theme.logoDataUrl && (
+                <Box sx={{ mb: 1, display: 'flex', justifyContent: theme.align === 'left' ? 'flex-start' : theme.align === 'right' ? 'flex-end' : 'center' }}>
+                  <img src={theme.logoDataUrl} alt="logo" style={{ maxHeight: 56, maxWidth: 200 }} />
+                </Box>
+              )}
+              <Typography variant="h6" sx={{ fontWeight: 'bold', letterSpacing: 0.3, color: theme.primaryColor }}>{header.shopName || '—'}</Typography>
               {header.address && <Typography variant="body2">{header.address}</Typography>}
               {(header.phone || header.email) && (
                 <Typography variant="body2">{[header.phone, header.email].filter(Boolean).join(' · ')}</Typography>
