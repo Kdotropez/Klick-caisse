@@ -965,32 +965,45 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                 size="small"
                 onClick={() => {
                   try {
-                    // Reproduire les données du tableau trié pour export
-                    const articleStats = new Map();
+                    // Reproduire les données du tableau trié pour export (avec vrais IDs)
+                    const articleStats = new Map<string, any>();
                     (Array.isArray(selectedDateTransactions) ? selectedDateTransactions : []).forEach((transaction:any) => {
                       if (Array.isArray(transaction.items)) {
                         transaction.items.forEach((item:any) => {
-                          const articleKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-                          const name = item.selectedVariation ? `${item.product.name} (${item.selectedVariation.name})` : item.product.name;
-                          const category = item.product.category || 'Non classé';
-                          const existing = articleStats.get(articleKey) || { name, category, totalQty: 0, totalAmount: 0, transactions: 0 };
-                          const unitPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                          const itemTotal = unitPrice * (item.quantity || 0);
-                          existing.totalQty += (item.quantity || 0);
+                          const product = item.product || {};
+                          const variation = item.selectedVariation || null;
+                          const variationLabel = variation ? (variation.attributes || variation.reference || variation.id) : undefined;
+                          const articleKey = `${String(product.id)}__${variation ? String(variation.id) : 'main'}`;
+                          const name = variation ? `${String(product.name)} (${String(variationLabel)})` : String(product.name);
+                          const category = product.category || 'Non classé';
+                          const existing = articleStats.get(articleKey) || {
+                            name,
+                            category,
+                            productId: String(product.id || ''), // on exportera sans suffixe 'main'
+                            productEAN: product.ean13 || '',
+                            productRef: product.reference || '',
+                            variationId: variation ? String(variation.id || '') : 'main',
+                            variationEAN: variation ? (variation.ean13 || '') : '',
+                            variationRef: variation ? (variation.reference || '') : '',
+                            totalQty: 0,
+                            totalAmount: 0,
+                            transactions: 0,
+                          };
+                          const unitPrice = variation ? variation.finalPrice : product.finalPrice;
+                          const qty = Number(item.quantity) || 0;
+                          const itemTotal = (Number(unitPrice) || 0) * qty;
+                          existing.totalQty += qty;
                           existing.totalAmount += itemTotal;
                           existing.transactions += 1;
                           articleStats.set(articleKey, existing);
                         });
                       }
                     });
-                    const rows = Array.from(articleStats.entries()).map(([key, val]) => {
-                      const [pid, vid] = key.split('__');
-                      return { 
-                        ...val, 
-                        productId: val.productId || pid, 
-                        variationId: val.variationId || (vid || 'main') 
-                      };
-                    });
+                    const rows = Array.from(articleStats.values()).map(r => ({
+                      ...r,
+                      productId: (String(r.productId||'').split('__')[0].split('-')[0] || String(r.productId||'')),
+                      variationId: (String(r.variationId||'').split('__').pop() || String(r.variationId||''))
+                    }));
                     const csv = [
                       ['Produit','Catégorie','ID Produit','ID Variation','EAN Produit','REF Produit','EAN Variation','REF Variation','Quantité','Transactions','CA (€)'].join(';'),
                       ...rows.map(r => [
