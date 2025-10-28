@@ -1007,10 +1007,25 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
 
                       return {
                         ...r,
+                        productIdRaw: rawProd,
                         productId: prodDigits,
                         variationId: cleanedVarId
                       };
                     });
+                    // Valider les IDs produit: doivent être 4 chiffres, sinon demander confirmation
+                    const invalids = rows.filter((r:any) => !(r.productId && /^\d{4}$/.test(String(r.productId))));
+                    if (invalids.length > 0) {
+                      const sample = invalids.slice(0, 20)
+                        .map((x:any, i:number) => `${i+1}) ${x.name} · ID source: ${x.productIdRaw||'vide'}`)
+                        .join('\n');
+                      const proceed = window.confirm(
+                        `⚠ Certains articles n'ont pas d'ID produit à 4 chiffres (${invalids.length}).\n` +
+                        sample +
+                        (invalids.length>20?`\n... (+${invalids.length-20} autres)`:'') +
+                        `\n\nPoursuivre l'export ? (les IDs manquants seront laissés vides)`
+                      );
+                      if (!proceed) return;
+                    }
                     const csv = [
                       ['Produit','Catégorie','ID Produit','ID Variation','EAN Produit','REF Produit','EAN Variation','REF Variation','Quantité','Transactions','CA (€)'].join(';'),
                       ...rows.map(r => [
