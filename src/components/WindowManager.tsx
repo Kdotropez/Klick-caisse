@@ -55,6 +55,7 @@ import DailyReportModal from './DailyReportModal';
 import ProductEditModal from './ProductEditModal';
 import SubcategoryManagementModal from './SubcategoryManagementModal';
 import ProductsPanel from './panels/ProductsPanel';
+import ProReceiptModal from './modals/ProReceiptModal';
 
 
 interface Window {
@@ -524,6 +525,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [filterProductText, setFilterProductText] = useState<string>('');
   // Tickets globaux (toutes sauvegardes)
   const [showGlobalTickets, setShowGlobalTickets] = useState(false);
+  const [showProReceiptQuick, setShowProReceiptQuick] = useState(false);
   const [globalFilterPayment, setGlobalFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup'>('all');
   const [globalAmountMin, setGlobalAmountMin] = useState<string>('');
   const [globalAmountMax, setGlobalAmountMax] = useState<string>('');
@@ -3775,6 +3777,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         setExpandedIds={(updater:any)=>setExpandedGlobalTicketIds(prev=>updater(prev))}
         showDiscountDetails={showDiscountDetails}
         setShowDiscountDetails={setShowDiscountDetails}
+        onRequestOpenProReceipt={() => setShowProReceiptQuick(true)}
         onOpenEditor={(tid:string)=>{
           const todays = StorageService.loadTodayTransactions();
           let tx: any = todays.find(t => String(t.id) === String(tid));
@@ -3797,6 +3800,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         filterCustomerId={filterCustomerForTickets}
         setFilterCustomerId={(id)=> setFilterCustomerForTickets(id)}
       />
+
+      {/* Ticket pro déclenché depuis Tickets globaux */}
+      <ProReceiptModal open={showProReceiptQuick} onClose={() => setShowProReceiptQuick(false)} />
       {/* La modale inline précédente a été remplacée par GlobalTicketsModal */}
 
       {/* Éditeur d'un ticket depuis Tickets globaux */}

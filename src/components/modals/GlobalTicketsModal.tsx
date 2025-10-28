@@ -34,6 +34,7 @@ interface GlobalTicketsModalProps {
   refreshTodayTransactions: () => void;
   filterCustomerId?: string | null;
   setFilterCustomerId?: (id: string | null) => void;
+  onRequestOpenProReceipt?: () => void;
 }
 
 const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
@@ -735,7 +736,11 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
               // On met à jour taxRateDefault et on laisse ldusager ajuster.
               professionalReceiptDefaults.taxRateDefault = d.taxRateDefault ?? 20;
               StorageService.saveSettings({ ...s, professionalReceiptDefaults, professionalReceiptPrefillItems: builtItems });
-              alert('✅ Ticket préparé pour le Ticket pro. Ouvrez « Ticket pro (composer/imprimer) » dans Paramètres.');
+              if (typeof onRequestOpenProReceipt === 'function') {
+                onRequestOpenProReceipt();
+              } else {
+                alert('✅ Ticket préparé pour le Ticket pro. Ouvrez « Ticket pro (composer/imprimer) » dans Paramètres.');
+              }
             } catch (e) {
               alert('❌ Impossible de préparer le ticket pro.');
             }
