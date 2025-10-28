@@ -735,7 +735,8 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
               // Stocker aussi un snapshot des lignes dans un espace temporaire pour préremplir
               // On met à jour taxRateDefault et on laisse ldusager ajuster.
               professionalReceiptDefaults.taxRateDefault = d.taxRateDefault ?? 20;
-              StorageService.saveSettings({ ...s, professionalReceiptDefaults, professionalReceiptPrefillItems: builtItems });
+              const professionalReceiptGlobalDiscount = tx.globalDiscount ? { ...tx.globalDiscount } : null;
+              StorageService.saveSettings({ ...s, professionalReceiptDefaults, professionalReceiptPrefillItems: builtItems, professionalReceiptGlobalDiscount });
               if (typeof onRequestOpenProReceipt === 'function') {
                 onRequestOpenProReceipt();
               } else {

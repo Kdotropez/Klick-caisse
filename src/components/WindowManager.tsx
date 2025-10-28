@@ -3104,7 +3104,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   time: now.toTimeString().slice(0,5),
                 } as any;
                 professionalReceiptDefaults.taxRateDefault = d.taxRateDefault ?? 20;
-                StorageService.saveSettings({ ...s, professionalReceiptDefaults, professionalReceiptPrefillItems: builtItems });
+                const professionalReceiptGlobalDiscount = globalDiscount ? { ...globalDiscount } : null;
+                StorageService.saveSettings({ ...s, professionalReceiptDefaults, professionalReceiptPrefillItems: builtItems, professionalReceiptGlobalDiscount });
                 setShowProReceiptQuick(true);
               } catch { alert('❌ Erreur préparation ticket pro'); }
             }}

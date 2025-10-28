@@ -164,6 +164,8 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     align: themeDefaults.align || 'center',
   });
 
+  const [globalDiscountPrefill, setGlobalDiscountPrefill] = useState<{ type: 'euro' | 'percent'; value: number } | null>(null);
+
   const [defaultTaxRate, setDefaultTaxRate] = useState<number>(
     Number.isFinite(Number(defaults.taxRateDefault)) ? Number(defaults.taxRateDefault) : 20
   );
@@ -244,6 +246,19 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
           StorageService.saveSettings(rest);
         } catch {}
       }
+
+      // Remise globale préremplie (si présente)
+      try {
+        const gd = (s as any).professionalReceiptGlobalDiscount;
+        if (gd && (gd.type === 'euro' || gd.type === 'percent') && Number.isFinite(Number(gd.value))) {
+          setGlobalDiscountPrefill({ type: gd.type, value: Number(gd.value) });
+          // Nettoyer la clé pour ne pas persister
+          const { professionalReceiptGlobalDiscount, ...rest2 } = s as any;
+          StorageService.saveSettings(rest2);
+        } else {
+          setGlobalDiscountPrefill(null);
+        }
+      } catch { setGlobalDiscountPrefill(null); }
     } catch {}
   }, [open]);
 
@@ -298,6 +313,13 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     });
     return { totalHT, totalTVA, totalTTC: totalHT + totalTVA, totalDiscount, byRate };
   }, [displayItems]);
+
+  const globalDiscountAmount = useMemo(() => {
+    if (!globalDiscountPrefill) return 0;
+    const base = totals.totalTTC;
+    if (globalDiscountPrefill.type === 'euro') return Math.max(0, Math.min(base, Number(globalDiscountPrefill.value) || 0));
+    return base * ((Number(globalDiscountPrefill.value) || 0) / 100);
+  }, [globalDiscountPrefill, totals.totalTTC]);
 
   const handleSaveDefaults = () => {
     try {
@@ -578,12 +600,18 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
                   <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#d32f2f' }}>-{totals.totalDiscount.toFixed(2)}€</Typography>
                 </>
               )}
+              {globalDiscountAmount > 0 && (
+                <>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#d32f2f' }}>Remise globale</Typography>
+                  <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#d32f2f' }}>-{globalDiscountAmount.toFixed(2)}€</Typography>
+                </>
+              )}
               <Typography variant="body2" sx={{ fontWeight: 600 }}>Total HT</Typography>
               <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 700 }}>{totals.totalHT.toFixed(2)}€</Typography>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>TVA</Typography>
               <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 700 }}>{totals.totalTVA.toFixed(2)}€</Typography>
               <Typography variant="body1" sx={{ fontWeight: 800 }}>Total TTC</Typography>
-              <Typography variant="body1" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 800 }}>{totals.totalTTC.toFixed(2)}€</Typography>
+              <Typography variant="body1" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 800 }}>{(totals.totalTTC - globalDiscountAmount).toFixed(2)}€</Typography>
             </Box>
             <Divider sx={{ my: 1, borderStyle: 'dashed' }} />
             <Box sx={{ textAlign: 'center', fontSize: '0.8rem' }}>
