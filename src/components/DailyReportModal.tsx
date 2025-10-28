@@ -1001,19 +1001,19 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                     });
                     const rows = Array.from(articleStats.values()).map(r => {
                       const rawProd = String(r.productId||'');
-                      const prodDigits = (rawProd.match(/\d{4}/)?.[0]) || '';
-                      const varId = String(r.variationId||'');
-                      const cleanedVarId = varId && varId.startsWith('var_') ? varId : (varId === 'main' ? '' : varId);
+                      const isValidProdId = /^\d{4}$/.test(rawProd);
+                      const varIdRaw = String(r.variationId||'');
+                      const varId = varIdRaw && varIdRaw.startsWith('var_') ? varIdRaw : '';
 
                       return {
                         ...r,
                         productIdRaw: rawProd,
-                        productId: prodDigits,
-                        variationId: cleanedVarId
+                        productId: isValidProdId ? rawProd : '',
+                        variationId: varId
                       };
                     });
-                    // Valider les IDs produit: doivent être 4 chiffres, sinon demander confirmation
-                    const invalids = rows.filter((r:any) => !(r.productId && /^\d{4}$/.test(String(r.productId))));
+                    // Valider les IDs produit: doivent être exactement 4 chiffres, sinon demander confirmation
+                    const invalids = rows.filter((r:any) => !(/^\d{4}$/.test(String(r.productIdRaw||''))));
                     if (invalids.length > 0) {
                       const sample = invalids.slice(0, 20)
                         .map((x:any, i:number) => `${i+1}) ${x.name} · ID source: ${x.productIdRaw||'vide'}`)
@@ -1022,21 +1022,18 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                         `⚠ Certains articles n'ont pas d'ID produit à 4 chiffres (${invalids.length}).\n` +
                         sample +
                         (invalids.length>20?`\n... (+${invalids.length-20} autres)`:'') +
-                        `\n\nPoursuivre l'export ? (les IDs manquants seront laissés vides)`
+                        `\n\nPoursuivre l'export ? (les IDs non conformes seront laissés vides)`
                       );
                       if (!proceed) return;
                     }
                     const csv = [
-                      ['Produit','Catégorie','ID Produit','ID Variation','EAN Produit','REF Produit','EAN Variation','REF Variation','Quantité','Transactions','CA (€)'].join(';'),
+                      ['Produit','Catégorie','ID Produit','ID Variation','REF Produit','Quantité','Transactions','CA (€)'].join(';'),
                       ...rows.map(r => [
                         String(r.name).replace(/;/g, ','),
                         String(r.category||'').replace(/;/g, ','),
                         String(r.productId||''),
                         String(r.variationId||''),
-                        String(r.productEAN||''),
                         String(r.productRef||''),
-                        String(r.variationEAN||''),
-                        String(r.variationRef||''),
                         String(r.totalQty||0),
                         String(r.transactions||0),
                         (Number(r.totalAmount)||0).toFixed(2)
