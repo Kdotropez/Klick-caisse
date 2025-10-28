@@ -1079,7 +1079,7 @@ export interface ProReceipt {
     phone?: string;
     vatNumber?: string;
   };
-  meta: { date: string; time: string; ticketNumber: string };
+  meta: { date: string; time: string; ticketNumber: string; orderRef?: string };
   footer: { paymentMethod: string; siret: string; customNote: string };
   theme?: { logoDataUrl?: string; primaryColor?: string; borderColor?: string; fontFamily?: string; align?: 'left'|'center'|'right' };
   groupAsGift?: boolean;

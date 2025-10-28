@@ -126,6 +126,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     date: defaults.date || now.toISOString().slice(0, 10),
     time: defaults.time || now.toTimeString().slice(0, 5),
     ticketNumber: defaults.ticketNumber || '',
+    orderRef: (defaults as any)?.orderRef || '',
   });
 
   const [footer, setFooter] = useState({
@@ -194,6 +195,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
         date: d.date || n.toISOString().slice(0, 10),
         time: d.time || n.toTimeString().slice(0, 5),
         ticketNumber: d.ticketNumber || '',
+        orderRef: (d as any)?.orderRef || '',
       });
       setFooter({
         paymentMethod: d.paymentMethod || '',
@@ -373,6 +375,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
             <Grid container spacing={1}>
               <Grid item xs={12} md={6}><TextField label="Société" fullWidth size="small" value={recipient.company} onChange={e => setRecipient({ ...recipient, company: e.target.value })} /></Grid>
               <Grid item xs={12} md={6}><TextField label="Contact" fullWidth size="small" value={recipient.contactName} onChange={e => setRecipient({ ...recipient, contactName: e.target.value })} /></Grid>
+              <Grid item xs={12} md={6}><TextField label="Référence commande" fullWidth size="small" value={meta.orderRef} onChange={e => setMeta({ ...meta, orderRef: e.target.value })} /></Grid>
               <Grid item xs={12} md={8}><TextField label="Adresse" fullWidth size="small" value={recipient.address} onChange={e => setRecipient({ ...recipient, address: e.target.value })} /></Grid>
               <Grid item xs={6} md={2}><TextField label="CP" fullWidth size="small" value={recipient.postalCode} onChange={e => setRecipient({ ...recipient, postalCode: e.target.value })} /></Grid>
               <Grid item xs={6} md={2}><TextField label="Ville" fullWidth size="small" value={recipient.city} onChange={e => setRecipient({ ...recipient, city: e.target.value })} /></Grid>
@@ -475,11 +478,12 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
             </Box>
             <Divider sx={{ my: 1, borderStyle: 'dashed' }} />
             {/* Coordonnées destinataire (si présentes) */}
-            {(recipient.company || recipient.contactName || recipient.address) && (
+            {(recipient.company || recipient.contactName || recipient.address || meta.orderRef) && (
               <Box sx={{ mb: 1 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.primaryColor }}>Destinataire</Typography>
                 {recipient.company && <Typography variant="body2">{recipient.company}</Typography>}
                 {recipient.contactName && <Typography variant="body2">À l'attention de: {recipient.contactName}</Typography>}
+                {meta.orderRef && <Typography variant="body2">Réf. commande: {meta.orderRef}</Typography>}
                 {recipient.address && <Typography variant="body2">{recipient.address}</Typography>}
                 {(recipient.postalCode || recipient.city) && <Typography variant="body2">{[recipient.postalCode, recipient.city].filter(Boolean).join(' ')}</Typography>}
                 {recipient.country && <Typography variant="body2">{recipient.country}</Typography>}
