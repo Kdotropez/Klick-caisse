@@ -1012,19 +1012,38 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                         variationId: varId
                       };
                     });
-                    // Valider les IDs produit: doivent être exactement 4 chiffres, sinon demander confirmation
+                    // Valider les IDs produit: doivent être exactement 4 chiffres, sinon proposer la saisie
                     const invalids = rows.filter((r:any) => !(/^\d{4}$/.test(String(r.productIdRaw||''))));
                     if (invalids.length > 0) {
-                      const sample = invalids.slice(0, 20)
-                        .map((x:any, i:number) => `${i+1}) ${x.name} · ID source: ${x.productIdRaw||'vide'}`)
+                      const sample = invalids.slice(0, 15)
+                        .map((x:any, i:number) => `${i+1}) ${x.name} · ID actuel: ${x.productIdRaw||'vide'}`)
                         .join('\n');
-                      const proceed = window.confirm(
-                        `⚠ Certains articles n'ont pas d'ID produit à 4 chiffres (${invalids.length}).\n` +
+                      const askFill = window.confirm(
+                        `⚠ ${invalids.length} article(s) sans ID produit à 4 chiffres.\n` +
                         sample +
-                        (invalids.length>20?`\n... (+${invalids.length-20} autres)`:'') +
-                        `\n\nPoursuivre l'export ? (les IDs non conformes seront laissés vides)`
+                        (invalids.length>15?`\n... (+${invalids.length-15} autres)`:'') +
+                        `\n\nOK = Saisir les IDs manquants maintenant\nAnnuler = Continuer sans (IDs vides)`
                       );
-                      if (!proceed) return;
+                      if (askFill) {
+                        for (let i = 0; i < rows.length; i++) {
+                          const r:any = rows[i];
+                          if (!/^\d{4}$/.test(String(r.productId||''))) {
+                            const entered = window.prompt(
+                              `ID produit (4 chiffres) pour:\n${r.name}\nCatégorie: ${r.category}\nID actuel: ${r.productIdRaw||'vide'}\n\nLaissez vide pour passer, Annuler pour arrêter l'export.`,
+                              ''
+                            );
+                            if (entered === null) return; // annuler export
+                            if (entered.trim().length === 0) {
+                              r.productId = '';
+                            } else if (/^\d{4}$/.test(entered.trim())) {
+                              r.productId = entered.trim();
+                            } else {
+                              // ID invalide -> on laisse vide
+                              r.productId = '';
+                            }
+                          }
+                        }
+                      }
                     }
                     const csv = [
                       ['Produit','Catégorie','ID Produit','ID Variation','REF Produit','Quantité','Transactions','CA (€)'].join(';'),
