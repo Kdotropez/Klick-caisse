@@ -982,7 +982,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                             productId: String(product.id || ''), // on exportera sans suffixe 'main'
                             productEAN: product.ean13 || '',
                             productRef: product.reference || '',
-                            variationId: variation ? String(variation.id || '') : 'main',
+                            variationId: variation ? String(variation.id || '') : '',
                             variationEAN: variation ? (variation.ean13 || '') : '',
                             variationRef: variation ? (variation.reference || '') : '',
                             totalQty: 0,
@@ -999,11 +999,18 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                         });
                       }
                     });
-                    const rows = Array.from(articleStats.values()).map(r => ({
-                      ...r,
-                      productId: (String(r.productId||'').split('__')[0].split('-')[0] || String(r.productId||'')),
-                      variationId: (String(r.variationId||'').split('__').pop() || String(r.variationId||''))
-                    }));
+                    const rows = Array.from(articleStats.values()).map(r => {
+                      const rawProd = String(r.productId||'');
+                      const prodDigits = (rawProd.match(/\d{4}/)?.[0]) || '';
+                      const varId = String(r.variationId||'');
+                      const cleanedVarId = varId && varId.startsWith('var_') ? varId : (varId === 'main' ? '' : varId);
+
+                      return {
+                        ...r,
+                        productId: prodDigits,
+                        variationId: cleanedVarId
+                      };
+                    });
                     const csv = [
                       ['Produit','Catégorie','ID Produit','ID Variation','EAN Produit','REF Produit','EAN Variation','REF Variation','Quantité','Transactions','CA (€)'].join(';'),
                       ...rows.map(r => [
