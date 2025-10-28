@@ -68,6 +68,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   refreshTodayTransactions,
   filterCustomerId = null,
   setFilterCustomerId,
+  onRequestOpenProReceipt,
 }) => {
   const [showCustomerPicker, setShowCustomerPicker] = React.useState(false);
      // Charger toutes les transactions
@@ -729,7 +730,6 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                 ...d,
                 date: ts.toISOString().slice(0,10),
                 time: ts.toTimeString().slice(0,5),
-                ticketNumber: String(tx.id),
                 // conserver autres champs existants (header/footer/recipient/theme)
               };
               // Stocker aussi un snapshot des lignes dans un espace temporaire pour préremplir
