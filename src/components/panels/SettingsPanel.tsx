@@ -7,6 +7,7 @@ import { StorageService } from '../../services/StorageService';
 import { UpdateService } from '../../services/UpdateService';
 import { APP_VERSION } from '../../version';
 import HistoricalReportModal from '../modals/HistoricalReportModal';
+import ProReceiptModal from '../modals/ProReceiptModal';
 
 interface SettingsPanelProps {
   width: number;
@@ -169,6 +170,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [showHistoricalReport, setShowHistoricalReport] = useState(false);
   const [showExcludeCats, setShowExcludeCats] = useState(false);
+  const [showProReceipt, setShowProReceipt] = useState(false);
 
   // Prévisualisation import TOUS les Z
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -327,6 +329,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       </Button>
 
       <ExcludeDiscountCategoriesModal open={showExcludeCats} onClose={() => setShowExcludeCats(false)} />
+
+      <Button
+        variant="contained"
+        sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#3f51b5', '&:hover': { backgroundColor: '#303f9f' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
+        onClick={() => setShowProReceipt(true)}
+      >
+        🧾 Ticket pro (composer/imprimer)
+      </Button>
 
       {/* Diagnostics sous-catégories */}
       <Button
@@ -1604,6 +1614,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         open={showHistoricalReport}
         onClose={() => setShowHistoricalReport(false)}
       />
+      <ProReceiptModal open={showProReceipt} onClose={() => setShowProReceipt(false)} />
     </Box>
   );
 };
