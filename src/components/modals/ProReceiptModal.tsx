@@ -37,6 +37,7 @@ type ReceiptItem = {
   quantity: number; // quantité
   unitPrice: number; // prix unitaire TTC
   taxRate: number; // TVA en %
+  originalUnitPrice?: number; // PU TTC avant remise (optionnel)
 };
 
 export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose }) => {
@@ -253,6 +254,20 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
 
   const rawSubtotalTTC = useMemo(() => items.reduce((s, it) => s + (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0), 0), [items]);
 
+  // Formater l'identifiant du ticket: yyyymmjj/hh:mm
+  const ticketId = useMemo(() => {
+    try {
+      const d = new Date(`${meta.date}T${meta.time || '00:00'}`);
+      if (isNaN(d.getTime())) return '';
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      return `${yyyy}${mm}${dd}/${hh}:${mi}`;
+    } catch { return ''; }
+  }, [meta.date, meta.time]);
+
   const displayItems: ReceiptItem[] = useMemo(() => {
     if (!groupAsGift) return items;
     return [{ description: giftLabel || 'Cadeaux entreprise', quantity: 1, unitPrice: rawSubtotalTTC, taxRate: giftTaxRate }];
@@ -261,10 +276,15 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
   const totals = useMemo(() => {
     let totalHT = 0;
     let totalTVA = 0;
+    let totalDiscount = 0;
     const byRate: Record<string, { baseHT: number; tva: number }> = {};
     displayItems.forEach(it => {
       const qty = Number(it.quantity) || 0;
       const puTTC = Number(it.unitPrice) || 0;
+      const puOrig = Number(it.originalUnitPrice);
+      if (puOrig && puOrig > puTTC) {
+        totalDiscount += (puOrig - puTTC) * qty;
+      }
       const rate = Number(it.taxRate) || 0;
       const lineTTC = qty * puTTC;
       const lineHT = rate > 0 ? lineTTC / (1 + rate / 100) : lineTTC;
@@ -276,7 +296,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
       byRate[key].baseHT += lineHT;
       byRate[key].tva += lineTVA;
     });
-    return { totalHT, totalTVA, totalTTC: totalHT + totalTVA, byRate };
+    return { totalHT, totalTVA, totalTTC: totalHT + totalTVA, totalDiscount, byRate };
   }, [displayItems]);
 
   const handleSaveDefaults = () => {
@@ -292,6 +312,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
         giftLabel: giftLabel,
         giftTaxRate: giftTaxRate,
         theme: { ...theme },
+        ticketNumber: ticketId,
       };
       StorageService.saveSettings({ ...s, professionalReceiptDefaults });
       alert('✅ En-tête/pied enregistrés comme défauts.');
@@ -309,7 +330,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     createdAt: '',
     updatedAt: '',
     header: { ...header },
-    meta: { ...meta },
+    meta: { ...meta, ticketNumber: ticketId },
     footer: { ...footer },
     theme: { ...theme },
     recipient: { ...recipient },
@@ -371,7 +392,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
             <Grid container spacing={1}>
               <Grid item xs={12} md={3}><TextField label="Date" type="date" fullWidth size="small" value={meta.date} onChange={e => setMeta({ ...meta, date: e.target.value })} /></Grid>
               <Grid item xs={12} md={3}><TextField label="Heure" type="time" fullWidth size="small" value={meta.time} onChange={e => setMeta({ ...meta, time: e.target.value })} /></Grid>
-              <Grid item xs={12} md={6}><TextField label="Numéro de ticket" fullWidth size="small" value={meta.ticketNumber} onChange={e => setMeta({ ...meta, ticketNumber: e.target.value })} /></Grid>
+              <Grid item xs={12} md={6}><TextField label="Numéro de ticket (auto)" fullWidth size="small" value={ticketId} disabled /></Grid>
               <Grid item xs={12} md={3}><TextField label="TVA par défaut (%)" type="number" inputProps={{ step: '0.1', min: '0' }} fullWidth size="small" value={defaultTaxRate} onChange={e => setDefaultTaxRate(parseFloat(e.target.value || '0'))} /></Grid>
               <Grid item xs={12}>
                 <FormControlLabel control={<Switch checked={groupAsGift} onChange={(_, v) => setGroupAsGift(v)} />} label="Remplacer la liste par un seul article (Cadeaux entreprise)" />
@@ -509,7 +530,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
             )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', mb: 1 }}>
               <span>Date: {meta.date} {meta.time}</span>
-              <span>Ticket: {meta.ticketNumber || '—'}</span>
+              <span>Ticket: {ticketId || '—'}</span>
             </Box>
             <Divider sx={{ my: 1, borderStyle: 'dashed' }} />
             <Box>
@@ -517,9 +538,23 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
                 <Box key={i} sx={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', columnGap: 8, rowGap: 0.25, mb: 0.75 }}>
                   <Typography variant="body2" sx={{ gridColumn: '1 / -1', fontWeight: 500 }}>{it.description || '—'}</Typography>
                   <Typography variant="caption">Qté {Number(it.quantity) || 0}</Typography>
-                  <Typography variant="caption" sx={{ textAlign: 'right' }}>PU TTC {(Number(it.unitPrice) || 0).toFixed(2)}€</Typography>
+                  <Box sx={{ textAlign: 'right' }}>
+                    {it.originalUnitPrice && it.originalUnitPrice > it.unitPrice ? (
+                      <>
+                        <Typography variant="caption" sx={{ textDecoration: 'line-through', display: 'block' }}>{(Number(it.originalUnitPrice)||0).toFixed(2)}€</Typography>
+                        <Typography variant="caption" sx={{ color: '#d32f2f', fontWeight: 600, display: 'block' }}>PU {(Number(it.unitPrice)||0).toFixed(2)}€</Typography>
+                      </>
+                    ) : (
+                      <Typography variant="caption">PU TTC {(Number(it.unitPrice) || 0).toFixed(2)}€</Typography>
+                    )}
+                  </Box>
                   <Typography variant="caption" sx={{ textAlign: 'right' }}>TVA {Number(it.taxRate || 0).toFixed(1)}%</Typography>
                   <Typography variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 600 }}>{(((Number(it.quantity) || 0) * (Number(it.unitPrice) || 0))).toFixed(2)}€</Typography>
+                  {it.originalUnitPrice && it.originalUnitPrice > it.unitPrice && (
+                    <Typography variant="caption" sx={{ gridColumn: '1 / -1', textAlign: 'right', color: '#d32f2f' }}>
+                      Remise: -{(((it.originalUnitPrice - it.unitPrice) * (it.quantity||0))).toFixed(2)}€ ({(((it.originalUnitPrice - it.unitPrice) / it.originalUnitPrice) * 100).toFixed(1)}%)
+                    </Typography>
+                  )}
                 </Box>
               ))}
             </Box>
@@ -537,6 +572,12 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
             </Box>
             <Divider sx={{ my: 1, borderStyle: 'dashed' }} />
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto', rowGap: 0.25 }}>
+              {totals.totalDiscount > 0 && (
+                <>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#d32f2f' }}>Total remises</Typography>
+                  <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#d32f2f' }}>-{totals.totalDiscount.toFixed(2)}€</Typography>
+                </>
+              )}
               <Typography variant="body2" sx={{ fontWeight: 600 }}>Total HT</Typography>
               <Typography variant="body2" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 700 }}>{totals.totalHT.toFixed(2)}€</Typography>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>TVA</Typography>

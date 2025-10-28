@@ -721,7 +721,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                   else if (discount.type === 'price') finalPrice = discount.value;
                 }
                 const desc = it.product?.name + (it.selectedVariation?.name ? ` (${it.selectedVariation.name})` : '');
-                return { description: desc || 'Article', quantity: it.quantity||0, unitPrice: Number(finalPrice)||0, taxRate: 20 };
+                return { description: desc || 'Article', quantity: it.quantity||0, unitPrice: Number(finalPrice)||0, originalUnitPrice: Number(originalPrice)||0, taxRate: 20 };
               });
               const s = StorageService.loadSettings() || {};
               const d = (s.professionalReceiptDefaults || {});

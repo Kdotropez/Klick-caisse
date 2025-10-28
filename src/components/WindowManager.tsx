@@ -3091,10 +3091,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 const s = StorageService.loadSettings() || {};
                 const d = (s as any).professionalReceiptDefaults || {};
                 const builtItems = (Array.isArray(cartItems) ? cartItems : []).map((it:any) => {
+                  const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
                   const finalPrice = getItemFinalPrice(it as any);
                   const desc = (it.product?.name || 'Article') + (it.selectedVariation?.name ? ` (${it.selectedVariation.name})` : '');
                   const tax = Number(d.taxRateDefault) || 20;
-                  return { description: desc, quantity: Number(it.quantity)||0, unitPrice: Number(finalPrice)||0, taxRate: tax };
+                  return { description: desc, quantity: Number(it.quantity)||0, unitPrice: Number(finalPrice)||0, originalUnitPrice: Number(originalPrice)||0, taxRate: tax };
                 });
                 const now = new Date();
                 const professionalReceiptDefaults = {
