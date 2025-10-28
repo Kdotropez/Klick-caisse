@@ -747,7 +747,7 @@ export class StorageService {
       const zCounter = this.getCurrentZNumber();
       const cashiers = this.loadCashiers();
       const customers = this.loadCustomers();
-      const proReceipts = this.loadProReceipts();
+      const proReceipts = ProReceiptStorage.loadProReceipts();
       // Lire brut la map des transactions par jour
       const txRaw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
       const transactionsByDay = txRaw ? JSON.parse(txRaw) : {};
@@ -827,7 +827,7 @@ export class StorageService {
 
       // Tickets pro (facultatif)
       const proReceipts = (data as any).proReceipts;
-      if (Array.isArray(proReceipts)) this.saveProReceipts(proReceipts);
+      if (Array.isArray(proReceipts)) ProReceiptStorage.saveProReceipts(proReceipts as any);
     } catch (e) {
       console.error('Erreur import backup:', e);
       throw e;
@@ -1068,6 +1068,17 @@ export interface ProReceipt {
   header: {
     shopName: string; address: string; phone: string; email: string; website: string;
   };
+  recipient?: {
+    company?: string;
+    contactName?: string;
+    address?: string;
+    postalCode?: string;
+    city?: string;
+    country?: string;
+    email?: string;
+    phone?: string;
+    vatNumber?: string;
+  };
   meta: { date: string; time: string; ticketNumber: string };
   footer: { paymentMethod: string; siret: string; customNote: string };
   theme?: { logoDataUrl?: string; primaryColor?: string; borderColor?: string; fontFamily?: string; align?: 'left'|'center'|'right' };
@@ -1081,7 +1092,7 @@ export interface ProReceipt {
 export class ProReceiptStorage {
   static loadProReceipts(): ProReceipt[] {
     try {
-      const raw = localStorage.getItem(StorageService["PRO_RECEIPTS_KEY" as any] || 'klick_caisse_pro_receipts');
+      const raw = localStorage.getItem('klick_caisse_pro_receipts');
       if (!raw) return [];
       const arr = JSON.parse(raw);
       return Array.isArray(arr) ? arr : [];

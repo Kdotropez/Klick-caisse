@@ -134,6 +134,19 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     customNote: defaults.customNote || '',
   });
 
+  // Coordonnées destinataire
+  const [recipient, setRecipient] = useState({
+    company: (defaults as any)?.recipient?.company || '',
+    contactName: (defaults as any)?.recipient?.contactName || '',
+    address: (defaults as any)?.recipient?.address || '',
+    postalCode: (defaults as any)?.recipient?.postalCode || '',
+    city: (defaults as any)?.recipient?.city || '',
+    country: (defaults as any)?.recipient?.country || 'France',
+    email: (defaults as any)?.recipient?.email || '',
+    phone: (defaults as any)?.recipient?.phone || '',
+    vatNumber: (defaults as any)?.recipient?.vatNumber || '',
+  });
+
   // Thème visuel
   const [theme, setTheme] = useState<{
     logoDataUrl?: string;
@@ -186,6 +199,17 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
         paymentMethod: d.paymentMethod || '',
         siret: d.siret || '',
         customNote: d.customNote || '',
+      });
+      setRecipient({
+        company: (d as any)?.recipient?.company || '',
+        contactName: (d as any)?.recipient?.contactName || '',
+        address: (d as any)?.recipient?.address || '',
+        postalCode: (d as any)?.recipient?.postalCode || '',
+        city: (d as any)?.recipient?.city || '',
+        country: (d as any)?.recipient?.country || 'France',
+        email: (d as any)?.recipient?.email || '',
+        phone: (d as any)?.recipient?.phone || '',
+        vatNumber: (d as any)?.recipient?.vatNumber || '',
       });
       setDefaultTaxRate(Number.isFinite(Number(d.taxRateDefault)) ? Number(d.taxRateDefault) : 20);
       setItems([{ description: '', quantity: 1, unitPrice: 0, taxRate: Number.isFinite(Number(d.taxRateDefault)) ? Number(d.taxRateDefault) : 20 }]);
@@ -244,6 +268,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
         ...header,
         ...meta,
         ...footer,
+        recipient: { ...recipient },
         taxRateDefault: defaultTaxRate,
         giftModeEnabled: groupAsGift,
         giftLabel: giftLabel,
@@ -269,6 +294,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     meta: { ...meta },
     footer: { ...footer },
     theme: { ...theme },
+    recipient: { ...recipient },
     groupAsGift,
     giftLabel,
     giftTaxRate,
@@ -338,6 +364,22 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
                   <Grid item xs={12} md={3}><TextField label="TVA regroupée (%)" type="number" inputProps={{ step: '0.1', min: '0' }} fullWidth size="small" value={giftTaxRate} onChange={e => setGiftTaxRate(parseFloat(e.target.value || '0'))} /></Grid>
                 </>
               )}
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Destinataire</Typography>
+            <Grid container spacing={1}>
+              <Grid item xs={12} md={6}><TextField label="Société" fullWidth size="small" value={recipient.company} onChange={e => setRecipient({ ...recipient, company: e.target.value })} /></Grid>
+              <Grid item xs={12} md={6}><TextField label="Contact" fullWidth size="small" value={recipient.contactName} onChange={e => setRecipient({ ...recipient, contactName: e.target.value })} /></Grid>
+              <Grid item xs={12} md={8}><TextField label="Adresse" fullWidth size="small" value={recipient.address} onChange={e => setRecipient({ ...recipient, address: e.target.value })} /></Grid>
+              <Grid item xs={6} md={2}><TextField label="CP" fullWidth size="small" value={recipient.postalCode} onChange={e => setRecipient({ ...recipient, postalCode: e.target.value })} /></Grid>
+              <Grid item xs={6} md={2}><TextField label="Ville" fullWidth size="small" value={recipient.city} onChange={e => setRecipient({ ...recipient, city: e.target.value })} /></Grid>
+              <Grid item xs={12} md={4}><TextField label="Pays" fullWidth size="small" value={recipient.country} onChange={e => setRecipient({ ...recipient, country: e.target.value })} /></Grid>
+              <Grid item xs={12} md={4}><TextField label="Email" fullWidth size="small" value={recipient.email} onChange={e => setRecipient({ ...recipient, email: e.target.value })} /></Grid>
+              <Grid item xs={12} md={4}><TextField label="Téléphone" fullWidth size="small" value={recipient.phone} onChange={e => setRecipient({ ...recipient, phone: e.target.value })} /></Grid>
+              <Grid item xs={12} md={4}><TextField label="N° TVA intracommunautaire" fullWidth size="small" value={recipient.vatNumber} onChange={e => setRecipient({ ...recipient, vatNumber: e.target.value })} /></Grid>
             </Grid>
           </Grid>
 
@@ -432,6 +474,19 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
               {header.website && <Typography variant="body2">{header.website}</Typography>}
             </Box>
             <Divider sx={{ my: 1, borderStyle: 'dashed' }} />
+            {/* Coordonnées destinataire (si présentes) */}
+            {(recipient.company || recipient.contactName || recipient.address) && (
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.primaryColor }}>Destinataire</Typography>
+                {recipient.company && <Typography variant="body2">{recipient.company}</Typography>}
+                {recipient.contactName && <Typography variant="body2">À l'attention de: {recipient.contactName}</Typography>}
+                {recipient.address && <Typography variant="body2">{recipient.address}</Typography>}
+                {(recipient.postalCode || recipient.city) && <Typography variant="body2">{[recipient.postalCode, recipient.city].filter(Boolean).join(' ')}</Typography>}
+                {recipient.country && <Typography variant="body2">{recipient.country}</Typography>}
+                {(recipient.email || recipient.phone) && <Typography variant="body2">{[recipient.email, recipient.phone].filter(Boolean).join(' · ')}</Typography>}
+                {recipient.vatNumber && <Typography variant="body2">TVA: {recipient.vatNumber}</Typography>}
+              </Box>
+            )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', mb: 1 }}>
               <span>Date: {meta.date} {meta.time}</span>
               <span>Ticket: {meta.ticketNumber || '—'}</span>
