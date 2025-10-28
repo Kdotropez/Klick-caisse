@@ -15,6 +15,7 @@ export class StorageService {
   private static readonly CASHIERS_KEY = 'klick_caisse_cashiers';
   private static readonly AUTO_BACKUPS_KEY = 'klick_caisse_auto_backups';
   private static readonly CUSTOMERS_KEY = 'klick_caisse_customers';
+  private static readonly PRO_RECEIPTS_KEY = 'klick_caisse_pro_receipts';
 
   private static getStoreKey(storeCode: string, key: string): string {
     return `klick_caisse_${storeCode}_${key}`;
@@ -746,6 +747,7 @@ export class StorageService {
       const zCounter = this.getCurrentZNumber();
       const cashiers = this.loadCashiers();
       const customers = this.loadCustomers();
+      const proReceipts = this.loadProReceipts();
       // Lire brut la map des transactions par jour
       const txRaw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
       const transactionsByDay = txRaw ? JSON.parse(txRaw) : {};
@@ -761,6 +763,7 @@ export class StorageService {
         zCounter,
         cashiers,
         customers,
+        proReceipts,
       };
     } catch (e) {
       console.error('Erreur export backup:', e);
@@ -821,6 +824,10 @@ export class StorageService {
         // Si absents, tenter une récupération rétroactive
         this.recoverCustomersIfMissing();
       }
+
+      // Tickets pro (facultatif)
+      const proReceipts = (data as any).proReceipts;
+      if (Array.isArray(proReceipts)) this.saveProReceipts(proReceipts);
     } catch (e) {
       console.error('Erreur import backup:', e);
       throw e;
@@ -1052,3 +1059,61 @@ export class StorageService {
 
 
 } 
+
+// ==================== Tickets Professionnels (Pro Receipts) ====================
+export interface ProReceipt {
+  id: string;
+  createdAt: string; // ISO
+  updatedAt: string; // ISO
+  header: {
+    shopName: string; address: string; phone: string; email: string; website: string;
+  };
+  meta: { date: string; time: string; ticketNumber: string };
+  footer: { paymentMethod: string; siret: string; customNote: string };
+  theme?: { logoDataUrl?: string; primaryColor?: string; borderColor?: string; fontFamily?: string; align?: 'left'|'center'|'right' };
+  groupAsGift?: boolean;
+  giftLabel?: string;
+  giftTaxRate?: number;
+  defaultTaxRate?: number;
+  items: Array<{ description: string; quantity: number; unitPrice: number; taxRate: number }>;
+}
+
+export class ProReceiptStorage {
+  static loadProReceipts(): ProReceipt[] {
+    try {
+      const raw = localStorage.getItem(StorageService["PRO_RECEIPTS_KEY" as any] || 'klick_caisse_pro_receipts');
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+
+  static saveProReceipts(list: ProReceipt[]): void {
+    try { localStorage.setItem('klick_caisse_pro_receipts', JSON.stringify(list)); } catch {}
+  }
+
+  static addProReceipt(data: Omit<ProReceipt, 'id'|'createdAt'|'updatedAt'> & { id?: string }): ProReceipt {
+    const list = this.loadProReceipts();
+    const id = data.id || `pro-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+    const now = new Date().toISOString();
+    const rec: ProReceipt = { ...data, id, createdAt: now, updatedAt: now } as ProReceipt;
+    list.unshift(rec);
+    this.saveProReceipts(list);
+    return rec;
+  }
+
+  static updateProReceipt(updated: ProReceipt): void {
+    const list = this.loadProReceipts();
+    const idx = list.findIndex(r => r.id === updated.id);
+    if (idx >= 0) {
+      list[idx] = { ...updated, updatedAt: new Date().toISOString() };
+      this.saveProReceipts(list);
+    }
+  }
+
+  static deleteProReceipt(id: string): void {
+    const list = this.loadProReceipts();
+    const next = list.filter(r => r.id !== id);
+    this.saveProReceipts(next);
+  }
+}

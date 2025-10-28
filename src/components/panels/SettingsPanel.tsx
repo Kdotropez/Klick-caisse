@@ -8,6 +8,7 @@ import { UpdateService } from '../../services/UpdateService';
 import { APP_VERSION } from '../../version';
 import HistoricalReportModal from '../modals/HistoricalReportModal';
 import ProReceiptModal from '../modals/ProReceiptModal';
+import ProReceiptsManagerModal from '../modals/ProReceiptsManagerModal';
 
 interface SettingsPanelProps {
   width: number;
@@ -171,6 +172,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [showHistoricalReport, setShowHistoricalReport] = useState(false);
   const [showExcludeCats, setShowExcludeCats] = useState(false);
   const [showProReceipt, setShowProReceipt] = useState(false);
+  const [showProManager, setShowProManager] = useState(false);
 
   // Prévisualisation import TOUS les Z
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -336,6 +338,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={() => setShowProReceipt(true)}
       >
         🧾 Ticket pro (composer/imprimer)
+      </Button>
+
+      <Button
+        variant="contained"
+        sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#3949ab', '&:hover': { backgroundColor: '#283593' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
+        onClick={() => setShowProManager(true)}
+      >
+        📚 Tickets pro enregistrés
       </Button>
 
       {/* Diagnostics sous-catégories */}
@@ -1615,6 +1625,25 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClose={() => setShowHistoricalReport(false)}
       />
       <ProReceiptModal open={showProReceipt} onClose={() => setShowProReceipt(false)} />
+      <ProReceiptsManagerModal open={showProManager} onClose={() => setShowProManager(false)} onOpenEditor={(rec) => {
+        try {
+          const s = StorageService.loadSettings() || {};
+          const professionalReceiptDefaults = {
+            ...rec.header,
+            ...rec.meta,
+            ...rec.footer,
+            taxRateDefault: rec.defaultTaxRate,
+            giftModeEnabled: rec.groupAsGift,
+            giftLabel: rec.giftLabel,
+            giftTaxRate: rec.giftTaxRate,
+            theme: rec.theme,
+          };
+          StorageService.saveSettings({ ...s, professionalReceiptDefaults });
+          setShowProReceipt(true);
+        } catch {
+          alert('❌ Impossible d\'ouvrir ce ticket');
+        }
+      }} />
     </Box>
   );
 };

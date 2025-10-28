@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { Add, Close, Delete, Print, Save, Download } from '@mui/icons-material';
 import { StorageService } from '../../services/StorageService';
+import { ProReceiptStorage, ProReceipt } from '../../services/StorageService';
 
 // Déclarations globales pour chargement CDN
 declare global {
@@ -260,6 +261,30 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
     window.print();
   };
 
+  const toProReceipt = (): ProReceipt => ({
+    id: '',
+    createdAt: '',
+    updatedAt: '',
+    header: { ...header },
+    meta: { ...meta },
+    footer: { ...footer },
+    theme: { ...theme },
+    groupAsGift,
+    giftLabel,
+    giftTaxRate,
+    defaultTaxRate,
+    items: [...items],
+  });
+
+  const handleSaveTicket = () => {
+    try {
+      const rec = ProReceiptStorage.addProReceipt(toProReceipt());
+      alert(`✅ Ticket pro enregistré (${rec.id}).`);
+    } catch {
+      alert('❌ Impossible d\'enregistrer le ticket pro');
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -455,6 +480,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
       </DialogContent>
       <DialogActions>
         <Button startIcon={<Save />} onClick={handleSaveDefaults} className="no-print">Enregistrer défauts</Button>
+        <Button startIcon={<Save />} onClick={handleSaveTicket} className="no-print">Enregistrer ticket</Button>
         <Button startIcon={<Print />} variant="contained" onClick={handlePrint}>Imprimer</Button>
         <Button startIcon={<Download />} variant="outlined" onClick={exportPDF}>Exporter PDF</Button>
       </DialogActions>
