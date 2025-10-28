@@ -3086,6 +3086,27 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             customerName={currentCustomer ? `${currentCustomer.lastName} ${currentCustomer.firstName}` : null}
             onPickCustomer={() => setShowCustomersList(true)}
             onClearCustomer={() => setCurrentCustomer(null)}
+            onCreateProReceipt={() => {
+              try {
+                const s = StorageService.loadSettings() || {};
+                const d = (s as any).professionalReceiptDefaults || {};
+                const builtItems = (Array.isArray(cartItems) ? cartItems : []).map((it:any) => {
+                  const finalPrice = getItemFinalPrice(it as any);
+                  const desc = (it.product?.name || 'Article') + (it.selectedVariation?.name ? ` (${it.selectedVariation.name})` : '');
+                  const tax = Number(d.taxRateDefault) || 20;
+                  return { description: desc, quantity: Number(it.quantity)||0, unitPrice: Number(finalPrice)||0, taxRate: tax };
+                });
+                const now = new Date();
+                const professionalReceiptDefaults = {
+                  ...d,
+                  date: now.toISOString().slice(0,10),
+                  time: now.toTimeString().slice(0,5),
+                } as any;
+                professionalReceiptDefaults.taxRateDefault = d.taxRateDefault ?? 20;
+                StorageService.saveSettings({ ...s, professionalReceiptDefaults, professionalReceiptPrefillItems: builtItems });
+                setShowProReceiptQuick(true);
+              } catch { alert('❌ Erreur préparation ticket pro'); }
+            }}
           />
         );
 

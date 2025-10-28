@@ -46,6 +46,7 @@ interface CartPanelProps {
   customerName?: string | null;
   onPickCustomer?: () => void;
   onClearCustomer?: () => void;
+  onCreateProReceipt?: () => void;
 }
 
 const CartPanel: React.FC<CartPanelProps> = ({
@@ -71,6 +72,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
   customerName,
   onPickCustomer,
   onClearCustomer,
+  onCreateProReceipt,
 }) => {
   const total = getTotalWithGlobalDiscount();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -528,6 +530,21 @@ const CartPanel: React.FC<CartPanelProps> = ({
             title="Activer/désactiver la remise associative (seau/vasque)"
           >
             Assoc.
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={onCreateProReceipt}
+            sx={{ 
+              backgroundColor: '#3f51b5', 
+              flex: 1, 
+              fontSize: '0.6rem',
+              py: 0.25,
+              minHeight: 24
+            }}
+            title="Créer un ticket pro à partir du panier"
+          >
+            Ticket pro
           </Button>
         </Box>
       </Box>
