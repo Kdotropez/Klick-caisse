@@ -1046,13 +1046,11 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                       }
                     }
                     const csv = [
-                      ['Produit','Catégorie','ID Produit','ID Variation','REF Produit','Quantité','Transactions','CA (€)'].join(';'),
+                      ['Produit','Catégorie','ID Produit','Quantité','Transactions','CA (€)'].join(';'),
                       ...rows.map(r => [
                         String(r.name).replace(/;/g, ','),
                         String(r.category||'').replace(/;/g, ','),
                         String(r.productId||''),
-                        String(r.variationId||''),
-                        String(r.productRef||''),
                         String(r.totalQty||0),
                         String(r.transactions||0),
                         (Number(r.totalAmount)||0).toFixed(2)
