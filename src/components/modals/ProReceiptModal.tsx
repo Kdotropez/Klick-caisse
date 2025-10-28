@@ -227,6 +227,22 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
         fontFamily: t.fontFamily || prev.fontFamily || 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
         align: (t.align as any) || prev.align || 'center',
       }));
+
+      // Préremplissage des lignes (si présent)
+      const prefill = (s as any).professionalReceiptPrefillItems;
+      if (Array.isArray(prefill) && prefill.length > 0) {
+        setItems(prefill.map((it:any)=>({
+          description: String(it.description||''),
+          quantity: Number(it.quantity)||0,
+          unitPrice: Number(it.unitPrice)||0,
+          taxRate: Number(it.taxRate)|| (Number(d.taxRateDefault)||20)
+        })));
+        // Nettoyer la clé pour éviter de réutiliser au prochain open
+        try {
+          const { professionalReceiptPrefillItems, ...rest } = s as any;
+          StorageService.saveSettings(rest);
+        } catch {}
+      }
     } catch {}
   }, [open]);
 

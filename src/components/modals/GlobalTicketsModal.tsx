@@ -694,6 +694,55 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
         >
           Modifier
         </Button>
+        <Button
+          variant="outlined"
+          disabled={selectedIds.size !== 1}
+          onClick={() => {
+            try {
+              const [tid] = Array.from(selectedIds);
+              const tx = (function(){
+                const id = String(tid);
+                const f = filtered.find((x:any)=> String(x.id)===id);
+                if (f) return f;
+                return allTx.find((x:any)=> String(x.id)===id);
+              })();
+              if (!tx) { alert('Ticket introuvable.'); return; }
+              // Construire les items avec prix final par ligne (incluant remises si possible)
+              const builtItems = (Array.isArray(tx.items)?tx.items:[]).map((it:any)=>{
+                const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+                let finalPrice = originalPrice;
+                const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+                if (tx.itemDiscounts && tx.itemDiscounts[discountKey]) {
+                  const discount = tx.itemDiscounts[discountKey];
+                  if (discount.type === 'euro') finalPrice = Math.max(0, originalPrice - discount.value);
+                  else if (discount.type === 'percent') finalPrice = originalPrice * (1 - discount.value / 100);
+                  else if (discount.type === 'price') finalPrice = discount.value;
+                }
+                const desc = it.product?.name + (it.selectedVariation?.name ? ` (${it.selectedVariation.name})` : '');
+                return { description: desc || 'Article', quantity: it.quantity||0, unitPrice: Number(finalPrice)||0, taxRate: 20 };
+              });
+              const s = StorageService.loadSettings() || {};
+              const d = (s.professionalReceiptDefaults || {});
+              const ts = new Date(tx.timestamp);
+              const professionalReceiptDefaults = {
+                ...d,
+                date: ts.toISOString().slice(0,10),
+                time: ts.toTimeString().slice(0,5),
+                ticketNumber: String(tx.id),
+                // conserver autres champs existants (header/footer/recipient/theme)
+              };
+              // Stocker aussi un snapshot des lignes dans un espace temporaire pour préremplir
+              // On met à jour taxRateDefault et on laisse ldusager ajuster.
+              professionalReceiptDefaults.taxRateDefault = d.taxRateDefault ?? 20;
+              StorageService.saveSettings({ ...s, professionalReceiptDefaults, professionalReceiptPrefillItems: builtItems });
+              alert('✅ Ticket préparé pour le Ticket pro. Ouvrez « Ticket pro (composer/imprimer) » dans Paramètres.');
+            } catch (e) {
+              alert('❌ Impossible de préparer le ticket pro.');
+            }
+          }}
+        >
+          Créer ticket pro
+        </Button>
         <Button 
           color="error" 
           variant="contained" 
