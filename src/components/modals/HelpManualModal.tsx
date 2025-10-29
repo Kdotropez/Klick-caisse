@@ -30,45 +30,71 @@ const HelpManualModal: React.FC<HelpManualModalProps> = ({ open, onClose }) => {
 
   const sections = useMemo(() => ([
     { title: 'Installation et démarrage', points: [
-      "Ouvrir l'application via le raccourci ou l'URL.",
-      "Importer une sauvegarde JSON si nécessaire (Paramètres > Restaurer).",
+      "Ouvrir l'application via le raccourci ou l'URL (Vercel).",
+      "Première utilisation: Paramètres > Restaurer pour importer une sauvegarde JSON (si existante).",
+      "Après encaissement, une sauvegarde auto est proposée (JSON horodaté).",
     ]},
-    { title: 'Interface', points: [
-      'Fenêtres: Produits, Panier, Paramètres, Recherche, Statistiques, Import.',
-      "Barre du Panier: Récap, Rem., Reset, Auto, Assoc., Ticket pro.",
+    { title: 'Interface (vue globale)', points: [
+      'Fenêtres: Produits (catalogue), Panier, Paramètres, Recherche, Statistiques, Import.',
+      "Barre du Panier: Récap (aperçu/print), Rem. (remise globale), Reset (vide + remises), Auto (6 verres), Assoc. (seau/vasque), Ticket pro (éditeur pro).",
+      "Raccourcis contextuels: clic sur article pour remise ligne (si non exclu).",
     ]},
-    { title: 'Produits et Panier', points: [
-      'Cliquer un produit pour ajouter au panier; choisir la variation si proposée.',
-      'Ajuster les quantités; supprimer via la corbeille.',
+    { title: 'Produits et Panier (pas à pas)', points: [
+      '1) Cliquer un produit pour l’ajouter. S’il a des déclinaisons, choisir la variation.',
+      '2) Ajuster quantité avec +/−. Supprimer via la corbeille sur la ligne.',
+      "3) Prix final d'une ligne = prix article après remises individuelles et, si applicables, la remise globale (hors exclusions).",
+      '4) Les exclusions de remises (catégories/sous‑catégories/produits) empêchent remise ligne/globale si configuré.',
     ]},
-    { title: 'Remises', points: [
-      "Remise ligne: cliquer l'article (si non exclu) → €/%/prix.",
-      'Remise globale: bouton Rem., respectant les exclusions configurées.',
-      'Exclusions: Paramètres > Exclure catégories (remises).',
+    { title: 'Remises (ligne et globale)', points: [
+      "Remise individuelle: cliquer l'article (non exclu) → choisir type (€ / % / prix).",
+      "Remise globale: bouton Rem. Calcule sur le total des lignes non exclues et sans remise individuelle déjà appliquée.",
+      'Exclusions: Paramètres > Exclure catégories (remises) — normalisation des libellés (accents, casse) incluse.',
+      'Assistants Auto/Assoc.: Auto (6 verres), Assoc. (compensations seau/vasque) avec règles de non‑cumul paramétrées.',
     ]},
-    { title: 'Tickets globaux', points: [
-      'Paramètres > Tickets globaux: filtres par montant, date/heure, paiement, client.',
-      'Créer un Ticket pro depuis un ticket encaissé: cocher > Créer ticket pro.',
+    { title: 'Tickets globaux (historique détaillé)', points: [
+      'Filtres: paiement (Espèces/Carte/SumUp/Tous), montants (min/max/exact), dates, heures, client.',
+      'Déduplication: fusionne transactions depuis Z/archives et jour en évitant les doublons.',
+      "Actions: Modifier (éditeur de ticket), Supprimer (retire de Z + archives), Créer ticket pro (ouvre l'éditeur pro prérempli).",
     ]},
-    { title: 'Ticket professionnel', points: [
-      'Ouvrir via Panier (Ticket pro), Tickets globaux (Créer), ou Paramètres.',
-      'Contenu: en‑tête, infos, destinataire, lignes (PU, TVA), remises (ligne+globale), totaux.',
-      'N° ticket auto: yyyymmjj/hh:mm.',
-      'Thème: logo, couleurs, police, alignement, cadre impression.',
-      'Actions: Enregistrer défauts, Enregistrer ticket, Imprimer, Exporter PDF.',
-      'Tickets pro enregistrés: Paramètres > 📚 Tickets pro (rechercher/éditer/exporter/supprimer).',
+    { title: 'Ticket professionnel (éditeur pro)', points: [
+      "Ouverture: depuis le Panier (prérempli), Tickets globaux (prérempli), ou Paramètres (vierge/défauts).",
+      'En‑tête: nom boutique, adresse, téléphone, email, site (défauts mémorisables).',
+      "Infos: date, heure, N° ticket automatique (yyyymmjj/hh:mm), Réf. commande.",
+      'Destinataire: société, contact, adresse, CP, ville, pays, email destinataire, téléphone, TVA intracommunautaire.',
+      'Lignes: désignation, quantité, PU TTC, TVA, PU initial barré si remise, ligne “Remise: -X€ (Y%)”.',
+      'Remise globale: si présente (ticket source/panier), affichée et déduite du total TTC.',
+      'Totaux: Total remises, Total HT, Total TVA (détaillé par taux), Total TTC (ajusté).',
+      'Thème: logo (upload), couleurs (primaire/bordure), police CSS, alignement, cadre impression.',
+      'Actions: Enregistrer défauts, Enregistrer ticket (consultable dans 📚), Imprimer, Exporter PDF.',
+      '📚 Tickets pro enregistrés: rechercher, éditer (réouvrir), exporter (JSON), supprimer.',
     ]},
-    { title: 'Sauvegardes et Z', points: [
-      'Sauvegarde manuelle/auto; restauration; import Z (un ou tous) avec renumérotation.',
-      'Reconstruction Z depuis archives; nettoyage doublons.',
+    { title: 'Sauvegardes, restauration et Z', points: [
+      'Sauvegarde manuelle: télécharge le JSON complet (produits, catégories, réglages, sous‑catégories, tickets/jours, clôtures, compteur Z, caissiers, clients, tickets pro).',
+      'Restauration: fusion intelligente des clôtures, clients, etc. (préserve existants si possible).',
+      'Importer un seul Z: choisit un Z dans un fichier, gère renumérotation en cas de conflit.',
+      'Importer tous les Z: prévisualisation avec sélection, import en lot, MAJ transactions_by_day.',
+      'Reconstruction: depuis transactions_by_day ou fichiers; nettoyage des doublons Z.',
     ]},
-    { title: 'Rapports et exports', points: [
-      'Récap ventes (jour/période) avec déduplication.',
-      'CSV Point 5: Produit, Catégorie, ID Produit (4 chiffres), Quantité, Transactions, CA (€), UTF‑8 BOM.',
+    { title: 'Rapports et exports (précisions)', points: [
+      'Récap ventes: agrège sur jour/période/mois/année, filtrage par timestamp des tickets (évite parasites).',
+      'Déduplication: clé id@timestamp pour ne compter qu’une fois.',
+      'CSV Point 5: colonnes = Produit, Catégorie, ID Produit (4 chiffres), Quantité, Transactions, CA (€).',
+      'CSV: encodage UTF‑8 BOM pour Excel (accents/€ corrects).',
     ]},
-    { title: 'Clients et catégories', points: [
-      'Gestion clients; récupération depuis tickets si nécessaire.',
-      'Gestion catégories/sous‑catégories; registre synchronisé.',
+    { title: 'Clients, catégories et sous‑catégories', points: [
+      'Clients: création/édition; récupération rétroactive depuis les tickets si backup ancien.',
+      'Catégories/sous‑catégories: gestion et registre synchronisé automatiquement avec les produits.',
+    ]},
+    { title: 'FAQ (problèmes fréquents)', points: [
+      '“Je ne vois pas les ventes après restauration”: utiliser reconstruction Z / vérifier transactions_by_day.',
+      '“Les accents sont illisibles dans Excel”: le CSV exporté inclut le BOM UTF‑8; importer via Données > À partir de texte/CSV.',
+      '“La remise globale ne s’applique pas”: vérifier exclusions configurées et remises lignes existantes.',
+      '“Envoyer le PDF par mail”: exporter PDF puis partager/joindre; (Option) API d’envoi possible (Resend/SendGrid).',
+    ]},
+    { title: 'Astuces', points: [
+      'Gagner du temps: mémoriser les défauts (en‑tête/pied/TVA/thème destinataire) pour les prochains tickets.',
+      'Ticket pro depuis un ticket encaissé: passez par Tickets globaux (préremplit PU initial + remises + global).',
+      'ID Produit 4 chiffres: l’export CSV invite à compléter si absent.',
     ]},
   ]), []);
 
