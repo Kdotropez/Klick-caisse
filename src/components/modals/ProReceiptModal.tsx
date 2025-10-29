@@ -439,7 +439,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
               <Grid item xs={6} md={2}><TextField label="CP" fullWidth size="small" value={recipient.postalCode} onChange={e => setRecipient({ ...recipient, postalCode: e.target.value })} /></Grid>
               <Grid item xs={6} md={2}><TextField label="Ville" fullWidth size="small" value={recipient.city} onChange={e => setRecipient({ ...recipient, city: e.target.value })} /></Grid>
               <Grid item xs={12} md={4}><TextField label="Pays" fullWidth size="small" value={recipient.country} onChange={e => setRecipient({ ...recipient, country: e.target.value })} /></Grid>
-              <Grid item xs={12} md={4}><TextField label="Email" fullWidth size="small" value={recipient.email} onChange={e => setRecipient({ ...recipient, email: e.target.value })} /></Grid>
+              <Grid item xs={12} md={4}><TextField label="Email destinataire" fullWidth size="small" value={recipient.email} onChange={e => setRecipient({ ...recipient, email: e.target.value })} /></Grid>
               <Grid item xs={12} md={4}><TextField label="Téléphone" fullWidth size="small" value={recipient.phone} onChange={e => setRecipient({ ...recipient, phone: e.target.value })} /></Grid>
               <Grid item xs={12} md={4}><TextField label="N° TVA intracommunautaire" fullWidth size="small" value={recipient.vatNumber} onChange={e => setRecipient({ ...recipient, vatNumber: e.target.value })} /></Grid>
             </Grid>
