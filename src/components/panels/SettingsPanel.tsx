@@ -9,6 +9,7 @@ import { APP_VERSION } from '../../version';
 import HistoricalReportModal from '../modals/HistoricalReportModal';
 import ProReceiptModal from '../modals/ProReceiptModal';
 import ProReceiptsManagerModal from '../modals/ProReceiptsManagerModal';
+import HelpManualModal from '../modals/HelpManualModal';
 
 interface SettingsPanelProps {
   width: number;
@@ -173,6 +174,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [showExcludeCats, setShowExcludeCats] = useState(false);
   const [showProReceipt, setShowProReceipt] = useState(false);
   const [showProManager, setShowProManager] = useState(false);
+  const [showHelpManual, setShowHelpManual] = useState(false);
 
   // Prévisualisation import TOUS les Z
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -346,6 +348,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={() => setShowProManager(true)}
       >
         📚 Tickets pro enregistrés
+      </Button>
+
+      <Button
+        variant="contained"
+        sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#455a64', '&:hover': { backgroundColor: '#37474f' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
+        onClick={() => setShowHelpManual(true)}
+      >
+        ❓ Aide / Manuel
       </Button>
 
       {/* Diagnostics sous-catégories */}
@@ -1644,6 +1654,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           alert('❌ Impossible d\'ouvrir ce ticket');
         }
       }} />
+      <HelpManualModal open={showHelpManual} onClose={() => setShowHelpManual(false)} />
     </Box>
   );
 };
