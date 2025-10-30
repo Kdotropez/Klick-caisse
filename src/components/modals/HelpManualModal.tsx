@@ -1,6 +1,7 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, Divider } from '@mui/material';
 import { Download, Close, PictureAsPdf } from '@mui/icons-material';
+import { StorageService } from '../../services/StorageService';
 
 declare global {
   interface Window {
@@ -27,6 +28,16 @@ const loadScript = (src: string) => new Promise<void>((resolve, reject) => {
 
 const HelpManualModal: React.FC<HelpManualModalProps> = ({ open, onClose }) => {
   const ref = useRef<HTMLDivElement | null>(null);
+  const [imagesBySection, setImagesBySection] = useState<Record<number, string[]>>({});
+
+  useEffect(() => {
+    if (!open) return;
+    try {
+      const s = StorageService.loadSettings() || {};
+      const imgs = (s as any).helpManualImages || {};
+      setImagesBySection(imgs);
+    } catch {}
+  }, [open]);
 
   const sections = useMemo(() => ([
     { title: 'Installation et démarrage', points: [
@@ -159,12 +170,43 @@ const HelpManualModal: React.FC<HelpManualModalProps> = ({ open, onClose }) => {
                   </li>
                 ))}
               </ul>
+              <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {(imagesBySection[idx] || []).map((src, i) => (
+                  <img key={i} src={src} alt={`capture-${idx}-${i}`} style={{ maxWidth: 180, maxHeight: 120, border: '1px solid #ddd', borderRadius: 4 }} />
+                ))}
+                <Button size="small" variant="outlined" onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = () => {
+                    const f = (input.files && input.files[0]) || null;
+                    if (!f) return;
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      setImagesBySection(prev => {
+                        const arr = Array.isArray(prev[idx]) ? [...prev[idx]] : [];
+                        arr.push(String(reader.result || ''));
+                        return { ...prev, [idx]: arr };
+                      });
+                    };
+                    reader.readAsDataURL(f);
+                  };
+                  input.click();
+                }}>Ajouter capture</Button>
+              </Box>
             </Box>
           ))}
         </Box>
       </DialogContent>
       <DialogActions>
         <Button startIcon={<PictureAsPdf />} variant="contained" onClick={exportPDF}>Exporter en PDF</Button>
+        <Button onClick={() => {
+          try {
+            const s = StorageService.loadSettings() || {};
+            StorageService.saveSettings({ ...s, helpManualImages: imagesBySection });
+            alert('✅ Captures enregistrées');
+          } catch { alert('❌ Erreur enregistrement captures'); }
+        }}>Enregistrer captures</Button>
         <Button startIcon={<Download />} onClick={() => {
           try {
             const blob = new Blob([JSON.stringify({ version: 'manuel-1', sections }, null, 2)], { type: 'application/json' });
