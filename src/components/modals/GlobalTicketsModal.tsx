@@ -100,23 +100,20 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
    
    // Ajouter les transactions archivées par jour
   try {
-    const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-    if (raw) {
-      const map = JSON.parse(raw) as Record<string, any[]>;
-      const todayStr = new Date().toISOString().slice(0,10);
-      Object.keys(map).forEach((day) => {
-        const list = Array.isArray(map[day]) ? map[day] : [];
-         if (day !== todayStr) {
-           list.forEach((t: any) => {
-             const txId = String(t.id);
-             if (!seenIds.has(txId)) {
-               seenIds.add(txId);
-               allTx.push(t);
-             }
-           });
-         }
-      });
-    }
+    const map = StorageService.getTransactionsByDayMap();
+    const todayStr = new Date().toISOString().slice(0,10);
+    Object.keys(map).forEach((day) => {
+      const list = Array.isArray(map[day]) ? map[day] : [];
+      if (day !== todayStr) {
+        list.forEach((t: any) => {
+          const txId = String(t.id);
+          if (!seenIds.has(txId)) {
+            seenIds.add(txId);
+            allTx.push(t);
+          }
+        });
+      }
+    });
   } catch {}
    
    console.log('Transactions chargées après déduplication:', allTx.length);
@@ -344,12 +341,11 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             variant="contained" 
             onClick={() => {
             try {
-              const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-                if (!raw) { 
-                  alert('Aucune sauvegarde de tickets trouvée.'); 
-                  return; 
+              const map = StorageService.getTransactionsByDayMap();
+                if (Object.keys(map).length === 0) {
+                  alert('Aucune sauvegarde de tickets trouvée.');
+                  return;
                 }
-              const map = JSON.parse(raw) as Record<string, any[]>;
               const days = Object.keys(map)
                 .filter(d => Array.isArray(map[d]) && map[d].length > 0)
                 .sort();

@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import WindowManager from './components/WindowManager';
 import LicenseModal from './components/LicenseModal';
+import StoreSelectModal from './components/StoreSelectModal';
+import LegacyMigrationModal from './components/LegacyMigrationModal';
 
 import { Product, Category, CartItem, ProductVariation } from './types';
+import { STORES } from './types/Store';
 import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
@@ -25,8 +28,24 @@ const App: React.FC = () => {
 
   const [rootSize, setRootSize] = useState<{ width: string; height: string }>({ width: '1280px', height: '880px' });
   const [currentStoreCode, setCurrentStoreCode] = useState<string>(StorageService.getCurrentStoreCode());
-  // Charger les données de production au démarrage
+  const [storeSessionReady, setStoreSessionReady] = useState<boolean>(false);
+  const [legacyMigrationDone, setLegacyMigrationDone] = useState<boolean>(
+    () => !StorageService.requiresLegacyMigrationPrompt()
+  );
+
+  const getStoreSelectInitialCode = () => {
+    try {
+      const s = sessionStorage.getItem('klick_suggested_store_after_migrate');
+      if (s && STORES.some((x) => x.code === s)) return s;
+    } catch {
+      /* ignore */
+    }
+    return StorageService.getCurrentStoreCode();
+  };
+
+  // Charger les données de production une fois la boutique choisie
   useEffect(() => {
+    if (!storeSessionReady) return;
     const loadData = async () => {
       const { products: loadedProducts, categories: loadedCategories } = await loadProductionData(currentStoreCode);
       setProducts(loadedProducts);
@@ -66,7 +85,7 @@ const App: React.FC = () => {
     
     // Désactiver temporairement la vérification des mises à jour (erreur 404 GitHub)
     // UpdateService.startBackgroundUpdateCheck(APP_VERSION, 30); // Vérifier toutes les 30 minutes
-  }, []);
+  }, [storeSessionReady, currentStoreCode]);
 
   // Persister l'ordre des catégories à chaque modification (drag & drop, ajout, import)
   useEffect(() => {
@@ -344,6 +363,43 @@ const App: React.FC = () => {
         open={showLicenseModal} 
         onLicenseValid={handleLicenseValid}
         isLocked={isLocked}
+      />
+    );
+  }
+
+  if (!legacyMigrationDone) {
+    return (
+      <LegacyMigrationModal
+        initialCode={StorageService.getCurrentStoreCode()}
+        onMigrate={(code) => {
+          StorageService.migrateLegacyBundleToStore(code);
+          try {
+            sessionStorage.setItem('klick_suggested_store_after_migrate', code);
+          } catch {
+            /* ignore */
+          }
+          setLegacyMigrationDone(true);
+        }}
+      />
+    );
+  }
+
+  if (!storeSessionReady) {
+    const storeSelectInitialCode = getStoreSelectInitialCode();
+    return (
+      <StoreSelectModal
+        key={legacyMigrationDone ? storeSelectInitialCode : 'pending'}
+        initialCode={storeSelectInitialCode}
+        onConfirm={(code) => {
+          try {
+            sessionStorage.removeItem('klick_suggested_store_after_migrate');
+          } catch {
+            /* ignore */
+          }
+          StorageService.setCurrentStoreCode(code);
+          setCurrentStoreCode(code);
+          setStoreSessionReady(true);
+        }}
       />
     );
   }

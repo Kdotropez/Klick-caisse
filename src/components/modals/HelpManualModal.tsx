@@ -144,7 +144,7 @@ const HelpManualModal: React.FC<HelpManualModalProps> = ({ open, onClose }) => {
           if (remaining > 0) pdf.addPage();
         }
       }
-      pdf.save('manuel-klick-caisse.pdf');
+      pdf.save(`manuel-klick-caisse-${StorageService.slugifyStoreForFilename()}.pdf`);
     } catch {
       alert('❌ Export PDF impossible');
     }
@@ -212,7 +212,7 @@ const HelpManualModal: React.FC<HelpManualModalProps> = ({ open, onClose }) => {
             const blob = new Blob([JSON.stringify({ version: 'manuel-1', sections }, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = 'manuel-klick-caisse.json';
+            a.href = url; a.download = `manuel-klick-caisse-${StorageService.slugifyStoreForFilename()}.json`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
           } catch {}
         }}>Exporter (JSON)</Button>

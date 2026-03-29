@@ -41,6 +41,7 @@ import RecapModal from './RecapModal';
 import PaymentRecapByMethodModal, { PaymentRecapSort } from './modals/PaymentRecapByMethodModal';
 
 import { StorageService } from '../services/StorageService';
+import { getStoreByCode } from '../types/Store';
 import TransactionHistoryModal from './modals/TransactionHistoryModal';
 import GlobalTicketsModal from './modals/GlobalTicketsModal';
 import GlobalTicketEditorModal from './modals/GlobalTicketEditorModal';
@@ -115,6 +116,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 }) => {
   // Dimensions pour l'émulation 1920×1080
   const APP_BAR_HEIGHT = 64;
+
+  const activeStoreDisplayName = useMemo(() => {
+    const code = currentStoreCode ?? StorageService.getCurrentStoreCode();
+    return getStoreByCode(code)?.name ?? 'Boutique';
+  }, [currentStoreCode]);
 
   // Facteur d'échelle global pour réduire l'ensemble du programme de 10%
   const GLOBAL_SCALE_FACTOR = 0.9;
@@ -2373,7 +2379,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         if (result.closures && Array.isArray(result.closures) && result.closures.length > 0) {
           StorageService.saveAllClosures(result.closures);
           if (result.zCounter) {
-            localStorage.setItem('klick_caisse_z_counter', String(result.zCounter));
+            StorageService.setZCounterValue(Number(result.zCounter));
           }
           console.log(`✅ ${result.closures.length} clôtures importées`);
         }
@@ -2386,7 +2392,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           StorageService.saveSubcategories(result.subcategories);
         }
         if (result.transactionsByDay) {
-          localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(result.transactionsByDay));
+          StorageService.saveTransactionsByDayMap(result.transactionsByDay as Record<string, any[]>);
         }
         if (result.cashiers && Array.isArray(result.cashiers)) {
           StorageService.saveCashiers(result.cashiers);
@@ -2854,7 +2860,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     if (!data) return;
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
-    a.download = `klick-caisse-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+    a.download = `${StorageService.backupFilePrefix()}-caisse-export-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`;
     a.href = URL.createObjectURL(blob);
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -2882,7 +2888,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       if (json && typeof json === 'object') {
         const tx = (json as any).transactionsByDay ?? (json as any).transactions_by_day ?? (json as any).klick_caisse_transactions_by_day;
         if (tx && typeof tx === 'object') {
-          localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(tx));
+          StorageService.saveTransactionsByDayMap(tx as Record<string, any[]>);
         }
         const closures = (json as any).closures ?? (json as any).klick_caisse_closures;
         if (Array.isArray(closures)) {
@@ -2890,7 +2896,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
         const zCounter = (json as any).zCounter ?? (json as any).z_counter ?? (json as any).klick_caisse_z_counter;
         if (Number.isFinite(Number(zCounter))) {
-          localStorage.setItem('klick_caisse_z_counter', String(Number(zCounter)));
+          StorageService.setZCounterValue(Number(zCounter));
         }
         // Importer ou reconstruire les clients si présents/absents
         const customers = (json as any).customers;
@@ -3572,6 +3578,27 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       overflow: 'hidden',
       backgroundColor: '#f5f5f5'
     }}>
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10001,
+          py: 0.75,
+          px: 2,
+          textAlign: 'center',
+          backgroundColor: '#0d47a1',
+          color: '#fff',
+          fontWeight: 800,
+          fontSize: '1rem',
+          letterSpacing: '0.04em',
+          boxShadow: 2,
+          pointerEvents: 'none',
+        }}
+      >
+        Boutique : {activeStoreDisplayName}
+      </Box>
       {/* Indicateur de mode drag and drop */}
       {isDragging && (
         <Box sx={{
@@ -3857,9 +3884,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         onChangeSort={(s) => setPaymentRecapSort(s as any)}
         transactions={(() => {
           try {
-            const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-            if (!raw) return [];
-            const map = JSON.parse(raw);
+            const map = StorageService.getTransactionsByDayMap();
             const list = Array.isArray(map[recapDate]) ? map[recapDate] : [];
             return list.map((t:any)=>({ ...t, timestamp: new Date(t.timestamp) }));
           } catch { return todayTransactions; }
@@ -3895,9 +3920,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               const from = new Date(`${recapRange.from}T00:00:00`);
               const to = new Date(`${recapRange.to}T23:59:59`);
               try {
-                const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-                if (raw) {
-                  const map = JSON.parse(raw) as Record<string, any[]>;
+                const map = StorageService.getTransactionsByDayMap();
+                if (Object.keys(map).length > 0) {
                   Object.keys(map).forEach(day => {
                     const d = new Date(`${day}T12:00:00`);
                     if (d >= from && d <= to) {
@@ -3931,7 +3955,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               return out;
             };
             const sourceTx = (recapPreset==='day')
-              ? (() => { try { const raw=localStorage.getItem('klick_caisse_transactions_by_day'); if(!raw) return []; const map=JSON.parse(raw); const list = Array.isArray(map[recapDate]) ? map[recapDate] : []; return list.map((t:any)=>({ ...t, timestamp:new Date(t.timestamp) })); } catch { return todayTransactions; } })()
+              ? (() => { try { const map = StorageService.getTransactionsByDayMap(); const list = Array.isArray(map[recapDate]) ? map[recapDate] : []; return list.map((t:any)=>({ ...t, timestamp:new Date(t.timestamp) })); } catch { return todayTransactions; } })()
               : loadRange();
             const rows = computeDailyProductSales(sourceTx);
             if (rows.length === 0) {

@@ -74,9 +74,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     const todayKey = getLocalDateKey(new Date());
     const loadFromTxByDay = (dateKey: string): any[] => {
       try {
-        const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-        if (!raw) return [];
-        const map = JSON.parse(raw) as Record<string, any[]>;
+        const map = StorageService.getTransactionsByDayMap();
         return Array.isArray(map[dateKey]) ? map[dateKey] : [];
       } catch { return []; }
     };
@@ -105,9 +103,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
       const seen = new Set<string>();
       const from = new Date(`${range.from}T00:00:00`);
       const to = new Date(`${range.to}T23:59:59`);
-      const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-      if (raw) {
-        const map = JSON.parse(raw) as Record<string, any[]>;
+      const map = StorageService.getTransactionsByDayMap();
+      if (Object.keys(map).length > 0) {
         Object.keys(map).forEach(day => {
           const d = new Date(`${day}T12:00:00`);
           if (d >= from && d <= to) {
@@ -1063,7 +1060,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                     a.href = url;
                     const labelFrom = preset==='day' ? selectedDate : range.from;
                     const labelTo = preset==='day' ? selectedDate : range.to;
-                    a.download = `rapport-point5-${labelFrom}_au_${labelTo}.csv`;
+                    a.download = `rapport-point5-${StorageService.slugifyStoreForFilename()}-${labelFrom}_au_${labelTo}.csv`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);

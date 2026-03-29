@@ -63,12 +63,12 @@ export const categories: Category[] = Array.from(uniqueCategories).map((name, in
   subcategoryOrder: [],
 }));
 
-export const loadProductionData = async (storeCode: string = 'default'): Promise<{
+export const loadProductionData = async (storeCode: string): Promise<{
   products: Product[];
   categories: Category[];
 }> => {
   try {
-    // 1) Charger depuis le localStorage d'abord
+    // 1) Données déjà isolées par boutique (blob productionData + clés dérivées via getCurrentStoreCode)
     const savedProducts = StorageService.loadProducts();
     const savedCategories = StorageService.loadCategories();
     
@@ -115,10 +115,8 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
       return { products: savedProducts, categories: savedCategories };
     }
     
-    // Si pas de données complètes, utiliser les données intégrées
-    // Forcer le rechargement depuis les données intégrées
-    StorageService.saveProducts(products);
-    StorageService.saveCategories(categories);
+    // Si pas de données complètes, utiliser les données intégrées pour cette boutique
+    StorageService.saveProductionData(products, categories, storeCode);
     const extracted = extractSubcategoriesFromProducts(products);
     StorageService.saveSubcategories(extracted);
     return { products, categories };
@@ -131,12 +129,12 @@ export const loadProductionData = async (storeCode: string = 'default'): Promise
 export const saveProductionData = async (
   products: Product[],
   categories: Category[],
-  storeCode: string = 'default'
+  storeCode?: string
 ): Promise<void> => {
   try {
-    StorageService.saveProducts(products);
-    StorageService.saveCategories(categories);
-    console.log(`💾 Données sauvegardées (${products.length} produits, ${categories.length} catégories)`);
+    const code = storeCode ?? StorageService.getCurrentStoreCode();
+    StorageService.saveProductionData(products, categories, code);
+    console.log(`💾 Données sauvegardées (${products.length} produits, ${categories.length} catégories) — boutique ${code}`);
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde:', error);
   }

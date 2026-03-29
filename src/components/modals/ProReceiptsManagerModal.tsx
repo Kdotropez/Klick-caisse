@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, List, ListItem, ListItemText, IconButton, TextField, Box } from '@mui/material';
 import { Delete, Edit, Print, Download } from '@mui/icons-material';
-import { ProReceiptStorage, ProReceipt } from '../../services/StorageService';
+import { ProReceiptStorage, ProReceipt, StorageService } from '../../services/StorageService';
 
 interface ProReceiptsManagerModalProps {
   open: boolean;
@@ -35,7 +35,7 @@ const ProReceiptsManagerModal: React.FC<ProReceiptsManagerModalProps> = ({ open,
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ticket-pro-${rec.id}.json`;
+    a.download = `ticket-pro-${StorageService.slugifyStoreForFilename()}-${rec.id}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

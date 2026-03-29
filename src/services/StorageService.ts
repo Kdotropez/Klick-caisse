@@ -1,6 +1,5 @@
 import { Product, Category, Transaction, Cashier } from '../types';
 import { Customer } from '../types/Customer';
-import { Store } from '../types/Store';
 import { getStoreByCode } from '../types/Store';
 import { defaultSubcategoriesRegistry } from '../data/subcategoriesRegistry';
 
@@ -9,22 +8,179 @@ export class StorageService {
   private static readonly CATEGORIES_KEY = 'klick_caisse_categories';
   private static readonly SETTINGS_KEY = 'klick_caisse_settings';
   private static readonly SUBCATEGORIES_KEY = 'klick_caisse_subcategories';
-  private static readonly TRANSACTIONS_BY_DAY_KEY = 'klick_caisse_transactions_by_day';
-  private static readonly CLOSURES_KEY = 'klick_caisse_closures';
-  private static readonly Z_COUNTER_KEY = 'klick_caisse_z_counter';
   private static readonly CASHIERS_KEY = 'klick_caisse_cashiers';
-  private static readonly AUTO_BACKUPS_KEY = 'klick_caisse_auto_backups';
-  private static readonly CUSTOMERS_KEY = 'klick_caisse_customers';
-  private static readonly PRO_RECEIPTS_KEY = 'klick_caisse_pro_receipts';
 
-  private static getStoreKey(storeCode: string, key: string): string {
+  static readonly STORE_MIGRATION_FLAG = 'klick_caisse_v2_store_migration_done';
+
+  static getStoreKey(storeCode: string, key: string): string {
     return `klick_caisse_${storeCode}_${key}`;
+  }
+
+  /** Clé localStorage pour le magasin courant (tickets, clôtures, Z, réglages, etc.) */
+  private static activeStoreKey(suffix: string): string {
+    return this.getStoreKey(this.getCurrentStoreCode(), suffix);
+  }
+
+  /** Supprime une entrée localStorage pour la boutique active (ex. closures, z_counter). */
+  static removeActiveStoreEntry(suffix: string): void {
+    localStorage.removeItem(this.activeStoreKey(suffix));
+  }
+
+  /** True si d’anciennes clés « globales » contiennent encore des données à migrer. */
+  static hasLegacyGlobalBundle(): boolean {
+    const nonEmpty = (key: string): boolean => {
+      const v = localStorage.getItem(key);
+      if (v == null || v === '') return false;
+      const t = v.trim();
+      if (t === '[]' || t === '{}' || t === 'null') return false;
+      return true;
+    };
+    return (
+      nonEmpty('klick_caisse_transactions_by_day') ||
+      nonEmpty('klick_caisse_closures') ||
+      nonEmpty('klick_caisse_products') ||
+      nonEmpty('klick_caisse_categories') ||
+      nonEmpty('klick_caisse_settings') ||
+      nonEmpty('klick_caisse_customers') ||
+      nonEmpty('klick_caisse_subcategories') ||
+      nonEmpty('klick_caisse_cashiers') ||
+      nonEmpty('klick_caisse_pro_receipts') ||
+      nonEmpty('klick_caisse_auto_backups')
+    );
+  }
+
+  /** Afficher la modale de migration legacy (données globales non encore scindées par boutique). */
+  static requiresLegacyMigrationPrompt(): boolean {
+    if (localStorage.getItem(this.STORE_MIGRATION_FLAG)) return false;
+    return this.hasLegacyGlobalBundle();
+  }
+
+  /** Normalisation pour contrôle d’accès : même nom de boutique, insensible à la casse / espaces / accents. */
+  static normalizeStoreNameForAccess(input: string): string {
+    return String(input || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  static getStoreAccessExpectedLabel(storeCode: string): string {
+    return getStoreByCode(storeCode)?.name?.trim() ?? '';
+  }
+
+  /** Le mot de passe d’ouverture est le nom de la boutique (voir STORES). */
+  static verifyStoreAccessPin(storeCode: string, input: string): boolean {
+    const expected = this.getStoreAccessExpectedLabel(storeCode);
+    if (!expected) return false;
+    return this.normalizeStoreNameForAccess(input) === this.normalizeStoreNameForAccess(expected);
+  }
+
+  /** Segment de nom de fichier sûr pour la boutique (ex. saint-tropez). */
+  static slugifyStoreForFilename(storeCode?: string): string {
+    const code = storeCode ?? this.getCurrentStoreCode();
+    const st = getStoreByCode(code);
+    const label = (st?.name || `magasin-${code}`).trim();
+    const slug = label
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+    return slug || `s${code}`;
+  }
+
+  private static datedStamp(d = new Date()): string {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    return `${yyyy}${mm}${dd}-${hh}${mi}${ss}`;
+  }
+
+  private static zSuffixFromClosures(closures: any[]): string {
+    if (!closures.length) return '';
+    const lastClosure = closures[closures.length - 1];
+    const closureDate = new Date(lastClosure.closedAt);
+    const closureDay = String(closureDate.getDate()).padStart(2, '0');
+    const closureMonth = String(closureDate.getMonth() + 1).padStart(2, '0');
+    return `-Z${lastClosure.zNumber}-${closureDay}${closureMonth}${closureDate.getFullYear()}`;
+  }
+
+  /** Préfixe type klick-saint-tropez pour les téléchargements liés à la boutique courante. */
+  static backupFilePrefix(storeCode?: string): string {
+    return `klick-${this.slugifyStoreForFilename(storeCode)}`;
+  }
+
+  /** À la première ouverture après mise à jour : copie l’ancien stockage global vers la boutique choisie. */
+  static migrateLegacyBundleToStore(storeCode: string): void {
+    if (localStorage.getItem(this.STORE_MIGRATION_FLAG)) return;
+
+    const copy = (legacyKey: string, suffix: string) => {
+      const v = localStorage.getItem(legacyKey);
+      if (v) localStorage.setItem(this.getStoreKey(storeCode, suffix), v);
+    };
+
+    copy('klick_caisse_transactions_by_day', 'transactions_by_day');
+    copy('klick_caisse_closures', 'closures');
+    copy('klick_caisse_z_counter', 'z_counter');
+    copy('klick_caisse_settings', 'settings');
+    copy('klick_caisse_customers', 'customers');
+    copy('klick_caisse_subcategories', 'subcategories');
+    copy('klick_caisse_pro_receipts', 'pro_receipts');
+    copy('klick_caisse_auto_backups', 'auto_backups');
+
+    const p = localStorage.getItem(this.PRODUCTS_KEY);
+    const c = localStorage.getItem(this.CATEGORIES_KEY);
+    if (p && c) {
+      try {
+        this.saveProductionData(JSON.parse(p), JSON.parse(c), storeCode);
+      } catch { /* ignore */ }
+    }
+    copy(this.CASHIERS_KEY, 'cashiers');
+
+    localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+  }
+
+  static getTransactionsByDayRaw(): string | null {
+    return localStorage.getItem(this.activeStoreKey('transactions_by_day'));
+  }
+
+  static setTransactionsByDayRaw(json: string): void {
+    localStorage.setItem(this.activeStoreKey('transactions_by_day'), json);
+  }
+
+  static getTransactionsByDayMap(): Record<string, any[]> {
+    try {
+      const raw = this.getTransactionsByDayRaw();
+      if (!raw) return {};
+      const m = JSON.parse(raw);
+      return m && typeof m === 'object' && !Array.isArray(m) ? m : {};
+    } catch {
+      return {};
+    }
+  }
+
+  static saveTransactionsByDayMap(map: Record<string, any[]>): void {
+    this.setTransactionsByDayRaw(JSON.stringify(map));
+  }
+
+  static setZCounterValue(n: number): void {
+    localStorage.setItem(this.activeStoreKey('z_counter'), String(n));
   }
 
   // Sauvegarder les produits
   static saveProducts(products: Product[]): void {
     try {
-      localStorage.setItem(this.PRODUCTS_KEY, JSON.stringify(products));
+      const code = this.getCurrentStoreCode();
+      const pd = this.loadProductionData(code);
+      const categories =
+        pd && Array.isArray(pd.categories) && pd.categories.length > 0
+          ? pd.categories
+          : this.loadCategories();
+      this.saveProductionData(products, categories, code);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des produits:', error);
     }
@@ -33,7 +189,7 @@ export class StorageService {
   // Clients
   static loadCustomers(): Customer[] {
     try {
-      const raw = localStorage.getItem(this.CUSTOMERS_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('customers'));
       if (!raw) return [];
       const arr = JSON.parse(raw);
       return (Array.isArray(arr) ? arr : []).map((c:any)=> ({ ...c, createdAt: new Date(c.createdAt) }));
@@ -42,7 +198,7 @@ export class StorageService {
 
   static saveCustomers(customers: Customer[]): void {
     try {
-      localStorage.setItem(this.CUSTOMERS_KEY, JSON.stringify(customers));
+      localStorage.setItem(this.activeStoreKey('customers'), JSON.stringify(customers));
     } catch {}
   }
 
@@ -72,6 +228,11 @@ export class StorageService {
   // Charger les produits
   static loadProducts(): Product[] {
     try {
+      const code = this.getCurrentStoreCode();
+      const pd = this.loadProductionData(code);
+      if (pd && Array.isArray(pd.products) && pd.products.length > 0) {
+        return pd.products;
+      }
       const data = localStorage.getItem(this.PRODUCTS_KEY);
       if (!data) return [];
       
@@ -108,7 +269,13 @@ export class StorageService {
   // Sauvegarder les catégories
   static saveCategories(categories: Category[]): void {
     try {
-      localStorage.setItem(this.CATEGORIES_KEY, JSON.stringify(categories));
+      const code = this.getCurrentStoreCode();
+      const pd = this.loadProductionData(code);
+      const products =
+        pd && Array.isArray(pd.products) && pd.products.length > 0
+          ? pd.products
+          : this.loadProducts();
+      this.saveProductionData(products, categories, code);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des catégories:', error);
     }
@@ -117,6 +284,11 @@ export class StorageService {
   // Charger les catégories
   static loadCategories(): Category[] {
     try {
+      const code = this.getCurrentStoreCode();
+      const pd = this.loadProductionData(code);
+      if (pd && Array.isArray(pd.categories) && pd.categories.length > 0) {
+        return pd.categories;
+      }
       const data = localStorage.getItem(this.CATEGORIES_KEY);
       if (!data) return [];
       
@@ -153,7 +325,7 @@ export class StorageService {
   // Sauvegarder les paramètres
   static saveSettings(settings: any): void {
     try {
-      localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
+      localStorage.setItem(this.activeStoreKey('settings'), JSON.stringify(settings));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des paramètres:', error);
     }
@@ -162,7 +334,7 @@ export class StorageService {
   // Charger les paramètres
   static loadSettings(): any {
     try {
-      const data = localStorage.getItem(this.SETTINGS_KEY);
+      const data = localStorage.getItem(this.activeStoreKey('settings'));
       return data ? JSON.parse(data) : {};
     } catch (error) {
       console.error('Erreur lors du chargement des paramètres:', error);
@@ -248,7 +420,7 @@ export class StorageService {
           return alnum.length >= 2; // ignorer \u0000S, 'c', 'b', etc.
         })))
         .sort();
-      localStorage.setItem(this.SUBCATEGORIES_KEY, JSON.stringify(unique));
+      localStorage.setItem(this.activeStoreKey('subcategories'), JSON.stringify(unique));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des sous-catégories:', error);
     }
@@ -256,7 +428,7 @@ export class StorageService {
 
   static loadSubcategories(): string[] {
     try {
-      const data = localStorage.getItem(this.SUBCATEGORIES_KEY);
+      const data = localStorage.getItem(this.activeStoreKey('subcategories'));
       const parsed: unknown = data ? JSON.parse(data) : [];
       const fromStorage = Array.isArray(parsed) ? (parsed as string[]) : [];
       
@@ -358,7 +530,7 @@ export class StorageService {
 
   static addDailyTransaction(tx: Transaction): void {
     try {
-      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       const map: Record<string, any[]> = raw ? JSON.parse(raw) : {};
       const key = this.getTodayKey();
       const list = Array.isArray(map[key]) ? map[key] : [];
@@ -366,7 +538,7 @@ export class StorageService {
       const serialized = { ...tx, timestamp: new Date(tx.timestamp).toISOString() };
       list.push(serialized);
       map[key] = list;
-      localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(map));
+      localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
     } catch (error) {
       console.error('Erreur lors de l\'ajout de la transaction du jour:', error);
     }
@@ -374,7 +546,7 @@ export class StorageService {
 
   static loadTodayTransactions(): Transaction[] {
     try {
-      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       if (!raw) return [];
       const map: Record<string, any[]> = JSON.parse(raw);
       const key = this.getTodayKey();
@@ -391,12 +563,12 @@ export class StorageService {
 
   static clearTodayTransactions(): void {
     try {
-      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       if (!raw) return;
       const map: Record<string, any[]> = JSON.parse(raw);
       const key = this.getTodayKey();
       delete map[key];
-      localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(map));
+      localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
     } catch (error) {
       console.error('Erreur lors de l\'effacement des transactions du jour:', error);
     }
@@ -405,7 +577,7 @@ export class StorageService {
   // ---------- Clôture (archives) ----------
   static loadClosures(): any[] {
     try {
-      const raw = localStorage.getItem(this.CLOSURES_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('closures'));
       console.log(`[DEBUG StorageService] loadClosures - raw:`, raw);
       const closures = raw ? JSON.parse(raw) : [];
       console.log(`[DEBUG StorageService] loadClosures - parsed:`, closures);
@@ -424,7 +596,7 @@ export class StorageService {
       console.log(`[DEBUG StorageService] saveClosure - existing closures:`, all.length);
       all.push(closure);
       console.log(`[DEBUG StorageService] saveClosure - total after push:`, all.length);
-      localStorage.setItem(this.CLOSURES_KEY, JSON.stringify(all));
+      localStorage.setItem(this.activeStoreKey('closures'), JSON.stringify(all));
       console.log(`[DEBUG StorageService] saveClosure - saved successfully`);
     } catch (error) {
       console.error('Erreur lors de l\'archivage de la clôture:', error);
@@ -433,7 +605,7 @@ export class StorageService {
 
   static saveAllClosures(closures: any[]): void {
     try {
-      localStorage.setItem(this.CLOSURES_KEY, JSON.stringify(closures || []));
+      localStorage.setItem(this.activeStoreKey('closures'), JSON.stringify(closures || []));
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement des clôtures:', error);
     }
@@ -458,7 +630,7 @@ export class StorageService {
   static recoverClosuresFromTransactionsByDay(merge: boolean = true): { created: number; merged: number } {
     let created = 0;
     try {
-      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       if (!raw) return { created: 0, merged: 0 };
       const map = JSON.parse(raw) as Record<string, any[]>;
       const existing = merge ? (this.loadClosures() || []) : [];
@@ -499,7 +671,7 @@ export class StorageService {
   }
 
   static getCurrentZNumber(): number {
-    const raw = localStorage.getItem(this.Z_COUNTER_KEY);
+    const raw = localStorage.getItem(this.activeStoreKey('z_counter'));
     const n = raw ? parseInt(raw, 10) : 0;
     return Number.isFinite(n) ? n : 0;
   }
@@ -507,13 +679,13 @@ export class StorageService {
   static incrementZNumber(): number {
     const current = this.getCurrentZNumber();
     const next = current + 1;
-    localStorage.setItem(this.Z_COUNTER_KEY, String(next));
+    localStorage.setItem(this.activeStoreKey('z_counter'), String(next));
     return next;
   }
 
   static updateDailyTransaction(updated: Transaction): void {
     try {
-      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       if (!raw) return;
       const map: Record<string, any[]> = JSON.parse(raw);
       const key = this.getTodayKey();
@@ -521,7 +693,7 @@ export class StorageService {
       const idx = list.findIndex((t: any) => t.id === updated.id);
       if (idx >= 0) {
         map[key][idx] = { ...updated, timestamp: new Date(updated.timestamp).toISOString() };
-        localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(map));
+        localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour du ticket:', error);
@@ -530,13 +702,13 @@ export class StorageService {
 
   static deleteDailyTransaction(transactionId: string): void {
     try {
-      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       if (!raw) return;
       const map: Record<string, any[]> = JSON.parse(raw);
       const key = this.getTodayKey();
       const list = Array.isArray(map[key]) ? map[key] : [];
       map[key] = list.filter((t: any) => t.id !== transactionId);
-      localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(map));
+      localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
     } catch (error) {
       console.error('Erreur lors de la suppression du ticket:', error);
     }
@@ -545,7 +717,7 @@ export class StorageService {
   // Supprime une transaction par son id dans toutes les journées archivées
   static deleteTransactionFromAllDays(transactionId: string): void {
     try {
-      const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       if (!raw) return;
       const map: Record<string, any[]> = JSON.parse(raw);
       let changed = false;
@@ -558,7 +730,7 @@ export class StorageService {
         }
       }
       if (changed) {
-        localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(map));
+        localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
       }
     } catch (error) {
       console.error('Erreur lors de la suppression (toutes journées):', error);
@@ -584,25 +756,11 @@ export class StorageService {
       const blob = new Blob([content], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mi = String(d.getMinutes()).padStart(2, '0');
-      const ss = String(d.getSeconds()).padStart(2, '0');
-      
-      // Nom plus explicite avec informations sur les clôtures
+      const stamp = this.datedStamp(d);
       const closures = data.closures || [];
-      let filename = `klick-manual-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}`;
-      
-      if (closures.length > 0) {
-        const lastClosure = closures[closures.length - 1];
-        const closureDate = new Date(lastClosure.closedAt);
-        const closureDay = String(closureDate.getDate()).padStart(2, '0');
-        const closureMonth = String(closureDate.getMonth() + 1).padStart(2, '0');
-        filename += `-Z${lastClosure.zNumber}-${closureDay}${closureMonth}${closureDate.getFullYear()}`;
-      }
-      
+      const prefix = this.backupFilePrefix();
+      let filename = `${prefix}-manual-backup-${stamp}`;
+      filename += this.zSuffixFromClosures(closures);
       filename += '.json';
       
       const a = document.createElement('a');
@@ -639,6 +797,9 @@ export class StorageService {
   // Effacer toutes les données
   static clearAllData(): void {
     try {
+      const code = this.getCurrentStoreCode();
+      localStorage.removeItem(this.getStoreKey(code, 'productionData'));
+      localStorage.removeItem(this.activeStoreKey('settings'));
       localStorage.removeItem(this.PRODUCTS_KEY);
       localStorage.removeItem(this.CATEGORIES_KEY);
       localStorage.removeItem(this.SETTINGS_KEY);
@@ -649,14 +810,17 @@ export class StorageService {
 
   // Vérifier si des données existent
   static hasData(): boolean {
+    const code = this.getCurrentStoreCode();
+    if (localStorage.getItem(this.getStoreKey(code, 'productionData'))) return true;
     return !!(localStorage.getItem(this.PRODUCTS_KEY) || localStorage.getItem(this.CATEGORIES_KEY));
   }
 
   // === GESTION DES CAISSIERS ===
 
   // Sauvegarder les caissiers (version avec support boutique)
-  static saveCashiers(cashiers: Cashier[], storeCode: string = '1'): void {
-    const key = this.getStoreKey(storeCode, 'cashiers');
+  static saveCashiers(cashiers: Cashier[], storeCode?: string): void {
+    const code = storeCode ?? this.getCurrentStoreCode();
+    const key = this.getStoreKey(code, 'cashiers');
     try {
       localStorage.setItem(key, JSON.stringify(cashiers));
     } catch (error) {
@@ -665,8 +829,9 @@ export class StorageService {
   }
 
   // Charger les caissiers (version avec support boutique)
-  static loadCashiers(storeCode: string = '1'): Cashier[] {
-    const key = this.getStoreKey(storeCode, 'cashiers');
+  static loadCashiers(storeCode?: string): Cashier[] {
+    const code = storeCode ?? this.getCurrentStoreCode();
+    const key = this.getStoreKey(code, 'cashiers');
     try {
       const data = localStorage.getItem(key);
       if (data) {
@@ -687,7 +852,7 @@ export class StorageService {
 
   // Créer un caissier par défaut si aucun n'existe
   static initializeDefaultCashier(): Cashier[] {
-    const existingCashiers = this.loadCashiers();
+    const existingCashiers = this.loadCashiers(this.getCurrentStoreCode());
     if (existingCashiers.length === 0) {
       const defaultCashier: Cashier = {
         id: 'cashier_default',
@@ -699,7 +864,7 @@ export class StorageService {
         totalSales: 0,
         totalTransactions: 0
       };
-      this.saveCashiers([defaultCashier]);
+      this.saveCashiers([defaultCashier], this.getCurrentStoreCode());
       return [defaultCashier];
     }
     return existingCashiers;
@@ -707,7 +872,7 @@ export class StorageService {
 
   // Mettre à jour les statistiques d'un caissier
   static updateCashierStats(cashierId: string, transactionTotal: number): void {
-    const cashiers = this.loadCashiers();
+    const cashiers = this.loadCashiers(this.getCurrentStoreCode());
     const updatedCashiers = cashiers.map(cashier => {
       if (cashier.id === cashierId) {
         return {
@@ -718,12 +883,12 @@ export class StorageService {
       }
       return cashier;
     });
-    this.saveCashiers(updatedCashiers);
+    this.saveCashiers(updatedCashiers, this.getCurrentStoreCode());
   }
 
   // Mettre à jour la dernière connexion d'un caissier
   static updateCashierLastLogin(cashierId: string): void {
-    const cashiers = this.loadCashiers();
+    const cashiers = this.loadCashiers(this.getCurrentStoreCode());
     const updatedCashiers = cashiers.map(cashier => {
       if (cashier.id === cashierId) {
         return {
@@ -733,7 +898,7 @@ export class StorageService {
       }
       return cashier;
     });
-    this.saveCashiers(updatedCashiers);
+    this.saveCashiers(updatedCashiers, this.getCurrentStoreCode());
   }
 
   // ===== Sauvegarde/export complet (backup) =====
@@ -749,11 +914,15 @@ export class StorageService {
       const customers = this.loadCustomers();
       const proReceipts = ProReceiptStorage.loadProReceipts();
       // Lire brut la map des transactions par jour
-      const txRaw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+      const txRaw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
       const transactionsByDay = txRaw ? JSON.parse(txRaw) : {};
+      const sc = this.getCurrentStoreCode();
+      const st = getStoreByCode(sc);
       return {
         schemaVersion: 1,
         exportedAt: new Date().toISOString(),
+        storeCode: sc,
+        storeName: st?.name,
         products,
         categories,
         settings,
@@ -779,13 +948,7 @@ export class StorageService {
       const blob = new Blob([content], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mi = String(d.getMinutes()).padStart(2, '0');
-      const ss = String(d.getSeconds()).padStart(2, '0');
-      const filename = `klick-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+      const filename = `${this.backupFilePrefix()}-backup-${this.datedStamp(d)}.json`;
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
@@ -809,12 +972,12 @@ export class StorageService {
       // Accepte deux notations pour transactions et zCounter
       const transactionsByDay = (data as any).transactionsByDay ?? (data as any).transactions_by_day ?? (data as any).klick_caisse_transactions_by_day;
       if (transactionsByDay && typeof transactionsByDay === 'object') {
-        localStorage.setItem(this.TRANSACTIONS_BY_DAY_KEY, JSON.stringify(transactionsByDay));
+        localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(transactionsByDay));
       }
       const closures = (data as any).closures ?? (data as any).klick_caisse_closures;
       if (Array.isArray(closures)) this.saveAllClosures(closures);
       const zCounter = (data as any).zCounter ?? (data as any).z_counter ?? (data as any).klick_caisse_z_counter;
-      if (Number.isFinite(Number(zCounter))) localStorage.setItem(this.Z_COUNTER_KEY, String(Number(zCounter)));
+      if (Number.isFinite(Number(zCounter))) localStorage.setItem(this.activeStoreKey('z_counter'), String(Number(zCounter)));
       const cashiers = (data as any).cashiers;
       if (Array.isArray(cashiers)) this.saveCashiers(cashiers);
       const customers = (data as any).customers;
@@ -876,7 +1039,7 @@ export class StorageService {
 
       // transactionsByDay
       try {
-        const raw = localStorage.getItem(this.TRANSACTIONS_BY_DAY_KEY);
+        const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
         if (raw) {
           const map = JSON.parse(raw) as Record<string, any[]>;
           for (const day of Object.keys(map)) {
@@ -898,16 +1061,16 @@ export class StorageService {
   }
 
   // Sauvegarde automatique locale (rotation limitée)
-  static addAutoBackup(storeCode: string = '1'): void {
+  static addAutoBackup(_storeCode?: string): void {
     try {
       const data = this.exportFullBackup();
       if (!data) return;
-      const raw = localStorage.getItem(this.AUTO_BACKUPS_KEY);
+      const raw = localStorage.getItem(this.activeStoreKey('auto_backups'));
       const list: Array<{ ts: string; data: any }> = raw ? JSON.parse(raw) : [];
       const entry = { ts: new Date().toISOString(), data };
       list.unshift(entry);
       const LIMITED = list.slice(0, 30); // garder les 30 dernières (augmenté pour éviter les pertes)
-      localStorage.setItem(this.AUTO_BACKUPS_KEY, JSON.stringify(LIMITED));
+      localStorage.setItem(this.activeStoreKey('auto_backups'), JSON.stringify(LIMITED));
       
       // Sauvegarde JSON automatique pour récupération en cas de coupure
       this.downloadAutoBackup(data);
@@ -923,25 +1086,10 @@ export class StorageService {
       const blob = new Blob([content], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mi = String(d.getMinutes()).padStart(2, '0');
-      const ss = String(d.getSeconds()).padStart(2, '0');
-      
-      // Nom plus explicite avec informations sur les clôtures
       const closures = data.closures || [];
-      const lastClosure = closures[closures.length - 1];
-      let filename = `klick-auto-backup-${yyyy}${mm}${dd}-${hh}${mi}${ss}`;
-      
-      if (lastClosure) {
-        const closureDate = new Date(lastClosure.closedAt);
-        const closureDay = String(closureDate.getDate()).padStart(2, '0');
-        const closureMonth = String(closureDate.getMonth() + 1).padStart(2, '0');
-        filename += `-Z${lastClosure.zNumber}-${closureDay}${closureMonth}${closureDate.getFullYear()}`;
-      }
-      
+      const prefix = this.backupFilePrefix();
+      let filename = `${prefix}-auto-backup-${this.datedStamp(d)}`;
+      filename += this.zSuffixFromClosures(closures);
       filename += '.json';
       
       const a = document.createElement('a');
@@ -960,15 +1108,17 @@ export class StorageService {
 
   // === GESTION DES BOUTIQUES ===
 
-  static saveProductionData(products: Product[], categories: Category[], storeCode: string = '1'): void {
+  static saveProductionData(products: Product[], categories: Category[], storeCode?: string): void {
+    const code = storeCode ?? this.getCurrentStoreCode();
     const data = { products, categories, timestamp: Date.now() };
-    const key = this.getStoreKey(storeCode, 'productionData');
+    const key = this.getStoreKey(code, 'productionData');
     localStorage.setItem(key, JSON.stringify(data));
-    this.addAutoBackup(storeCode);
+    this.addAutoBackup(code);
   }
 
-  static loadProductionData(storeCode: string = '1'): { products: Product[]; categories: Category[] } | null {
-    const key = this.getStoreKey(storeCode, 'productionData');
+  static loadProductionData(storeCode?: string): { products: Product[]; categories: Category[] } | null {
+    const code = storeCode ?? this.getCurrentStoreCode();
+    const key = this.getStoreKey(code, 'productionData');
     const data = localStorage.getItem(key);
     if (!data) return null;
     
@@ -984,13 +1134,15 @@ export class StorageService {
     }
   }
 
-  static saveTransactions(transactions: Transaction[], storeCode: string = '1'): void {
-    const key = this.getStoreKey(storeCode, 'transactions');
+  static saveTransactions(transactions: Transaction[], storeCode?: string): void {
+    const code = storeCode ?? this.getCurrentStoreCode();
+    const key = this.getStoreKey(code, 'transactions');
     localStorage.setItem(key, JSON.stringify(transactions));
   }
 
-  static loadTransactions(storeCode: string = '1'): Transaction[] {
-    const key = this.getStoreKey(storeCode, 'transactions');
+  static loadTransactions(storeCode?: string): Transaction[] {
+    const code = storeCode ?? this.getCurrentStoreCode();
+    const key = this.getStoreKey(code, 'transactions');
     const data = localStorage.getItem(key);
     if (!data) return [];
     
@@ -1090,9 +1242,13 @@ export interface ProReceipt {
 }
 
 export class ProReceiptStorage {
+  private static key(): string {
+    return StorageService.getStoreKey(StorageService.getCurrentStoreCode(), 'pro_receipts');
+  }
+
   static loadProReceipts(): ProReceipt[] {
     try {
-      const raw = localStorage.getItem('klick_caisse_pro_receipts');
+      const raw = localStorage.getItem(this.key());
       if (!raw) return [];
       const arr = JSON.parse(raw);
       return Array.isArray(arr) ? arr : [];
@@ -1100,7 +1256,7 @@ export class ProReceiptStorage {
   }
 
   static saveProReceipts(list: ProReceipt[]): void {
-    try { localStorage.setItem('klick_caisse_pro_receipts', JSON.stringify(list)); } catch {}
+    try { localStorage.setItem(this.key(), JSON.stringify(list)); } catch {}
   }
 
   static addProReceipt(data: Omit<ProReceipt, 'id'|'createdAt'|'updatedAt'> & { id?: string }): ProReceipt {

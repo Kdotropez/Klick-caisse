@@ -75,7 +75,7 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     console.log(`[DEBUG] Nombre de clôtures:`, closures.length);
     
     // Debug localStorage
-    console.log(`[DEBUG] localStorage.getItem('klick_caisse_closures'):`, localStorage.getItem('klick_caisse_closures'));
+    console.log(`[DEBUG] closures (boutique courante):`, closures.length);
     
     // Vérifier toutes les clés localStorage
     const allKeys = Object.keys(localStorage).filter(key => key.includes('klick_caisse'));
@@ -459,82 +459,14 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
                  size="small"
                  onClick={() => {
                    if (window.confirm('Récupérer les clôtures depuis les transactions ? Cette action va analyser les transactions quotidiennes et créer des clôtures.')) {
-                     // Exécuter le script de récupération
-                     const script = `
-// Script pour récupérer les clôtures depuis les transactions quotidiennes
-console.log('=== RÉCUPÉRATION DEPUIS LES TRANSACTIONS ===');
-
-// Fonction pour analyser les transactions par jour et créer des clôtures
-function recoverClosuresFromTransactions() {
-  try {
-    // Récupérer les transactions par jour
-    const transactionsByDayRaw = localStorage.getItem('klick_caisse_transactions_by_day');
-    console.log('📊 Transactions par jour trouvées:', !!transactionsByDayRaw);
-    
-    if (!transactionsByDayRaw) {
-      console.log('❌ Aucune transaction par jour trouvée');
-      return [];
-    }
-    
-    const transactionsByDay = JSON.parse(transactionsByDayRaw);
-    console.log('📅 Jours avec transactions:', Object.keys(transactionsByDay));
-    
-    const recoveredClosures = [];
-    let zNumber = 1;
-    
-    // Parcourir chaque jour
-    Object.entries(transactionsByDay).forEach(([dateKey, transactions]) => {
-      if (Array.isArray(transactions) && transactions.length > 0) {
-        console.log(\`📅 Jour \${dateKey}: \${transactions.length} transactions\`);
-        
-        // Calculer le total CA
-        const totalCA = transactions.reduce((sum, tx) => sum + (tx.total || 0), 0);
-        
-        // Créer une clôture
-        const closure = {
-          zNumber: zNumber++,
-          closedAt: dateKey,
-          transactions: transactions,
-          totalCA: totalCA,
-          totalTransactions: transactions.length
-        };
-        
-        recoveredClosures.push(closure);
-        console.log(\`✅ Clôture Z\${closure.zNumber - 1} créée pour \${dateKey}: \${totalCA.toFixed(2)} €\`);
-      }
-    });
-    
-    return recoveredClosures;
-    
-  } catch (error) {
-    console.error('❌ Erreur lors de la récupération:', error);
-    return [];
-  }
-}
-
-// Exécuter la récupération
-const recoveredClosures = recoverClosuresFromTransactions();
-
-if (recoveredClosures.length > 0) {
-  // Sauvegarder dans localStorage
-  localStorage.setItem('klick_caisse_closures', JSON.stringify(recoveredClosures));
-  
-  // Vérifier la sauvegarde
-  const saved = localStorage.getItem('klick_caisse_closures');
-  const parsed = JSON.parse(saved);
-  console.log(\`✅ \${parsed.length} clôtures sauvegardées\`);
-  
-  alert(\`✅ \${parsed.length} clôtures récupérées avec succès! Rechargez la page pour les voir.\`);
-  
-  // Forcer le rechargement des données
-  window.location.reload();
-} else {
-  alert('❌ Aucune clôture récupérée. Vérifiez les logs dans la console.');
-}
-`;
-                     
                      try {
-                       eval(script);
+                       const { created, merged } = StorageService.recoverClosuresFromTransactionsByDay(true);
+                       if (merged > 0) {
+                         alert(`✅ Clôtures mises à jour (${created} créée(s), ${merged} au total). Rechargement…`);
+                         window.location.reload();
+                       } else {
+                         alert('❌ Aucune clôture récupérée. Vérifiez les transactions archivées.');
+                       }
                      } catch (error) {
                        console.error('Erreur lors de la récupération:', error);
                        alert('Erreur lors de la récupération. Vérifiez la console.');

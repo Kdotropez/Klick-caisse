@@ -101,7 +101,8 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
           }
         }
       }
-      const name = `${(header.shopName || 'ticket').replace(/[^a-z0-9-_]+/gi,'_')}-${meta.date}-${meta.ticketNumber || ''}.pdf`;
+      const storeBit = `${StorageService.slugifyStoreForFilename()}-`;
+      const name = `${storeBit}${(header.shopName || 'ticket').replace(/[^a-z0-9-_]+/gi, '_')}-${meta.date}-${meta.ticketNumber || ''}.pdf`;
       pdf.save(name);
     } catch (e) {
       alert('❌ Export PDF impossible');

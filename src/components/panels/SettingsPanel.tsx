@@ -37,7 +37,7 @@ interface SettingsPanelProps {
 const reconstructFromFiles = async (files: File[]) => {
   console.log('📁 Reconstruction à partir des fichiers JSON...');
   
-  const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+  const currentClosures = StorageService.loadClosures();
   const existingZNumbers = new Set(currentClosures.map((c: any) => c.zNumber));
   const missingZNumbers: number[] = [];
   
@@ -127,12 +127,10 @@ const reconstructFromFiles = async (files: File[]) => {
     const allClosures = [...currentClosures, ...reconstructedClosures];
     allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
     
-    // Sauvegarder
-    localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
-    
-    // Mettre à jour le compteur Z
+    StorageService.saveAllClosures(allClosures);
+
     const maxZ = Math.max(...allClosures.map((c: any) => c.zNumber));
-    localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+    StorageService.setZCounterValue(maxZ);
     
     console.log(`🎉 Reconstruction terminée !`);
     console.log(`📊 ${reconstructedClosures.length} clôtures reconstruites`);
@@ -205,7 +203,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       return;
     }
     // Fusion + renumérotation si conflit
-    const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+    const currentClosures: any[] = StorageService.loadClosures();
     const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
     let maxZExisting = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
     const findNextAvailable = (start: number) => {
@@ -217,9 +215,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
     const imported: any[] = [];
     const mapping: Array<{ from?: number; to: number; count: number; ca: number }>=[];
-    const txMergeMap: Record<string, any[]> = (() => {
-      try { const raw = localStorage.getItem('klick_caisse_transactions_by_day'); return raw ? JSON.parse(raw) : {}; } catch { return {}; }
-    })();
+    const txMergeMap: Record<string, any[]> = StorageService.getTransactionsByDayMap();
 
     for (const e of selected) {
       const originalZ = Number(e.z) || 0;
@@ -239,9 +235,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     }
 
     const merged = [...currentClosures, ...imported].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
-    localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
-    localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(txMergeMap));
-    localStorage.setItem('klick_caisse_z_counter', String(maxZExisting));
+    StorageService.saveAllClosures(merged);
+    StorageService.saveTransactionsByDayMap(txMergeMap);
+    StorageService.setZCounterValue(maxZExisting);
 
     const lines = mapping.sort((a,b)=>a.to-b.to).map(m=>`Z${m.from ?? '-'} → Z${m.to} · ${m.count} tickets · ${m.ca.toFixed(2)}€`);
     alert(`✅ Import terminé: ${imported.length} clôtures ajoutées.\n\n${lines.join('\n')}`);
@@ -405,10 +401,12 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         }}
         onClick={() => {
           try {
+            const code = StorageService.getCurrentStoreCode();
+            localStorage.removeItem(StorageService.getStoreKey(code, 'productionData'));
+            StorageService.removeActiveStoreEntry('settings');
             localStorage.removeItem('klick_caisse_products');
             localStorage.removeItem('klick_caisse_categories');
             localStorage.removeItem('klick_caisse_settings');
-            // Réinjecter immédiatement la base intégrée et les sous-catégories
             resetToEmbeddedBase();
             alert('Données locales réinitialisées. Base intégrée restaurée. Rechargement...');
             window.location.reload();
@@ -694,30 +692,34 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   hasTransactions: !!data.transactionsByDay
                 });
                 
-                // Restaurer les données
-                if (data.products) {
-                  localStorage.setItem('klick_caisse_products', JSON.stringify(data.products));
-                  console.log('✅ Produits restaurés:', data.products.length);
+                // Restaurer les données (boutique courante)
+                if (data.products && data.categories) {
+                  StorageService.saveProductionData(data.products, data.categories);
+                  console.log('✅ Produits + catégories restaurés:', data.products.length, data.categories.length);
+                } else {
+                  if (data.products) {
+                    StorageService.saveProducts(data.products);
+                    console.log('✅ Produits restaurés:', data.products.length);
+                  }
+                  if (data.categories) {
+                    StorageService.saveCategories(data.categories);
+                    console.log('✅ Catégories restaurées:', data.categories.length);
+                  }
                 }
-                
-                if (data.categories) {
-                  localStorage.setItem('klick_caisse_categories', JSON.stringify(data.categories));
-                  console.log('✅ Catégories restaurées:', data.categories.length);
-                }
-                
+
                 if (data.settings) {
-                  localStorage.setItem('klick_caisse_settings', JSON.stringify(data.settings));
+                  StorageService.saveSettings(data.settings);
                   console.log('✅ Paramètres restaurés');
                 }
-                
+
                 if (data.subcategories) {
-                  localStorage.setItem('klick_caisse_subcategories', JSON.stringify(data.subcategories));
+                  StorageService.saveSubcategories(data.subcategories);
                   console.log('✅ Sous-catégories restaurées:', data.subcategories.length);
                 }
                 
                 if (data.closures) {
                   // Fusionner intelligemment les clôtures au lieu de les remplacer
-                  const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                  const currentClosures = StorageService.loadClosures();
                   const newClosures = data.closures;
                   
                   // Créer un Set des numéros Z existants pour éviter les doublons
@@ -740,27 +742,27 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   // Trier par numéro Z
                   mergedClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
                   
-                  localStorage.setItem('klick_caisse_closures', JSON.stringify(mergedClosures));
+                  StorageService.saveAllClosures(mergedClosures);
                   console.log(`✅ Clôtures fusionnées: ${addedCount} nouvelles + ${currentClosures.length} existantes = ${mergedClosures.length} total`);
                 }
-                
+
                 if (data.zCounter !== undefined) {
-                  localStorage.setItem('klick_caisse_z_counter', String(data.zCounter));
+                  StorageService.setZCounterValue(Number(data.zCounter));
                   console.log('✅ Compteur Z restauré:', data.zCounter);
                 }
-                
+
                 if (data.transactionsByDay) {
-                  localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(data.transactionsByDay));
+                  StorageService.saveTransactionsByDayMap(data.transactionsByDay as Record<string, any[]>);
                   console.log('✅ Transactions restaurées');
                 }
-                
+
                 if (data.cashiers) {
-                  localStorage.setItem('klick_caisse_cashiers', JSON.stringify(data.cashiers));
+                  StorageService.saveCashiers(data.cashiers);
                   console.log('✅ Caissiers restaurés:', data.cashiers.length);
                 }
                 
                 // Calculer le nombre total de clôtures après fusion
-                const finalClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                const finalClosures = StorageService.loadClosures();
                 const finalZNumbers = finalClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
                 
                 const message = `✅ Restauration terminée avec succès !\n\n` +
@@ -875,7 +877,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   return;
                 }
                 // Charger les clôtures locales et vérifier disponibilité du Z cible
-                const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                const currentClosures: any[] = StorageService.loadClosures();
                 const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
                 const maxZ = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
 
@@ -899,15 +901,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
                 selected = { ...selected, zNumber: targetZ };
                 const merged = [...currentClosures, selected].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
-                localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
+                StorageService.saveAllClosures(merged);
                 const newCounter = Math.max(maxZ, Number(selected.zNumber) || 0);
-                localStorage.setItem('klick_caisse_z_counter', String(newCounter));
+                StorageService.setZCounterValue(newCounter);
 
-                // Fusionner transactionsByDay pour assurer la visibilité dans les rapports
                 const txs = Array.isArray(selected?.transactions) ? selected.transactions : [];
                 try {
-                  const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-                  const map: Record<string, any[]> = raw ? JSON.parse(raw) : {};
+                  const map = StorageService.getTransactionsByDayMap();
                   for (const t of txs) {
                     const d = new Date(t?.timestamp);
                     const day = isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
@@ -915,7 +915,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     if (!Array.isArray(map[day])) map[day] = [];
                     map[day].push(t);
                   }
-                  localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(map));
+                  StorageService.saveTransactionsByDayMap(map);
                 } catch {}
 
                 alert(`✅ Z importé: Z${selected.zNumber} (tickets: ${txs.length}).`);
@@ -965,10 +965,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 // 1. Récupérer les clôtures actuelles
                 let currentClosures: any[] = [];
                 try {
-                  const current = localStorage.getItem('klick_caisse_closures');
-                  if (current) {
-                    currentClosures = JSON.parse(current);
-                  }
+                  currentClosures = StorageService.loadClosures();
                 } catch (e) {
                   console.error('❌ Erreur lecture clôtures actuelles:', e);
                 }
@@ -1024,15 +1021,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   const allClosures = [...currentClosures, ...recoveredClosures];
                   allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
                   
-                  // 6. Sauvegarder
-                  localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
+                  StorageService.saveAllClosures(allClosures);
                   console.log(`✅ ${allClosures.length} clôtures sauvegardées au total`);
-                  
-                  // Mettre à jour le compteur Z si nécessaire
+
                   const maxZ = Math.max(...allClosures.map((c: any) => c.zNumber));
-                  const currentCounter = parseInt(localStorage.getItem('klick_caisse_z_counter') || '0');
+                  const currentCounter = StorageService.getCurrentZNumber();
                   if (maxZ > currentCounter) {
-                    localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+                    StorageService.setZCounterValue(maxZ);
                     console.log(`🔢 Compteur Z mis à jour : ${maxZ}`);
                   }
                   
@@ -1123,14 +1118,12 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
               return;
             }
             
-            // 1. Récupérer toutes les transactions archivées du localStorage
-            const transactionsByDay = localStorage.getItem('klick_caisse_transactions_by_day');
-            if (!transactionsByDay) {
+            const txMap = StorageService.getTransactionsByDayMap();
+            if (Object.keys(txMap).length === 0) {
               alert('❌ Aucune transaction archivée trouvée dans le localStorage.\n\nEssayez avec les fichiers JSON de sauvegarde.');
               return;
             }
             
-            const txMap = JSON.parse(transactionsByDay);
             const allTransactions: any[] = [];
             
             // Parcourir tous les jours
@@ -1145,7 +1138,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             console.log(`📊 ${allTransactions.length} transactions archivées trouvées`);
             
             // 2. Identifier les gaps
-            const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+            const currentClosures = StorageService.loadClosures();
             const existingZNumbers = new Set(currentClosures.map((c: any) => c.zNumber));
             const missingZNumbers: number[] = [];
             
@@ -1214,12 +1207,10 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
               const allClosures = [...currentClosures, ...reconstructedClosures];
               allClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
               
-              // 6. Sauvegarder
-              localStorage.setItem('klick_caisse_closures', JSON.stringify(allClosures));
-              
-              // Mettre à jour le compteur Z
+              StorageService.saveAllClosures(allClosures);
+
               const maxZ = Math.max(...allClosures.map((c: any) => c.zNumber));
-              localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+              StorageService.setZCounterValue(maxZ);
               
               console.log(`🎉 Reconstruction terminée !`);
               console.log(`📊 ${reconstructedClosures.length} clôtures reconstruites`);
@@ -1272,7 +1263,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           try {
             console.log('🧹 Nettoyage des doublons de clôtures...');
             
-            const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+            const currentClosures = StorageService.loadClosures();
             console.log(`📊 Avant nettoyage: ${currentClosures.length} clôtures`);
             
             // Supprimer les doublons en gardant la première occurrence de chaque Z
@@ -1293,12 +1284,10 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             // Trier par numéro Z
             uniqueClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
             
-            // Sauvegarder les clôtures nettoyées
-            localStorage.setItem('klick_caisse_closures', JSON.stringify(uniqueClosures));
-            
-            // Mettre à jour le compteur Z
+            StorageService.saveAllClosures(uniqueClosures);
+
             const maxZ = Math.max(...uniqueClosures.map((c: any) => c.zNumber));
-            localStorage.setItem('klick_caisse_z_counter', String(maxZ));
+            StorageService.setZCounterValue(maxZ);
             
             const zNumbers = uniqueClosures.map((c: any) => c.zNumber);
             
@@ -1344,8 +1333,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         }}
         onClick={() => {
           try {
-            const currentClosures = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
-            const zCounter = parseInt(localStorage.getItem('klick_caisse_z_counter') || '0');
+            const currentClosures = StorageService.loadClosures();
+            const zCounter = StorageService.getCurrentZNumber();
             
             if (currentClosures.length === 0) {
               alert('ℹ️ Aucune clôture Z en mémoire à supprimer.');
@@ -1373,9 +1362,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
               return;
             }
             
-            // Supprimer toutes les clôtures
-            localStorage.removeItem('klick_caisse_closures');
-            localStorage.removeItem('klick_caisse_z_counter');
+            StorageService.removeActiveStoreEntry('closures');
+            StorageService.removeActiveStoreEntry('z_counter');
             
             console.log('🗑️ Toutes les clôtures Z supprimées de la mémoire');
             
@@ -1417,7 +1405,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={() => {
           try {
             if (!window.confirm('Supprimer TOUTES les archives de tickets (transactions_by_day) ?')) return;
-            localStorage.removeItem('klick_caisse_transactions_by_day');
+            StorageService.removeActiveStoreEntry('transactions_by_day');
             try { StorageService.clearTodayTransactions(); } catch {}
             alert('✅ Tickets archivés purgés.');
           } catch (e) {
@@ -1447,12 +1435,10 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onClick={() => {
           try {
             if (!window.confirm('Purge COMPLÈTE ventes (Z + tickets jour + archives) ?')) return;
-            // Clôtures
-            localStorage.removeItem('klick_caisse_closures');
-            localStorage.removeItem('klick_caisse_z_counter');
-            // Tickets jour + archives
+            StorageService.removeActiveStoreEntry('closures');
+            StorageService.removeActiveStoreEntry('z_counter');
             try { StorageService.clearTodayTransactions(); } catch {}
-            localStorage.removeItem('klick_caisse_transactions_by_day');
+            StorageService.removeActiveStoreEntry('transactions_by_day');
             alert('✅ Purge ventes effectuée.');
           } catch (e) {
             alert('❌ Erreur purge ventes');
@@ -1502,7 +1488,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 );
                 if (importAll) {
                   // Charger clôtures existantes et préparer renumérotation si conflit
-                  const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                  const currentClosures: any[] = StorageService.loadClosures();
                   const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
                   const findNextAvailable = (start: number) => {
                     let z = Math.max(1, Number(start) || 1);
@@ -1545,7 +1531,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 const selected = entries.find(e => e.idx === pickIdx)!;
 
                 // Préparer numéro Z cible
-                const currentClosures: any[] = JSON.parse(localStorage.getItem('klick_caisse_closures') || '[]');
+                const currentClosures: any[] = StorageService.loadClosures();
                 const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
                 const maxZ = currentClosures.reduce((m, c) => Math.max(m, Number(c?.zNumber) || 0), 0);
                 const defaultTarget = used.has(selected.z) ? (maxZ + 1) : (selected.z || (maxZ + 1));
@@ -1566,15 +1552,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
                 const closureToImport = { ...selected.raw, zNumber: targetZ };
                 const merged = [...currentClosures, closureToImport].sort((a, b) => Number(a.zNumber) - Number(b.zNumber));
-                localStorage.setItem('klick_caisse_closures', JSON.stringify(merged));
+                StorageService.saveAllClosures(merged);
                 const newCounter = Math.max(maxZ, Number(targetZ) || 0);
-                localStorage.setItem('klick_caisse_z_counter', String(newCounter));
+                StorageService.setZCounterValue(newCounter);
 
-                // Fusionner transactionsByDay
                 const txs = Array.isArray(closureToImport?.transactions) ? closureToImport.transactions : [];
                 try {
-                  const raw = localStorage.getItem('klick_caisse_transactions_by_day');
-                  const map: Record<string, any[]> = raw ? JSON.parse(raw) : {};
+                  const map = StorageService.getTransactionsByDayMap();
                   for (const t of txs) {
                     const d = new Date(t?.timestamp);
                     const day = isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
@@ -1582,7 +1566,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     if (!Array.isArray(map[day])) map[day] = [];
                     map[day].push(t);
                   }
-                  localStorage.setItem('klick_caisse_transactions_by_day', JSON.stringify(map));
+                  StorageService.saveTransactionsByDayMap(map);
                 } catch {}
 
                 alert(`✅ Z importé depuis fichier: Z${targetZ} (tickets: ${txs.length}).`);
