@@ -117,10 +117,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Dimensions pour l'émulation 1920×1080
   const APP_BAR_HEIGHT = 64;
 
-  const activeStoreDisplayName = useMemo(() => {
-    const code = currentStoreCode ?? StorageService.getCurrentStoreCode();
-    return getStoreByCode(code)?.name ?? 'Boutique';
-  }, [currentStoreCode]);
+  const activeStoreCode = currentStoreCode ?? StorageService.getCurrentStoreCode();
 
   // Facteur d'échelle global pour réduire l'ensemble du programme de 10%
   const GLOBAL_SCALE_FACTOR = 0.9;
@@ -393,6 +390,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     
     setPendingCompensations(null);
     setShowCompensationChoiceModal(false);
+    // Nettoyage basé sur l'état panier ; inclure itemDiscounts déclencherait des boucles.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartItems]);
 
   // Fonction pour vérifier si les conditions de compensation sont remplies
@@ -811,7 +810,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       // Cibles de compensation: catégories "seau" et "vasque(s)"
       // Créer des lignes groupées par produit pour permettre les compensations multiples
       const targetLineInfos: Array<{ key: string; subtotal: number; qty: number; availableSlots: number }> = [];
-      let totalTargetQty = 0;
       for (const it of cartItems) {
         const catNorm = normalizeKey(it.product.category || '');
         if (catNorm.includes('seau') || catNorm.includes('vasque')) {
@@ -821,7 +819,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           
           // Créer une ligne avec le nombre de slots disponibles égal à la quantité
           targetLineInfos.push({ key, subtotal: unit * qty, qty, availableSlots: qty });
-          totalTargetQty += qty;
         }
       }
 
@@ -874,7 +871,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         }
 
         const hasVasqueTargets = targetLineInfos.some(t => {
-          const keyParts = t.key.split('-');
           const prod = cartItems.find(ci => `${ci.product.id}-${ci.selectedVariation?.id || 'main'}` === t.key)?.product;
           const catNorm = normalizeKey(prod?.category || '');
           return catNorm.includes('vasque');
@@ -916,7 +912,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         const maxVasqueComps = Math.floor(totalGlassesForVasque / 12);
         for (const sub of Object.keys(qtyBySubcat)) {
           const totalQty = qtyBySubcat[sub] || 0;
-          const compPerSet = SEAU_COMP_BY_SUB[sub] || 0;
           const percentVerre = autoGlassDiscountEnabled ? (DISCOUNT_BY_SUBCAT[sub] || 0) : 0;
           const keys = lineKeysBySubcat[sub] || [];
           const pools = keys.map(k => keyToInfo[k]).filter(Boolean).map(info => ({ unit: info.unit, qty: info.qty }));
@@ -1238,7 +1233,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Packs -> Seaux/Vasques (compensation nette) - avec choix utilisateur si nécessaire
         if (packBasedComps.length > 0) {
           const hasVasqueTargets = vasqueTargets.length > 0;
-          const totalTargets = seauTargets.length + (hasVasqueTargets ? 1 : 0);
           
           console.log(`[DEBUG] Vérification choix: packBasedComps=${packBasedComps.length}, seauTargets=${seauTargets.length}, hasVasqueTargets=${hasVasqueTargets}`);
           
@@ -1405,7 +1399,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       if (!raw) return '';
       let s = String(raw).trim().replace(/\s+/g, '');
       s = s.replace(/,/g, '.');
-      if (/e[+\-]?/i.test(s)) {
+      if (/e[+-]?/i.test(s)) {
         const n = Number.parseFloat(s);
         if (Number.isFinite(n)) s = Math.round(n).toString();
       }
@@ -3597,7 +3591,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           pointerEvents: 'none',
         }}
       >
-        Boutique : {activeStoreDisplayName}
+        Boutique : {getStoreByCode(activeStoreCode)?.name ?? 'Boutique'}
       </Box>
       {/* Indicateur de mode drag and drop */}
       {isDragging && (

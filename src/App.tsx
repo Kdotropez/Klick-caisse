@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box } from '@mui/material';
 import WindowManager from './components/WindowManager';
 import LicenseModal from './components/LicenseModal';
@@ -283,7 +283,7 @@ const App: React.FC = () => {
   };
 
   // Vérifier si la licence est toujours valide (même date)
-  const checkLicenseValidity = () => {
+  const checkLicenseValidity = useCallback(() => {
     const today = new Date().toLocaleDateString('fr-FR');
     if (lastValidatedDate !== today) {
       setIsLicenseValid(false);
@@ -291,14 +291,14 @@ const App: React.FC = () => {
       setLastValidatedDate('');
       setIsLocked(false);
     }
-  };
+  }, [lastValidatedDate]);
 
   // Gestion du verrouillage automatique
   const updateActivity = () => {
     setLastActivity(Date.now());
   };
 
-  const checkAutoLock = () => {
+  const checkAutoLock = useCallback(() => {
     if (isLicenseValid && !isLocked) {
       const now = Date.now();
       const timeSinceLastActivity = now - lastActivity;
@@ -309,7 +309,7 @@ const App: React.FC = () => {
         setShowLicenseModal(true);
       }
     }
-  };
+  }, [isLicenseValid, isLocked, lastActivity]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -346,7 +346,7 @@ const App: React.FC = () => {
         document.removeEventListener('visibilitychange', handleFocus);
       };
     }
-  }, [isLicenseValid, lastValidatedDate, lastActivity, isLocked]);
+  }, [isLicenseValid, lastValidatedDate, lastActivity, isLocked, checkLicenseValidity, checkAutoLock]);
 
   const rootWidthPx = parseInt(rootSize.width);
   const rootHeightPx = parseInt(rootSize.height);

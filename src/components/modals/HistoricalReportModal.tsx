@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -26,7 +26,6 @@ import {
   Grid,
   Card,
   CardContent,
-  Divider
 } from '@mui/material';
 import { ExpandMore, TrendingUp, ShoppingCart, Euro } from '@mui/icons-material';
 import { StorageService } from '../../services/StorageService';
@@ -85,7 +84,7 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
   }, []);
 
   // Fonction pour calculer les dates selon la période sélectionnée
-  const getPeriodDates = (period: string) => {
+  const getPeriodDates = useCallback((period: string) => {
     const today = new Date();
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth();
@@ -142,7 +141,7 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
         console.log(`[DEBUG] Période personnalisée: ${startDate} - ${endDate}`);
         return { start: startDate, end: endDate };
     }
-  };
+  }, [startDate, endDate]);
 
   // Filtrer les clôtures par période
   const filteredClosures = useMemo(() => {
@@ -169,7 +168,7 @@ const HistoricalReportModal: React.FC<HistoricalReportModalProps> = ({ open, onC
     
     console.log(`[DEBUG] Clôtures filtrées: ${filtered.length} sur ${allClosures.length}`);
     return filtered;
-  }, [allClosures, selectedPeriod, startDate, endDate]);
+  }, [allClosures, selectedPeriod, getPeriodDates]);
 
   // Calculer les statistiques globales
   const globalStats = useMemo(() => {

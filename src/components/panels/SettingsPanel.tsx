@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Checkbox, FormControlLabel, Divider } from '@mui/material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Checkbox, Divider } from '@mui/material';
 import ExcludeDiscountCategoriesModal from '../modals/ExcludeDiscountCategoriesModal';
-import { CheckCircle, Update, Assessment } from '@mui/icons-material';
+import { Assessment } from '@mui/icons-material';
 import { resetToEmbeddedBase } from '../../data/productionData';
 import { StorageService } from '../../services/StorageService';
 import { UpdateService } from '../../services/UpdateService';
@@ -861,7 +861,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                       const sub = window.prompt(
                         `Plusieurs Z${num} trouvés. Choisissez parmi:\n` +
                         subLines.join('\n') +
-                        `\n\nEntrez l\'index (1..${same.length})`
+                        `\n\nEntrez l'index (1..${same.length})`
                       );
                       const subIdx = parseInt(sub || '', 10);
                       if (!Number.isFinite(subIdx) || subIdx < 1 || subIdx > same.length) {
@@ -1487,16 +1487,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   `Annuler = choisir un seul Z à importer`
                 );
                 if (importAll) {
-                  // Charger clôtures existantes et préparer renumérotation si conflit
-                  const currentClosures: any[] = StorageService.loadClosures();
-                  const used = new Set(currentClosures.map(c => Number(c?.zNumber) || 0));
-                  const findNextAvailable = (start: number) => {
-                    let z = Math.max(1, Number(start) || 1);
-                    while (used.has(z)) z++;
-                    used.add(z);
-                    return z;
-                  };
-
                   // Construire les entrées de prévisualisation et ouvrir la modale
                   const entries = closures.map((c: any, i: number) => {
                     const z = Number(c?.zNumber) || 0;

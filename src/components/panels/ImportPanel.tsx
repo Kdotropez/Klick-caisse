@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { CheckCircle } from '@mui/icons-material';
 
 interface ImportPanelProps {
   productsCount: number;

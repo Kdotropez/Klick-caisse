@@ -48,7 +48,6 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [range, setRange] = useState<{ from: string; to: string }>(() => {
-    const d = new Date();
     const key = new Date().toISOString().slice(0, 10);
     return { from: key, to: key };
   });

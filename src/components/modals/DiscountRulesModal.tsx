@@ -160,7 +160,10 @@ const DiscountRulesModal: React.FC<DiscountRulesModalProps> = ({ open, onClose }
     return subcategoryOptionsAll;
   };
 
-  useEffect(() => { if (open) setRows(loadRowsFromSettings()); }, [open]);
+  useEffect(() => {
+    if (open) setRows(loadRowsFromSettings());
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- recharger depuis le stockage à l'ouverture
+  }, [open]);
 
   const addRow = () => {
     setRows(prev => [...prev, { id: String(Date.now()), minQty: 6, subcategory: '', target: 'seau', amount: 0, sourceCategory: 'verres' }]);

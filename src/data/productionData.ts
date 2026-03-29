@@ -4,7 +4,6 @@
 
 import { Product, Category } from '../types';
 import { StorageService } from '../services/StorageService';
-import { APP_VERSION } from '../version';
 
 // Import de la nouvelle base de données
 import newBaseData from '../base complete 15 aout.nested.json';

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import {
   Box,
   Paper,
@@ -90,19 +90,6 @@ const CartPanel: React.FC<CartPanelProps> = ({
       item.quantity > 0
     );
   }, [cartItems]);
-
-  // Callbacks stables pour éviter les re-rendus
-  const handleUpdateQuantity = useCallback((productId: string, variationId: string | null, quantity: number) => {
-    onUpdateQuantity(productId, variationId, quantity);
-  }, [onUpdateQuantity]);
-
-  const handleRemoveItem = useCallback((productId: string, variationId: string | null) => {
-    onRemoveItem(productId, variationId);
-  }, [onRemoveItem]);
-
-  const handleOpenDiscountModal = useCallback((item: CartItem) => {
-    onOpenDiscountModal(item);
-  }, [onOpenDiscountModal]);
 
   // Auto-scroll vers le bas quand de nouveaux articles sont ajoutés
   useEffect(() => {

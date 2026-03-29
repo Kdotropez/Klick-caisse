@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, List, ListItem, ListItemText, IconButton, TextField, Box } from '@mui/material';
-import { Delete, Edit, Print, Download } from '@mui/icons-material';
+import { Delete, Edit, Download } from '@mui/icons-material';
 import { ProReceiptStorage, ProReceipt, StorageService } from '../../services/StorageService';
 
 interface ProReceiptsManagerModalProps {
@@ -11,7 +11,10 @@ interface ProReceiptsManagerModalProps {
 
 const ProReceiptsManagerModal: React.FC<ProReceiptsManagerModalProps> = ({ open, onClose, onOpenEditor }) => {
   const [search, setSearch] = useState('');
-  const list = useMemo(() => ProReceiptStorage.loadProReceipts(), [open]);
+  const [list, setList] = useState(() => ProReceiptStorage.loadProReceipts());
+  useEffect(() => {
+    if (open) setList(ProReceiptStorage.loadProReceipts());
+  }, [open]);
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
     if (!s) return list;

@@ -9,9 +9,8 @@ import {
   Typography,
   Box,
   Alert,
-  IconButton
 } from '@mui/material';
-import { Close, Lock, CheckCircle, Error } from '@mui/icons-material';
+import { Lock, CheckCircle, Error } from '@mui/icons-material';
 import { validateLicenseCode, getTodayCode, getExpectedFormat, LicenseInfo } from '../utils/license';
 
 interface LicenseModalProps {

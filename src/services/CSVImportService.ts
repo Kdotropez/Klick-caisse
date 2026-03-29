@@ -274,6 +274,7 @@ export class CSVImportService {
   private static sanitizeSubcategoryLabel(input: string): string {
     try {
       return String(input)
+        // eslint-disable-next-line no-control-regex -- retirer les caractères de contrôle
         .replace(/[\x00-\x1F\x7F]/g, '')
         .replace(/\s+/g, ' ')
         .trim();

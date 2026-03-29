@@ -110,7 +110,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
   };
   const settings = useMemo(() => {
     try { return StorageService.loadSettings() || {}; } catch { return {}; }
-  }, [open]);
+  }, []);
 
   const defaults = (settings && settings.professionalReceiptDefaults) || {};
   const themeDefaults = (defaults && (defaults as any).theme) || (settings && (settings as any).professionalReceiptTheme) || {};
@@ -223,7 +223,7 @@ export const ProReceiptModal: React.FC<ProReceiptModalProps> = ({ open, onClose 
       setGiftLabel(d.giftLabel || 'Cadeaux entreprise');
       setGiftTaxRate(Number.isFinite(Number(d.giftTaxRate)) ? Number(d.giftTaxRate) : (Number.isFinite(Number(d.taxRateDefault)) ? Number(d.taxRateDefault) : 20));
       // Thème depuis defaults.theme (nouveau) ou ancien emplacement
-      const t = (d && (d as any).theme) || themeDefaults || {};
+      const t = (d && (d as any).theme) || (s as any).professionalReceiptTheme || {};
       setTheme(prev => ({
         logoDataUrl: t.logoDataUrl || prev.logoDataUrl || '',
         primaryColor: t.primaryColor || prev.primaryColor || '#222222',
