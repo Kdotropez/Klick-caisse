@@ -26,7 +26,7 @@ export const useKeyboardShortcuts = ({
       return;
     }
 
-    const { key, ctrlKey, shiftKey, altKey } = event;
+    const { key, ctrlKey, altKey } = event;
 
     // Raccourcis de base
     switch (key.toLowerCase()) {

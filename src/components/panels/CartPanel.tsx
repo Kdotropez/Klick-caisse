@@ -78,6 +78,21 @@ const CartPanel: React.FC<CartPanelProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [editingPrice, setEditingPrice] = useState<{ key: string; value: string } | null>(null);
 
+  const settings = useMemo(() => {
+    try {
+      return StorageService.loadSettings() || ({} as any);
+    } catch {
+      return {} as any;
+    }
+  }, []);
+
+  const excludedDiscountLists = useMemo(() => {
+    const excludedCats: string[] = Array.isArray(settings.excludedDiscountCategories) ? settings.excludedDiscountCategories : [];
+    const excludedSub: string[] = Array.isArray(settings.excludedDiscountSubcategories) ? settings.excludedDiscountSubcategories : [];
+    const excludedProd: string[] = Array.isArray(settings.excludedDiscountProductIds) ? settings.excludedDiscountProductIds : [];
+    return { excludedCats, excludedSub, excludedProd };
+  }, [settings]);
+
   // Protection contre les états incohérents avec stabilisation
   const safeCartItems = useMemo(() => {
     if (!Array.isArray(cartItems)) return [];
@@ -90,6 +105,59 @@ const CartPanel: React.FC<CartPanelProps> = ({
       item.quantity > 0
     );
   }, [cartItems]);
+
+  const totalsBreakdown = useMemo(() => {
+    const items = Array.isArray(cartItems) ? cartItems : [];
+
+    // Subtotal (toutes lignes)
+    const subtotal = items.reduce((sum, item) => {
+      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+      return sum + (originalPrice * item.quantity);
+    }, 0);
+
+    // Remises individuelles (ligne)
+    const individualDiscounts = items.reduce((sum, item) => {
+      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+      const originalTotal = originalPrice * item.quantity;
+      const finalPrice = getItemFinalPrice(item);
+      const finalTotal = finalPrice * item.quantity;
+      return sum + (originalTotal - finalTotal);
+    }, 0);
+
+    // Remise globale (ticket) en excluant catégories/sous-catégories/produits marqués exclus
+    let globalDiscountAmount = 0;
+    if (globalDiscount) {
+      const norm = (s: string) => StorageService.normalizeLabel(String(s || ''));
+      const excludedCats = new Set((excludedDiscountLists.excludedCats || []).map(norm));
+      const excludedSub = new Set((excludedDiscountLists.excludedSub || []).map(norm));
+      const excludedProd: string[] = excludedDiscountLists.excludedProd || [];
+
+      const isExcluded = (it: typeof items[number]) => {
+        if (excludedProd.includes(it.product.id)) return true;
+        const cat = it.product?.category || '';
+        if (excludedCats.has(norm(cat))) return true;
+        const subs: string[] = Array.isArray((it.product as any)?.associatedCategories) ? (it.product as any).associatedCategories : [];
+        return subs.some(s => excludedSub.has(norm(s)));
+      };
+
+      const totalWithoutIndividualDiscount = items.reduce((sum, item) => {
+        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+        const hasIndividualDiscount = itemDiscounts[discountKey];
+        if (!hasIndividualDiscount && !isExcluded(item)) {
+          const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+          return sum + (originalPrice * item.quantity);
+        }
+        return sum;
+      }, 0);
+
+      globalDiscountAmount = globalDiscount.type === 'euro'
+        ? Math.min(totalWithoutIndividualDiscount, globalDiscount.value)
+        : totalWithoutIndividualDiscount * (globalDiscount.value / 100);
+    }
+
+    const totalDiscounts = individualDiscounts + globalDiscountAmount;
+    return { subtotal, individualDiscounts, globalDiscountAmount, totalDiscounts };
+  }, [cartItems, excludedDiscountLists, getItemFinalPrice, globalDiscount, itemDiscounts]);
 
   // Auto-scroll vers le bas quand de nouveaux articles sont ajoutés
   useEffect(() => {
@@ -138,10 +206,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
         ) : (
           <List dense>
             {safeCartItems.map((item, index) => {
-              const settings = StorageService.loadSettings() || ({} as any);
-              const excludedCats: string[] = Array.isArray(settings.excludedDiscountCategories) ? settings.excludedDiscountCategories : [];
-              const excludedSub: string[] = Array.isArray(settings.excludedDiscountSubcategories) ? settings.excludedDiscountSubcategories : [];
-              const excludedProd: string[] = Array.isArray(settings.excludedDiscountProductIds) ? settings.excludedDiscountProductIds : [];
+              const { excludedCats, excludedSub, excludedProd } = excludedDiscountLists;
               const isExcludedForDiscount = (() => {
                 if (excludedProd.includes(item.product.id)) return true;
                 const cat = item.product?.category || '';
@@ -152,11 +217,6 @@ const CartPanel: React.FC<CartPanelProps> = ({
               const variationId = item.selectedVariation?.id || null;
               const discountKey = `${item.product.id}-${variationId || 'main'}`;
               const discount = itemDiscounts[discountKey];
-              if (discount) {
-                console.log(`[CART] remise détectée pour ${discountKey}:`, discount);
-              } else {
-                console.log(`[CART] aucune remise pour ${discountKey}`);
-              }
               const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
               const finalPrice = getItemFinalPrice(item);
               const originalTotal = originalPrice * item.quantity;
@@ -396,71 +456,22 @@ const CartPanel: React.FC<CartPanelProps> = ({
       </Box>
 
       <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
-        {(() => {
-          // Subtotal (toutes lignes)
-          const subtotal = cartItems.reduce((sum, item) => {
-            const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-            return sum + (originalPrice * item.quantity);
-          }, 0);
-
-          // Remises individuelles (ligne)
-          const individualDiscounts = cartItems.reduce((sum, item) => {
-            const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-            const originalTotal = originalPrice * item.quantity;
-            const finalPrice = getItemFinalPrice(item);
-            const finalTotal = finalPrice * item.quantity;
-            return sum + (originalTotal - finalTotal);
-          }, 0);
-
-          // Remise globale (ticket) en excluant catégories/sous-catégories/produits marqués exclus
-          let globalDiscountAmount = 0;
-          if (globalDiscount) {
-            const settings = StorageService.loadSettings() || ({} as any);
-            const norm = (s: string) => StorageService.normalizeLabel(String(s||''));
-            const excludedCats = new Set((Array.isArray(settings.excludedDiscountCategories)?settings.excludedDiscountCategories:[]).map(norm));
-            const excludedSub = new Set((Array.isArray(settings.excludedDiscountSubcategories)?settings.excludedDiscountSubcategories:[]).map(norm));
-            const excludedProd: string[] = Array.isArray(settings.excludedDiscountProductIds) ? settings.excludedDiscountProductIds : [];
-            const isExcluded = (it: typeof cartItems[number]) => {
-              if (excludedProd.includes(it.product.id)) return true;
-              const cat = it.product?.category || '';
-              if (excludedCats.has(norm(cat))) return true;
-              const subs: string[] = Array.isArray((it.product as any)?.associatedCategories) ? (it.product as any).associatedCategories : [];
-              return subs.some(s => excludedSub.has(norm(s)));
-            };
-            const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
-              const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-              const hasIndividualDiscount = itemDiscounts[discountKey];
-              if (!hasIndividualDiscount && !isExcluded(item)) {
-                const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                return sum + (originalPrice * item.quantity);
-              }
-              return sum;
-            }, 0);
-            globalDiscountAmount = globalDiscount.type === 'euro'
-              ? Math.min(totalWithoutIndividualDiscount, globalDiscount.value)
-              : totalWithoutIndividualDiscount * (globalDiscount.value / 100);
-          }
-
-          const totalDiscounts = individualDiscounts + globalDiscountAmount;
-          return (
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Sous-total: {subtotal.toFixed(2)} €</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                <Typography variant="body2" sx={{ color: '#f44336', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-                  Remises: -{totalDiscounts.toFixed(2)} €
-                </Typography>
-                {globalDiscount && (
-                  <IconButton size="small" onClick={onClearGlobalDiscount} sx={{ color: '#f44336', p: 0.25 }} title="Annuler la remise principale">
-                    ✕
-                  </IconButton>
-                )}
-              </Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                Total: {total.toFixed(2)} €
-              </Typography>
-            </Box>
-          );
-        })()}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'center', gap: 1, mb: 0.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Sous-total: {totalsBreakdown.subtotal.toFixed(2)} €</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+            <Typography variant="body2" sx={{ color: '#f44336', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+              Remises: -{totalsBreakdown.totalDiscounts.toFixed(2)} €
+            </Typography>
+            {globalDiscount && (
+              <IconButton size="small" onClick={onClearGlobalDiscount} sx={{ color: '#f44336', p: 0.25 }} title="Annuler la remise principale">
+                ✕
+              </IconButton>
+            )}
+          </Box>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textAlign: 'right', whiteSpace: 'nowrap' }}>
+            Total: {total.toFixed(2)} €
+          </Typography>
+        </Box>
 
         <Box sx={{ display: 'flex', gap: 0.25, mt: 1 }}>
           <Button

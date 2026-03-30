@@ -5,9 +5,6 @@ import PaymentPanel from './panels/PaymentPanel';
 import SettingsPanel from './panels/SettingsPanel';
 import ImportPanel from './panels/ImportPanel';
 import StatsPanel from './panels/StatsPanel';
-import CustomerCreateModal from './modals/CustomerCreateModal';
-import CustomersListModal from './modals/CustomersListModal';
-import CustomerEditModal from './modals/CustomerEditModal';
 import { Customer } from '../types/Customer';
 import SubcategoriesPanel from './panels/SubcategoriesPanel';
 import FreePanel from './panels/FreePanel';
@@ -36,27 +33,33 @@ import { Cashier } from '../types/Cashier';
 import { saveProductionData } from '../data/productionData';
 // import { formatEuro } from '../utils/currency';
 import { parsePrice } from '../utils/number';
-import VariationModal from './VariationModal';
-import RecapModal from './RecapModal';
-import PaymentRecapByMethodModal, { PaymentRecapSort } from './modals/PaymentRecapByMethodModal';
+import type { PaymentRecapSort } from './modals/PaymentRecapByMethodModal';
 
 import { StorageService } from '../services/StorageService';
 import { getStoreByCode } from '../types/Store';
-import TransactionHistoryModal from './modals/TransactionHistoryModal';
-import GlobalTicketsModal from './modals/GlobalTicketsModal';
-import GlobalTicketEditorModal from './modals/GlobalTicketEditorModal';
-import ClosuresModal from './modals/ClosuresModal';
-import EndOfDayModal from './modals/EndOfDayModal';
-import DiscountRulesModal from './modals/DiscountRulesModal';
-import GlobalDiscountModal from './GlobalDiscountModal';
-import ItemDiscountModal from './ItemDiscountModal';
- 
-import CategoryManagementModal from './CategoryManagementModal';
-import DailyReportModal from './DailyReportModal';
-import ProductEditModal from './ProductEditModal';
-import SubcategoryManagementModal from './SubcategoryManagementModal';
 import ProductsPanel from './panels/ProductsPanel';
-import ProReceiptModal from './modals/ProReceiptModal';
+import { getProductGridLayout } from '../utils/productGridLayout';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+
+const GlobalTicketsModal = React.lazy(() => import('./modals/GlobalTicketsModal'));
+const GlobalTicketEditorModal = React.lazy(() => import('./modals/GlobalTicketEditorModal'));
+const DiscountRulesModal = React.lazy(() => import('./modals/DiscountRulesModal'));
+const TransactionHistoryModal = React.lazy(() => import('./modals/TransactionHistoryModal'));
+const ProReceiptModal = React.lazy(() => import('./modals/ProReceiptModal'));
+const ClosuresModal = React.lazy(() => import('./modals/ClosuresModal'));
+const PaymentRecapByMethodModal = React.lazy(() => import('./modals/PaymentRecapByMethodModal'));
+const EndOfDayModal = React.lazy(() => import('./modals/EndOfDayModal'));
+const CustomerCreateModal = React.lazy(() => import('./modals/CustomerCreateModal'));
+const CustomersListModal = React.lazy(() => import('./modals/CustomersListModal'));
+const CustomerEditModal = React.lazy(() => import('./modals/CustomerEditModal'));
+const VariationModal = React.lazy(() => import('./VariationModal'));
+const RecapModal = React.lazy(() => import('./RecapModal'));
+const GlobalDiscountModal = React.lazy(() => import('./GlobalDiscountModal'));
+const ItemDiscountModal = React.lazy(() => import('./ItemDiscountModal'));
+const CategoryManagementModal = React.lazy(() => import('./CategoryManagementModal'));
+const DailyReportModal = React.lazy(() => import('./DailyReportModal'));
+const ProductEditModal = React.lazy(() => import('./ProductEditModal'));
+const SubcategoryManagementModal = React.lazy(() => import('./SubcategoryManagementModal'));
 
 
 interface Window {
@@ -91,7 +94,10 @@ interface WindowManagerProps {
   onCashierLogin?: (cashier: Cashier) => void;
   currentStoreCode?: string;
   onStoreChange?: (code: string) => void;
-
+  /** Zone utile réelle (px) : cadre App après resize, pas toute la fenêtre navigateur — pour limites drag/redimensionnement fenêtres internes. */
+  layoutBounds: { width: number; height: number };
+  onClearCart?: () => void;
+  onToggleLayoutLock?: () => void;
 }
 
 const WindowManager: React.FC<WindowManagerProps> = ({
@@ -113,14 +119,32 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   onCashierLogin,
   currentStoreCode,
   onStoreChange,
+  layoutBounds,
+  onClearCart,
+  onToggleLayoutLock,
 }) => {
   // Dimensions pour l'émulation 1920×1080
   const APP_BAR_HEIGHT = 64;
 
   const activeStoreCode = currentStoreCode ?? StorageService.getCurrentStoreCode();
 
-  // Facteur d'échelle global pour réduire l'ensemble du programme de 10%
-  const GLOBAL_SCALE_FACTOR = 0.9;
+  /** 1 = taille nominale ; éviter une double réduction avec le scale du conteneur App. */
+  const GLOBAL_SCALE_FACTOR = 1;
+
+  // Logs de debug : activables via `localStorage.setItem('ui.debug','1')`
+  const debugEnabled = (() => {
+    try {
+      return typeof window !== 'undefined' && window.localStorage.getItem('ui.debug') === '1';
+    } catch {
+      return false;
+    }
+  })();
+  const debugLog = useCallback((...args: any[]) => {
+    if (!debugEnabled) return;
+    // Eviter le motif `console.log(` pour permettre un remplacement global en debugLog.
+    const c = (globalThis as any)?.console;
+    if (c?.log) c.log(...args);
+  }, [debugEnabled]);
 
   // Fonction helper pour appliquer le facteur d'échelle
   // Garder des décimales pour éviter de tomber à 0rem
@@ -248,7 +272,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     
     // Règle : 1 pack = compensation seau uniquement
     if (packBasedComps.length === 1) {
-      console.log(`[DEBUG] 1 pack détecté - compensation seau uniquement`);
+      debugLog(`[DEBUG] 1 pack détecté - compensation seau uniquement`);
       // Ignorer les choix vasque et appliquer seulement sur seau
       selectedSeauChoices.forEach((choice) => {
         const packIndex = parseInt(choice.packId.replace('pack-', ''));
@@ -261,14 +285,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
             if (perUnitEuro > 0) {
               next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur seau (1 pack): ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              debugLog(`[DEBUG] Compensation appliquée sur seau (1 pack): ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
             }
           }
         }
       });
     } else {
       // Plusieurs packs - appliquer selon les choix, mais un pack ne peut être utilisé qu'une fois
-      console.log(`[DEBUG] ${packBasedComps.length} packs détectés - application avec règles strictes`);
+      debugLog(`[DEBUG] ${packBasedComps.length} packs détectés - application avec règles strictes`);
       
       // Créer un mapping des packs par type de cible
       const packSeauUsage = new Map<number, boolean>();
@@ -288,7 +312,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
             if (perUnitEuro > 0) {
               next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              debugLog(`[DEBUG] Compensation appliquée sur seau (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
             }
           }
         }
@@ -308,11 +332,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const perUnitEuro = target.qty > 0 ? (compAmount / target.qty) : 0;
             if (perUnitEuro > 0) {
               next[choice.targetId] = { type: 'euro', value: perUnitEuro };
-              console.log(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
+              debugLog(`[DEBUG] Compensation appliquée sur vasque (choix utilisateur): Pack ${packIndex + 1} → ${compAmount.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité)`);
             }
           }
         } else if (packUsage.get(packIndex)) {
-          console.log(`[DEBUG] Pack ${packIndex + 1} déjà utilisé, ignoré pour vasque`);
+          debugLog(`[DEBUG] Pack ${packIndex + 1} déjà utilisé, ignoré pour vasque`);
         }
       });
     }
@@ -345,7 +369,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
         if (perUnitEuro > 0) {
           next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
-          console.log(`[DEBUG] Compensation automatique appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+          debugLog(`[DEBUG] Compensation automatique appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
         }
         
         compIndex += slotsToUse;
@@ -376,7 +400,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           const conditionsMet = checkCompensationConditions(cartItems, isSeau ? 'seau' : 'vasque');
           
           if (!conditionsMet) {
-            console.log(`[DEBUG] Conditions non remplies pour ${isSeau ? 'seau' : 'vasque'} - suppression compensation`);
+            debugLog(`[DEBUG] Conditions non remplies pour ${isSeau ? 'seau' : 'vasque'} - suppression compensation`);
             delete currentDiscounts[key];
             hasChanges = true;
           }
@@ -936,7 +960,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               const comp12 = VASQUE_COMP_BY_SUB[sub] || 0;
               const net12 = Math.max(0, comp12 - discountSum12);
               if (net12 > 0) {
-                console.log(`[COMPENSATION VASQUE] Sous-cat: ${sub}, Barème: ${comp12}€, Remise auto: ${discountSum12.toFixed(2)}€, Net: ${net12.toFixed(2)}€`);
+                debugLog(`[COMPENSATION VASQUE] Sous-cat: ${sub}, Barème: ${comp12}€, Remise auto: ${discountSum12.toFixed(2)}€, Net: ${net12.toFixed(2)}€`);
                 vasqueComps.push(net12);
                 totalVasqueComps++;
               }
@@ -990,7 +1014,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             // Compensation seau = barème seau - remise auto sur 6 verres
             const net = Math.max(0, compPerSet - discountSum);
             if (net > 0) {
-              console.log(`[COMPENSATION SEAU] Sous-cat: ${sub}, Barème: ${compPerSet}€, Remise auto: ${discountSum.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              debugLog(`[COMPENSATION SEAU] Sous-cat: ${sub}, Barème: ${compPerSet}€, Remise auto: ${discountSum.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
               seauComps.push(net);
               totalSeauComps++;
             }
@@ -1030,7 +1054,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             if (need > 0) break; // sécurité
             const net = Math.max(0, VASQUE_BASELINE - discountSum12);
             if (net > 0) {
-              console.log(`[COMPENSATION VASQUE MIXTE] Barème: ${VASQUE_BASELINE}€, Remise auto: ${discountSum12.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              debugLog(`[COMPENSATION VASQUE MIXTE] Barème: ${VASQUE_BASELINE}€, Remise auto: ${discountSum12.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
               vasqueFromMixedTwelve.push(net);
               mixedVasqueComps++;
             }
@@ -1070,7 +1094,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           for (let i = 0; i + 1 < autos.length && packVasqueComps < 1; i += 2) {
             const net = Math.max(0, VASQUE_BASELINE - (autos[i] + autos[i+1]));
             if (net > 0) {
-              console.log(`[COMPENSATION VASQUE PACKS] Barème: ${VASQUE_BASELINE}€, Remise auto packs: ${(autos[i] + autos[i+1]).toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              debugLog(`[COMPENSATION VASQUE PACKS] Barème: ${VASQUE_BASELINE}€, Remise auto packs: ${(autos[i] + autos[i+1]).toFixed(2)}€, Net: ${net.toFixed(2)}€`);
               vasqueFromPackPairs.push(net);
               packVasqueComps++;
             }
@@ -1110,7 +1134,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             if (need6>0) continue; // pas assez de verres pour constituer un set de 6
             const net = Math.max(0, VASQUE_BASELINE - autoOf(p.num) - discount6);
             if (net>0) {
-              console.log(`[COMPENSATION VASQUE PACK+6] Barème: ${VASQUE_BASELINE}€, Remise auto pack: ${autoOf(p.num)}€, Remise auto 6 verres: ${discount6.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
+              debugLog(`[COMPENSATION VASQUE PACK+6] Barème: ${VASQUE_BASELINE}€, Remise auto pack: ${autoOf(p.num)}€, Remise auto 6 verres: ${discount6.toFixed(2)}€, Net: ${net.toFixed(2)}€`);
               vasqueFromPackPlusSix.push(net);
               packVasqueComps++;
             }
@@ -1136,8 +1160,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // On détecte des lignes PACK VERRE et on mappe PACK X.Y -> "verre X.Y" pour utiliser SEAU_COMP_BY_SUB
         // Cette compensation s'applique même si aucune remise verres (percent) n'a été appliquée sur des lignes "verre"
         const packBasedComps: number[] = [];
-        console.log(`[DEBUG] Recherche de packs dans ${cartItems.length} articles, ${seauTargets.length} seaux disponibles`);
-        console.log(`[DEBUG] Tous les articles:`, cartItems.map(it => ({
+        debugLog(`[DEBUG] Recherche de packs dans ${cartItems.length} articles, ${seauTargets.length} seaux disponibles`);
+        debugLog(`[DEBUG] Tous les articles:`, cartItems.map(it => ({
           name: it.product.name,
           category: it.product.category,
           normalized: normalizeKey(it.product.category || '')
@@ -1146,9 +1170,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         if (seauTargets.length > 0) {
           for (const it of cartItems) {
             const catNorm = normalizeKey(it.product.category || '');
-            console.log(`[DEBUG] Article: ${it.product.name}, Catégorie: ${it.product.category}, Normalisée: ${catNorm}`);
+            debugLog(`[DEBUG] Article: ${it.product.name}, Catégorie: ${it.product.category}, Normalisée: ${catNorm}`);
             if (!(catNorm.includes('pack') && catNorm.includes('verre'))) {
-              console.log(`[DEBUG] Ignoré: pas un pack verre (${catNorm} ne contient pas 'pack' ET 'verre')`);
+              debugLog(`[DEBUG] Ignoré: pas un pack verre (${catNorm} ne contient pas 'pack' ET 'verre')`);
               continue;
             }
 
@@ -1179,7 +1203,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             const compNet = Math.max(0, compConfigured - packAuto);
             if (compNet <= 0) continue;
 
-            console.log(`[COMPENSATION PACK→SEAU] Pack: ${matchedSub}, Barème: ${compConfigured}€, Remise auto pack: ${packAuto}€, Net: ${compNet.toFixed(2)}€`);
+            debugLog(`[COMPENSATION PACK→SEAU] Pack: ${matchedSub}, Barème: ${compConfigured}€, Remise auto pack: ${packAuto}€, Net: ${compNet.toFixed(2)}€`);
 
             // Ajouter une compensation par quantité de packs (limité par le nombre de seaux disponibles)
             const times = Math.max(1, it.quantity || 0);
@@ -1233,8 +1257,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         // Packs -> Seaux/Vasques (compensation nette) - avec choix utilisateur si nécessaire
         if (packBasedComps.length > 0) {
           const hasVasqueTargets = vasqueTargets.length > 0;
-          
-          console.log(`[DEBUG] Vérification choix: packBasedComps=${packBasedComps.length}, seauTargets=${seauTargets.length}, hasVasqueTargets=${hasVasqueTargets}`);
+
+          debugLog(`[DEBUG] Vérification choix: packBasedComps=${packBasedComps.length}, seauTargets=${seauTargets.length}, hasVasqueTargets=${hasVasqueTargets}`);
           
           // Vérifier s'il y a vraiment des choix multiples
           const totalSeauSlots = seauTargets.reduce((sum, target) => sum + target.availableSlots, 0);
@@ -1243,7 +1267,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           
           // La modale ne s'affiche que s'il y a des choix multiples ET des slots disponibles
           if (seauTargets.length > 0 && hasVasqueTargets && packBasedComps.length > 0 && totalAvailableSlots > 0) {
-            console.log(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux (${totalSeauSlots} slots), 1 vasque (${totalVasqueSlots} slots)`);
+            debugLog(`[DEBUG] Choix de compensation nécessaire: ${packBasedComps.length} packs, ${seauTargets.length} seaux (${totalSeauSlots} slots), 1 vasque (${totalVasqueSlots} slots)`);
             
             // Préparer les choix disponibles
             const choices: Array<{packId: string, targetType: 'seau' | 'vasque', targetId: string, selected: boolean}> = [];
@@ -1284,7 +1308,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               setPendingCompensations({ packBasedComps, seauTargets, vasqueTargets });
               setShowCompensationChoiceModal(true);
             } else {
-              console.log(`[DEBUG] Pas de choix multiples - appliquer automatiquement sur seaux`);
+              debugLog(`[DEBUG] Pas de choix multiples - appliquer automatiquement sur seaux`);
               // Appliquer automatiquement sur les seaux
               let compIndex = 0;
               for (const seauTarget of seauTargets) {
@@ -1301,7 +1325,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                   const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
                   if (perUnitEuro > 0) {
                     next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
-                    console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+                    debugLog(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
                   }
                   
                   compIndex += slotsToUse;
@@ -1310,10 +1334,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             }
           } else {
             // Pas de choix nécessaire, appliquer automatiquement
-            console.log(`[DEBUG] Pas de choix nécessaire - appliquer automatiquement`);
-            console.log(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
-            console.log(`[DEBUG] packBasedComps:`, packBasedComps);
-            console.log(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty, availableSlots: t.availableSlots })));
+            debugLog(`[DEBUG] Pas de choix nécessaire - appliquer automatiquement`);
+            debugLog(`[DEBUG] packBasedComps: ${packBasedComps.length} compensations, seauTargets: ${seauTargets.length} seaux`);
+            debugLog(`[DEBUG] packBasedComps:`, packBasedComps);
+            debugLog(`[DEBUG] seauTargets:`, seauTargets.map(t => ({ key: t.key, qty: t.qty, availableSlots: t.availableSlots })));
             
             let compIndex = 0;
             
@@ -1334,7 +1358,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
                 const perUnitEuro = seauTarget.qty > 0 ? (totalComp / seauTarget.qty) : 0;
                 if (perUnitEuro > 0) {
                   next[seauTarget.key] = { type: 'euro', value: perUnitEuro };
-                  console.log(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
+                  debugLog(`[DEBUG] Compensation appliquée sur seau: ${totalComp.toFixed(2)}€ total (${perUnitEuro.toFixed(2)}€ par unité) pour ${slotsToUse} slots`);
                 }
                 
                 compIndex += slotsToUse;
@@ -1360,7 +1384,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               distribute(limited, availableVasqueTargets, { singleTarget: true });
             }
           } else {
-            console.log(`[DEBUG] Compensations vasque ignorées car ${packBasedComps.length} packs déjà utilisés pour les seaux`);
+            debugLog(`[DEBUG] Compensations vasque ignorées car ${packBasedComps.length} packs déjà utilisés pour les seaux`);
           }
         }
       }
@@ -1450,7 +1474,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       
       // Si on a 13 chiffres, traiter comme un code-barres
       if (/^\d{8,13}$/.test(barcodeBuffer)) {
-        console.log(`🎯 Code-barres détecté globalement: ${barcodeBuffer}`);
+        debugLog(`🎯 Code-barres détecté globalement: ${barcodeBuffer}`);
         e.preventDefault();
         e.stopPropagation();
         handleBarcodeScan(barcodeBuffer);
@@ -1475,7 +1499,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       document.removeEventListener('keypress', handleKeyPress);
       clearTimeout(barcodeTimeout);
     };
-  }, [products, isEditMode, cartItems, handleBarcodeScan]);
+  }, [products, isEditMode, cartItems, handleBarcodeScan, debugLog]);
 
 
 
@@ -1570,6 +1594,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [subcategorySearchTerm, setSubcategorySearchTerm] = useState('');
 
@@ -1586,22 +1611,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [resizeDirection, setResizeDirection] = useState<string>('');
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [screenDimensions, setScreenDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
+    width: layoutBounds.width,
+    height: layoutBounds.height,
   });
 
-  // Système de scaling automatique pour adaptation dynamique
-  const [scaleFactor, setScaleFactor] = useState(1);
-
-  // Réinitialiser la page quand les filtres changent
   useEffect(() => {
-    console.log('🔄 useEffect: Réinitialisation de la page à 1', {
-      selectedCategory,
-      selectedSubcategory,
-      searchTerm
-    });
-    setCurrentPage(1);
-  }, [selectedCategory, selectedSubcategory, searchTerm]);
+    setScreenDimensions({ width: layoutBounds.width, height: layoutBounds.height });
+  }, [layoutBounds.width, layoutBounds.height]);
 
   // Recentrer les barres sur le bouton "Toutes" quand on revient à null
   useEffect(() => {
@@ -1625,22 +1641,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [isDragging, setIsDragging] = useState(false);
 
 
-
-  // Calcul du facteur d'échelle optimal
-  const calculateScaleFactor = () => {
-    // Résolution de référence (écran de développement)
-    const referenceWidth = 1920;
-    const referenceHeight = 1080;
-    
-    // Calculer le facteur d'échelle basé sur la plus petite dimension
-    const widthScale = window.innerWidth / referenceWidth;
-    const heightScale = window.innerHeight / referenceHeight;
-    const newScaleFactor = Math.min(widthScale, heightScale, 2.0); // Limiter à 2.0x max
-    
-    return Math.max(1.0, newScaleFactor); // Minimum 1.0x pour garder la taille normale
-  };
-
-  // Détection d'appareil tactile (non utilisée)
 
   // Fonctions de drag and drop
   const handleDragStart = (e: React.DragEvent, product: Product) => {
@@ -1681,7 +1681,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         newProducts[draggedIndex] = newProducts[targetIndex];
         newProducts[targetIndex] = tmp;
         
-        console.log('Échange de produits:', {
+        debugLog('Échange de produits:', {
           from: { index: draggedIndex, name: draggedProduct.name },
           to: { index: targetIndex, name: targetProduct.name },
         });
@@ -1761,25 +1761,57 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     setItemDiscounts({});
     setGlobalDiscount(null);
 
-    console.log(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€ - Compteurs de ventes mis à jour`);
+    debugLog(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€ - Compteurs de ventes mis à jour`);
   };
 
+  useKeyboardShortcuts({
+    onCheckout: () => setShowRecapModal(true),
+    onClearCart: () => {
+      if (cartItems.length === 0) return;
+      setItemDiscounts({});
+      setGlobalDiscount(null);
+      onClearCart?.();
+    },
+    onSearch: () => {
+      const el = searchInputRef.current;
+      if (el) {
+        el.focus();
+        el.select();
+      }
+    },
+    onToggleLayout: () => onToggleLayoutLock?.(),
+    onQuickPayment: (method) => {
+      const label = method === 'cash' ? 'Espèces' : method === 'card' ? 'Carte' : 'SumUp';
+      handleDirectPayment(label);
+    },
+    isLayoutLocked,
+    hasItemsInCart: cartItems.length > 0,
+  });
+
   // Fonction pour obtenir une couleur basée sur la catégorie
+  const categoryColorById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const cat of categories) {
+      if (cat?.id && cat?.color) m.set(cat.id, cat.color);
+    }
+    return m;
+  }, [categories]);
+
+  const categoryColorByName = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const cat of categories) {
+      if (cat?.name && cat?.color) m.set(cat.name, cat.color);
+    }
+    return m;
+  }, [categories]);
+
   const getCategoryColor = (categoryId: string) => {
-    // D'abord, essayer de trouver la catégorie par ID et utiliser sa couleur personnalisée
-    const category = categories.find(cat => cat.id === categoryId);
-    if (category && category.color) {
-      console.log('🎨 Couleur personnalisée trouvée pour', categoryId, ':', category.color);
-      return category.color;
-    }
-    
-    // Si pas de couleur personnalisée, essayer de trouver par nom
-    const categoryByName = categories.find(cat => cat.name === categoryId);
-    if (categoryByName && categoryByName.color) {
-      console.log('🎨 Couleur personnalisée trouvée par nom pour', categoryId, ':', categoryByName.color);
-      return categoryByName.color;
-    }
-    
+    // O(1) : lookup par ID ou nom
+    const byId = categoryColorById.get(categoryId);
+    if (byId) return byId;
+    const byName = categoryColorByName.get(categoryId);
+    if (byName) return byName;
+
     // Palette de couleurs vives et contrastées (fallback)
     const colors = [
       '#FF1744', // Rouge vif
@@ -1846,8 +1878,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     return colors[index];
   };
 
-  const CARDS_PER_PAGE = 25; // 5×5 produits au lieu de 5×6
-  
+  const productGridLayout = useMemo(() => {
+    const pw = windows.find((w) => w.type === 'products' && !w.isMinimized);
+    return getProductGridLayout(pw?.width ?? 802);
+  }, [windows]);
+
+  const CARDS_PER_PAGE = productGridLayout.cardsPerPage;
+
   // Debug: Afficher les informations de filtrage
   if (process.env.NODE_ENV === 'development' && false) console.log('🔍 Debug Filtrage:', {
     selectedCategory,
@@ -1986,6 +2023,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   
   const currentProducts = sortedAndFilteredProducts.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredProducts.length / CARDS_PER_PAGE);
+
+  useEffect(() => {
+    const tp = Math.max(1, totalPages || 1);
+    if (currentPage > tp) setCurrentPage(tp);
+  }, [currentPage, totalPages]);
   
   // Debug: Vérifier les produits actuels
   if (process.env.NODE_ENV === 'development' && false) console.log('🔍 Debug CurrentProducts:', {
@@ -2116,37 +2158,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draggedWindow, resizingWindow]);
 
-  // Mettre à jour les dimensions de l'écran quand la fenêtre change de taille
-  useEffect(() => {
-    const handleResize = () => {
-      const newDimensions = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-      if (
-        newDimensions.width === screenDimensions.width &&
-        newDimensions.height === screenDimensions.height
-      ) {
-        return;
-      }
-      setScreenDimensions(newDimensions);
-      
-      const newScaleFactor = calculateScaleFactor();
-      if (newScaleFactor !== scaleFactor) {
-      setScaleFactor(newScaleFactor);
-      }
-      // logs désactivés
-    };
-
-    // Initialisation
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [screenDimensions.width, screenDimensions.height, scaleFactor]);
-
-  
-  
   // Fonctions de gestion des déclinaisons
   const handleProductClick = (product: Product) => {
     // Appliquer la quantité saisie si présente
@@ -2180,19 +2191,19 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const handleVariationSelect = (variation: ProductVariation) => {
-    console.log(`🔄 Sélection déclinaison: ${variation.attributes}`);
-    console.log(`📦 Produit: ${selectedProduct?.name}`);
-    console.log(`💰 Prix déclinaison: ${variation.finalPrice}€`);
+    debugLog(`🔄 Sélection déclinaison: ${variation.attributes}`);
+    debugLog(`📦 Produit: ${selectedProduct?.name}`);
+    debugLog(`💰 Prix déclinaison: ${variation.finalPrice}€`);
     
     if (selectedProduct) {
       onProductWithVariationClick(selectedProduct, variation);
-      console.log(`✅ Produit avec déclinaison ajouté au panier!`);
+      debugLog(`✅ Produit avec déclinaison ajouté au panier!`);
       
       // Fermer la modale après ajout
       setVariationModalOpen(false);
       setSelectedProduct(null);
     } else {
-      console.log(`❌ Erreur: selectedProduct est null`);
+      debugLog(`❌ Erreur: selectedProduct est null`);
     }
   };
 
@@ -2219,18 +2230,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const handleUpdateCategories = (newCategories: Category[]) => {
     // Mettre à jour les catégories dans le composant parent
-    console.log('🔄 Mise à jour des catégories:', newCategories.length, 'catégories');
+    debugLog('🔄 Mise à jour des catégories:', newCategories.length, 'catégories');
     if (onUpdateCategories) {
       onUpdateCategories(newCategories);
     } else {
-      console.log('Nouvelles catégories:', newCategories);
+      debugLog('Nouvelles catégories:', newCategories);
       alert(`Catégories mises à jour: ${newCategories.length} catégories`);
     }
     
     // Sauvegarder automatiquement dans localStorage
     saveProductionData(products, newCategories);
     
-    console.log('✅ Catégories sauvegardées avec succès');
+    debugLog('✅ Catégories sauvegardées avec succès');
   };
 
   const handleSaveProduct = (updatedProduct: Product) => {
@@ -2247,7 +2258,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Sauvegarder automatiquement dans localStorage
     saveProductionData(updatedProducts, categories);
     
-    console.log('✅ Article modifié et sauvegardé avec succès:', updatedProduct.name);
+    debugLog('✅ Article modifié et sauvegardé avec succès:', updatedProduct.name);
   };
 
   const handleCreateNewProduct = () => {
@@ -2284,7 +2295,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Sauvegarder automatiquement dans localStorage
     saveProductionData(updatedProducts, categories);
     
-    console.log('🗑️ Article supprimé et sauvegardé avec succès');
+    debugLog('🗑️ Article supprimé et sauvegardé avec succès');
   };
 
   const handleUpdateSubcategories = (categoryId: string, newSubcategories: string[]) => {
@@ -2300,7 +2311,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     );
     onUpdateCategories?.(updatedCategories);
     saveProductionData(products, updatedCategories);
-    console.log(`✅ Ordre des sous-catégories mis à jour pour ${category.name}:`, normalizedOrder);
+    debugLog(`✅ Ordre des sous-catégories mis à jour pour ${category.name}:`, normalizedOrder);
   };
 
   // Fonction pour importer un fichier CSV ou JSON nested
@@ -2375,7 +2386,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           if (result.zCounter) {
             StorageService.setZCounterValue(Number(result.zCounter));
           }
-          console.log(`✅ ${result.closures.length} clôtures importées`);
+          debugLog(`✅ ${result.closures.length} clôtures importées`);
         }
         
         // Importer les autres données si présentes
@@ -3015,6 +3026,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       case 'products':
         return (
           <ProductsPanel
+            gridLayout={productGridLayout}
             width={window.width}
             height={window.height}
             currentPage={currentPage}
@@ -3237,6 +3249,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             {/* Ligne 2: Recherches */}
             <Box sx={{ p: 1, display: 'flex', gap: 1, alignItems: 'center', borderBottom: '1px solid #eee' }}>
               <TextField
+                inputRef={searchInputRef}
                 size="small"
                 placeholder="Rechercher article..."
                 variant="outlined"
@@ -3567,8 +3580,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   return (
     <Box sx={{ 
       position: 'relative', 
-      width: '100vw', 
-      height: '100vh', 
+      width: '100%', 
+      height: '100%', 
+      minHeight: 0,
       overflow: 'hidden',
       backgroundColor: '#f5f5f5'
     }}>
@@ -3706,184 +3720,234 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       ))}
 
              {/* Modale de sélection des déclinaisons */}
-       <VariationModal
-         open={variationModalOpen}
-         product={selectedProduct}
-         onClose={() => setVariationModalOpen(false)}
-         onSelectVariation={handleVariationSelect}
-       />
+       {variationModalOpen && (
+         <React.Suspense fallback={null}>
+           <VariationModal
+             open={variationModalOpen}
+             product={selectedProduct}
+             onClose={() => setVariationModalOpen(false)}
+             onSelectVariation={handleVariationSelect}
+           />
+         </React.Suspense>
+       )}
 
                {/* Modale de remise individuelle */}
         {showDiscountModal && selectedItemForDiscount && (
-          <ItemDiscountModal
-            open={showDiscountModal}
-            onClose={() => setShowDiscountModal(false)}
-            item={selectedItemForDiscount}
-            onApplyDiscount={applyItemDiscount}
-            onUpdateQuantity={onUpdateQuantity}
-          />
+          <React.Suspense fallback={null}>
+            <ItemDiscountModal
+              open={showDiscountModal}
+              onClose={() => setShowDiscountModal(false)}
+              item={selectedItemForDiscount}
+              onApplyDiscount={applyItemDiscount}
+              onUpdateQuantity={onUpdateQuantity}
+            />
+          </React.Suspense>
         )}
 
        {/* Modale Recap */}
-       <RecapModal
-         open={showRecapModal}
-         onClose={() => setShowRecapModal(false)}
-         cartItems={cartItems}
-         itemDiscounts={itemDiscounts as any}
-         globalDiscount={globalDiscount as any}
-         getItemFinalPrice={getItemFinalPrice}
-       />
+       {showRecapModal && (
+         <React.Suspense fallback={null}>
+           <RecapModal
+             open={showRecapModal}
+             onClose={() => setShowRecapModal(false)}
+             cartItems={cartItems}
+             itemDiscounts={itemDiscounts as any}
+             globalDiscount={globalDiscount as any}
+             getItemFinalPrice={getItemFinalPrice}
+           />
+         </React.Suspense>
+       )}
        
 
        {/* Modale de remise globale */}
-       <GlobalDiscountModal
-         open={showGlobalDiscountModal}
-         onClose={() => setShowGlobalDiscountModal(false)}
-         cartItems={cartItems}
-         onApplyDiscount={applyGlobalDiscount}
-        onApplyItemDiscount={applyItemDiscount}
-         onRemoveItemDiscount={(itemId, variationId)=>{
-           const key = `${itemId}-${variationId || 'main'}`;
-           const next = { ...itemDiscounts } as any;
-           delete next[key];
-           setItemDiscounts(next);
-         }}
-       />
+       {showGlobalDiscountModal && (
+         <React.Suspense fallback={null}>
+           <GlobalDiscountModal
+             open={showGlobalDiscountModal}
+             onClose={() => setShowGlobalDiscountModal(false)}
+             cartItems={cartItems}
+             onApplyDiscount={applyGlobalDiscount}
+            onApplyItemDiscount={applyItemDiscount}
+             onRemoveItemDiscount={(itemId, variationId)=>{
+               const key = `${itemId}-${variationId || 'main'}`;
+               const next = { ...itemDiscounts } as any;
+               delete next[key];
+               setItemDiscounts(next);
+             }}
+           />
+         </React.Suspense>
+       )}
 
-       {/* Modale barèmes remises */}
-       <DiscountRulesModal
-         open={showDiscountRules}
-         onClose={()=>setShowDiscountRules(false)}
-       />
+      {/* Modale barèmes remises */}
+      {showDiscountRules && (
+        <React.Suspense fallback={null}>
+          <DiscountRulesModal
+            open={showDiscountRules}
+            onClose={()=>setShowDiscountRules(false)}
+          />
+        </React.Suspense>
+      )}
 
        {/* Modale de gestion des catégories */}
-       <CategoryManagementModal
-         open={showCategoryManagementModal}
-         onClose={() => setShowCategoryManagementModal(false)}
-         categories={categories}
-         onUpdateCategories={handleUpdateCategories}
-       />
+       {showCategoryManagementModal && (
+         <React.Suspense fallback={null}>
+           <CategoryManagementModal
+             open={showCategoryManagementModal}
+             onClose={() => setShowCategoryManagementModal(false)}
+             categories={categories}
+             onUpdateCategories={handleUpdateCategories}
+           />
+         </React.Suspense>
+       )}
 
       {/* Modale de rapport journalier */}
-       <DailyReportModal
-         open={showDailyReportModal}
-         onClose={() => setShowDailyReportModal(false)}
-         cartItems={cartItems}
-       />
+       {showDailyReportModal && (
+         <React.Suspense fallback={null}>
+           <DailyReportModal
+             open={showDailyReportModal}
+             onClose={() => setShowDailyReportModal(false)}
+             cartItems={cartItems}
+           />
+         </React.Suspense>
+       )}
 
       {/* Modale historique des transactions du jour */}
-      <TransactionHistoryModal
-        open={showTransactionHistory}
-        onClose={() => setShowTransactionHistory(false)}
-        transactions={todayTransactions}
-        filterPayment={filterPayment as any}
-        setFilterPayment={(v:any) => setFilterPayment(v)}
-        filterAmountMin={filterAmountMin}
-        setFilterAmountMin={setFilterAmountMin}
-        filterAmountMax={filterAmountMax}
-        setFilterAmountMax={setFilterAmountMax}
-        filterAmountExact={filterAmountExact}
-        setFilterAmountExact={setFilterAmountExact}
-        filterProductText={filterProductText}
-        setFilterProductText={setFilterProductText}
-        daySelectedIds={daySelectedIds}
-        setDaySelectedIds={(updater:any) => setDaySelectedIds(prev => updater(prev))}
-        expandedDayTicketIds={expandedDayTicketIds}
-        setExpandedDayTicketIds={(updater:any) => setExpandedDayTicketIds(prev => updater(prev))}
-        setTransactions={setTodayTransactions as any}
-      />
+      {showTransactionHistory && (
+        <React.Suspense fallback={null}>
+          <TransactionHistoryModal
+            open={showTransactionHistory}
+            onClose={() => setShowTransactionHistory(false)}
+            transactions={todayTransactions}
+            filterPayment={filterPayment as any}
+            setFilterPayment={(v:any) => setFilterPayment(v)}
+            filterAmountMin={filterAmountMin}
+            setFilterAmountMin={setFilterAmountMin}
+            filterAmountMax={filterAmountMax}
+            setFilterAmountMax={setFilterAmountMax}
+            filterAmountExact={filterAmountExact}
+            setFilterAmountExact={setFilterAmountExact}
+            filterProductText={filterProductText}
+            setFilterProductText={setFilterProductText}
+            daySelectedIds={daySelectedIds}
+            setDaySelectedIds={(updater:any) => setDaySelectedIds(prev => updater(prev))}
+            expandedDayTicketIds={expandedDayTicketIds}
+            setExpandedDayTicketIds={(updater:any) => setExpandedDayTicketIds(prev => updater(prev))}
+            setTransactions={setTodayTransactions as any}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale tickets globaux (toutes clôtures cumulées) */}
-      <GlobalTicketsModal
-        open={showGlobalTickets}
-        onClose={() => setShowGlobalTickets(false)}
-        onlyToday={globalOnlyToday}
-        setOnlyToday={(v:boolean)=>setGlobalOnlyToday(v)}
-        filterPayment={globalFilterPayment as any}
-        setFilterPayment={(v:any)=>setGlobalFilterPayment(v)}
-        amountMin={globalAmountMin}
-        setAmountMin={setGlobalAmountMin}
-        amountMax={globalAmountMax}
-        setAmountMax={setGlobalAmountMax}
-        amountExact={globalAmountExact}
-        setAmountExact={setGlobalAmountExact}
-        dateFrom={globalDateFrom}
-        setDateFrom={setGlobalDateFrom}
-        dateTo={globalDateTo}
-        setDateTo={setGlobalDateTo}
-        timeFrom={globalTimeFrom}
-        setTimeFrom={setGlobalTimeFrom}
-        timeTo={globalTimeTo}
-        setTimeTo={setGlobalTimeTo}
-        selectedIds={globalSelectedIds}
-        setSelectedIds={(updater:any)=>setGlobalSelectedIds(prev=>updater(prev))}
-        expandedIds={expandedGlobalTicketIds}
-        setExpandedIds={(updater:any)=>setExpandedGlobalTicketIds(prev=>updater(prev))}
-        showDiscountDetails={showDiscountDetails}
-        setShowDiscountDetails={setShowDiscountDetails}
-        onRequestOpenProReceipt={() => setShowProReceiptQuick(true)}
-        onOpenEditor={(tid:string)=>{
-          const todays = StorageService.loadTodayTransactions();
-          let tx: any = todays.find(t => String(t.id) === String(tid));
-          let isToday = !!tx;
-          if (!tx) {
-            const closures = StorageService.loadClosures();
-            for (const c of closures) {
-              const arr = Array.isArray(c.transactions) ? c.transactions : [];
-              const found = arr.find((t: any) => String(t.id) === String(tid));
-              if (found) { tx = found; break; }
-            }
-          }
-          if (!tx) return;
-          const draft = { ...tx, items: (Array.isArray(tx.items)?tx.items:[]).map((it:any)=>({ ...it })) };
-          setGlobalEditorDraft(draft);
-          setGlobalEditorIsToday(!!isToday);
-          setShowGlobalEditor(true);
-        }}
-        refreshTodayTransactions={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
-        filterCustomerId={filterCustomerForTickets}
-        setFilterCustomerId={(id)=> setFilterCustomerForTickets(id)}
-      />
+      {showGlobalTickets && (
+        <React.Suspense fallback={null}>
+          <GlobalTicketsModal
+            open={showGlobalTickets}
+            onClose={() => setShowGlobalTickets(false)}
+            onlyToday={globalOnlyToday}
+            setOnlyToday={(v:boolean)=>setGlobalOnlyToday(v)}
+            filterPayment={globalFilterPayment as any}
+            setFilterPayment={(v:any)=>setGlobalFilterPayment(v)}
+            amountMin={globalAmountMin}
+            setAmountMin={setGlobalAmountMin}
+            amountMax={globalAmountMax}
+            setAmountMax={setGlobalAmountMax}
+            amountExact={globalAmountExact}
+            setAmountExact={setGlobalAmountExact}
+            dateFrom={globalDateFrom}
+            setDateFrom={setGlobalDateFrom}
+            dateTo={globalDateTo}
+            setDateTo={setGlobalDateTo}
+            timeFrom={globalTimeFrom}
+            setTimeFrom={setGlobalTimeFrom}
+            timeTo={globalTimeTo}
+            setTimeTo={setGlobalTimeTo}
+            selectedIds={globalSelectedIds}
+            setSelectedIds={(updater:any)=>setGlobalSelectedIds(prev=>updater(prev))}
+            expandedIds={expandedGlobalTicketIds}
+            setExpandedIds={(updater:any)=>setExpandedGlobalTicketIds(prev=>updater(prev))}
+            showDiscountDetails={showDiscountDetails}
+            setShowDiscountDetails={setShowDiscountDetails}
+            onRequestOpenProReceipt={() => setShowProReceiptQuick(true)}
+            onOpenEditor={(tid:string)=>{
+              const todays = StorageService.loadTodayTransactions();
+              let tx: any = todays.find(t => String(t.id) === String(tid));
+              let isToday = !!tx;
+              if (!tx) {
+                const closures = StorageService.loadClosures();
+                for (const c of closures) {
+                  const arr = Array.isArray(c.transactions) ? c.transactions : [];
+                  const found = arr.find((t: any) => String(t.id) === String(tid));
+                  if (found) { tx = found; break; }
+                }
+              }
+              if (!tx) return;
+              const draft = { ...tx, items: (Array.isArray(tx.items)?tx.items:[]).map((it:any)=>({ ...it })) };
+              setGlobalEditorDraft(draft);
+              setGlobalEditorIsToday(!!isToday);
+              setShowGlobalEditor(true);
+            }}
+            refreshTodayTransactions={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+            filterCustomerId={filterCustomerForTickets}
+            setFilterCustomerId={(id)=> setFilterCustomerForTickets(id)}
+          />
+        </React.Suspense>
+      )}
 
       {/* Ticket pro déclenché depuis Tickets globaux */}
-      <ProReceiptModal open={showProReceiptQuick} onClose={() => setShowProReceiptQuick(false)} />
+      {showProReceiptQuick && (
+        <React.Suspense fallback={null}>
+          <ProReceiptModal open={showProReceiptQuick} onClose={() => setShowProReceiptQuick(false)} />
+        </React.Suspense>
+      )}
       {/* La modale inline précédente a été remplacée par GlobalTicketsModal */}
 
       {/* Éditeur d'un ticket depuis Tickets globaux */}
-      <GlobalTicketEditorModal
-        open={showGlobalEditor}
-        onClose={() => setShowGlobalEditor(false)}
-        isToday={globalEditorIsToday}
-        draft={globalEditorDraft}
-        setDraft={(updater:any)=>setGlobalEditorDraft((prev:any)=>updater(prev))}
-        refreshToday={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
-      />
+      {showGlobalEditor && (
+        <React.Suspense fallback={null}>
+          <GlobalTicketEditorModal
+            open={showGlobalEditor}
+            onClose={() => setShowGlobalEditor(false)}
+            isToday={globalEditorIsToday}
+            draft={globalEditorDraft}
+            setDraft={(updater:any)=>setGlobalEditorDraft((prev:any)=>updater(prev))}
+            refreshToday={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale des clôtures (archives) */}
-      <ClosuresModal
-        open={showClosures}
-        onClose={() => setShowClosures(false)}
-        closures={closures}
-        selectedIdx={selectedClosureIdx}
-        setSelectedIdx={setSelectedClosureIdx}
-        computeDailyProductSales={computeDailyProductSales}
-      />
+      {showClosures && (
+        <React.Suspense fallback={null}>
+          <ClosuresModal
+            open={showClosures}
+            onClose={() => setShowClosures(false)}
+            closures={closures}
+            selectedIdx={selectedClosureIdx}
+            setSelectedIdx={setSelectedClosureIdx}
+            computeDailyProductSales={computeDailyProductSales}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale récap par mode de règlement */}
-      <PaymentRecapByMethodModal
-        open={showPaymentRecap}
-        onClose={() => setShowPaymentRecap(false)}
-        method={paymentRecapMethod as any}
-        sort={paymentRecapSort as PaymentRecapSort}
-        onChangeSort={(s) => setPaymentRecapSort(s as any)}
-        transactions={(() => {
-          try {
-            const map = StorageService.getTransactionsByDayMap();
-            const list = Array.isArray(map[recapDate]) ? map[recapDate] : [];
-            return list.map((t:any)=>({ ...t, timestamp: new Date(t.timestamp) }));
-          } catch { return todayTransactions; }
-        })()}
-      />
+      {showPaymentRecap && (
+        <React.Suspense fallback={null}>
+          <PaymentRecapByMethodModal
+            open={showPaymentRecap}
+            onClose={() => setShowPaymentRecap(false)}
+            method={paymentRecapMethod as any}
+            sort={paymentRecapSort as PaymentRecapSort}
+            onChangeSort={(s) => setPaymentRecapSort(s as any)}
+            transactions={(() => {
+              try {
+                const map = StorageService.getTransactionsByDayMap();
+                const list = Array.isArray(map[recapDate]) ? map[recapDate] : [];
+                return list.map((t:any)=>({ ...t, timestamp: new Date(t.timestamp) }));
+              } catch { return todayTransactions; }
+            })()}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale récapitulatif ventes du jour */}
       <Dialog open={showSalesRecap} onClose={() => setShowSalesRecap(false)} maxWidth="md" fullWidth>
@@ -3994,78 +4058,102 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       </Dialog>
 
       {/* Modale fin de journée / Clôture */}
-      <EndOfDayModal
-        open={showEndOfDay}
-        onClose={() => setShowEndOfDay(false)}
-        transactions={todayTransactions}
-        computeDailyProductSales={computeDailyProductSales}
-        refreshToday={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
-      />
+      {showEndOfDay && (
+        <React.Suspense fallback={null}>
+          <EndOfDayModal
+            open={showEndOfDay}
+            onClose={() => setShowEndOfDay(false)}
+            transactions={todayTransactions}
+            computeDailyProductSales={computeDailyProductSales}
+            refreshToday={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale création client */}
-      <CustomerCreateModal
-        open={showCustomerCreate}
-        onClose={() => setShowCustomerCreate(false)}
-        onCreate={(c)=>{
-          const created = StorageService.addCustomer(c as any);
-          try { setCustomers(StorageService.loadCustomers()); } catch {}
-          console.log('Client créé:', created);
-        }}
-      />
+      {showCustomerCreate && (
+        <React.Suspense fallback={null}>
+          <CustomerCreateModal
+            open={showCustomerCreate}
+            onClose={() => setShowCustomerCreate(false)}
+            onCreate={(c)=>{
+              const created = StorageService.addCustomer(c as any);
+              try { setCustomers(StorageService.loadCustomers()); } catch {}
+              debugLog('Client créé:', created);
+            }}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale liste clients */}
-      <CustomersListModal
-        open={showCustomersList}
-        onClose={() => setShowCustomersList(false)}
-        customers={customers}
-        onEdit={(c)=>{ setCustomerToEdit(c); setShowCustomersList(false); }}
-        onPick={(c)=>{ setCurrentCustomer(c); setShowCustomersList(false); }}
-        onViewSales={(c)=>{
-          setShowCustomersList(false);
-          // Ouvrir Tickets globaux filtrés par client
-          setGlobalOnlyToday(false);
-          setGlobalFilterPayment('all');
-          // Petite attente pour garantir fermeture modal, puis ouvrir tickets
-          setTimeout(()=>{
-            setShowGlobalTickets(true);
-          }, 0);
-          // Marquer l'ID client dans un état local pour filtrer
-          setFilterCustomerForTickets(c.id);
-        }}
-      />
+      {showCustomersList && (
+        <React.Suspense fallback={null}>
+          <CustomersListModal
+            open={showCustomersList}
+            onClose={() => setShowCustomersList(false)}
+            customers={customers}
+            onEdit={(c)=>{ setCustomerToEdit(c); setShowCustomersList(false); }}
+            onPick={(c)=>{ setCurrentCustomer(c); setShowCustomersList(false); }}
+            onViewSales={(c)=>{
+              setShowCustomersList(false);
+              // Ouvrir Tickets globaux filtrés par client
+              setGlobalOnlyToday(false);
+              setGlobalFilterPayment('all');
+              // Petite attente pour garantir fermeture modal, puis ouvrir tickets
+              setTimeout(()=>{
+                setShowGlobalTickets(true);
+              }, 0);
+              // Marquer l'ID client dans un état local pour filtrer
+              setFilterCustomerForTickets(c.id);
+            }}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale d'édition client */}
-      <CustomerEditModal
-        open={!!customerToEdit}
-        onClose={() => setCustomerToEdit(null)}
-        customer={customerToEdit}
-        onSave={(c: Customer)=>{
-          StorageService.updateCustomer(c);
-          try { setCustomers(StorageService.loadCustomers()); } catch {}
-          setCustomerToEdit(null);
-        }}
-      />
+      {!!customerToEdit && (
+        <React.Suspense fallback={null}>
+          <CustomerEditModal
+            open={!!customerToEdit}
+            onClose={() => setCustomerToEdit(null)}
+            customer={customerToEdit}
+            onSave={(c: Customer)=>{
+              StorageService.updateCustomer(c);
+              try { setCustomers(StorageService.loadCustomers()); } catch {}
+              setCustomerToEdit(null);
+            }}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modale d'édition de ticket supprimée (remplacée par l'édition via Tickets jour) */}
 
        {/* Modale de modification d'article */}
-       <ProductEditModal
-         open={showProductEditModal}
-         onClose={() => setShowProductEditModal(false)}
-         product={selectedProductForEdit}
-         categories={categories}
-         onSave={handleSaveProduct}
-         onDelete={handleDeleteProduct}
-       />
+       {showProductEditModal && (
+         <React.Suspense fallback={null}>
+           <ProductEditModal
+             open={showProductEditModal}
+             onClose={() => setShowProductEditModal(false)}
+             product={selectedProductForEdit}
+             categories={categories}
+             onSave={handleSaveProduct}
+             onDelete={handleDeleteProduct}
+           />
+         </React.Suspense>
+       )}
 
        {/* Modale de gestion des sous-catégories */}
-       <SubcategoryManagementModal
-         open={showSubcategoryManagementModal}
-         onClose={() => setShowSubcategoryManagementModal(false)}
-         categories={categories}
-         products={products}
-         onUpdateSubcategories={handleUpdateSubcategories}
-       />
+       {showSubcategoryManagementModal && (
+         <React.Suspense fallback={null}>
+           <SubcategoryManagementModal
+             open={showSubcategoryManagementModal}
+             onClose={() => setShowSubcategoryManagementModal(false)}
+             categories={categories}
+             products={products}
+             onUpdateSubcategories={handleUpdateSubcategories}
+           />
+         </React.Suspense>
+       )}
 
        {/* Modale de choix des compensations */}
        <Dialog

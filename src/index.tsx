@@ -1,11 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import './index.css';
 import App from './App';
 import { UISettingsProvider } from './context/UISettingsContext';
+import { AdminProvider } from './context/AdminContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ErrorRecovery from './components/ErrorRecovery';
 import { setupGlobalErrorHandler, checkEmergencyRecovery } from './utils/errorRecovery';
+
+const appTheme = createTheme({
+  palette: {
+    primary: { main: '#1976d2' },
+    secondary: { main: '#2e7d32' },
+    warning: { main: '#ff9800' },
+    background: { default: '#f5f5f5' },
+  },
+  typography: {
+    fontFamily: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'].join(
+      ','
+    ),
+  },
+});
 
 // Configurer la récupération d'erreur globale
 setupGlobalErrorHandler();
@@ -22,9 +39,14 @@ const renderApp = () => {
       <React.StrictMode>
         <ErrorRecovery>
           <ErrorBoundary>
-            <UISettingsProvider>
-              <App />
-            </UISettingsProvider>
+            <AdminProvider>
+              <UISettingsProvider>
+                <ThemeProvider theme={appTheme}>
+                  <CssBaseline enableColorScheme />
+                  <App />
+                </ThemeProvider>
+              </UISettingsProvider>
+            </AdminProvider>
           </ErrorBoundary>
         </ErrorRecovery>
       </React.StrictMode>

@@ -1,7 +1,8 @@
-import React from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, TextField, Typography } from '@mui/material';
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, TextField, Typography } from '@mui/material';
 import CustomersListModal from './CustomersListModal';
 import { StorageService } from '../../services/StorageService';
+import { List } from 'react-window';
 
 interface GlobalTicketsModalProps {
   open: boolean;
@@ -71,114 +72,232 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   onRequestOpenProReceipt,
 }) => {
   const [showCustomerPicker, setShowCustomerPicker] = React.useState(false);
-     // Charger toutes les transactions
-  const allClosures = StorageService.loadClosures();
-  const allTx: any[] = [];
-   const seenIds = new Set<string>();
-   
-   // Ajouter les transactions des clôtures
-  for (const c of allClosures) {
-    const txs = Array.isArray(c.transactions) ? c.transactions : [];
-     for (const t of txs) {
-       const txId = String(t.id);
-       if (!seenIds.has(txId)) {
-         seenIds.add(txId);
-         allTx.push(t);
-       }
-     }
-   }
-   
-   // Ajouter les transactions du jour
-  const todayTxs = StorageService.loadTodayTransactions();
-   for (const t of todayTxs) {
-     const txId = String(t.id);
-     if (!seenIds.has(txId)) {
-       seenIds.add(txId);
-       allTx.push(t);
-     }
-   }
-   
-   // Ajouter les transactions archivées par jour
-  try {
-    const map = StorageService.getTransactionsByDayMap();
-    const todayStr = new Date().toISOString().slice(0,10);
-    Object.keys(map).forEach((day) => {
-      const list = Array.isArray(map[day]) ? map[day] : [];
-      if (day !== todayStr) {
-        list.forEach((t: any) => {
-          const txId = String(t.id);
-          if (!seenIds.has(txId)) {
-            seenIds.add(txId);
-            allTx.push(t);
-          }
-        });
+
+  // Construire la base unique des transactions une fois quand le modal s'ouvre.
+  // (Sinon, chaque frappe sur un filtre recharge localStorage et reconstruit tout.)
+  const allTx = useMemo(() => {
+    if (!open) return [];
+
+    const allClosures = StorageService.loadClosures();
+    const txs: any[] = [];
+    const seenIds = new Set<string>();
+
+    // Clôtures
+    for (const c of allClosures) {
+      const list = Array.isArray(c.transactions) ? c.transactions : [];
+      for (const t of list) {
+        const txId = String(t.id);
+        if (!seenIds.has(txId)) {
+          seenIds.add(txId);
+          txs.push(t);
+        }
       }
-    });
-  } catch {}
-   
-   console.log('Transactions chargées après déduplication:', allTx.length);
-   
-   // Filtrer par date si nécessaire
-  if (onlyToday) {
-    const todayStart = new Date(); 
-    todayStart.setHours(0,0,0,0);
-    const todayEnd = new Date(); 
-    todayEnd.setHours(23,59,59,999);
-    const only = allTx.filter((t: any) => {
+    }
+
+    // Aujourd'hui
+    const todayTxs = StorageService.loadTodayTransactions();
+    for (const t of todayTxs) {
+      const txId = String(t.id);
+      if (!seenIds.has(txId)) {
+        seenIds.add(txId);
+        txs.push(t);
+      }
+    }
+
+    // Archivées par jour
+    try {
+      const map = StorageService.getTransactionsByDayMap();
+      const todayStr = new Date().toISOString().slice(0, 10);
+      Object.keys(map).forEach((day) => {
+        const list = Array.isArray((map as any)[day]) ? (map as any)[day] : [];
+        if (day !== todayStr) {
+          list.forEach((t: any) => {
+            const txId = String(t.id);
+            if (!seenIds.has(txId)) {
+              seenIds.add(txId);
+              txs.push(t);
+            }
+          });
+        }
+      });
+    } catch {}
+
+    return txs;
+  }, [open]);
+
+  const allTxOnlyToday = useMemo(() => {
+    if (!onlyToday) return allTx;
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    return allTx.filter((t: any) => {
       const ts = new Date(t.timestamp);
       return ts >= todayStart && ts <= todayEnd;
     });
-    allTx.length = 0; 
-    only.forEach(x => allTx.push(x));
-  }
-  
-  // Appliquer tous les filtres
-  const filtered = allTx.filter((t: any) => {
-    // Filtre par méthode de paiement
-    const m = String(t.paymentMethod || '').toLowerCase();
-    if (filterPayment === 'cash' && !(m==='cash' || m.includes('esp'))) return false;
-    if (filterPayment === 'card' && !(m==='card' || m.includes('carte'))) return false;
-    if (filterPayment === 'sumup' && m!=='sumup') return false;
-    // Filtre par client si demandé
-    if (filterCustomerId && String(t.customerId || '') !== String(filterCustomerId)) return false;
-    
-    // Filtre par montant
-    const amount = t.total || 0;
+  }, [allTx, onlyToday]);
+
+  const customers = useMemo(() => {
+    if (!open) return [];
+    try {
+      return StorageService.loadCustomers();
+    } catch {
+      return [];
+    }
+  }, [open]);
+
+  const customerName = useMemo(() => {
+    if (!filterCustomerId) return 'Tous';
+    try {
+      const found = (customers as any[]).find((c: any) => String(c.id) === String(filterCustomerId));
+      return found ? `${found.lastName} ${found.firstName}` : '(inconnu)';
+    } catch {
+      return '(inconnu)';
+    }
+  }, [customers, filterCustomerId]);
+
+  const filtered = useMemo(() => {
     const min = parseFloat(amountMin || 'NaN');
     const max = parseFloat(amountMax || 'NaN');
     const exact = parseFloat(amountExact || 'NaN');
-    if (!Number.isNaN(exact) && Math.abs(amount - exact) > 0.009) return false;
-    if (!Number.isNaN(min) && amount < min) return false;
-    if (!Number.isNaN(max) && amount > max) return false;
-    
-    // Filtre par date
-    if (dateFrom) {
-      const dfrom = new Date(dateFrom + 'T00:00:00');
-      if (new Date(t.timestamp) < dfrom) return false;
+
+    return allTxOnlyToday.filter((t: any) => {
+      // Filtre par méthode de paiement
+      const m = String(t.paymentMethod || '').toLowerCase();
+      if (filterPayment === 'cash' && !(m === 'cash' || m.includes('esp'))) return false;
+      if (filterPayment === 'card' && !(m === 'card' || m.includes('carte'))) return false;
+      if (filterPayment === 'sumup' && m !== 'sumup') return false;
+
+      // Filtre par client si demandé
+      if (filterCustomerId && String(t.customerId || '') !== String(filterCustomerId)) return false;
+
+      // Filtre par montant
+      const amount = t.total || 0;
+      if (!Number.isNaN(exact) && Math.abs(amount - exact) > 0.009) return false;
+      if (!Number.isNaN(min) && amount < min) return false;
+      if (!Number.isNaN(max) && amount > max) return false;
+
+      // Filtre par date
+      if (dateFrom) {
+        const dfrom = new Date(dateFrom + 'T00:00:00');
+        if (new Date(t.timestamp) < dfrom) return false;
+      }
+      if (dateTo) {
+        const dto = new Date(dateTo + 'T23:59:59');
+        if (new Date(t.timestamp) > dto) return false;
+      }
+
+      // Filtre par heure
+      if (timeFrom) {
+        const [h, mm] = timeFrom.split(':').map(Number);
+        const ts = new Date(t.timestamp);
+        const tf = new Date(ts);
+        tf.setHours(h || 0, mm || 0, 0, 0);
+        if (ts < tf) return false;
+      }
+      if (timeTo) {
+        const [h, mm] = timeTo.split(':').map(Number);
+        const ts = new Date(t.timestamp);
+        const tt = new Date(ts);
+        tt.setHours(h || 23, mm || 59, 59, 999);
+        if (ts > tt) return false;
+      }
+
+      return true;
+    });
+  }, [
+    allTxOnlyToday,
+    filterPayment,
+    filterCustomerId,
+    amountMin,
+    amountMax,
+    amountExact,
+    dateFrom,
+    dateTo,
+    timeFrom,
+    timeTo,
+  ]);
+
+  const renderedRows = useMemo(() => {
+    return filtered.map((t: any) => {
+      const items = Array.isArray(t.items) ? t.items : [];
+      const qty = items.reduce((s: number, it: any) => s + (it.quantity || 0), 0);
+      const isExpanded = expandedIds.has(String(t.id));
+      const dt = new Date(t.timestamp);
+      const dateStr = dt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      const timeStr = dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const shortId = String(t.id).slice(-6);
+      return { t, items, qty, isExpanded, dateStr, timeStr, shortId };
+    });
+  }, [filtered, expandedIds]);
+
+  const listBoxRef = useRef<HTMLDivElement | null>(null);
+  const [listSize, setListSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+
+  useLayoutEffect(() => {
+    const el = listBoxRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const r = el.getBoundingClientRect();
+      const width = Math.floor(r.width);
+      const height = Math.floor(r.height);
+      setListSize(prev => (prev.width === width && prev.height === height ? prev : { width, height }));
+    };
+
+    update();
+    const ro = new ResizeObserver(() => update());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const getItemSize = useCallback((index: number) => {
+    const row = renderedRows[index];
+    if (!row) return 56;
+
+    // Hauteur de base (ligne principale + paddings)
+    const base = 56;
+    if (!row.isExpanded) return base;
+
+    // Détails: on approxime une ligne par item + marges.
+    // (On préfère une estimation un peu “large” pour éviter le chevauchement.)
+    const perItem = 26;
+    const detailsHeader = showDiscountDetails ? 52 : 20;
+    const details = detailsHeader + row.items.length * perItem + 24;
+    return base + details;
+  }, [renderedRows, showDiscountDetails]);
+
+  const summary = useMemo(() => {
+    let totalSales = 0;
+    let totalOriginalAmount = 0;
+    let totalDiscounts = 0;
+
+    for (const t of filtered as any[]) {
+      totalSales += t.total || 0;
+
+      const items = Array.isArray(t.items) ? t.items : [];
+      for (const item of items) {
+        const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+        const originalTotal = originalPrice * item.quantity;
+        totalOriginalAmount += originalTotal;
+
+        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+        const discount = t.itemDiscounts?.[discountKey];
+        if (!discount) continue;
+
+        let finalTotal = originalTotal;
+        if (discount.type === 'euro') finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+        else if (discount.type === 'percent') finalTotal = originalTotal * (1 - discount.value / 100);
+        else if (discount.type === 'price') finalTotal = discount.value * item.quantity;
+
+        totalDiscounts += (originalTotal - finalTotal);
+      }
     }
-    if (dateTo) {
-      const dto = new Date(dateTo + 'T23:59:59');
-      if (new Date(t.timestamp) > dto) return false;
-    }
-    
-    // Filtre par heure
-    if (timeFrom) {
-      const [h,m] = timeFrom.split(':').map(Number);
-      const ts = new Date(t.timestamp); 
-      const tf = new Date(ts); 
-      tf.setHours(h||0, m||0, 0, 0);
-      if (ts < tf) return false;
-    }
-    if (timeTo) {
-      const [h,m] = timeTo.split(':').map(Number);
-      const ts = new Date(t.timestamp); 
-      const tt = new Date(ts); 
-      tt.setHours(h||23, m||59, 59, 999);
-      if (ts > tt) return false;
-    }
-    
-    return true;
-  });
+
+    return { totalSales, totalOriginalAmount, totalDiscounts };
+  }, [filtered]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -224,10 +343,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                      <Button 
              size="small" 
              variant={showDiscountDetails?'contained':'outlined'} 
-             onClick={() => {
-               console.log('Toggle showDiscountDetails from', showDiscountDetails, 'to', !showDiscountDetails);
-               setShowDiscountDetails(!showDiscountDetails);
-             }}
+             onClick={() => setShowDiscountDetails(!showDiscountDetails)}
            >
              Détails remises ({showDiscountDetails ? 'ON' : 'OFF'})
            </Button>
@@ -237,14 +353,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Client:</Typography>
           <Typography variant="body2" sx={{ color: filterCustomerId ? 'primary.main' : 'text.secondary' }}>
-            {(() => {
-              if (!filterCustomerId) return 'Tous';
-              try {
-                const list = StorageService.loadCustomers();
-                const found = list.find((c:any)=> String(c.id) === String(filterCustomerId));
-                return found ? `${found.lastName} ${found.firstName}` : '(inconnu)';
-              } catch { return '(inconnu)'; }
-            })()}
+            {customerName}
           </Typography>
           <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
             <Button size="small" variant="outlined" onClick={()=> setShowCustomerPicker(true)}>Choisir</Button>
@@ -372,226 +481,225 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
         </Box>
 
         {/* Liste des transactions */}
-        <List dense>
-          {filtered.map((t: any) => {
-            const qty = Array.isArray(t.items) ? t.items.reduce((s: number, it: any) => s + (it.quantity || 0), 0) : 0;
-            const isEx = expandedIds.has(String(t.id));
-            
-            return (
-              <ListItem key={`${t.id}-${t.timestamp}`} sx={{ py: 0.5, borderBottom: '1px solid #eee', px: 1 }}>
-                {/* Ligne principale */}
-                <Box sx={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: '30px 100px 80px 80px 120px 100px', 
-                  alignItems: 'center', 
-                  gap: 1, 
-                  width: '100%' 
-                }}>
-                  <input 
-                    type="checkbox" 
-                    checked={selectedIds.has(String(t.id))} 
-                    onChange={() => setSelectedIds(prev => { 
-                      const next = new Set(prev); 
-                      const k = String(t.id); 
-                      if(next.has(k)) next.delete(k); 
-                      else next.add(k); 
-                      return next; 
-                    })} 
-                  />
-                  <Typography 
-                    noWrap 
-                    variant="caption" 
-                    onClick={() => setExpandedIds(prev => {
-                      const next = new Set(prev); 
-                      const k = String(t.id); 
-                      if(next.has(k)) next.delete(k); 
-                      else next.add(k); 
-                      return next;
-                    })} 
-                    sx={{ 
-                      fontFamily: 'monospace', 
-                      color: '#1976d2', 
-                      cursor: 'pointer',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    #{String(t.id).slice(-6)}
-                  </Typography>
-                  <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
-                    {new Date(t.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
-                  </Typography>
-                  <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
-                    {new Date(t.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                  </Typography>
-                  <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>
-                    {`${qty} article${qty>1?'s':''}`}
-                  </Typography>
-                  <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                    {(t.total||0).toFixed(2)} €
-                  </Typography>
-                </Box>
-
-                {/* Détails de la transaction */}
-                {isEx && (
-                  <Box sx={{ mt: 1, ml: 2, width: '100%' }}>
-                                         {/* Total des remises pour cette transaction */}
-                     {showDiscountDetails && (() => {
-                       console.log('showDiscountDetails is true, checking transaction:', t.id);
-                       console.log('Transaction itemDiscounts:', t.itemDiscounts);
-                       let totalDiscountForTx = 0;
-                       if (t.items && Array.isArray(t.items)) {
-                         t.items.forEach((item: any) => {
-                           const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                           const originalTotal = originalPrice * item.quantity;
-                           const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-                           console.log('Checking total discount for key:', discountKey);
-                           if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
-                             const discount = t.itemDiscounts[discountKey];
-                             console.log('Found discount for total:', discount);
-                             let finalTotal = originalTotal;
-                             if (discount.type === 'euro') {
-                               finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
-                             } else if (discount.type === 'percent') {
-                               finalTotal = originalTotal * (1 - discount.value / 100);
-                             } else if (discount.type === 'price') {
-                               finalTotal = discount.value * item.quantity;
-                             }
-                             totalDiscountForTx += (originalTotal - finalTotal);
-                           }
-                         });
-                       }
-                      
-                      if (totalDiscountForTx > 0) {
-                        return (
-                          <Box sx={{ 
-                            backgroundColor: '#fff3e0', 
-                            p: 1, 
-                            borderRadius: 1, 
-                            mb: 1,
-                            border: '1px solid #ff9800'
-                          }}>
-                            <Typography variant="caption" sx={{ 
-                              fontFamily: 'monospace', 
-                              fontWeight: 'bold', 
-                              color: '#f44336',
-                              fontSize: '14px'
-                            }}>
-                              TOTAL REMISE: {totalDiscountForTx.toFixed(2)} €
-                            </Typography>
-                          </Box>
-                        );
-                      }
-                      return null;
-                    })()}
-
-                    {/* Détails des articles */}
-                    {(Array.isArray(t.items) ? t.items : []).map((it: any) => {
-                      const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
-                      const originalTotal = originalPrice * it.quantity;
-                      
-                      // Calculer le prix final avec remises
-                      let finalPrice = originalPrice;
-                      let finalTotal = originalTotal;
-                      let discountAmount = 0;
-                      
-                                             // Vérifier s'il y a des remises sur cet article
-                       const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-                       console.log('Checking discount for:', discountKey, 'ItemDiscounts:', t.itemDiscounts);
-                       if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
-                        const discount = t.itemDiscounts[discountKey];
-                                                 console.log('Found discount:', discount);
-                         if (discount.type === 'euro') {
-                           finalPrice = Math.max(0, originalPrice - discount.value);
-                           finalTotal = finalPrice * it.quantity;
-                           discountAmount = originalTotal - finalTotal;
-                         } else if (discount.type === 'percent') {
-                           finalPrice = originalPrice * (1 - discount.value / 100);
-                           finalTotal = finalPrice * it.quantity;
-                           discountAmount = originalTotal - finalTotal;
-                         } else if (discount.type === 'price') {
-                           finalPrice = discount.value;
-                           finalTotal = finalPrice * it.quantity;
-                           discountAmount = originalTotal - finalTotal;
-                                                  }
-                       }
-                       
-                       console.log('Final total for', it.product.name, ':', finalTotal, 'Original:', originalTotal, 'Discount:', discountAmount, 'Will show discount:', Math.abs(discountAmount) > 0.01);
-                       
-                       return (
-                        <Box key={it.product.id} sx={{ 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          gap: 0.5, 
-                          py: 0.5,
-                          borderBottom: '1px solid #f0f0f0'
-                        }}>
-                                                   {/* Ligne principale de l'article avec remises sur la même ligne */}
-                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                           <Typography variant="caption" sx={{ 
-                             fontFamily: 'monospace', 
-                             fontSize: '13px',
-                             minWidth: 200
-                           }}>
-                             {it.quantity}x {it.product.name}
-                           </Typography>
-                           
-                           {/* Détails des remises sur la même ligne */}
-                           {showDiscountDetails && (
-                             <>
-                               {Math.abs(discountAmount) > 0.01 ? (
-                                 <Box sx={{ 
-                                   backgroundColor: '#ffebee', 
-                                   p: 0.5, 
-                                   borderRadius: 0.5,
-                                   border: '1px solid #f44336',
-                                   display: 'inline-block'
-                                 }}>
-                                   <Typography variant="caption" sx={{ 
-                                     color: '#000000', 
-                                     fontFamily: 'monospace', 
-                                     fontWeight: 'bold',
-                                     fontSize: '12px'
-                                   }}>
-                                     -{discountAmount.toFixed(2)}€ ({((discountAmount / originalTotal) * 100).toFixed(1)}%) / ({originalTotal.toFixed(2)}€)
-                                   </Typography>
-                                 </Box>
-                               ) : (
-                                 <Typography variant="caption" sx={{ 
-                                   color: '#666', 
-                                   fontFamily: 'monospace',
-                                   fontSize: '12px',
-                                   fontStyle: 'italic'
-                                 }}>
-                                   Pas de remise
-                                 </Typography>
-                               )}
-                             </>
-                           )}
-                           
-                           <Typography variant="caption" sx={{ 
-                             fontFamily: 'monospace', 
-                             fontWeight: 'bold',
-                             fontSize: '13px',
-                             marginLeft: 'auto'
-                           }}>
-                             {finalTotal.toFixed(2)} €
-                           </Typography>
-                         </Box>
-                      </Box>
-                       );
-                     })}
-                  </Box>
-                )}
-              </ListItem>
-            );
-          })}
-          
-          {filtered.length === 0 && (
+        <Box ref={listBoxRef} sx={{ height: '52vh', minHeight: 320, border: '1px solid #eee', borderRadius: 1, overflow: 'hidden' }}>
+          {filtered.length === 0 ? (
             <Box sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
               Aucun ticket trouvé pour ces filtres
             </Box>
+          ) : (
+            listSize.width > 0 && listSize.height > 0 && (
+              <List
+                style={{ height: listSize.height, width: listSize.width }}
+                rowCount={renderedRows.length}
+                rowHeight={(index: number) => getItemSize(index)}
+                overscanCount={8}
+                rowProps={{}}
+                rowComponent={({ index, style }: any) => {
+                  const row = renderedRows[index];
+                  if (!row) return <div style={style} />;
+
+                  const { t, items, qty, isExpanded, dateStr, timeStr, shortId } = row;
+                  const tid = String(t.id);
+
+                  return (
+                    <div style={style} key={`${t.id}-${t.timestamp}`}>
+                      <ListItem sx={{ py: 0.5, borderBottom: '1px solid #eee', px: 1, alignItems: 'flex-start' }}>
+                        <Box sx={{ width: '100%' }}>
+                            {/* Ligne principale */}
+                            <Box sx={{
+                              display: 'grid',
+                              gridTemplateColumns: '30px 100px 80px 80px 120px 100px',
+                              alignItems: 'center',
+                              gap: 1,
+                              width: '100%',
+                            }}>
+                              <input
+                                type="checkbox"
+                                checked={selectedIds.has(tid)}
+                                onChange={() => setSelectedIds(prev => {
+                                  const next = new Set(prev);
+                                  if (next.has(tid)) next.delete(tid);
+                                  else next.add(tid);
+                                  return next;
+                                })}
+                              />
+                              <Typography
+                                noWrap
+                                variant="caption"
+                                onClick={() => setExpandedIds(prev => {
+                                  const next = new Set(prev);
+                                  if (next.has(tid)) next.delete(tid);
+                                  else next.add(tid);
+                                  return next;
+                                })}
+                                sx={{
+                                  fontFamily: 'monospace',
+                                  color: '#1976d2',
+                                  cursor: 'pointer',
+                                  fontWeight: 'bold',
+                                }}
+                              >
+                                #{shortId}
+                              </Typography>
+                              <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
+                                {dateStr}
+                              </Typography>
+                              <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
+                                {timeStr}
+                              </Typography>
+                              <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                {`${qty} article${qty > 1 ? 's' : ''}`}
+                              </Typography>
+                              <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                {(t.total || 0).toFixed(2)} €
+                              </Typography>
+                            </Box>
+
+                            {/* Détails de la transaction */}
+                            {isExpanded && (
+                              <Box sx={{ mt: 1, ml: 2, width: '100%' }}>
+                                {/* Total des remises pour cette transaction */}
+                                {showDiscountDetails && (() => {
+                                  let totalDiscountForTx = 0;
+                                  if (items.length) {
+                                    items.forEach((item: any) => {
+                                      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                                      const originalTotal = originalPrice * item.quantity;
+                                      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+                                      if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
+                                        const discount = t.itemDiscounts[discountKey];
+                                        let finalTotal = originalTotal;
+                                        if (discount.type === 'euro') finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+                                        else if (discount.type === 'percent') finalTotal = originalTotal * (1 - discount.value / 100);
+                                        else if (discount.type === 'price') finalTotal = discount.value * item.quantity;
+                                        totalDiscountForTx += (originalTotal - finalTotal);
+                                      }
+                                    });
+                                  }
+
+                                  if (totalDiscountForTx > 0) {
+                                    return (
+                                      <Box sx={{
+                                        backgroundColor: '#fff3e0',
+                                        p: 1,
+                                        borderRadius: 1,
+                                        mb: 1,
+                                        border: '1px solid #ff9800',
+                                      }}>
+                                        <Typography variant="caption" sx={{
+                                          fontFamily: 'monospace',
+                                          fontWeight: 'bold',
+                                          color: '#f44336',
+                                          fontSize: '14px',
+                                        }}>
+                                          TOTAL REMISE: {totalDiscountForTx.toFixed(2)} €
+                                        </Typography>
+                                      </Box>
+                                    );
+                                  }
+                                  return null;
+                                })()}
+
+                                {/* Détails des articles */}
+                                {items.map((it: any) => {
+                                  const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+                                  const originalTotal = originalPrice * it.quantity;
+
+                                  // Calculer le prix final avec remises
+                                  let finalPrice = originalPrice;
+                                  let finalTotal = originalTotal;
+                                  let discountAmount = 0;
+
+                                  const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+                                  if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
+                                    const discount = t.itemDiscounts[discountKey];
+                                    if (discount.type === 'euro') {
+                                      finalPrice = Math.max(0, originalPrice - discount.value);
+                                      finalTotal = finalPrice * it.quantity;
+                                      discountAmount = originalTotal - finalTotal;
+                                    } else if (discount.type === 'percent') {
+                                      finalPrice = originalPrice * (1 - discount.value / 100);
+                                      finalTotal = finalPrice * it.quantity;
+                                      discountAmount = originalTotal - finalTotal;
+                                    } else if (discount.type === 'price') {
+                                      finalPrice = discount.value;
+                                      finalTotal = finalPrice * it.quantity;
+                                      discountAmount = originalTotal - finalTotal;
+                                    }
+                                  }
+
+                                  return (
+                                    <Box key={it.product.id} sx={{
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: 0.5,
+                                      py: 0.5,
+                                      borderBottom: '1px solid #f0f0f0',
+                                    }}>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography variant="caption" sx={{
+                                          fontFamily: 'monospace',
+                                          fontSize: '13px',
+                                          minWidth: 200,
+                                        }}>
+                                          {it.quantity}x {it.product.name}
+                                        </Typography>
+
+                                        {showDiscountDetails && (
+                                          <>
+                                            {Math.abs(discountAmount) > 0.01 ? (
+                                              <Box sx={{
+                                                backgroundColor: '#ffebee',
+                                                p: 0.5,
+                                                borderRadius: 0.5,
+                                                border: '1px solid #f44336',
+                                                display: 'inline-block',
+                                              }}>
+                                                <Typography variant="caption" sx={{
+                                                  color: '#000000',
+                                                  fontFamily: 'monospace',
+                                                  fontWeight: 'bold',
+                                                  fontSize: '12px',
+                                                }}>
+                                                  -{discountAmount.toFixed(2)}€ ({((discountAmount / originalTotal) * 100).toFixed(1)}%) / ({originalTotal.toFixed(2)}€)
+                                                </Typography>
+                                              </Box>
+                                            ) : (
+                                              <Typography variant="caption" sx={{
+                                                color: '#666',
+                                                fontFamily: 'monospace',
+                                                fontSize: '12px',
+                                                fontStyle: 'italic',
+                                              }}>
+                                                Pas de remise
+                                              </Typography>
+                                            )}
+                                          </>
+                                        )}
+
+                                        <Typography variant="caption" sx={{
+                                          fontFamily: 'monospace',
+                                          fontWeight: 'bold',
+                                          fontSize: '13px',
+                                          marginLeft: 'auto',
+                                        }}>
+                                          {finalTotal.toFixed(2)} €
+                                        </Typography>
+                                      </Box>
+                                    </Box>
+                                  );
+                                })}
+                              </Box>
+                            )}
+                        </Box>
+                      </ListItem>
+                    </div>
+                  );
+                }}
+              />
+            )
           )}
-        </List>
+        </Box>
 
         {/* Résumé des transactions */}
         {filtered.length > 0 && (
@@ -605,69 +713,33 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
               Résumé des {filtered.length} transaction{filtered.length > 1 ? 's' : ''}
             </Typography>
-            
-            {(() => {
-              let totalSales = 0;
-              let totalOriginalAmount = 0;
-              let totalDiscounts = 0;
 
-              filtered.forEach((t: any) => {
-                totalSales += t.total || 0;
-                
-                if (t.items && Array.isArray(t.items)) {
-                  t.items.forEach((item: any) => {
-                    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                    const originalTotal = originalPrice * item.quantity;
-                    totalOriginalAmount += originalTotal;
-                    
-                    // Calculer les remises
-                    if (t.itemDiscounts && t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`]) {
-                      const discount = t.itemDiscounts[`${item.product.id}-${item.selectedVariation?.id || 'main'}`];
-                      let finalTotal = originalTotal;
-                      
-                      if (discount.type === 'euro') {
-                        finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
-                      } else if (discount.type === 'percent') {
-                        finalTotal = originalTotal * (1 - discount.value / 100);
-                      } else if (discount.type === 'price') {
-                        finalTotal = discount.value * item.quantity;
-                      }
-                      
-                      totalDiscounts += (originalTotal - finalTotal);
-                    }
-                  });
-                }
-              });
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>CA Total</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  {summary.totalSales.toFixed(2)} €
+                </Typography>
+              </Box>
 
-              return (
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>CA Total</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                      {totalSales.toFixed(2)} €
-                    </Typography>
-                  </Box>
-                  
-                  {totalDiscounts > 0 && (
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>Remises Total</Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#f44336' }}>
-                        -{totalDiscounts.toFixed(2)} €
-                      </Typography>
-                    </Box>
-                  )}
-                  
-                  {totalDiscounts > 0 && (
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>Montant Original</Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#666' }}>
-                        {totalOriginalAmount.toFixed(2)} €
-                      </Typography>
-                    </Box>
-                  )}
+              {summary.totalDiscounts > 0 && (
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>Remises Total</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#f44336' }}>
+                    -{summary.totalDiscounts.toFixed(2)} €
+                  </Typography>
                 </Box>
-              );
-            })()}
+              )}
+
+              {summary.totalDiscounts > 0 && (
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>Montant Original</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#666' }}>
+                    {summary.totalOriginalAmount.toFixed(2)} €
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
         )}
       </DialogContent>
@@ -675,7 +747,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
       <CustomersListModal
         open={showCustomerPicker}
         onClose={()=> setShowCustomerPicker(false)}
-        customers={(() => { try { return StorageService.loadCustomers(); } catch { return []; } })()}
+        customers={customers}
         onPick={(c:any)=>{ setFilterCustomerId && setFilterCustomerId(c.id); setShowCustomerPicker(false); }}
         onEdit={undefined}
         onViewSales={undefined}

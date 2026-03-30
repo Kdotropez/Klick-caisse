@@ -21,13 +21,19 @@ import { STORES } from '../types/Store';
 export interface LegacyMigrationModalProps {
   initialCode: string;
   onMigrate: (targetStoreCode: string) => void;
+  /** Anciennes données globales supprimées, aucune copie vers une boutique */
+  onDiscardLegacy?: () => void;
 }
 
 /**
  * Affiché une seule fois tant que des données « globales » (avant multi-boutiques)
  * sont présentes et non migrées. L’utilisateur choisit explicitement la boutique cible.
  */
-const LegacyMigrationModal: React.FC<LegacyMigrationModalProps> = ({ initialCode, onMigrate }) => {
+const LegacyMigrationModal: React.FC<LegacyMigrationModalProps> = ({
+  initialCode,
+  onMigrate,
+  onDiscardLegacy,
+}) => {
   const validInitial = STORES.some((s) => s.code === initialCode) ? initialCode : STORES[0]?.code ?? '1';
   const [selected, setSelected] = useState<string>(validInitial);
 
@@ -83,6 +89,26 @@ const LegacyMigrationModal: React.FC<LegacyMigrationModalProps> = ({ initialCode
         <Button variant="contained" color="warning" size="large" fullWidth onClick={() => onMigrate(selected)}>
           Migrer vers cette boutique
         </Button>
+        {onDiscardLegacy && (
+          <Button
+            variant="outlined"
+            color="error"
+            size="medium"
+            fullWidth
+            onClick={() => {
+              if (
+                !window.confirm(
+                  'Supprimer définitivement les anciennes données de cet ordinateur (tickets, Z, réglages globalisés) sans les migrer ? Cette action est irréversible.'
+                )
+              ) {
+                return;
+              }
+              onDiscardLegacy();
+            }}
+          >
+            Effacer les anciennes données sans migrer
+          </Button>
+        )}
         <Typography variant="caption" color="text.secondary" textAlign="center">
           À l&apos;étape suivante, le mot de passe sera le <strong>nom de la boutique</strong> que vous ouvrirez (voir
           la liste des magasins).

@@ -14,10 +14,6 @@ interface GlobalTicketEditorModalProps {
 }
 
 const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open, onClose, isToday, draft, setDraft, refreshToday }) => {
-  // Debug: afficher les informations du draft
-  console.log('GlobalTicketEditorModal - draft:', draft);
-  console.log('GlobalTicketEditorModal - paymentMethod:', draft?.paymentMethod);
-  
   // État pour la modification des prix
   const [editingPrice, setEditingPrice] = useState<{ itemIndex: number; newPrice: string } | null>(null);
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);

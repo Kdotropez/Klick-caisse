@@ -144,6 +144,35 @@ export class StorageService {
     localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
   }
 
+  /**
+   * Supprime uniquement les clés « globales » legacy (sans copier vers une boutique).
+   * Utile si les données locales ne doivent pas être rattachées au multi-magasin.
+   * Pose le drapeau de migration pour ne plus afficher la modale.
+   */
+  static purgeLegacyGlobalBundle(): void {
+    const keys = [
+      'klick_caisse_transactions_by_day',
+      'klick_caisse_closures',
+      'klick_caisse_z_counter',
+      'klick_caisse_settings',
+      'klick_caisse_customers',
+      'klick_caisse_subcategories',
+      'klick_caisse_pro_receipts',
+      'klick_caisse_auto_backups',
+      this.PRODUCTS_KEY,
+      this.CATEGORIES_KEY,
+      this.CASHIERS_KEY,
+    ];
+    for (const k of keys) {
+      try {
+        localStorage.removeItem(k);
+      } catch {
+        /* ignore */
+      }
+    }
+    localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+  }
+
   static getTransactionsByDayRaw(): string | null {
     return localStorage.getItem(this.activeStoreKey('transactions_by_day'));
   }
@@ -578,10 +607,7 @@ export class StorageService {
   static loadClosures(): any[] {
     try {
       const raw = localStorage.getItem(this.activeStoreKey('closures'));
-      console.log(`[DEBUG StorageService] loadClosures - raw:`, raw);
       const closures = raw ? JSON.parse(raw) : [];
-      console.log(`[DEBUG StorageService] loadClosures - parsed:`, closures);
-      console.log(`[DEBUG StorageService] loadClosures - count:`, closures.length);
       return closures;
     } catch (error) {
       console.error(`[DEBUG StorageService] loadClosures - error:`, error);
@@ -591,13 +617,9 @@ export class StorageService {
 
   static saveClosure(closure: any): void {
     try {
-      console.log(`[DEBUG StorageService] saveClosure - closure:`, closure);
       const all = this.loadClosures();
-      console.log(`[DEBUG StorageService] saveClosure - existing closures:`, all.length);
       all.push(closure);
-      console.log(`[DEBUG StorageService] saveClosure - total after push:`, all.length);
       localStorage.setItem(this.activeStoreKey('closures'), JSON.stringify(all));
-      console.log(`[DEBUG StorageService] saveClosure - saved successfully`);
     } catch (error) {
       console.error('Erreur lors de l\'archivage de la clôture:', error);
     }

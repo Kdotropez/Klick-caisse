@@ -10,6 +10,8 @@ import HistoricalReportModal from '../modals/HistoricalReportModal';
 import ProReceiptModal from '../modals/ProReceiptModal';
 import ProReceiptsManagerModal from '../modals/ProReceiptsManagerModal';
 import HelpManualModal from '../modals/HelpManualModal';
+import { useUISettings } from '../../context/UISettingsContext';
+import { useAdmin } from '../../context/AdminContext';
 
 interface SettingsPanelProps {
   width: number;
@@ -167,12 +169,39 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onClearAllCategories,
   onOpenDiscountRules,
 }) => {
+  const { compactMode, setCompactMode, autoFit, setAutoFit } = useUISettings();
+  const { isAdmin, unlockWithCode, lock } = useAdmin();
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [showHistoricalReport, setShowHistoricalReport] = useState(false);
   const [showExcludeCats, setShowExcludeCats] = useState(false);
   const [showProReceipt, setShowProReceipt] = useState(false);
   const [showProManager, setShowProManager] = useState(false);
   const [showHelpManual, setShowHelpManual] = useState(false);
+
+  const [adminTapCount, setAdminTapCount] = useState(0);
+  const lastAdminTapRef = React.useRef<number>(0);
+
+  const handleAdminSecretTap = () => {
+    const now = Date.now();
+    const last = lastAdminTapRef.current || 0;
+    lastAdminTapRef.current = now;
+    const within = now - last < 1800;
+    const nextCount = within ? adminTapCount + 1 : 1;
+    setAdminTapCount(nextCount);
+    if (nextCount >= 7) {
+      setAdminTapCount(0);
+      // eslint-disable-next-line no-alert
+      const code = window.prompt('Code administrateur ?');
+      if (code == null) return;
+      if (!unlockWithCode(code)) {
+        // eslint-disable-next-line no-alert
+        window.alert('Code incorrect.');
+      } else {
+        // eslint-disable-next-line no-alert
+        window.alert('Mode administrateur activé.');
+      }
+    }
+  };
 
   // Prévisualisation import TOUS les Z
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -289,6 +318,39 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         overflowY: 'auto',
       }}
     >
+      {/* Affichage */}
+      <Box
+        onClick={handleAdminSecretTap}
+        sx={{
+          gridColumn: '1 / -1',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 1,
+          px: 1,
+          py: 0.25,
+          border: '1px solid #eee',
+          borderRadius: 1,
+          backgroundColor: '#fafafa',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Checkbox checked={compactMode} onChange={(e) => setCompactMode(e.target.checked)} />
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Mode compact</Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Checkbox checked={autoFit} onChange={(e) => setAutoFit(e.target.checked)} />
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Auto-fit</Typography>
+        </Box>
+        {isAdmin && (
+          <Box sx={{ ml: 'auto', pl: 1 }}>
+            <Button size="small" variant="text" onClick={(e) => { e.stopPropagation(); lock(); }} sx={{ fontSize: '0.7rem', minWidth: 0 }}>
+              Admin
+            </Button>
+          </Box>
+        )}
+      </Box>
+
       {/* Input de fichier JSON caché pour import nested */}
       <input
         type="file"
@@ -300,51 +362,61 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
       {/* Indication "base intégrée" retirée sur demande */}
 
-      <Button
-        variant="contained"
-        sx={{
-          width: '100%',
-          height: '100%',
-          fontSize: getScaledFontSize('0.5rem'),
-          fontWeight: 'bold',
-          backgroundColor: '#9c27b0',
-          '&:hover': { backgroundColor: '#7b1fa2' },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          textTransform: 'none',
-          lineHeight: 1.0,
-          padding: '1px',
-        }}
-        onClick={() => (document.getElementById('klick-import-json-input') as HTMLInputElement)?.click()}
-      >
-        Importer JSON (nested)
-      </Button>
+      {isAdmin && (
+        <Button
+          variant="contained"
+          sx={{
+            width: '100%',
+            height: '100%',
+            fontSize: getScaledFontSize('0.5rem'),
+            fontWeight: 'bold',
+            backgroundColor: '#9c27b0',
+            '&:hover': { backgroundColor: '#7b1fa2' },
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            textTransform: 'none',
+            lineHeight: 1.0,
+            padding: '1px',
+          }}
+          onClick={() => (document.getElementById('klick-import-json-input') as HTMLInputElement)?.click()}
+        >
+          Importer JSON (nested)
+        </Button>
+      )}
 
-      <Button
-        variant="contained"
-        sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#795548', '&:hover': { backgroundColor: '#5d4037' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
-        onClick={() => setShowExcludeCats(true)}
-      >
-        Exclure catégories (remises)
-      </Button>
+      {isAdmin && (
+        <>
+          <Button
+            variant="contained"
+            sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#795548', '&:hover': { backgroundColor: '#5d4037' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
+            onClick={() => setShowExcludeCats(true)}
+          >
+            Exclure catégories (remises)
+          </Button>
 
-      <ExcludeDiscountCategoriesModal open={showExcludeCats} onClose={() => setShowExcludeCats(false)} />
+          <ExcludeDiscountCategoriesModal open={showExcludeCats} onClose={() => setShowExcludeCats(false)} />
+        </>
+      )}
 
-      <Button
-        variant="contained"
-        sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#3f51b5', '&:hover': { backgroundColor: '#303f9f' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
-        onClick={() => setShowProReceipt(true)}
-      >
-        🧾 Ticket pro (composer/imprimer)
-      </Button>
+      {isAdmin && (
+        <Button
+          variant="contained"
+          sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#3f51b5', '&:hover': { backgroundColor: '#303f9f' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
+          onClick={() => setShowProReceipt(true)}
+        >
+          🧾 Ticket pro (composer/imprimer)
+        </Button>
+      )}
 
-      <Button
-        variant="contained"
-        sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#3949ab', '&:hover': { backgroundColor: '#283593' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
-        onClick={() => setShowProManager(true)}
-      >
-        📚 Tickets pro enregistrés
-      </Button>
+      {isAdmin && (
+        <Button
+          variant="contained"
+          sx={{ width: '100%', height: '100%', fontSize: getScaledFontSize('0.5rem'), fontWeight: 'bold', backgroundColor: '#3949ab', '&:hover': { backgroundColor: '#283593' }, boxSizing: 'border-box', overflow: 'hidden', textTransform: 'none', lineHeight: 1.0, padding: '1px' }}
+          onClick={() => setShowProManager(true)}
+        >
+          📚 Tickets pro enregistrés
+        </Button>
+      )}
 
       <Button
         variant="contained"
