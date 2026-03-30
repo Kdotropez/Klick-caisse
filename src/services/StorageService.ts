@@ -134,10 +134,15 @@ export class StorageService {
 
     const p = localStorage.getItem(this.PRODUCTS_KEY);
     const c = localStorage.getItem(this.CATEGORIES_KEY);
-    if (p && c) {
+    const legacyProducts = this.parseLegacyProductsRaw(p);
+    const legacyCategories = this.parseLegacyCategoriesRaw(c);
+    if (legacyProducts.length > 0 || legacyCategories.length > 0) {
       try {
-        this.saveProductionData(JSON.parse(p), JSON.parse(c), storeCode);
-      } catch { /* ignore */ }
+        /** Éviter export auto + téléchargement JSON pendant la migration (gros volume → UI bloquée). */
+        this.saveProductionData(legacyProducts, legacyCategories, storeCode, { skipAutoBackup: true });
+      } catch (e) {
+        console.error('Migration legacy produits/catégories:', e);
+      }
     }
     copy(this.CASHIERS_KEY, 'cashiers');
 
@@ -1130,12 +1135,54 @@ export class StorageService {
 
   // === GESTION DES BOUTIQUES ===
 
-  static saveProductionData(products: Product[], categories: Category[], storeCode?: string): void {
+  static saveProductionData(
+    products: Product[],
+    categories: Category[],
+    storeCode?: string,
+    opts?: { skipAutoBackup?: boolean }
+  ): void {
     const code = storeCode ?? this.getCurrentStoreCode();
     const data = { products, categories, timestamp: Date.now() };
     const key = this.getStoreKey(code, 'productionData');
     localStorage.setItem(key, JSON.stringify(data));
-    this.addAutoBackup(code);
+    if (!opts?.skipAutoBackup) {
+      this.addAutoBackup(code);
+    }
+  }
+
+  /** Parse l’ancienne clé globale produits (même règles que loadProducts sans lire le blob boutique). */
+  private static parseLegacyProductsRaw(data: string | null): Product[] {
+    if (!data) return [];
+    try {
+      const parsed = JSON.parse(data);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(
+        (product: any) =>
+          product &&
+          typeof product === 'object' &&
+          typeof product.id === 'string' &&
+          typeof product.name === 'string'
+      ) as Product[];
+    } catch {
+      return [];
+    }
+  }
+
+  private static parseLegacyCategoriesRaw(data: string | null): Category[] {
+    if (!data) return [];
+    try {
+      const parsed = JSON.parse(data);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(
+        (category: any) =>
+          category &&
+          typeof category === 'object' &&
+          typeof category.id === 'string' &&
+          typeof category.name === 'string'
+      ) as Category[];
+    } catch {
+      return [];
+    }
   }
 
   static loadProductionData(storeCode?: string): { products: Product[]; categories: Category[] } | null {

@@ -544,7 +544,15 @@ const App: React.FC = () => {
       <LegacyMigrationModal
         initialCode={StorageService.getCurrentStoreCode()}
         onMigrate={(code) => {
-          StorageService.migrateLegacyBundleToStore(code);
+          try {
+            StorageService.migrateLegacyBundleToStore(code);
+          } catch (e) {
+            console.error(e);
+            window.alert(
+              "La migration n'a pas pu se terminer (souvent: mémoire du navigateur pleine). Libérez de l'espace ou réessayez. Détails dans la console."
+            );
+            return;
+          }
           try {
             sessionStorage.setItem('klick_suggested_store_after_migrate', code);
           } catch {

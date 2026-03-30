@@ -71,10 +71,9 @@ export const loadProductionData = async (storeCode: string): Promise<{
     const savedProducts = StorageService.loadProducts();
     const savedCategories = StorageService.loadCategories();
     
-    // Vérifier si les sous-catégories sont présentes
-    const subcats = StorageService.loadSubcategories();
-    
-    if (savedProducts.length > 0 && savedCategories.length > 0 && subcats.length > 0) {
+    // Ne pas exiger les sous-catégories : après migration legacy elles peuvent être vides
+    // alors que produits + catégories sont déjà dans le blob — sinon on écrase tout par la base intégrée.
+    if (savedProducts.length > 0 || savedCategories.length > 0) {
       // Migration automatique: réinjecter les sous-catégories manquantes depuis la base intégrée
       try {
         const refById = new Map<string, { categorie?: string; sousCategorie?: string }>();
