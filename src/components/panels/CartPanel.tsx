@@ -7,7 +7,6 @@ import {
   Button,
   List,
   ListItem,
-  ListItemText,
   Divider,
   Chip,
   TextField,
@@ -221,6 +220,9 @@ const CartPanel: React.FC<CartPanelProps> = ({
               const finalPrice = getItemFinalPrice(item);
               const originalTotal = originalPrice * item.quantity;
               const finalTotal = finalPrice * item.quantity;
+              const discountAmountPerUnit = originalPrice - finalPrice;
+              const discountAmountTotal = discountAmountPerUnit * item.quantity;
+              const discountPercent = originalPrice > 0 ? (discountAmountPerUnit / originalPrice) * 100 : 0;
 
               return (
                 <React.Fragment key={`${item.product.id}-${variationId || 'main'}`}>
@@ -237,215 +239,131 @@ const CartPanel: React.FC<CartPanelProps> = ({
                     onClick={() => { if (!isExcludedForDiscount) onOpenDiscountModal(item); }}
                     title={isExcludedForDiscount ? 'Remise exclue pour cet article' : undefined}
                   >
-                    <ListItemText
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {item.product.name}
-                            {isExcludedForDiscount && (
-                              <Typography component="span" variant="caption" sx={{ color: 'text.secondary', ml: 0.5 }}>
-                                (remise exclue)
-                              </Typography>
-                            )}
-                            {item.selectedVariation && (
-                              <Typography 
-                                component="span" 
-                                variant="body2" 
-                                sx={{ color: '#2196f3', fontWeight: 'normal', ml: 0.5, fontStyle: 'italic' }}
-                              >
-                                ({item.selectedVariation.attributes})
-                              </Typography>
-                            )}
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto auto auto auto auto', alignItems: 'center', gap: 0.5, width: '100%' }}>
+                      <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', minWidth: 0 }}>
+                        {item.product.name}
+                        {item.selectedVariation && (
+                          <Typography component="span" variant="body2" sx={{ color: '#2196f3', fontWeight: 'normal', ml: 0.5, fontStyle: 'italic' }}>
+                            ({item.selectedVariation.attributes})
                           </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRemoveItem(item.product.id, variationId);
-                            }}
-                            sx={{ color: '#f44336', p: 0.5 }}
-                          >
+                        )}
+                        {isExcludedForDiscount && (
+                          <Typography component="span" variant="caption" sx={{ color: 'text.secondary', ml: 0.5 }}>
+                            (remise exclue)
+                          </Typography>
+                        )}
+                      </Typography>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} onClick={(e) => e.stopPropagation()}>
+                        <IconButton size="small" onClick={() => onUpdateQuantity(item.product.id, variationId, item.quantity - 1)} sx={{ p: 0.25 }}>
+                          <Remove fontSize="small" />
+                        </IconButton>
+                        <Chip label={item.quantity} size="small" sx={{ height: 22 }} />
+                        <IconButton size="small" onClick={() => onUpdateQuantity(item.product.id, variationId, item.quantity + 1)} sx={{ p: 0.25 }}>
+                          <Add fontSize="small" />
+                        </IconButton>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} onClick={(e) => e.stopPropagation()}>
+                        {editingPrice?.key === discountKey ? (
+                          <>
+                            <TextField
+                              size="small"
+                              type="text"
+                              value={editingPrice.value}
+                              onChange={(e) => setEditingPrice({ key: discountKey, value: e.target.value })}
+                              placeholder="0,00"
+                              sx={{ width: 76, '& .MuiInputBase-input': { py: 0.25, px: 0.75 } }}
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  const normalized = editingPrice.value.replace(',', '.');
+                                  const val = parseFloat(normalized);
+                                  if (Number.isFinite(val) && val >= 0) {
+                                    onApplyItemDiscount(item.product.id, variationId, 'price', val);
+                                    setEditingPrice(null);
+                                  } else {
+                                    alert('Prix invalide');
+                                  }
+                                }
+                                if (e.key === 'Escape') setEditingPrice(null);
+                              }}
+                            />
+                            <Button
+                              size="small"
+                              variant="contained"
+                              onClick={() => {
+                                const normalized = editingPrice.value.replace(',', '.');
+                                const val = parseFloat(normalized);
+                                if (Number.isFinite(val) && val >= 0) {
+                                  onApplyItemDiscount(item.product.id, variationId, 'price', val);
+                                  setEditingPrice(null);
+                                } else {
+                                  alert('Prix invalide');
+                                }
+                              }}
+                              sx={{ minWidth: 0, px: 0.75, py: 0.1 }}
+                            >
+                              ✓
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Typography
+                              variant="body2"
+                              noWrap
+                              sx={{ width: 62, textAlign: 'right', fontWeight: 'bold', color: discount?.type==='price' ? '#ef6c00' : '#666', textDecoration: discount?.type==='price' ? 'underline' : 'none' }}
+                              onClick={() => {
+                                const currentUnit = finalPrice;
+                                setEditingPrice({ key: discountKey, value: currentUnit.toFixed(2).replace('.', ',') });
+                              }}
+                              title={discount?.type==='price' ? 'Prix modifié - cliquer pour changer' : 'Cliquer pour modifier le prix'}
+                            >
+                              {(discount?.type==='price' ? finalPrice : originalPrice).toFixed(2)} €
+                            </Typography>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                const currentUnit = finalPrice;
+                                setEditingPrice({ key: discountKey, value: currentUnit.toFixed(2).replace('.', ',') });
+                              }}
+                              sx={{ p: 0.25 }}
+                            >
+                              <Edit fontSize="small" />
+                            </IconButton>
+                          </>
+                        )}
+                      </Box>
+
+                      {discount && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} onClick={(e) => e.stopPropagation()}>
+                          <Typography variant="caption" noWrap sx={{ color: '#ef6c00', fontWeight: 'bold', maxWidth: 92 }}>
+                            -{discountAmountTotal.toFixed(2)}€ ({discountPercent.toFixed(0)}%)
+                          </Typography>
+                          <Typography variant="caption" noWrap sx={{ color: '#666', textDecoration: 'line-through', maxWidth: 70 }}>
+                            {originalTotal.toFixed(2)}€
+                          </Typography>
+                          <IconButton size="small" onClick={() => onRemoveItemDiscount(discountKey)} sx={{ color: '#ff0000', p: 0.25 }}>
                             ✕
                           </IconButton>
-                          {/* Zone prix unitaire (édition inline) */}
-                          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }} onClick={(e)=>e.stopPropagation()}>
-                            {editingPrice?.key === discountKey ? (
-                              <>
-                                <TextField
-                                  size="small"
-                                  type="text"
-                                  value={editingPrice.value}
-                                  onChange={(e) => setEditingPrice({ key: discountKey, value: e.target.value })}
-                                  placeholder="0,00"
-                                  sx={{ width: 90 }}
-                                  autoFocus
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      const normalized = editingPrice.value.replace(',', '.');
-                                      const val = parseFloat(normalized);
-                                      if (Number.isFinite(val) && val >= 0) {
-                                        onApplyItemDiscount(item.product.id, variationId, 'price', val);
-                                        setEditingPrice(null);
-                                      } else {
-                                        alert('Prix invalide');
-                                      }
-                                    }
-                                    if (e.key === 'Escape') {
-                                      setEditingPrice(null);
-                                    }
-                                  }}
-                                />
-                                <Typography variant="body2">€</Typography>
-                                <Button 
-                                  size="small" 
-                                  variant="contained"
-                                  onClick={() => {
-                                    const normalized = editingPrice.value.replace(',', '.');
-                                    const val = parseFloat(normalized);
-                                    if (Number.isFinite(val) && val >= 0) {
-                                      onApplyItemDiscount(item.product.id, variationId, 'price', val);
-                                      setEditingPrice(null);
-                                    } else {
-                                      alert('Prix invalide');
-                                    }
-                                  }}
-                                  sx={{ minWidth: 0, px: 1, py: 0.25 }}
-                                >
-                                  ✓
-                                </Button>
-                                <Button 
-                                  size="small" 
-                                  variant="outlined"
-                                  onClick={() => setEditingPrice(null)}
-                                  sx={{ minWidth: 0, px: 1, py: 0.25 }}
-                                >
-                                  ✕
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <Typography 
-                                  variant="body2" 
-                                  sx={{ fontWeight: 'bold', color: discount?.type==='price' ? '#ef6c00' : '#666', textDecoration: discount?.type==='price' ? 'underline' : 'none' }}
-                                  onClick={() => {
-                                    const currentUnit = finalPrice; // prix actuel appliqué
-                                    setEditingPrice({ key: discountKey, value: currentUnit.toFixed(2).replace('.', ',') });
-                                  }}
-                                  title={discount?.type==='price' ? 'Prix modifié - cliquer pour changer' : 'Cliquer pour modifier le prix'}
-                                >
-                                  {(discount?.type==='price' ? finalPrice : originalPrice).toFixed(2)} €
-                                </Typography>
-                                <IconButton 
-                                  size="small" 
-                                  onClick={() => {
-                                    const currentUnit = finalPrice; 
-                                    setEditingPrice({ key: discountKey, value: currentUnit.toFixed(2).replace('.', ',') });
-                                  }}
-                                  sx={{ p: 0.5 }}
-                                >
-                                  <Edit fontSize="small" />
-                                </IconButton>
-                                {discount?.type === 'price' && (
-                                  <Button 
-                                    size="small"
-                                    variant="outlined"
-                                    onClick={() => onRemoveItemDiscount(discountKey)}
-                                    sx={{ minWidth: 0, px: 1, py: 0.25 }}
-                                    title="Réinitialiser prix (retour tarif)"
-                                  >
-                                    Réinit
-                                  </Button>
-                                )}
-                              </>
-                            )}
-                          </Box>
                         </Box>
-                      }
-                      secondary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                          <IconButton 
-                            size="small" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onUpdateQuantity(item.product.id, variationId, item.quantity - 1);
-                            }}
-                          >
-                            <Remove fontSize="small" />
-                          </IconButton>
-                          <Chip label={item.quantity} size="small" />
-                          <IconButton 
-                            size="small" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onUpdateQuantity(item.product.id, variationId, item.quantity + 1);
-                            }}
-                          >
-                            <Add fontSize="small" />
-                          </IconButton>
+                      )}
 
-                          {discount && (() => {
-                            const discountAmountPerUnit = originalPrice - finalPrice;
-                            const discountAmountTotal = discountAmountPerUnit * item.quantity;
-                            const discountPercent = ((discountAmountPerUnit / originalPrice) * 100);
+                      <Box sx={{ backgroundColor: '#2196F3', color: 'white', px: 1, py: 0.25, borderRadius: 1, fontSize: '0.85rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                        {finalTotal.toFixed(2)} €
+                      </Box>
 
-                            return (
-                              <Box sx={{ display: 'flex', gap: 0.5, ml: 1, alignItems: 'center' }}>
-                                <Box sx={{
-                                  display: 'flex',
-                                  gap: 0.5,
-                                  backgroundColor: '#ff9800',
-                                  color: 'black',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  fontSize: '0.9rem',
-                                  fontWeight: 'bold'
-                                }}>
-                                  <span>-{discountAmountTotal.toFixed(2)}€</span>
-                                  <span>(-{discountPercent.toFixed(1)}%)</span>
-                                </Box>
-                                <Box sx={{
-                                  backgroundColor: '#000',
-                                  color: 'white',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  fontSize: '0.9rem',
-                                  fontWeight: 'bold',
-                                  ml: 1,
-                                  textDecoration: 'line-through'
-                                }}>
-                                  {originalTotal.toFixed(2)} €
-                                </Box>
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onRemoveItemDiscount(discountKey);
-                                  }}
-                                  sx={{ color: '#ff0000', fontSize: '0.8rem', ml: 0.5, p: 0.5, minWidth: 'auto' }}
-                                >
-                                  ✕
-                                </IconButton>
-                              </Box>
-                            );
-                          })()}
-
-                          <Box sx={{
-                            backgroundColor: '#2196F3',
-                            color: 'white',
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: 1,
-                            fontSize: '0.9rem',
-                            fontWeight: 'bold',
-                            ml: 'auto'
-                          }}>
-                            {finalTotal.toFixed(2)} €
-                          </Box>
-                        </Box>
-                      }
-                    />
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRemoveItem(item.product.id, variationId);
+                        }}
+                        sx={{ color: '#f44336', p: 0.25 }}
+                      >
+                        ✕
+                      </IconButton>
+                    </Box>
                   </ListItem>
                   {index < safeCartItems.length - 1 && <Divider />}
                 </React.Fragment>

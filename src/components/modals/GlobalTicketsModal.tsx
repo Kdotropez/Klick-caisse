@@ -232,7 +232,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
       const dateStr = dt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
       const timeStr = dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
       const shortId = String(t.id).slice(-6);
-      return { t, items, qty, isExpanded, dateStr, timeStr, shortId };
+      return { t, items, qty, isExpanded, dateTimeStr: `${dateStr} ${timeStr}`, shortId };
     });
   }, [filtered, expandedIds]);
 
@@ -260,8 +260,8 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
     const row = renderedRows[index];
     if (!row) return 56;
 
-    // Hauteur de base (ligne principale + paddings)
-    const base = 56;
+    // Ligne principale compacte: un ticket = une ligne.
+    const base = 38;
     if (!row.isExpanded) return base;
 
     // Détails: on approxime une ligne par item + marges.
@@ -502,20 +502,21 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                   const row = renderedRows[index];
                   if (!row) return <div style={style} />;
 
-                  const { t, items, qty, isExpanded, dateStr, timeStr, shortId } = row;
+                  const { t, items, qty, isExpanded, dateTimeStr, shortId } = row;
                   const tid = String(t.id);
 
                   return (
                     <div style={style} key={`${t.id}-${t.timestamp}`}>
-                      <ListItem sx={{ py: 0.5, borderBottom: '1px solid #eee', px: 1, alignItems: 'flex-start' }}>
+                      <ListItem sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1, alignItems: 'flex-start' }}>
                         <Box sx={{ width: '100%' }}>
                             {/* Ligne principale */}
                             <Box sx={{
                               display: 'grid',
-                              gridTemplateColumns: '30px 100px 80px 80px 120px 100px',
+                              gridTemplateColumns: '24px 76px 116px minmax(86px, 1fr) 104px',
                               alignItems: 'center',
-                              gap: 1,
+                              gap: 0.75,
                               width: '100%',
+                              minHeight: 32,
                             }}>
                               <input
                                 type="checkbox"
@@ -546,10 +547,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
                                 #{shortId}
                               </Typography>
                               <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
-                                {dateStr}
-                              </Typography>
-                              <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
-                                {timeStr}
+                                {dateTimeStr}
                               </Typography>
                               <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>
                                 {`${qty} article${qty > 1 ? 's' : ''}`}
