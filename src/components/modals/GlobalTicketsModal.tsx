@@ -33,6 +33,7 @@ interface GlobalTicketsModalProps {
   setShowDiscountDetails: (v: boolean) => void;
   onOpenEditor: (txId: string) => void;
   refreshTodayTransactions: () => void;
+  refreshKey: number;
   filterCustomerId?: string | null;
   setFilterCustomerId?: (id: string | null) => void;
   onRequestOpenProReceipt?: () => void;
@@ -67,6 +68,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   setShowDiscountDetails,
   onOpenEditor,
   refreshTodayTransactions,
+  refreshKey,
   filterCustomerId = null,
   setFilterCustomerId,
   onRequestOpenProReceipt,
@@ -77,6 +79,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
   // (Sinon, chaque frappe sur un filtre recharge localStorage et reconstruit tout.)
   const allTx = useMemo(() => {
     if (!open) return [];
+    void refreshKey;
 
     const allClosures = StorageService.loadClosures();
     const txs: any[] = [];
@@ -123,7 +126,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
     } catch {}
 
     return txs;
-  }, [open]);
+  }, [open, refreshKey]);
 
   const allTxOnlyToday = useMemo(() => {
     if (!onlyToday) return allTx;
@@ -438,6 +441,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             setDateTo('');
             setTimeFrom('');
             setTimeTo('');
+            setFilterCustomerId?.(null);
             setSelectedIds(() => new Set());
             setExpandedIds(() => new Set());
             }}

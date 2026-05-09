@@ -566,6 +566,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [globalTimeTo, setGlobalTimeTo] = useState<string>('');
   const [globalSelectedIds, setGlobalSelectedIds] = useState<Set<string>>(new Set());
   const [globalOnlyToday, setGlobalOnlyToday] = useState<boolean>(false);
+  const [globalTicketsRefreshKey, setGlobalTicketsRefreshKey] = useState(0);
   const [showDiscountDetails, setShowDiscountDetails] = useState<boolean>(false);
   // Saisie de quantité via pavé numérique (catégories)
   const [pendingQtyInput, setPendingQtyInput] = useState<string>('');
@@ -583,6 +584,23 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Réfs pour remettre les barres sur "Toutes"
   const categoriesScrollRef = useRef<HTMLDivElement | null>(null);
   const subcategoriesScrollRef = useRef<HTMLDivElement | null>(null);
+
+  const openGlobalTickets = useCallback(() => {
+    setGlobalOnlyToday(false);
+    setGlobalFilterPayment('all');
+    setGlobalAmountMin('');
+    setGlobalAmountMax('');
+    setGlobalAmountExact('');
+    setGlobalDateFrom('');
+    setGlobalDateTo('');
+    setGlobalTimeFrom('');
+    setGlobalTimeTo('');
+    setFilterCustomerForTickets(null);
+    setGlobalSelectedIds(() => new Set());
+    setExpandedGlobalTicketIds(() => new Set());
+    setGlobalTicketsRefreshKey((v) => v + 1);
+    setShowGlobalTickets(true);
+  }, []);
 
   // Compteur quotidien par produit (toutes variations confondues)
   const dailyQtyByProduct = useMemo(() => {
@@ -1750,6 +1768,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     try { StorageService.addAutoBackup(); } catch {}
     try { StorageService.downloadFullBackup(); } catch {}
     setTodayTransactions(StorageService.loadTodayTransactions());
+    setGlobalTicketsRefreshKey((v) => v + 1);
 
     // Mettre à jour les compteurs de ventes et vider le panier
     onCheckout();
@@ -3530,7 +3549,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               onOpenDailyReport={() => setShowDailyReportModal(true)}
               onOpenGlobalDiscount={() => openGlobalDiscountModal()}
               onOpenSalesRecap={() => setShowSalesRecap(true)}
-              onOpenGlobalTickets={() => { setGlobalOnlyToday(false); setShowGlobalTickets(true); }}
+              onOpenGlobalTickets={openGlobalTickets}
               onOpenClosures={() => { setClosures(StorageService.loadClosures()); setSelectedClosureIdx(null); setShowClosures(true); }}
               onOpenEndOfDay={() => setShowEndOfDay(true)}
               totalDailyDiscounts={totalDailyDiscounts}
@@ -3882,7 +3901,11 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               setGlobalEditorIsToday(!!isToday);
               setShowGlobalEditor(true);
             }}
-            refreshTodayTransactions={()=>setTodayTransactions(StorageService.loadTodayTransactions())}
+            refreshTodayTransactions={() => {
+              setTodayTransactions(StorageService.loadTodayTransactions());
+              setGlobalTicketsRefreshKey((v) => v + 1);
+            }}
+            refreshKey={globalTicketsRefreshKey}
             filterCustomerId={filterCustomerForTickets}
             setFilterCustomerId={(id)=> setFilterCustomerForTickets(id)}
           />
@@ -4097,6 +4120,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
               setGlobalFilterPayment('all');
               // Petite attente pour garantir fermeture modal, puis ouvrir tickets
               setTimeout(()=>{
+                setGlobalTicketsRefreshKey((v) => v + 1);
                 setShowGlobalTickets(true);
               }, 0);
               // Marquer l'ID client dans un état local pour filtrer
