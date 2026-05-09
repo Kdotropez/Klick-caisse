@@ -9,6 +9,8 @@ export class StorageService {
   private static readonly SETTINGS_KEY = 'klick_caisse_settings';
   private static readonly SUBCATEGORIES_KEY = 'klick_caisse_subcategories';
   private static readonly CASHIERS_KEY = 'klick_caisse_cashiers';
+  /** Ancienne clé globale (avant isolation par boutique) — encore présente après migration si la copie a raté ou mauvaise boutique. */
+  private static readonly LEGACY_CLOSURES_KEY = 'klick_caisse_closures';
 
   static readonly STORE_MIGRATION_FLAG = 'klick_caisse_v2_store_migration_done';
 
@@ -26,6 +28,32 @@ export class StorageService {
     localStorage.removeItem(this.activeStoreKey(suffix));
   }
 
+  private static isQuotaExceeded(error: unknown): boolean {
+    const e = error as { name?: string; code?: number };
+    return e?.name === 'QuotaExceededError' || e?.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e?.code === 22 || e?.code === 1014;
+  }
+
+  private static purgeOversizedLocalBackups(): void {
+    try {
+      localStorage.removeItem(this.activeStoreKey('auto_backups'));
+      localStorage.removeItem('klick_caisse_auto_backups');
+      localStorage.removeItem('klick_emergency_backup');
+      localStorage.removeItem('klick_emergency_recovery');
+    } catch {
+      /* ignore */
+    }
+  }
+
+  private static setItemWithQuotaRecovery(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      if (!this.isQuotaExceeded(error)) throw error;
+      this.purgeOversizedLocalBackups();
+      localStorage.setItem(key, value);
+    }
+  }
+
   /** True si d’anciennes clés « globales » contiennent encore des données à migrer. */
   static hasLegacyGlobalBundle(): boolean {
     const nonEmpty = (key: string): boolean => {
@@ -37,7 +65,7 @@ export class StorageService {
     };
     return (
       nonEmpty('klick_caisse_transactions_by_day') ||
-      nonEmpty('klick_caisse_closures') ||
+      nonEmpty(this.LEGACY_CLOSURES_KEY) ||
       nonEmpty('klick_caisse_products') ||
       nonEmpty('klick_caisse_categories') ||
       nonEmpty('klick_caisse_settings') ||
@@ -124,7 +152,7 @@ export class StorageService {
     };
 
     copy('klick_caisse_transactions_by_day', 'transactions_by_day');
-    copy('klick_caisse_closures', 'closures');
+    copy(this.LEGACY_CLOSURES_KEY, 'closures');
     copy('klick_caisse_z_counter', 'z_counter');
     copy('klick_caisse_settings', 'settings');
     copy('klick_caisse_customers', 'customers');
@@ -157,7 +185,7 @@ export class StorageService {
   static purgeLegacyGlobalBundle(): void {
     const keys = [
       'klick_caisse_transactions_by_day',
-      'klick_caisse_closures',
+      this.LEGACY_CLOSURES_KEY,
       'klick_caisse_z_counter',
       'klick_caisse_settings',
       'klick_caisse_customers',
@@ -183,7 +211,7 @@ export class StorageService {
   }
 
   static setTransactionsByDayRaw(json: string): void {
-    localStorage.setItem(this.activeStoreKey('transactions_by_day'), json);
+    this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), json);
   }
 
   static getTransactionsByDayMap(): Record<string, any[]> {
@@ -202,7 +230,7 @@ export class StorageService {
   }
 
   static setZCounterValue(n: number): void {
-    localStorage.setItem(this.activeStoreKey('z_counter'), String(n));
+    this.setItemWithQuotaRecovery(this.activeStoreKey('z_counter'), String(n));
   }
 
   // Sauvegarder les produits
@@ -562,6 +590,36 @@ export class StorageService {
     return `${yyyy}-${mm}-${dd}`;
   }
 
+  private static coerceAmount(value: unknown): number {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    const n = Number.parseFloat(String(value ?? '').replace(/\s+/g, '').replace(',', '.'));
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  private static computeTransactionTotalFromItems(t: any): number {
+    try {
+      return (Array.isArray(t.items) ? t.items : []).reduce((sum: number, item: any) => {
+        const unit = item?.selectedVariation?.finalPrice ?? item?.product?.finalPrice ?? 0;
+        return sum + this.coerceAmount(unit) * (Number(item?.quantity) || 0);
+      }, 0);
+    } catch {
+      return 0;
+    }
+  }
+
+  private static normalizeTransactionRecord(t: any): Transaction | null {
+    if (!t || !Array.isArray(t.items) || !t.id) return null;
+    const shouldRecomputeTotal =
+      t.total == null ||
+      t.total === '' ||
+      (typeof t.total === 'number' && !Number.isFinite(t.total));
+    return {
+      ...t,
+      total: shouldRecomputeTotal ? this.computeTransactionTotalFromItems(t) : this.coerceAmount(t.total),
+      timestamp: new Date(t.timestamp),
+    } as Transaction;
+  }
+
   static addDailyTransaction(tx: Transaction): void {
     try {
       const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
@@ -569,10 +627,19 @@ export class StorageService {
       const key = this.getTodayKey();
       const list = Array.isArray(map[key]) ? map[key] : [];
       // Sérialiser Date -> ISO
-      const serialized = { ...tx, timestamp: new Date(tx.timestamp).toISOString() };
+      const shouldRecomputeTotal =
+        (tx as any).total == null ||
+        (tx as any).total === '' ||
+        (typeof (tx as any).total === 'number' && !Number.isFinite((tx as any).total));
+      const total = shouldRecomputeTotal ? this.computeTransactionTotalFromItems(tx) : this.coerceAmount(tx.total);
+      const serialized = {
+        ...tx,
+        total,
+        timestamp: new Date(tx.timestamp).toISOString()
+      };
       list.push(serialized);
       map[key] = list;
-      localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
     } catch (error) {
       console.error('Erreur lors de l\'ajout de la transaction du jour:', error);
     }
@@ -587,8 +654,8 @@ export class StorageService {
       const list = Array.isArray(map[key]) ? map[key] : [];
       // Désérialiser ISO -> Date et filtrer les entrées invalides
       return list
-        .filter((t: any) => t && Array.isArray(t.items) && typeof t.total === 'number' && t.id)
-        .map((t: any) => ({ ...t, timestamp: new Date(t.timestamp) })) as Transaction[];
+        .map((t: any) => this.normalizeTransactionRecord(t))
+        .filter((t): t is Transaction => t !== null);
     } catch (error) {
       console.error('Erreur lors du chargement des transactions du jour:', error);
       return [];
@@ -602,7 +669,7 @@ export class StorageService {
       const map: Record<string, any[]> = JSON.parse(raw);
       const key = this.getTodayKey();
       delete map[key];
-      localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
     } catch (error) {
       console.error('Erreur lors de l\'effacement des transactions du jour:', error);
     }
@@ -610,10 +677,21 @@ export class StorageService {
 
   // ---------- Clôture (archives) ----------
   static loadClosures(): any[] {
+    const parseArray = (raw: string | null): any[] | null => {
+      if (raw == null || raw === '') return null;
+      try {
+        const v = JSON.parse(raw);
+        return Array.isArray(v) ? v : null;
+      } catch {
+        return null;
+      }
+    };
     try {
-      const raw = localStorage.getItem(this.activeStoreKey('closures'));
-      const closures = raw ? JSON.parse(raw) : [];
-      return closures;
+      const fromStore = parseArray(localStorage.getItem(this.activeStoreKey('closures')));
+      if (fromStore && fromStore.length > 0) return fromStore;
+      const fromLegacy = parseArray(localStorage.getItem(this.LEGACY_CLOSURES_KEY));
+      if (fromLegacy && fromLegacy.length > 0) return fromLegacy;
+      return [];
     } catch (error) {
       console.error(`[DEBUG StorageService] loadClosures - error:`, error);
       return [];
@@ -624,7 +702,7 @@ export class StorageService {
     try {
       const all = this.loadClosures();
       all.push(closure);
-      localStorage.setItem(this.activeStoreKey('closures'), JSON.stringify(all));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('closures'), JSON.stringify(all));
     } catch (error) {
       console.error('Erreur lors de l\'archivage de la clôture:', error);
     }
@@ -632,7 +710,7 @@ export class StorageService {
 
   static saveAllClosures(closures: any[]): void {
     try {
-      localStorage.setItem(this.activeStoreKey('closures'), JSON.stringify(closures || []));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('closures'), JSON.stringify(closures || []));
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement des clôtures:', error);
     }
@@ -706,7 +784,7 @@ export class StorageService {
   static incrementZNumber(): number {
     const current = this.getCurrentZNumber();
     const next = current + 1;
-    localStorage.setItem(this.activeStoreKey('z_counter'), String(next));
+    this.setItemWithQuotaRecovery(this.activeStoreKey('z_counter'), String(next));
     return next;
   }
 
@@ -719,8 +797,12 @@ export class StorageService {
       const list = Array.isArray(map[key]) ? map[key] : [];
       const idx = list.findIndex((t: any) => t.id === updated.id);
       if (idx >= 0) {
-        map[key][idx] = { ...updated, timestamp: new Date(updated.timestamp).toISOString() };
-        localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
+        map[key][idx] = {
+          ...updated,
+          total: this.coerceAmount(updated.total),
+          timestamp: new Date(updated.timestamp).toISOString()
+        };
+        this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour du ticket:', error);
@@ -735,7 +817,7 @@ export class StorageService {
       const key = this.getTodayKey();
       const list = Array.isArray(map[key]) ? map[key] : [];
       map[key] = list.filter((t: any) => t.id !== transactionId);
-      localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
     } catch (error) {
       console.error('Erreur lors de la suppression du ticket:', error);
     }
@@ -757,7 +839,7 @@ export class StorageService {
         }
       }
       if (changed) {
-        localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
+        this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
       }
     } catch (error) {
       console.error('Erreur lors de la suppression (toutes journées):', error);
@@ -1087,20 +1169,31 @@ export class StorageService {
     }
   }
 
-  // Sauvegarde automatique locale (rotation limitée)
+  // Sauvegarde automatique: téléchargement JSON + trace légère en localStorage.
   static addAutoBackup(_storeCode?: string): void {
     try {
       const data = this.exportFullBackup();
       if (!data) return;
-      const raw = localStorage.getItem(this.activeStoreKey('auto_backups'));
-      const list: Array<{ ts: string; data: any }> = raw ? JSON.parse(raw) : [];
-      const entry = { ts: new Date().toISOString(), data };
-      list.unshift(entry);
-      const LIMITED = list.slice(0, 30); // garder les 30 dernières (augmenté pour éviter les pertes)
-      localStorage.setItem(this.activeStoreKey('auto_backups'), JSON.stringify(LIMITED));
-      
-      // Sauvegarde JSON automatique pour récupération en cas de coupure
       this.downloadAutoBackup(data);
+
+      const raw = localStorage.getItem(this.activeStoreKey('auto_backups'));
+      const parsed = raw ? JSON.parse(raw) : [];
+      const list: Array<{ ts: string; storeCode?: string; zCounter?: number }> = (Array.isArray(parsed) ? parsed : [])
+        .map((item: any) => ({
+          ts: String(item?.ts || item?.data?.exportedAt || ''),
+          storeCode: item?.storeCode || item?.data?.storeCode,
+          zCounter: Number.isFinite(Number(item?.zCounter ?? item?.data?.zCounter))
+            ? Number(item?.zCounter ?? item?.data?.zCounter)
+            : undefined,
+        }))
+        .filter((item) => item.ts);
+      const entry = {
+        ts: new Date().toISOString(),
+        storeCode: data.storeCode,
+        zCounter: data.zCounter,
+      };
+      list.unshift(entry);
+      this.setItemWithQuotaRecovery(this.activeStoreKey('auto_backups'), JSON.stringify(list.slice(0, 5)));
     } catch (e) {
       console.error('Erreur sauvegarde auto:', e);
     }
@@ -1144,7 +1237,7 @@ export class StorageService {
     const code = storeCode ?? this.getCurrentStoreCode();
     const data = { products, categories, timestamp: Date.now() };
     const key = this.getStoreKey(code, 'productionData');
-    localStorage.setItem(key, JSON.stringify(data));
+    this.setItemWithQuotaRecovery(key, JSON.stringify(data));
     if (!opts?.skipAutoBackup) {
       this.addAutoBackup(code);
     }

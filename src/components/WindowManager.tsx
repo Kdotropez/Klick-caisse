@@ -627,9 +627,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     let cash = 0, card = 0, sumup = 0;
     for (const tx of transactions) {
       const method = String((tx as any).paymentMethod || '').toLowerCase();
-      if (method === 'cash' || method.includes('esp')) cash += tx.total;
-      else if (method === 'card' || method.includes('carte')) card += tx.total;
-      else if (method === 'sumup') sumup += tx.total;
+      const total = Number(tx.total) || 0;
+      if (method === 'cash' || method.includes('esp')) cash += total;
+      else if (method === 'card' || method.includes('carte')) card += total;
+      else if (method === 'sumup') sumup += total;
     }
     return { 'Espèces': cash, 'SumUp': sumup, 'Carte': card } as typeof paymentTotals;
   }, []);
@@ -1710,7 +1711,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   // Fonction de règlement direct
-  const handleDirectPayment = (method: string) => {
+  const handleDirectPayment = (method: Transaction['paymentMethod']) => {
     if (cartItems.length === 0) {
       alert('Le panier est vide !');
       return;
@@ -1719,14 +1720,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Calculer le total avec toutes remises (individuelles + globale)
     const total = getTotalWithGlobalDiscount();
 
-    // Accumuler le total pour cette méthode de paiement
-    setPaymentTotals(prev => ({
-      ...prev,
-      [method]: prev[method as keyof typeof prev] + total
-    }));
+    const methodLabel = method === 'cash' ? 'Espèces' : method === 'card' ? 'Carte' : method === 'sumup' ? 'SumUp' : 'Chèque';
 
     // Afficher la notification de succès
-    setPaymentMethod(method);
+    setPaymentMethod(methodLabel);
     setShowPaymentSuccess(true);
 
     // Masquer la notification après 3 secondes
@@ -1740,7 +1737,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       id: Date.now().toString(),
       items: cartItems.map(i => ({ ...i })),
       total,
-      paymentMethod: method as any,
+      paymentMethod: method,
       cashierName: 'Caissier',
       timestamp: new Date(),
       itemDiscounts: { ...itemDiscounts },
@@ -1781,8 +1778,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     },
     onToggleLayout: () => onToggleLayoutLock?.(),
     onQuickPayment: (method) => {
-      const label = method === 'cash' ? 'Espèces' : method === 'card' ? 'Carte' : 'SumUp';
-      handleDirectPayment(label);
+      handleDirectPayment(method);
     },
     isLayoutLocked,
     hasItemsInCart: cartItems.length > 0,
@@ -3349,9 +3345,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             cartItems={cartItems}
             totalAmount={getTotalWithGlobalDiscount()}
             paymentTotals={paymentTotals as any}
-            onPayCash={() => handleDirectPayment('Espèces')}
-            onPaySumUp={() => handleDirectPayment('SumUp')}
-            onPayCard={() => handleDirectPayment('Carte')}
+            onPayCash={() => handleDirectPayment('cash')}
+            onPaySumUp={() => handleDirectPayment('sumup')}
+            onPayCard={() => handleDirectPayment('card')}
             onOpenCashRecap={() => { setPaymentRecapMethod('cash'); setShowPaymentRecap(true); }}
             onOpenSumUpRecap={() => { setPaymentRecapMethod('sumup'); setShowPaymentRecap(true); }}
             onOpenCardRecap={() => { setPaymentRecapMethod('card'); setShowPaymentRecap(true); }}

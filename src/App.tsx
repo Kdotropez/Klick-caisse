@@ -545,6 +545,9 @@ const App: React.FC = () => {
         initialCode={StorageService.getCurrentStoreCode()}
         onMigrate={(code) => {
           try {
+            /** Aligner la boutique active tout de suite : sinon tickets/clôtures lisaient encore l’ancien code magasin. */
+            StorageService.setCurrentStoreCode(code);
+            setCurrentStoreCode(code);
             StorageService.migrateLegacyBundleToStore(code);
           } catch (e) {
             console.error(e);
