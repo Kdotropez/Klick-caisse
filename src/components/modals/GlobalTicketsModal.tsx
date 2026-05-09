@@ -1,8 +1,7 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, TextField, Typography } from '@mui/material';
 import CustomersListModal from './CustomersListModal';
 import { StorageService } from '../../services/StorageService';
-import { List } from 'react-window';
 
 interface GlobalTicketsModalProps {
   open: boolean;
@@ -236,42 +235,6 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
     });
   }, [filtered, expandedIds]);
 
-  const listBoxRef = useRef<HTMLDivElement | null>(null);
-  const [listSize, setListSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
-
-  useLayoutEffect(() => {
-    const el = listBoxRef.current;
-    if (!el) return;
-
-    const update = () => {
-      const r = el.getBoundingClientRect();
-      const width = Math.floor(r.width);
-      const height = Math.floor(r.height);
-      setListSize(prev => (prev.width === width && prev.height === height ? prev : { width, height }));
-    };
-
-    update();
-    const ro = new ResizeObserver(() => update());
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const getItemSize = useCallback((index: number) => {
-    const row = renderedRows[index];
-    if (!row) return 56;
-
-    // Ligne principale compacte: un ticket = une ligne.
-    const base = 38;
-    if (!row.isExpanded) return base;
-
-    // Détails: on approxime une ligne par item + marges.
-    // (On préfère une estimation un peu “large” pour éviter le chevauchement.)
-    const perItem = 26;
-    const detailsHeader = showDiscountDetails ? 52 : 20;
-    const details = detailsHeader + row.items.length * perItem + 24;
-    return base + details;
-  }, [renderedRows, showDiscountDetails]);
-
   const summary = useMemo(() => {
     let totalSales = 0;
     let totalOriginalAmount = 0;
@@ -485,221 +448,138 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
         </Box>
 
         {/* Liste des transactions */}
-        <Box ref={listBoxRef} sx={{ height: '52vh', minHeight: 320, border: '1px solid #eee', borderRadius: 1, overflow: 'hidden' }}>
+        <Box sx={{ height: '52vh', minHeight: 320, border: '1px solid #eee', borderRadius: 1, overflow: 'auto' }}>
           {filtered.length === 0 ? (
             <Box sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
               Aucun ticket trouvé pour ces filtres
             </Box>
           ) : (
-            listSize.width > 0 && listSize.height > 0 && (
-              <List
-                style={{ height: listSize.height, width: listSize.width }}
-                rowCount={renderedRows.length}
-                rowHeight={(index: number) => getItemSize(index)}
-                overscanCount={8}
-                rowProps={{}}
-                rowComponent={({ index, style }: any) => {
-                  const row = renderedRows[index];
-                  if (!row) return <div style={style} />;
+            renderedRows.map(({ t, items, qty, isExpanded, dateTimeStr, shortId }) => {
+              const tid = String(t.id);
+              return (
+                <ListItem key={`${t.id}-${t.timestamp}`} sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1, alignItems: 'flex-start' }}>
+                  <Box sx={{ width: '100%' }}>
+                    <Box sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '24px 76px 116px minmax(86px, 1fr) 104px',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      width: '100%',
+                      minHeight: 32,
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(tid)}
+                        onChange={() => setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(tid)) next.delete(tid);
+                          else next.add(tid);
+                          return next;
+                        })}
+                      />
+                      <Typography
+                        noWrap
+                        variant="caption"
+                        onClick={() => setExpandedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(tid)) next.delete(tid);
+                          else next.add(tid);
+                          return next;
+                        })}
+                        sx={{ fontFamily: 'monospace', color: '#1976d2', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        #{shortId}
+                      </Typography>
+                      <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
+                        {dateTimeStr}
+                      </Typography>
+                      <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>
+                        {`${qty} article${qty > 1 ? 's' : ''}`}
+                      </Typography>
+                      <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                        {(t.total || 0).toFixed(2)} €
+                      </Typography>
+                    </Box>
 
-                  const { t, items, qty, isExpanded, dateTimeStr, shortId } = row;
-                  const tid = String(t.id);
+                    {isExpanded && (
+                      <Box sx={{ mt: 1, ml: 2, width: '100%' }}>
+                        {showDiscountDetails && (() => {
+                          let totalDiscountForTx = 0;
+                          if (items.length) {
+                            items.forEach((item: any) => {
+                              const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
+                              const originalTotal = originalPrice * item.quantity;
+                              const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+                              if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
+                                const discount = t.itemDiscounts[discountKey];
+                                let finalTotal = originalTotal;
+                                if (discount.type === 'euro') finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
+                                else if (discount.type === 'percent') finalTotal = originalTotal * (1 - discount.value / 100);
+                                else if (discount.type === 'price') finalTotal = discount.value * item.quantity;
+                                totalDiscountForTx += (originalTotal - finalTotal);
+                              }
+                            });
+                          }
 
-                  return (
-                    <div style={style} key={`${t.id}-${t.timestamp}`}>
-                      <ListItem sx={{ py: 0.25, borderBottom: '1px solid #eee', px: 1, alignItems: 'flex-start' }}>
-                        <Box sx={{ width: '100%' }}>
-                            {/* Ligne principale */}
-                            <Box sx={{
-                              display: 'grid',
-                              gridTemplateColumns: '24px 76px 116px minmax(86px, 1fr) 104px',
-                              alignItems: 'center',
-                              gap: 0.75,
-                              width: '100%',
-                              minHeight: 32,
-                            }}>
-                              <input
-                                type="checkbox"
-                                checked={selectedIds.has(tid)}
-                                onChange={() => setSelectedIds(prev => {
-                                  const next = new Set(prev);
-                                  if (next.has(tid)) next.delete(tid);
-                                  else next.add(tid);
-                                  return next;
-                                })}
-                              />
-                              <Typography
-                                noWrap
-                                variant="caption"
-                                onClick={() => setExpandedIds(prev => {
-                                  const next = new Set(prev);
-                                  if (next.has(tid)) next.delete(tid);
-                                  else next.add(tid);
-                                  return next;
-                                })}
-                                sx={{
-                                  fontFamily: 'monospace',
-                                  color: '#1976d2',
-                                  cursor: 'pointer',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                #{shortId}
-                              </Typography>
-                              <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace', color: '#666' }}>
-                                {dateTimeStr}
-                              </Typography>
-                              <Typography noWrap variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                {`${qty} article${qty > 1 ? 's' : ''}`}
-                              </Typography>
-                              <Typography noWrap variant="caption" sx={{ textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                                {(t.total || 0).toFixed(2)} €
-                              </Typography>
-                            </Box>
-
-                            {/* Détails de la transaction */}
-                            {isExpanded && (
-                              <Box sx={{ mt: 1, ml: 2, width: '100%' }}>
-                                {/* Total des remises pour cette transaction */}
-                                {showDiscountDetails && (() => {
-                                  let totalDiscountForTx = 0;
-                                  if (items.length) {
-                                    items.forEach((item: any) => {
-                                      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-                                      const originalTotal = originalPrice * item.quantity;
-                                      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-                                      if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
-                                        const discount = t.itemDiscounts[discountKey];
-                                        let finalTotal = originalTotal;
-                                        if (discount.type === 'euro') finalTotal = Math.max(0, originalTotal - (discount.value * item.quantity));
-                                        else if (discount.type === 'percent') finalTotal = originalTotal * (1 - discount.value / 100);
-                                        else if (discount.type === 'price') finalTotal = discount.value * item.quantity;
-                                        totalDiscountForTx += (originalTotal - finalTotal);
-                                      }
-                                    });
-                                  }
-
-                                  if (totalDiscountForTx > 0) {
-                                    return (
-                                      <Box sx={{
-                                        backgroundColor: '#fff3e0',
-                                        p: 1,
-                                        borderRadius: 1,
-                                        mb: 1,
-                                        border: '1px solid #ff9800',
-                                      }}>
-                                        <Typography variant="caption" sx={{
-                                          fontFamily: 'monospace',
-                                          fontWeight: 'bold',
-                                          color: '#f44336',
-                                          fontSize: '14px',
-                                        }}>
-                                          TOTAL REMISE: {totalDiscountForTx.toFixed(2)} €
-                                        </Typography>
-                                      </Box>
-                                    );
-                                  }
-                                  return null;
-                                })()}
-
-                                {/* Détails des articles */}
-                                {items.map((it: any) => {
-                                  const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
-                                  const originalTotal = originalPrice * it.quantity;
-
-                                  // Calculer le prix final avec remises
-                                  let finalPrice = originalPrice;
-                                  let finalTotal = originalTotal;
-                                  let discountAmount = 0;
-
-                                  const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
-                                  if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
-                                    const discount = t.itemDiscounts[discountKey];
-                                    if (discount.type === 'euro') {
-                                      finalPrice = Math.max(0, originalPrice - discount.value);
-                                      finalTotal = finalPrice * it.quantity;
-                                      discountAmount = originalTotal - finalTotal;
-                                    } else if (discount.type === 'percent') {
-                                      finalPrice = originalPrice * (1 - discount.value / 100);
-                                      finalTotal = finalPrice * it.quantity;
-                                      discountAmount = originalTotal - finalTotal;
-                                    } else if (discount.type === 'price') {
-                                      finalPrice = discount.value;
-                                      finalTotal = finalPrice * it.quantity;
-                                      discountAmount = originalTotal - finalTotal;
-                                    }
-                                  }
-
-                                  return (
-                                    <Box key={it.product.id} sx={{
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: 0.5,
-                                      py: 0.5,
-                                      borderBottom: '1px solid #f0f0f0',
-                                    }}>
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Typography variant="caption" sx={{
-                                          fontFamily: 'monospace',
-                                          fontSize: '13px',
-                                          minWidth: 200,
-                                        }}>
-                                          {it.quantity}x {it.product.name}
-                                        </Typography>
-
-                                        {showDiscountDetails && (
-                                          <>
-                                            {Math.abs(discountAmount) > 0.01 ? (
-                                              <Box sx={{
-                                                backgroundColor: '#ffebee',
-                                                p: 0.5,
-                                                borderRadius: 0.5,
-                                                border: '1px solid #f44336',
-                                                display: 'inline-block',
-                                              }}>
-                                                <Typography variant="caption" sx={{
-                                                  color: '#000000',
-                                                  fontFamily: 'monospace',
-                                                  fontWeight: 'bold',
-                                                  fontSize: '12px',
-                                                }}>
-                                                  -{discountAmount.toFixed(2)}€ ({((discountAmount / originalTotal) * 100).toFixed(1)}%) / ({originalTotal.toFixed(2)}€)
-                                                </Typography>
-                                              </Box>
-                                            ) : (
-                                              <Typography variant="caption" sx={{
-                                                color: '#666',
-                                                fontFamily: 'monospace',
-                                                fontSize: '12px',
-                                                fontStyle: 'italic',
-                                              }}>
-                                                Pas de remise
-                                              </Typography>
-                                            )}
-                                          </>
-                                        )}
-
-                                        <Typography variant="caption" sx={{
-                                          fontFamily: 'monospace',
-                                          fontWeight: 'bold',
-                                          fontSize: '13px',
-                                          marginLeft: 'auto',
-                                        }}>
-                                          {finalTotal.toFixed(2)} €
-                                        </Typography>
-                                      </Box>
-                                    </Box>
-                                  );
-                                })}
+                          if (totalDiscountForTx > 0) {
+                            return (
+                              <Box sx={{ backgroundColor: '#fff3e0', p: 1, borderRadius: 1, mb: 1, border: '1px solid #ff9800' }}>
+                                <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 'bold', color: '#f44336', fontSize: '14px' }}>
+                                  TOTAL REMISE: {totalDiscountForTx.toFixed(2)} €
+                                </Typography>
                               </Box>
-                            )}
-                        </Box>
-                      </ListItem>
-                    </div>
-                  );
-                }}
-              />
-            )
+                            );
+                          }
+                          return null;
+                        })()}
+
+                        {items.map((it: any, itemIndex: number) => {
+                          const originalPrice = it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice;
+                          const originalTotal = originalPrice * it.quantity;
+                          let finalTotal = originalTotal;
+                          let discountAmount = 0;
+
+                          const discountKey = `${it.product.id}-${it.selectedVariation?.id || 'main'}`;
+                          if (t.itemDiscounts && t.itemDiscounts[discountKey]) {
+                            const discount = t.itemDiscounts[discountKey];
+                            if (discount.type === 'euro') finalTotal = Math.max(0, originalTotal - (discount.value * it.quantity));
+                            else if (discount.type === 'percent') finalTotal = originalTotal * (1 - discount.value / 100);
+                            else if (discount.type === 'price') finalTotal = discount.value * it.quantity;
+                            discountAmount = originalTotal - finalTotal;
+                          }
+
+                          return (
+                            <Box key={`${it.product.id}-${it.selectedVariation?.id || 'main'}-${itemIndex}`} sx={{ py: 0.5, borderBottom: '1px solid #f0f0f0' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="caption" noWrap sx={{ fontFamily: 'monospace', fontSize: '13px', minWidth: 200 }}>
+                                  {it.quantity}x {it.product.name}
+                                </Typography>
+                                {showDiscountDetails && (
+                                  Math.abs(discountAmount) > 0.01 ? (
+                                    <Box sx={{ backgroundColor: '#ffebee', p: 0.5, borderRadius: 0.5, border: '1px solid #f44336', display: 'inline-block' }}>
+                                      <Typography variant="caption" sx={{ color: '#000000', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '12px' }}>
+                                        -{discountAmount.toFixed(2)}€ ({((discountAmount / originalTotal) * 100).toFixed(1)}%) / ({originalTotal.toFixed(2)}€)
+                                      </Typography>
+                                    </Box>
+                                  ) : (
+                                    <Typography variant="caption" sx={{ color: '#666', fontFamily: 'monospace', fontSize: '12px', fontStyle: 'italic' }}>
+                                      Pas de remise
+                                    </Typography>
+                                  )
+                                )}
+                                <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 'bold', fontSize: '13px', marginLeft: 'auto' }}>
+                                  {finalTotal.toFixed(2)} €
+                                </Typography>
+                              </Box>
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    )}
+                  </Box>
+                </ListItem>
+              );
+            })
           )}
         </Box>
 

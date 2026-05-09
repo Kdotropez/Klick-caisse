@@ -190,7 +190,6 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
                               } as any;
                               StorageService.addDailyTransaction(inverse);
                               try { StorageService.addAutoBackup(); } catch {}
-                              try { StorageService.downloadFullBackup(); } catch {}
                               setTransactions(StorageService.loadTodayTransactions());
                             }}>Inv</Button>
                           </Box>
@@ -229,7 +228,6 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
           });
           // Sauvegarde auto + téléchargement JSON après suppression/annulation
           try { StorageService.addAutoBackup(); } catch {}
-          try { StorageService.downloadFullBackup(); } catch {}
           setTransactions(StorageService.loadTodayTransactions());
           setDaySelectedIds(() => new Set());
           // eslint-disable-next-line no-alert

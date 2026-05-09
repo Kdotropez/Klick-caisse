@@ -11,6 +11,7 @@ export class StorageService {
   private static readonly CASHIERS_KEY = 'klick_caisse_cashiers';
   /** Ancienne clé globale (avant isolation par boutique) — encore présente après migration si la copie a raté ou mauvaise boutique. */
   private static readonly LEGACY_CLOSURES_KEY = 'klick_caisse_closures';
+  private static readonly AUTO_BACKUP_DOWNLOAD_THROTTLE_MS = 5 * 60_000;
 
   static readonly STORE_MIGRATION_FLAG = 'klick_caisse_v2_store_migration_done';
 
@@ -881,11 +882,6 @@ export class StorageService {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       console.log(`✅ Sauvegarde manuelle créée: ${filename}`);
-      
-      // Afficher une notification
-      if (typeof window !== 'undefined' && window.alert) {
-        window.alert(`✅ Sauvegarde créée: ${filename}`);
-      }
     } catch (e) {
       console.error('Erreur sauvegarde manuelle:', e);
       if (typeof window !== 'undefined' && window.alert) {
@@ -1174,7 +1170,9 @@ export class StorageService {
     try {
       const data = this.exportFullBackup();
       if (!data) return;
-      this.downloadAutoBackup(data);
+      if (this.shouldDownloadAutoBackup()) {
+        this.downloadAutoBackup(data);
+      }
 
       const raw = localStorage.getItem(this.activeStoreKey('auto_backups'));
       const parsed = raw ? JSON.parse(raw) : [];
@@ -1196,6 +1194,21 @@ export class StorageService {
       this.setItemWithQuotaRecovery(this.activeStoreKey('auto_backups'), JSON.stringify(list.slice(0, 5)));
     } catch (e) {
       console.error('Erreur sauvegarde auto:', e);
+    }
+  }
+
+  private static shouldDownloadAutoBackup(): boolean {
+    try {
+      const key = this.activeStoreKey('last_auto_backup_download_at');
+      const now = Date.now();
+      const last = Number(localStorage.getItem(key) || '0');
+      if (Number.isFinite(last) && now - last < this.AUTO_BACKUP_DOWNLOAD_THROTTLE_MS) {
+        return false;
+      }
+      localStorage.setItem(key, String(now));
+      return true;
+    } catch {
+      return true;
     }
   }
 

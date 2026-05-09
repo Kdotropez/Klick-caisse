@@ -1764,9 +1764,8 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       customerName: currentCustomer ? `${currentCustomer.lastName} ${currentCustomer.firstName}` : undefined,
     };
     StorageService.addDailyTransaction(tx as any);
-    // Sauvegarde automatique complète (silencieuse) + téléchargement JSON (obligatoire après encaissement)
+    // Sauvegarde automatique complète, avec téléchargement limité pour éviter d'empiler les popups navigateur.
     try { StorageService.addAutoBackup(); } catch {}
-    try { StorageService.downloadFullBackup(); } catch {}
     setTodayTransactions(StorageService.loadTodayTransactions());
     setGlobalTicketsRefreshKey((v) => v + 1);
 
