@@ -21,6 +21,15 @@ import { Store as StoreIcon, Lock } from '@mui/icons-material';
 import { STORES, getStoreByCode } from '../types/Store';
 import { StorageService } from '../services/StorageService';
 
+const STORE_ACCESS_BYPASS_DATE = '2026-06-22';
+
+const getLocalDateKey = (date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export interface StoreSelectModalProps {
   /** Code boutique pré-sélectionné (ex. dernière session ou après migration) */
   initialCode: string;
@@ -35,8 +44,15 @@ const StoreSelectModal: React.FC<StoreSelectModalProps> = ({ initialCode, onConf
   const [pinError, setPinError] = useState<string | null>(null);
 
   const selectedStore = getStoreByCode(selected);
+  const skipAccessCodeToday = getLocalDateKey() === STORE_ACCESS_BYPASS_DATE;
 
   const handleOpenCaisse = () => {
+    if (skipAccessCodeToday) {
+      setPinError(null);
+      onConfirm(selected);
+      return;
+    }
+
     if (!StorageService.verifyStoreAccessPin(selected, pin)) {
       setPinError(`Saisissez le nom de la boutique : ${selectedStore?.name ?? ''}.`);
       return;
@@ -46,6 +62,11 @@ const StoreSelectModal: React.FC<StoreSelectModalProps> = ({ initialCode, onConf
   };
 
   const goToPinStep = () => {
+    if (skipAccessCodeToday) {
+      onConfirm(selected);
+      return;
+    }
+
     setPin('');
     setPinError(null);
     setStep('pin');
@@ -95,7 +116,7 @@ const StoreSelectModal: React.FC<StoreSelectModalProps> = ({ initialCode, onConf
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
             <Button variant="contained" size="large" fullWidth onClick={goToPinStep}>
-              Continuer
+              {skipAccessCodeToday ? 'Ouvrir la caisse' : 'Continuer'}
             </Button>
           </DialogActions>
         </>
