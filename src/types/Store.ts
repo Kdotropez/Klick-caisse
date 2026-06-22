@@ -9,7 +9,8 @@ export const STORES: Store[] = [
   { code: '2', name: 'Sainte Maxime', location: 'Sainte Maxime' },
   { code: '3', name: 'Saint Tropez', location: 'Saint Tropez' },
   { code: '4', name: 'Marchés', location: 'Marchés' },
-  { code: '5', name: 'Cannes', location: 'Cannes' }
+  { code: '5', name: 'Cannes', location: 'Cannes' },
+  { code: '6', name: 'Cavalaire', location: 'Cavalaire' }
 ];
 
 export const getStoreByCode = (code: string): Store | undefined => {
