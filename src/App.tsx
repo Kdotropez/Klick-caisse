@@ -16,17 +16,9 @@ import { useUISettings } from './context/UISettingsContext';
 
 const MIN_ROOT_WIDTH = 800;
 const MIN_ROOT_HEIGHT = 600;
-const AUTHORIZATION_CODE_BYPASS_DATE = '2026-06-22';
 
 /** Affiche la poignée de redimensionnement du cadre racine. */
 const SHOW_ROOT_RESIZE_HANDLE = false;
-
-const getLocalDateKey = (date = new Date()): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
 
 function getDefaultRootSize(): { width: string; height: string } {
   if (typeof window === 'undefined') {
@@ -537,7 +529,7 @@ const App: React.FC = () => {
   };
 
   // Si la licence n'est pas valide ou si l'application est verrouillée, afficher la modale de licence
-  if (getLocalDateKey() !== AUTHORIZATION_CODE_BYPASS_DATE && (!isLicenseValid || isLocked)) {
+  if (!isLicenseValid || isLocked) {
     return (
       <LicenseModal 
         open={showLicenseModal} 
