@@ -63,7 +63,7 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
         <Divider sx={{ my: 0.5 }} />
 
         {/* Cumul par mode */}
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
           <Button
             variant="outlined"
             sx={{ flex: 1, py: 0.5, fontSize: '1.1rem', fontWeight: 800, minHeight: '35px', borderColor: '#2e7d32', color: '#2e7d32', '&:hover': { borderColor: '#1b5e20', backgroundColor: '#e8f5e8' } }}
@@ -94,6 +94,26 @@ const PaymentPanel: React.FC<PaymentPanelProps> = ({
               <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{formatEuro(paymentTotals['Carte'])}</Typography>
             </Box>
           </Button>
+          {(Number(paymentTotals['Chèque']) > 0 || Number(paymentTotals['Autres']) > 0) && (
+            <>
+              {Number(paymentTotals['Chèque']) > 0 && (
+                <Button variant="outlined" sx={{ flex: 1, minWidth: '30%', py: 0.5, minHeight: '35px', borderColor: '#795548', color: '#795548' }} disabled>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Cumul chèques</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{formatEuro(paymentTotals['Chèque'])}</Typography>
+                  </Box>
+                </Button>
+              )}
+              {Number(paymentTotals['Autres']) > 0 && (
+                <Button variant="outlined" sx={{ flex: 1, minWidth: '30%', py: 0.5, minHeight: '35px' }} disabled>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1, alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8, mb: 0.25 }}>Autres modes</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 800 }}>{formatEuro(paymentTotals['Autres'])}</Typography>
+                  </Box>
+                </Button>
+              )}
+            </>
+          )}
         </Box>
       </Box>
     </Box>

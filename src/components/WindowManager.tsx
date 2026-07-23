@@ -40,6 +40,15 @@ import { getStoreByCode } from '../types/Store';
 import ProductsPanel from './panels/ProductsPanel';
 import { getProductGridLayout } from '../utils/productGridLayout';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import {
+  computeTicketTotal,
+  computePaymentTotalsFromTransactionList,
+  getLineFinalUnitPrice,
+  getLinePayableAmount,
+  allocateGlobalDiscountByLineKey,
+  loadDiscountExclusionSettings,
+  type ItemDiscount,
+} from '../utils/ticketTotal';
 
 const GlobalTicketsModal = React.lazy(() => import('./modals/GlobalTicketsModal'));
 const GlobalTicketEditorModal = React.lazy(() => import('./modals/GlobalTicketEditorModal'));
@@ -618,23 +627,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const computeDailyProductSales = (transactions: Transaction[]) => {
     const byProduct: Record<string, { product: Product; totalQty: number; totalAmount: number }> = {};
     for (const tx of transactions) {
-      const itemDiscounts = (tx as any)?.itemDiscounts || {};
+      const txItemDiscounts = (tx as any)?.itemDiscounts || {};
+      const globalDisc = (tx as any)?.globalDiscount ?? null;
+      const settings = loadDiscountExclusionSettings();
+      const globalShare = allocateGlobalDiscountByLineKey(tx.items, txItemDiscounts, globalDisc, settings);
+
       for (const item of tx.items) {
         const key = item.product.id;
-        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-        const originalUnit = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-        let unit = originalUnit;
-        const d = itemDiscounts[discountKey];
-        if (d) {
-          if (d.type === 'euro') unit = Math.max(0, originalUnit - d.value);
-          else if (d.type === 'percent') unit = originalUnit * (1 - d.value / 100);
-          else if (d.type === 'price') unit = d.value;
-        }
-        const lineAmount = unit * (item.quantity || 0);
+        const lineAmount = getLinePayableAmount(item, txItemDiscounts, globalShare);
         if (!byProduct[key]) {
           byProduct[key] = { product: item.product, totalQty: 0, totalAmount: 0 };
         }
-        byProduct[key].totalQty += (item.quantity || 0);
+        byProduct[key].totalQty += item.quantity || 0;
         byProduct[key].totalAmount += lineAmount;
       }
     }
@@ -642,22 +646,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
   
   const computePaymentTotalsFromTransactions = useCallback((transactions: Transaction[]) => {
-    let cash = 0, card = 0, sumup = 0;
-    for (const tx of transactions) {
-      const method = String((tx as any).paymentMethod || '').toLowerCase();
-      const total = Number(tx.total) || 0;
-      if (method === 'cash' || method.includes('esp')) cash += total;
-      else if (method === 'card' || method.includes('carte')) card += total;
-      else if (method === 'sumup') sumup += total;
-    }
-    return { 'Espèces': cash, 'SumUp': sumup, 'Carte': card } as typeof paymentTotals;
+    return computePaymentTotalsFromTransactionList(transactions);
   }, []);
   
   // États pour les totaux par méthode de paiement
   const [paymentTotals, setPaymentTotals] = useState({
     'Espèces': 0,
     'SumUp': 0,
-    'Carte': 0
+    'Carte': 0,
+    'Chèque': 0,
+    'Autres': 0,
   });
   const totalDailyDiscounts = useMemo(() => {
     try {
@@ -1737,6 +1735,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     // Calculer le total avec toutes remises (individuelles + globale)
     const total = getTotalWithGlobalDiscount();
+    if (!Number.isFinite(total) || total < 0) {
+      alert('Total du panier invalide. Vérifiez les prix des articles avant de valider le règlement.');
+      return;
+    }
 
     const methodLabel = method === 'cash' ? 'Espèces' : method === 'card' ? 'Carte' : method === 'sumup' ? 'SumUp' : 'Chèque';
 
@@ -2943,84 +2945,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const getItemFinalPrice = (item: CartItem) => {
-    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-    const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-    const discount = itemDiscounts[discountKey];
-
-    if (!discount) return originalPrice;
-
-    switch (discount.type) {
-      case 'euro':
-        return Math.max(0, originalPrice - discount.value);
-      case 'percent':
-        return originalPrice * (1 - discount.value / 100);
-      case 'price':
-        return discount.value;
-      default:
-        return originalPrice;
-    }
+    return getLineFinalUnitPrice(item, itemDiscounts as Record<string, ItemDiscount>);
   };
 
   const getTotalWithGlobalDiscount = () => {
-    // Calculer le sous-total (prix originaux)
-    const settings = StorageService.loadSettings() || {};
-    const excludedCatsRaw: string[] = Array.isArray(settings.excludedDiscountCategories) ? settings.excludedDiscountCategories : [];
-    const excludedSubRaw: string[] = Array.isArray((settings as any).excludedDiscountSubcategories) ? (settings as any).excludedDiscountSubcategories : [];
-    const excludedProd: string[] = Array.isArray((settings as any).excludedDiscountProductIds) ? (settings as any).excludedDiscountProductIds : [];
-    const norm = (s: string) => StorageService.normalizeLabel(String(s||''));
-    const excludedCats = new Set(excludedCatsRaw.map(norm));
-    const excludedSub = new Set(excludedSubRaw.map(norm));
-    const isExcluded = (item: CartItem) => {
-      if (excludedProd.includes(item.product.id)) return true;
-      const cat = item.product?.category || '';
-      if (excludedCats.has(norm(cat))) return true;
-      // Vérifier sous-catégories associées
-      const subs: string[] = Array.isArray((item.product as any)?.associatedCategories) ? (item.product as any).associatedCategories : [];
-      return subs.some(s => excludedSub.has(norm(s)));
-    };
-
-    const subtotal = cartItems.reduce((sum, item) => {
-      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      return sum + (originalPrice * item.quantity);
-    }, 0);
-
-    // Calculer les remises individuelles
-    const individualDiscounts = cartItems.reduce((sum, item) => {
-      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      const originalTotal = originalPrice * item.quantity;
-      const finalPrice = getItemFinalPrice(item);
-      const finalTotal = finalPrice * item.quantity;
-      
-      return sum + (originalTotal - finalTotal);
-    }, 0);
-
-    // Calculer la remise globale
-    let globalDiscountAmount = 0;
-    if (globalDiscount) {
-      // Total des produits sans remise individuelle
-      const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
-        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-        const hasIndividualDiscount = itemDiscounts[discountKey];
-        // Exclure aussi les catégories marquées exclues
-        if (!hasIndividualDiscount && !isExcluded(item)) {
-          const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-          return sum + (originalPrice * item.quantity);
-        }
-        return sum;
-      }, 0);
-
-      // Appliquer la remise globale sur le total
-      if (globalDiscount.type === 'euro') {
-        globalDiscountAmount = Math.min(totalWithoutIndividualDiscount, globalDiscount.value);
-      } else {
-        globalDiscountAmount = totalWithoutIndividualDiscount * (globalDiscount.value / 100);
-      }
-    }
-
-    const totalDiscounts = individualDiscounts + globalDiscountAmount;
-    
-    // Total final = Sous-total - Total des remises
-    return subtotal - totalDiscounts;
+    return computeTicketTotal(
+      cartItems,
+      itemDiscounts as Record<string, ItemDiscount>,
+      globalDiscount,
+      loadDiscountExclusionSettings()
+    );
   };
 
 

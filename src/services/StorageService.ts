@@ -2,6 +2,7 @@ import { Product, Category, Transaction, Cashier } from '../types';
 import { Customer } from '../types/Customer';
 import { getStoreByCode } from '../types/Store';
 import { defaultSubcategoriesRegistry } from '../data/subcategoriesRegistry';
+import { computeTicketTotal } from '../utils/ticketTotal';
 
 export class StorageService {
   private static readonly PRODUCTS_KEY = 'klick_caisse_products';
@@ -599,10 +600,23 @@ export class StorageService {
 
   private static computeTransactionTotalFromItems(t: any): number {
     try {
-      return (Array.isArray(t.items) ? t.items : []).reduce((sum: number, item: any) => {
-        const unit = item?.selectedVariation?.finalPrice ?? item?.product?.finalPrice ?? 0;
-        return sum + this.coerceAmount(unit) * (Number(item?.quantity) || 0);
-      }, 0);
+      const settings = this.loadSettings() || {};
+      return computeTicketTotal(
+        Array.isArray(t.items) ? t.items : [],
+        t.itemDiscounts || {},
+        t.globalDiscount ?? null,
+        {
+          excludedDiscountCategories: Array.isArray(settings.excludedDiscountCategories)
+            ? settings.excludedDiscountCategories
+            : [],
+          excludedDiscountSubcategories: Array.isArray((settings as any).excludedDiscountSubcategories)
+            ? (settings as any).excludedDiscountSubcategories
+            : [],
+          excludedDiscountProductIds: Array.isArray((settings as any).excludedDiscountProductIds)
+            ? (settings as any).excludedDiscountProductIds
+            : [],
+        }
+      );
     } catch {
       return 0;
     }

@@ -16,6 +16,11 @@ import { IconButton } from '@mui/material';
 import { CartItem } from '../types/Product';
 import { APP_VERSION } from '../version';
 import { StorageService } from '../services/StorageService';
+import {
+  allocateGlobalDiscountByLineKey,
+  getLinePayableAmount,
+  loadDiscountExclusionSettings,
+} from '../utils/ticketTotal';
 
 interface DailyReportModalProps {
   open: boolean;
@@ -58,6 +63,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
   // Tri des articles (détail produits)
   const [productSortKey, setProductSortKey] = useState<'name'|'category'|'totalQty'|'transactions'|'totalAmount'|'percentage'>('totalAmount');
   const [productSortDir, setProductSortDir] = useState<'asc'|'desc'>('desc');
+
+  const discountExclusionSettings = React.useMemo(() => loadDiscountExclusionSettings(), []);
 
   // Les données seront lues à la volée dans les mémos pour éviter les dépendances instables
 
@@ -965,6 +972,13 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                     const articleStats = new Map<string, any>();
                     (Array.isArray(selectedDateTransactions) ? selectedDateTransactions : []).forEach((transaction:any) => {
                       if (Array.isArray(transaction.items)) {
+                        const txDiscounts = transaction.itemDiscounts || {};
+                        const globalShare = allocateGlobalDiscountByLineKey(
+                          transaction.items,
+                          txDiscounts,
+                          transaction.globalDiscount ?? null,
+                          discountExclusionSettings
+                        );
                         transaction.items.forEach((item:any) => {
                           const product = item.product || {};
                           const variation = item.selectedVariation || null;
@@ -985,9 +999,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                             totalAmount: 0,
                             transactions: 0,
                           };
-                          const unitPrice = variation ? variation.finalPrice : product.finalPrice;
                           const qty = Number(item.quantity) || 0;
-                          const itemTotal = (Number(unitPrice) || 0) * qty;
+                          const itemTotal = getLinePayableAmount(item, txDiscounts, globalShare);
                           existing.totalQty += qty;
                           existing.totalAmount += itemTotal;
                           existing.transactions += 1;
@@ -1095,6 +1108,13 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               
               selectedDateTransactions.forEach(transaction => {
                 if (transaction.items && Array.isArray(transaction.items)) {
+                  const txDiscounts = transaction.itemDiscounts || {};
+                  const globalShare = allocateGlobalDiscountByLineKey(
+                    transaction.items,
+                    txDiscounts,
+                    transaction.globalDiscount ?? null,
+                    discountExclusionSettings
+                  );
                   transaction.items.forEach((item: any) => {
                     const product = item.product || {};
                     const variation = item.selectedVariation || null;
@@ -1119,9 +1139,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                       percentage: 0
                     };
 
-                    const unitPrice = variation ? variation.finalPrice : product.finalPrice;
                     const qty = Number(item.quantity) || 0;
-                    const itemTotal = (Number(unitPrice) || 0) * qty;
+                    const itemTotal = getLinePayableAmount(item, txDiscounts, globalShare);
 
                     existing.totalQty += qty;
                     existing.totalAmount += itemTotal;
