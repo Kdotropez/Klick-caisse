@@ -216,17 +216,23 @@ export class StorageService {
     const c = localStorage.getItem(this.CATEGORIES_KEY);
     const legacyProducts = this.parseLegacyProductsRaw(p);
     const legacyCategories = this.parseLegacyCategoriesRaw(c);
+    let productCatalogMigrationOk = true;
     if (legacyProducts.length > 0 || legacyCategories.length > 0) {
       try {
         /** Éviter export auto + téléchargement JSON pendant la migration (gros volume → UI bloquée). */
         this.saveProductionData(legacyProducts, legacyCategories, storeCode, { skipAutoBackup: true });
       } catch (e) {
+        productCatalogMigrationOk = false;
         console.error('Migration legacy produits/catégories:', e);
       }
     }
     copy(this.CASHIERS_KEY, 'cashiers');
 
-    localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+    if (productCatalogMigrationOk) {
+      localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+    } else {
+      console.warn('Migration legacy incomplète: le catalogue produits/catégories sera reproposé au prochain démarrage.');
+    }
   }
 
   /**
