@@ -783,11 +783,31 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 
                 // Restaurer les données (boutique courante)
                 if (data.products && data.categories) {
-                  StorageService.saveProductionData(data.products, data.categories);
+                  try {
+                    StorageService.saveProductionData(data.products, data.categories, undefined, { skipAutoBackup: true });
+                  } catch (restoreError) {
+                    const ok = window.confirm(
+                      'Le stockage navigateur est plein.\n\n' +
+                      'Une archive de sécurité va être téléchargée, puis les données de la boutique courante seront vidées avant de relancer la restauration.\n\n' +
+                      'Continuer ?'
+                    );
+                    if (!ok) throw restoreError;
+                    StorageService.prepareActiveStoreForFullRestore();
+                    StorageService.saveProductionData(data.products, data.categories, undefined, { skipAutoBackup: true });
+                  }
                   console.log('✅ Produits + catégories restaurés:', data.products.length, data.categories.length);
                 } else {
                   if (data.products) {
-                    StorageService.saveProducts(data.products);
+                    try {
+                      StorageService.saveProducts(data.products);
+                    } catch (restoreError) {
+                      const ok = window.confirm(
+                        'Le stockage navigateur est plein.\n\nCréer une archive, vider la boutique courante puis relancer la restauration ?'
+                      );
+                      if (!ok) throw restoreError;
+                      StorageService.prepareActiveStoreForFullRestore();
+                      StorageService.saveProducts(data.products);
+                    }
                     console.log('✅ Produits restaurés:', data.products.length);
                   }
                   if (data.categories) {

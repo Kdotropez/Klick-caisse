@@ -1414,6 +1414,30 @@ export class StorageService {
     this.setItemWithQuotaRecovery('klick_caisse_current_store', storeCode);
   }
 
+  static prepareActiveStoreForFullRestore(): void {
+    this.downloadLocalStorageArchiveBeforePurge();
+    const keys = [
+      'productionData',
+      'transactions_by_day',
+      'transactions',
+      'closures',
+      'z_counter',
+      'settings',
+      'subcategories',
+      'customers',
+      'cashiers',
+      'pro_receipts',
+      'auto_backups',
+    ];
+    for (const suffix of keys) {
+      try {
+        localStorage.removeItem(this.activeStoreKey(suffix));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   static getAllStoreData(storeCode: string): {
     products: Product[];
     categories: Category[];
