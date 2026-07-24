@@ -8,8 +8,8 @@ export const PRODUCT_GRID_MAX_ROWS = 7;
 
 /** Largeur/hauteur cible minimale d'une carte tactile. */
 const MIN_CARD_WIDTH = 118;
-const MIN_CARD_HEIGHT = 82;
-const MAX_CARD_HEIGHT = 126;
+const MIN_CARD_HEIGHT = 102;
+const MAX_CARD_HEIGHT = 145;
 const GRID_GAP = 2;
 const GRID_PADDING = 2;
 

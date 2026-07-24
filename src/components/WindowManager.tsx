@@ -1544,7 +1544,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     const usableHeight = Math.max(620, layoutBounds.height - APP_BAR_HEIGHT - margin * 2);
     const rightWidth = Math.min(Math.max(usableWidth * 0.36, applyScale(430)), applyScale(600));
     const leftWidth = Math.max(applyScale(420), usableWidth - rightWidth - gap);
-    const categoriesHeight = Math.min(applyScale(170), Math.max(applyScale(118), usableHeight * 0.2));
+    const categoriesHeight = Math.min(applyScale(235), Math.max(applyScale(190), usableHeight * 0.24));
     const paymentHeight = Math.min(applyScale(178), Math.max(applyScale(132), usableHeight * 0.2));
     const bottomHeight = collapseBottomMenus
       ? 0
