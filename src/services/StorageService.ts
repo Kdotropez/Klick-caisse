@@ -37,18 +37,8 @@ export class StorageService {
 
   private static purgeOversizedLocalBackups(): void {
     try {
-      for (let i = localStorage.length - 1; i >= 0; i--) {
-        const key = localStorage.key(i);
-        if (!key) continue;
-        const normalized = key.toLowerCase();
-        if (
-          normalized.includes('auto_backups') ||
-          normalized.includes('emergency_backup') ||
-          normalized.includes('emergency_recovery')
-        ) {
-          localStorage.removeItem(key);
-        }
-      }
+      // Ne jamais purger automatiquement les traces de sauvegarde des autres boutiques.
+      // On limite la récupération de quota à la boutique active et aux anciennes clés globales.
       localStorage.removeItem(this.activeStoreKey('auto_backups'));
       localStorage.removeItem('klick_caisse_auto_backups');
       localStorage.removeItem('klick_emergency_backup');
