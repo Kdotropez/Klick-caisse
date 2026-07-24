@@ -142,7 +142,7 @@ export const loadProductionData = async (storeCode: string): Promise<{
     return { products, categories };
   } catch (error) {
     console.error('❌ Erreur lors du chargement des données:', error);
-    return { products: [], categories: [] };
+    return { products, categories };
   }
 };
 

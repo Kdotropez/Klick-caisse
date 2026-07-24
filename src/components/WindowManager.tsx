@@ -1541,7 +1541,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     const margin = applyScale(8);
     const gap = applyScale(8);
     const usableWidth = Math.max(900, layoutBounds.width - margin * 2);
-    const usableHeight = Math.max(620, layoutBounds.height - margin * 2);
+    const usableHeight = Math.max(620, layoutBounds.height - APP_BAR_HEIGHT - margin * 2);
     const rightWidth = Math.min(Math.max(usableWidth * 0.36, applyScale(430)), applyScale(600));
     const leftWidth = Math.max(applyScale(420), usableWidth - rightWidth - gap);
     const categoriesHeight = Math.min(applyScale(170), Math.max(applyScale(118), usableHeight * 0.2));
@@ -1552,9 +1552,9 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     const xLeft = margin;
     const xRight = margin + leftWidth + gap;
-    const yTop = margin;
+    const yTop = margin + APP_BAR_HEIGHT;
     const yProducts = yTop + categoriesHeight + gap;
-    const yBottom = margin + usableHeight - bottomHeight;
+    const yBottom = yTop + usableHeight - bottomHeight;
     const productsHeight = Math.max(
       applyScale(260),
       collapseBottomMenus
@@ -1869,7 +1869,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const productGridLayout = useMemo(() => {
     const pw = windows.find((w) => w.type === 'products' && !w.isMinimized);
-    return getProductGridLayout(pw?.width ?? 802);
+    return getProductGridLayout(pw?.width ?? 802, pw?.height ?? 520);
   }, [windows]);
 
   const CARDS_PER_PAGE = productGridLayout.cardsPerPage;

@@ -286,9 +286,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   onProductClick,
   onEditProduct,
 }) => {
-  const headerHeight = 82;
   const { cols, rows, cardWidth, cardHeight, prevCellIndex, nextCellIndex, totalCells } = gridLayout;
-  const totalHeightToSubtract = 2 * rows + 1;
   const cellIndices = useMemo(() => Array.from({ length: totalCells }, (_, index) => index), [totalCells]);
   const cardScaleFactor = useMemo(() => Math.min(cardWidth / 150, cardHeight / 120), [cardWidth, cardHeight]);
 
@@ -302,12 +300,13 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           gridTemplateRows: `repeat(${rows}, ${cardHeight}px)`,
           gap: '1px',
           p: '1px',
-          overflow: 'hidden',
+          overflow: 'auto',
           minHeight: 0,
           width: '100%',
-          height: `${headerHeight + totalHeightToSubtract + cardHeight * rows}px`,
+          height: '100%',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignContent: 'start',
+          alignItems: 'start',
           boxSizing: 'border-box',
         }}
       >
