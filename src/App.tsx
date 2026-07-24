@@ -6,7 +6,7 @@ import StoreSelectModal from './components/StoreSelectModal';
 import LegacyMigrationModal from './components/LegacyMigrationModal';
 
 import { Product, Category, CartItem, ProductVariation } from './types';
-import { STORES } from './types/Store';
+import { BACK_OFFICE_DEFAULT_STORE_CODE, BACK_OFFICE_PROFILE_CODE, STORES } from './types/Store';
 import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
@@ -584,8 +584,14 @@ const App: React.FC = () => {
           } catch {
             /* ignore */
           }
-          StorageService.setCurrentStoreCode(code);
-          setCurrentStoreCode(code);
+          const effectiveStoreCode = code === BACK_OFFICE_PROFILE_CODE ? BACK_OFFICE_DEFAULT_STORE_CODE : code;
+          try {
+            localStorage.setItem('ui.backOfficeCentral', code === BACK_OFFICE_PROFILE_CODE ? '1' : '0');
+          } catch {
+            /* ignore */
+          }
+          StorageService.setCurrentStoreCode(effectiveStoreCode);
+          setCurrentStoreCode(effectiveStoreCode);
           setStoreSessionReady(true);
         }}
       />

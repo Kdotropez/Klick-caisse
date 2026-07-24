@@ -1,6 +1,6 @@
 import { Product, Category, Transaction, Cashier } from '../types';
 import { Customer } from '../types/Customer';
-import { getStoreByCode } from '../types/Store';
+import { BACK_OFFICE_PROFILE_CODE, getStoreByCode } from '../types/Store';
 import { defaultSubcategoriesRegistry } from '../data/subcategoriesRegistry';
 import { computeTicketTotal } from '../utils/ticketTotal';
 
@@ -159,6 +159,9 @@ export class StorageService {
 
   /** Le mot de passe d’ouverture est le nom de la boutique (voir STORES). */
   static verifyStoreAccessPin(storeCode: string, input: string): boolean {
+    if (storeCode === BACK_OFFICE_PROFILE_CODE) {
+      return this.normalizeStoreNameForAccess(input) === this.normalizeStoreNameForAccess('hermitan');
+    }
     const expected = this.getStoreAccessExpectedLabel(storeCode);
     if (!expected) return false;
     return this.normalizeStoreNameForAccess(input) === this.normalizeStoreNameForAccess(expected);
