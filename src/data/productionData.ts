@@ -62,14 +62,14 @@ export const categories: Category[] = Array.from(uniqueCategories).map((name, in
   subcategoryOrder: [],
 }));
 
-export const loadProductionData = async (_storeCode: string): Promise<{
+export const loadProductionData = async (storeCode: string): Promise<{
   products: Product[];
   categories: Category[];
 }> => {
   try {
     // 1) Données déjà isolées par boutique (blob productionData + clés dérivées via getCurrentStoreCode)
-    const savedProducts = StorageService.loadProducts();
-    const savedCategories = StorageService.loadCategories();
+    const savedProducts = StorageService.loadProducts(storeCode, { skipLegacy: true });
+    const savedCategories = StorageService.loadCategories(storeCode, { skipLegacy: true });
     
     // Ne pas exiger les sous-catégories : après migration legacy elles peuvent être vides
     // alors que produits + catégories sont déjà dans le blob — sinon on écrase tout par la base intégrée.

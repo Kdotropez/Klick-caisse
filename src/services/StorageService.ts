@@ -299,7 +299,7 @@ export class StorageService {
       const categories =
         pd && Array.isArray(pd.categories) && pd.categories.length > 0
           ? pd.categories
-          : this.loadCategories();
+          : this.loadCategories(code);
       this.saveProductionData(products, categories, code);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des produits:', error);
@@ -346,13 +346,15 @@ export class StorageService {
   }
 
   // Charger les produits
-  static loadProducts(): Product[] {
+  static loadProducts(storeCode?: string, opts?: { skipLegacy?: boolean }): Product[] {
     try {
-      const code = this.getCurrentStoreCode();
+      const code = storeCode ?? this.getCurrentStoreCode();
       const pd = this.loadProductionData(code);
       if (pd && Array.isArray(pd.products) && pd.products.length > 0) {
         return pd.products;
       }
+      const canUseLegacyFallback = !opts?.skipLegacy && !localStorage.getItem(this.STORE_MIGRATION_FLAG);
+      if (!canUseLegacyFallback) return [];
       const data = localStorage.getItem(this.PRODUCTS_KEY);
       if (!data) return [];
       
@@ -394,7 +396,7 @@ export class StorageService {
       const products =
         pd && Array.isArray(pd.products) && pd.products.length > 0
           ? pd.products
-          : this.loadProducts();
+          : this.loadProducts(code);
       this.saveProductionData(products, categories, code);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des catégories:', error);
@@ -402,13 +404,15 @@ export class StorageService {
   }
 
   // Charger les catégories
-  static loadCategories(): Category[] {
+  static loadCategories(storeCode?: string, opts?: { skipLegacy?: boolean }): Category[] {
     try {
-      const code = this.getCurrentStoreCode();
+      const code = storeCode ?? this.getCurrentStoreCode();
       const pd = this.loadProductionData(code);
       if (pd && Array.isArray(pd.categories) && pd.categories.length > 0) {
         return pd.categories;
       }
+      const canUseLegacyFallback = !opts?.skipLegacy && !localStorage.getItem(this.STORE_MIGRATION_FLAG);
+      if (!canUseLegacyFallback) return [];
       const data = localStorage.getItem(this.CATEGORIES_KEY);
       if (!data) return [];
       
@@ -571,11 +575,6 @@ export class StorageService {
           return alnum.length >= 2;
         })
       )).sort();
-      
-      // Sauvegarder automatiquement les sous-catégories synchronisées
-      if (productSubcategories.length > 0) {
-        this.saveSubcategories(merged);
-      }
       
       return merged;
     } catch (error) {

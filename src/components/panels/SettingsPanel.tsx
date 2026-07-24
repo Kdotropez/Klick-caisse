@@ -448,8 +448,24 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             const products = StorageService.loadProducts() as any[];
             const categories = StorageService.loadCategories() as any[];
             const subcats = StorageService.loadSubcategories();
+            const code = StorageService.getCurrentStoreCode();
+            const prodKey = StorageService.getStoreKey(code, 'productionData');
+            const prodBlob = localStorage.getItem(prodKey) || '';
+            const totalBytes = Object.keys(localStorage).reduce((sum, key) => {
+              const value = localStorage.getItem(key) || '';
+              return sum + key.length + value.length;
+            }, 0);
             const sample = products.slice(0, 5).map(p => ({ id: p.id, cat: p.category, sub: p.associatedCategories }));
-            alert(`Produits: ${products.length}\nCatégories: ${categories.length}\nSous-catégories (registre): ${subcats.length}\nExemples:\n${JSON.stringify(sample, null, 2)}`);
+            alert(
+              `Boutique: ${code}\n` +
+              `Produits: ${products.length}\n` +
+              `Catégories: ${categories.length}\n` +
+              `Sous-catégories (registre): ${subcats.length}\n` +
+              `Blob productionData: ${(prodBlob.length / 1024).toFixed(1)} Ko\n` +
+              `Stockage local total: ${(totalBytes / 1024).toFixed(1)} Ko\n` +
+              `Migration legacy: ${localStorage.getItem(StorageService.STORE_MIGRATION_FLAG) ? 'faite' : 'non faite'}\n\n` +
+              `Exemples:\n${JSON.stringify(sample, null, 2)}`
+            );
           } catch (e) { alert('Erreur diagnostics'); }
         }}
       >
