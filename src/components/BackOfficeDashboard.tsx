@@ -72,6 +72,47 @@ const collectStoreTransactions = (storeCode: string, closures: any[]): any[] => 
   return out;
 };
 
+const mergeClosuresByZ = (existing: any[], incoming: any[]): any[] => {
+  const byZ = new Map<number, any>();
+  for (const closure of existing) {
+    const z = Number(closure?.zNumber);
+    if (Number.isFinite(z)) byZ.set(z, closure);
+  }
+  for (const closure of incoming) {
+    const z = Number(closure?.zNumber);
+    if (!Number.isFinite(z)) continue;
+    if (!byZ.has(z)) byZ.set(z, closure);
+  }
+  return Array.from(byZ.values()).sort((a, b) => (Number(a?.zNumber) || 0) - (Number(b?.zNumber) || 0));
+};
+
+const mergeTransactionsByDay = (
+  existing: Record<string, any[]>,
+  incoming: Record<string, any[]>
+): Record<string, any[]> => {
+  const result: Record<string, any[]> = {};
+  const add = (day: string, tx: any) => {
+    if (!result[day]) result[day] = [];
+    const id = String(tx?.id || '');
+    const ts = new Date(tx?.timestamp || 0).getTime();
+    const key = `${id}@${ts}`;
+    const already = result[day].some((item) => {
+      const itemId = String(item?.id || '');
+      const itemTs = new Date(item?.timestamp || 0).getTime();
+      return `${itemId}@${itemTs}` === key;
+    });
+    if (!already) result[day].push(tx);
+  };
+
+  for (const [day, list] of Object.entries(existing || {})) {
+    if (Array.isArray(list)) list.forEach((tx) => add(day, tx));
+  }
+  for (const [day, list] of Object.entries(incoming || {})) {
+    if (Array.isArray(list)) list.forEach((tx) => add(day, tx));
+  }
+  return result;
+};
+
 const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
   const closures = StorageService.loadClosures(storeCode);
   const txs = collectStoreTransactions(storeCode, closures);
@@ -180,8 +221,14 @@ const BackOfficeDashboard: React.FC = () => {
       }
       if (data.settings) StorageService.saveSettings(data.settings, targetStoreCode);
       if (Array.isArray(data.subcategories)) StorageService.saveSubcategories(data.subcategories, targetStoreCode);
-      if (Array.isArray(data.closures)) StorageService.saveAllClosures(data.closures, targetStoreCode);
-      if (data.transactionsByDay) StorageService.saveTransactionsByDayMap(data.transactionsByDay, targetStoreCode);
+      if (Array.isArray(data.closures)) {
+        const existingClosures = StorageService.loadClosures(targetStoreCode);
+        StorageService.saveAllClosures(mergeClosuresByZ(existingClosures, data.closures), targetStoreCode);
+      }
+      if (data.transactionsByDay) {
+        const existingMap = parseMap(localStorage.getItem(StorageService.getStoreKey(targetStoreCode, 'transactions_by_day')));
+        StorageService.saveTransactionsByDayMap(mergeTransactionsByDay(existingMap, data.transactionsByDay), targetStoreCode);
+      }
       if (Number.isFinite(Number(data.zCounter))) StorageService.setZCounterValue(Number(data.zCounter), targetStoreCode);
       if (Array.isArray(data.cashiers)) StorageService.saveCashiers(data.cashiers, targetStoreCode);
       if (Array.isArray(data.customers)) StorageService.saveCustomers(data.customers, targetStoreCode);
