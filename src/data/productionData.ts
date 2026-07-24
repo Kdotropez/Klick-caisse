@@ -49,24 +49,6 @@ const extractSubcategoriesFromProducts = (list: Product[]): string[] => {
   return Array.from(set).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
 };
 
-const tryPersistEmbeddedBase = (storeCode: string): void => {
-  try {
-    StorageService.saveProductionData(products, categories, storeCode, { skipAutoBackup: true });
-  } catch (error) {
-    console.warn(
-      'Base intégrée chargée en mémoire, mais non sauvegardée localement (quota navigateur atteint).',
-      error
-    );
-  }
-
-  try {
-    const extracted = extractSubcategoriesFromProducts(products);
-    StorageService.saveSubcategories(extracted);
-  } catch (error) {
-    console.warn('Sous-catégories intégrées non sauvegardées localement (quota navigateur atteint).', error);
-  }
-};
-
 
 
 
@@ -80,7 +62,7 @@ export const categories: Category[] = Array.from(uniqueCategories).map((name, in
   subcategoryOrder: [],
 }));
 
-export const loadProductionData = async (storeCode: string): Promise<{
+export const loadProductionData = async (_storeCode: string): Promise<{
   products: Product[];
   categories: Category[];
 }> => {
@@ -92,8 +74,7 @@ export const loadProductionData = async (storeCode: string): Promise<{
     // Ne pas exiger les sous-catégories : après migration legacy elles peuvent être vides
     // alors que produits + catégories sont déjà dans le blob — sinon on écrase tout par la base intégrée.
     if (savedProducts.length === 0 && savedCategories.length > 0) {
-      console.warn('Base locale incomplète détectée (catégories sans produits), rechargement de la base intégrée.');
-      tryPersistEmbeddedBase(storeCode);
+      console.warn('Base locale incomplète détectée (catégories sans produits), utilisation de la base intégrée sans écriture locale.');
       return { products, categories };
     }
 
@@ -137,8 +118,8 @@ export const loadProductionData = async (storeCode: string): Promise<{
       return { products: savedProducts, categories: savedCategories };
     }
     
-    // Si pas de données complètes, utiliser les données intégrées pour cette boutique
-    tryPersistEmbeddedBase(storeCode);
+    // Si pas de données complètes, utiliser les données intégrées sans recopier tout le catalogue en localStorage.
+    // Les modifications utilisateur seront persistées lors des prochains enregistrements explicites.
     return { products, categories };
   } catch (error) {
     console.error('❌ Erreur lors du chargement des données:', error);
