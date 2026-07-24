@@ -806,13 +806,26 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   hasSubcategories: !!data.subcategories,
                   hasTransactions: !!data.transactionsByDay
                 });
+
+                const targetStoreCode = isBackOfficeCentral && data.storeCode
+                  ? String(data.storeCode)
+                  : StorageService.getCurrentStoreCode();
+                const targetStoreName = data.storeName || `Boutique ${targetStoreCode}`;
+                if (isBackOfficeCentral && data.storeCode) {
+                  const okTarget = window.confirm(
+                    `Restaurer cette sauvegarde dans la boutique du fichier ?\n\n` +
+                    `Boutique: ${targetStoreName}\nCode: ${targetStoreCode}\n\n` +
+                    `Le PC central peut ensuite ouvrir cette boutique pour consulter les Z, ventes et statistiques.`
+                  );
+                  if (!okTarget) return;
+                }
                 
                 let catalogPersisted = true;
 
                 // Restaurer les données (boutique courante)
                 if (data.products && data.categories) {
                   try {
-                    StorageService.saveProductionData(data.products, data.categories, undefined, { skipAutoBackup: true });
+                    StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
                   } catch (restoreError) {
                     const ok = window.confirm(
                       'Le stockage navigateur est plein.\n\n' +
@@ -820,9 +833,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                       'Continuer ?'
                     );
                     if (!ok) throw restoreError;
-                    StorageService.prepareActiveStoreForFullRestore();
+                    StorageService.prepareActiveStoreForFullRestore(targetStoreCode);
                     try {
-                      StorageService.saveProductionData(data.products, data.categories, undefined, { skipAutoBackup: true });
+                      StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
                     } catch (retryError) {
                       catalogPersisted = false;
                       console.warn('Catalogue non sauvegardé localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
@@ -832,15 +845,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 } else {
                   if (data.products) {
                     try {
-                      StorageService.saveProducts(data.products);
+                      const categoriesForTarget = Array.isArray(data.categories) ? data.categories : [];
+                      StorageService.saveProductionData(data.products, categoriesForTarget, targetStoreCode, { skipAutoBackup: true });
                     } catch (restoreError) {
                       const ok = window.confirm(
                         'Le stockage navigateur est plein.\n\nCréer une archive, vider la boutique courante puis relancer la restauration ?'
                       );
                       if (!ok) throw restoreError;
-                      StorageService.prepareActiveStoreForFullRestore();
+                      StorageService.prepareActiveStoreForFullRestore(targetStoreCode);
                       try {
-                        StorageService.saveProducts(data.products);
+                        const categoriesForTarget = Array.isArray(data.categories) ? data.categories : [];
+                        StorageService.saveProductionData(data.products, categoriesForTarget, targetStoreCode, { skipAutoBackup: true });
                       } catch (retryError) {
                         catalogPersisted = false;
                         console.warn('Produits non sauvegardés localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
@@ -850,7 +865,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   }
                   if (data.categories) {
                     try {
-                      StorageService.saveCategories(data.categories);
+                      const productsForTarget = Array.isArray(data.products) ? data.products : [];
+                      StorageService.saveProductionData(productsForTarget, data.categories, targetStoreCode, { skipAutoBackup: true });
                     } catch (retryError) {
                       catalogPersisted = false;
                       console.warn('Catégories non sauvegardées localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
@@ -860,18 +876,18 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 }
 
                 if (data.settings) {
-                  StorageService.saveSettings(data.settings);
+                  StorageService.saveSettings(data.settings, targetStoreCode);
                   console.log('✅ Paramètres restaurés');
                 }
 
                 if (data.subcategories) {
-                  StorageService.saveSubcategories(data.subcategories);
+                  StorageService.saveSubcategories(data.subcategories, targetStoreCode);
                   console.log('✅ Sous-catégories restaurées:', data.subcategories.length);
                 }
                 
                 if (data.closures) {
                   // Fusionner intelligemment les clôtures au lieu de les remplacer
-                  const currentClosures = StorageService.loadClosures();
+                  const currentClosures = StorageService.loadClosures(targetStoreCode);
                   const newClosures = data.closures;
                   
                   // Créer un Set des numéros Z existants pour éviter les doublons
@@ -894,32 +910,37 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   // Trier par numéro Z
                   mergedClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
                   
-                  StorageService.saveAllClosures(mergedClosures);
+                  StorageService.saveAllClosures(mergedClosures, targetStoreCode);
                   console.log(`✅ Clôtures fusionnées: ${addedCount} nouvelles + ${currentClosures.length} existantes = ${mergedClosures.length} total`);
                 }
 
                 if (data.zCounter !== undefined) {
-                  StorageService.setZCounterValue(Number(data.zCounter));
+                  StorageService.setZCounterValue(Number(data.zCounter), targetStoreCode);
                   console.log('✅ Compteur Z restauré:', data.zCounter);
                 }
 
                 if (data.transactionsByDay) {
-                  StorageService.saveTransactionsByDayMap(data.transactionsByDay as Record<string, any[]>);
+                  StorageService.saveTransactionsByDayMap(data.transactionsByDay as Record<string, any[]>, targetStoreCode);
                   console.log('✅ Transactions restaurées');
                 }
 
                 if (data.cashiers) {
-                  StorageService.saveCashiers(data.cashiers);
+                  StorageService.saveCashiers(data.cashiers, targetStoreCode);
                   console.log('✅ Caissiers restaurés:', data.cashiers.length);
+                }
+                if (data.customers) {
+                  StorageService.saveCustomers(data.customers, targetStoreCode);
+                  console.log('✅ Clients restaurés:', data.customers.length);
                 }
                 
                 // Calculer le nombre total de clôtures après fusion
-                const finalClosures = StorageService.loadClosures();
+                const finalClosures = StorageService.loadClosures(targetStoreCode);
                 const finalZNumbers = finalClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
                 
                 const message = `✅ Restauration terminée avec succès !\n\n` +
                                `📦 ${data.products?.length || 0} produits\n` +
                                `📂 ${data.categories?.length || 0} catégories\n` +
+                               `🏪 Boutique cible: ${targetStoreName} (${targetStoreCode})\n` +
                                `🔒 ${finalClosures.length} clôtures (fusion intelligente)\n` +
                                `📈 Séquence Z: ${finalZNumbers.join(' → ')}\n` +
                                `💰 Z${data.zCounter || 0}\n` +

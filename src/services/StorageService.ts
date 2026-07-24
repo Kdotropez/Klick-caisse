@@ -294,12 +294,14 @@ export class StorageService {
     }
   }
 
-  static saveTransactionsByDayMap(map: Record<string, any[]>): void {
-    this.setTransactionsByDayRaw(JSON.stringify(map));
+  static saveTransactionsByDayMap(map: Record<string, any[]>, storeCode?: string): void {
+    const key = storeCode ? this.getStoreKey(storeCode, 'transactions_by_day') : this.activeStoreKey('transactions_by_day');
+    this.setItemWithQuotaRecovery(key, JSON.stringify(map));
   }
 
-  static setZCounterValue(n: number): void {
-    this.setItemWithQuotaRecovery(this.activeStoreKey('z_counter'), String(n));
+  static setZCounterValue(n: number, storeCode?: string): void {
+    const key = storeCode ? this.getStoreKey(storeCode, 'z_counter') : this.activeStoreKey('z_counter');
+    this.setItemWithQuotaRecovery(key, String(n));
   }
 
   // Sauvegarder les produits
@@ -327,9 +329,10 @@ export class StorageService {
     } catch { return []; }
   }
 
-  static saveCustomers(customers: Customer[]): void {
+  static saveCustomers(customers: Customer[], storeCode?: string): void {
     try {
-      this.setItemWithQuotaRecovery(this.activeStoreKey('customers'), JSON.stringify(customers));
+      const key = storeCode ? this.getStoreKey(storeCode, 'customers') : this.activeStoreKey('customers');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(customers));
     } catch {}
   }
 
@@ -458,9 +461,10 @@ export class StorageService {
   }
 
   // Sauvegarder les paramètres
-  static saveSettings(settings: any): void {
+  static saveSettings(settings: any, storeCode?: string): void {
     try {
-      this.setItemWithQuotaRecovery(this.activeStoreKey('settings'), JSON.stringify(settings));
+      const key = storeCode ? this.getStoreKey(storeCode, 'settings') : this.activeStoreKey('settings');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(settings));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des paramètres:', error);
     }
@@ -542,7 +546,7 @@ export class StorageService {
     }
   }
 
-  static saveSubcategories(subcategories: string[]): void {
+  static saveSubcategories(subcategories: string[], storeCode?: string): void {
     try {
       const unique = Array.from(new Set(subcategories
         // eslint-disable-next-line no-control-regex
@@ -555,7 +559,8 @@ export class StorageService {
           return alnum.length >= 2; // ignorer \u0000S, 'c', 'b', etc.
         })))
         .sort();
-      this.setItemWithQuotaRecovery(this.activeStoreKey('subcategories'), JSON.stringify(unique));
+      const key = storeCode ? this.getStoreKey(storeCode, 'subcategories') : this.activeStoreKey('subcategories');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(unique));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des sous-catégories:', error);
     }
@@ -757,7 +762,7 @@ export class StorageService {
   }
 
   // ---------- Clôture (archives) ----------
-  static loadClosures(): any[] {
+  static loadClosures(storeCode?: string): any[] {
     const parseArray = (raw: string | null): any[] | null => {
       if (raw == null || raw === '') return null;
       try {
@@ -768,8 +773,10 @@ export class StorageService {
       }
     };
     try {
-      const fromStore = parseArray(localStorage.getItem(this.activeStoreKey('closures')));
+      const key = storeCode ? this.getStoreKey(storeCode, 'closures') : this.activeStoreKey('closures');
+      const fromStore = parseArray(localStorage.getItem(key));
       if (fromStore && fromStore.length > 0) return fromStore;
+      if (storeCode) return [];
       const fromLegacy = parseArray(localStorage.getItem(this.LEGACY_CLOSURES_KEY));
       if (fromLegacy && fromLegacy.length > 0) return fromLegacy;
       return [];
@@ -789,9 +796,10 @@ export class StorageService {
     }
   }
 
-  static saveAllClosures(closures: any[]): void {
+  static saveAllClosures(closures: any[], storeCode?: string): void {
     try {
-      this.setItemWithQuotaRecovery(this.activeStoreKey('closures'), JSON.stringify(closures || []));
+      const key = storeCode ? this.getStoreKey(storeCode, 'closures') : this.activeStoreKey('closures');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(closures || []));
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement des clôtures:', error);
     }
@@ -1417,8 +1425,9 @@ export class StorageService {
     this.setItemWithQuotaRecovery('klick_caisse_current_store', storeCode);
   }
 
-  static prepareActiveStoreForFullRestore(): void {
+  static prepareActiveStoreForFullRestore(storeCode?: string): void {
     this.downloadLocalStorageArchiveBeforePurge();
+    const keyFor = (suffix: string) => storeCode ? this.getStoreKey(storeCode, suffix) : this.activeStoreKey(suffix);
     const keys = [
       'productionData',
       'transactions_by_day',
@@ -1434,7 +1443,7 @@ export class StorageService {
     ];
     for (const suffix of keys) {
       try {
-        localStorage.removeItem(this.activeStoreKey(suffix));
+        localStorage.removeItem(keyFor(suffix));
       } catch {
         /* ignore */
       }
