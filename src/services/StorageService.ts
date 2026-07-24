@@ -37,6 +37,7 @@ export class StorageService {
 
   private static purgeOversizedLocalBackups(): void {
     try {
+      this.downloadLocalStorageArchiveBeforePurge();
       // Ne jamais purger automatiquement les traces de sauvegarde des autres boutiques.
       // On limite la récupération de quota à la boutique active et aux anciennes clés globales.
       localStorage.removeItem(this.activeStoreKey('auto_backups'));
@@ -45,6 +46,53 @@ export class StorageService {
       localStorage.removeItem('klick_emergency_recovery');
     } catch {
       /* ignore */
+    }
+  }
+
+  private static downloadLocalStorageArchiveBeforePurge(): void {
+    try {
+      if (typeof document === 'undefined') return;
+      const storeCode = this.getCurrentStoreCode();
+      const sessionKey = `klick_quota_archive_downloaded_${storeCode}`;
+      try {
+        if (sessionStorage.getItem(sessionKey) === '1') return;
+      } catch {
+        /* ignore */
+      }
+
+      const snapshot: Record<string, string> = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        snapshot[key] = localStorage.getItem(key) || '';
+      }
+
+      const archive = {
+        schemaVersion: 1,
+        type: 'localStorage-archive-before-quota-cleanup',
+        exportedAt: new Date().toISOString(),
+        storeCode,
+        localStorage: snapshot,
+      };
+      const blob = new Blob([JSON.stringify(archive, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const filename = `${this.backupFilePrefix(storeCode)}-archive-avant-nettoyage-quota-${this.datedStamp(new Date())}.json`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      try {
+        sessionStorage.setItem(sessionKey, '1');
+      } catch {
+        /* ignore */
+      }
+      console.warn(`Archive locale créée avant nettoyage quota: ${filename}`);
+    } catch (error) {
+      console.warn('Impossible de créer l’archive locale avant nettoyage quota:', error);
     }
   }
 
