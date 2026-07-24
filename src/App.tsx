@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box } from '@mui/material';
 import WindowManager from './components/WindowManager';
+import BackOfficeDashboard from './components/BackOfficeDashboard';
 import LicenseModal from './components/LicenseModal';
 import StoreSelectModal from './components/StoreSelectModal';
 import LegacyMigrationModal from './components/LegacyMigrationModal';
@@ -620,6 +621,14 @@ const App: React.FC = () => {
     width: parseInt(rootSize.width, 10) || MIN_ROOT_WIDTH,
     height: parseInt(rootSize.height, 10) || MIN_ROOT_HEIGHT,
   };
+
+  if (isBackOfficeCentral) {
+    return (
+      <Box sx={{ height: rootSize.height, width: rootSize.width, backgroundColor: '#f4f6f8', overflow: 'hidden' }}>
+        <BackOfficeDashboard />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{
