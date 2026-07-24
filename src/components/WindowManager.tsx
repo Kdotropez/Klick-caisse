@@ -1520,22 +1520,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
 
 
-  const [bottomMenusCollapsed, setBottomMenusCollapsedState] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('ui.bottomMenusCollapsed') !== '0';
-    } catch {
-      return true;
-    }
-  });
-
-  const setBottomMenusCollapsed = (value: boolean) => {
-    setBottomMenusCollapsedState(value);
-    try {
-      localStorage.setItem('ui.bottomMenusCollapsed', value ? '1' : '0');
-    } catch {
-      // Ignore storage failures.
-    }
-  };
+  const [bottomMenusCollapsed, setBottomMenusCollapsed] = useState<boolean>(true);
 
   const buildOptimizedWindows = useCallback((collapseBottomMenus: boolean): Window[] => {
     const margin = applyScale(8);
