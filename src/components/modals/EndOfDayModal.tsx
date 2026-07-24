@@ -16,7 +16,16 @@ const EndOfDayModal: React.FC<EndOfDayModalProps> = ({ open, onClose, transactio
   const totalCA = txs.reduce((s, t) => s + (t.total || 0), 0);
   const byMethod = txs.reduce((acc: Record<string, number>, t: any) => {
     const m = String((t as any).paymentMethod || '').toLowerCase();
-    const key = m.includes('esp') || m==='cash' ? 'Espèces' : m.includes('carte') || m==='card' ? 'Carte' : 'SumUp';
+    const key =
+      m.includes('esp') || m === 'cash'
+        ? 'Espèces'
+        : m.includes('carte') || m === 'card'
+          ? 'Carte'
+          : m.includes('chèq') || m.includes('cheq') || m === 'check'
+            ? 'Chèque'
+            : m === 'sumup'
+              ? 'SumUp'
+              : 'Autres';
     acc[key] = (acc[key] || 0) + (t.total || 0);
     return acc;
   }, {} as Record<string, number>);
@@ -49,7 +58,7 @@ const EndOfDayModal: React.FC<EndOfDayModalProps> = ({ open, onClose, transactio
         <Divider sx={{ my: 1 }} />
         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Totaux par mode de règlement</Typography>
         <List dense>
-          {['Espèces','Carte','SumUp'].map(k => (
+          {['Espèces','Carte','SumUp','Chèque','Autres'].map(k => (
             <ListItem key={k} sx={{ py: 0.25 }}>
               <ListItemText primary={k} />
               <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{(byMethod[k]||0).toFixed(2)} €</Typography>

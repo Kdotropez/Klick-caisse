@@ -32,7 +32,7 @@ const CheckoutDialog: React.FC<CheckoutDialogProps> = ({
   items,
   onCompleteTransaction,
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'sumup'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'check' | 'sumup'>('card');
   const [cashierName, setCashierName] = useState('');
 
   const subtotal = items.reduce((sum, item) => sum + (item.product.finalPrice * item.quantity), 0);
@@ -128,10 +128,11 @@ const CheckoutDialog: React.FC<CheckoutDialogProps> = ({
               <Select
                 value={paymentMethod}
                 label="Méthode de paiement"
-                onChange={(e) => setPaymentMethod(e.target.value as 'cash' | 'card' | 'sumup')}
+                onChange={(e) => setPaymentMethod(e.target.value as 'cash' | 'card' | 'check' | 'sumup')}
               >
                 <MenuItem value="card">Carte bancaire</MenuItem>
                 <MenuItem value="cash">Espèces</MenuItem>
+                <MenuItem value="check">Chèque</MenuItem>
                 <MenuItem value="sumup">SumUp</MenuItem>
               </Select>
             </FormControl>
