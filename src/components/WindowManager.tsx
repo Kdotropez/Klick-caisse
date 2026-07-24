@@ -136,6 +136,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const APP_BAR_HEIGHT = 64;
 
   const activeStoreCode = currentStoreCode ?? StorageService.getCurrentStoreCode();
+  const isBackOfficeCentral = (() => {
+    try {
+      return localStorage.getItem('ui.backOfficeCentral') === '1';
+    } catch {
+      return false;
+    }
+  })();
 
   /** 1 = taille nominale ; éviter une double réduction avec le scale du conteneur App. */
   const GLOBAL_SCALE_FACTOR = 1;
@@ -1540,6 +1547,24 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     const yTop = margin + APP_BAR_HEIGHT;
     const yProducts = yTop + categoriesHeight + gap;
     const yBottom = yTop + usableHeight - bottomHeight;
+    if (isBackOfficeCentral) {
+      const backOfficeRightWidth = Math.min(Math.max(usableWidth * 0.34, applyScale(390)), applyScale(560));
+      const backOfficeLeftWidth = Math.max(applyScale(520), usableWidth - backOfficeRightWidth - gap);
+      const backOfficeSettingsHeight = collapseBottomMenus ? 0 : Math.min(applyScale(230), Math.max(applyScale(170), usableHeight * 0.24));
+      const backOfficeProductsHeight = Math.max(
+        applyScale(320),
+        usableHeight - categoriesHeight - gap - (collapseBottomMenus ? 0 : backOfficeSettingsHeight + gap)
+      );
+      return [
+        { id: 'products', title: 'Grille Produits', type: 'products', x: xLeft, y: yProducts, width: backOfficeLeftWidth, height: backOfficeProductsHeight, isMinimized: false, isMaximized: false, zIndex: 1 },
+        { id: 'cart', title: 'Panier & Ticket', type: 'cart', x: xRight, y: yTop, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 2 },
+        { id: 'categories', title: 'Catégories', type: 'categories', x: xLeft, y: yTop, width: backOfficeLeftWidth, height: categoriesHeight, isMinimized: false, isMaximized: false, zIndex: 3 },
+        { id: 'search', title: 'Modes de Règlement', type: 'search', x: xRight, y: yTop, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 4 },
+        { id: 'window5', title: 'Fonction', type: 'settings', x: xLeft, y: yTop + categoriesHeight + gap + backOfficeProductsHeight + gap, width: backOfficeLeftWidth, height: backOfficeSettingsHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 5 },
+        { id: 'window6', title: 'Fenêtre Libre 2', type: 'free', x: xLeft, y: yBottom, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 6 },
+        { id: 'window7', title: 'Back office Stats', type: 'stats', x: xLeft + backOfficeLeftWidth + gap, y: yTop, width: backOfficeRightWidth, height: usableHeight, isMinimized: false, isMaximized: false, zIndex: 7 },
+      ];
+    }
     const productsHeight = Math.max(
       applyScale(260),
       collapseBottomMenus
@@ -1559,7 +1584,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       { id: 'window6', title: 'Fenêtre Libre 2', type: 'free', x: xLeft, y: yBottom, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 6 },
       { id: 'window7', title: 'Fonction Stat', type: 'stats', x: xLeft + settingsWidth + gap, y: yBottom, width: statsWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 7 },
     ];
-  }, [applyScale, layoutBounds.height, layoutBounds.width]);
+  }, [applyScale, isBackOfficeCentral, layoutBounds.height, layoutBounds.width]);
 
   const [windows, setWindows] = useState<Window[]>(() => buildOptimizedWindows(bottomMenusCollapsed));
 
@@ -2951,7 +2976,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onDragEnd={handleDragEnd}
-            onProductClick={handleProductClick}
+            onProductClick={isBackOfficeCentral ? () => undefined : handleProductClick}
             onEditProduct={(p) => { setSelectedProductForEdit(p); setShowProductEditModal(true); }}
           />
         );
@@ -3591,7 +3616,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
                            {windows
           .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window7'].includes(window.id)) // Afficher les fenêtres utiles
-          .filter(window => !bottomMenusCollapsed || !['window5', 'window6', 'window7'].includes(window.id))
+          .filter(window => !isBackOfficeCentral || !['cart', 'search'].includes(window.id))
+          .filter(window => {
+            if (!bottomMenusCollapsed) return true;
+            if (['window5', 'window6'].includes(window.id)) return false;
+            if (window.id === 'window7') return isBackOfficeCentral;
+            return true;
+          })
           .map((window) => (
                            <Paper
             key={window.id}

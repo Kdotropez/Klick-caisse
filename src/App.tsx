@@ -529,17 +529,6 @@ const App: React.FC = () => {
     document.addEventListener('touchcancel', onUp);
   };
 
-  // Si la licence n'est pas valide ou si l'application est verrouillée, afficher la modale de licence
-  if (!isLicenseValid || isLocked) {
-    return (
-      <LicenseModal 
-        open={showLicenseModal} 
-        onLicenseValid={handleLicenseValid}
-        isLocked={isLocked}
-      />
-    );
-  }
-
   if (!legacyMigrationDone) {
     return (
       <LegacyMigrationModal
@@ -585,15 +574,44 @@ const App: React.FC = () => {
             /* ignore */
           }
           const effectiveStoreCode = code === BACK_OFFICE_PROFILE_CODE ? BACK_OFFICE_DEFAULT_STORE_CODE : code;
+          const isBackOfficeLogin = code === BACK_OFFICE_PROFILE_CODE;
           try {
-            localStorage.setItem('ui.backOfficeCentral', code === BACK_OFFICE_PROFILE_CODE ? '1' : '0');
+            localStorage.setItem('ui.backOfficeCentral', isBackOfficeLogin ? '1' : '0');
           } catch {
             /* ignore */
+          }
+          if (isBackOfficeLogin) {
+            setIsLicenseValid(true);
+            setShowLicenseModal(false);
+            setIsLocked(false);
+            setLastValidatedDate(new Date().toLocaleDateString('fr-FR'));
+          } else {
+            setIsLicenseValid(false);
+            setShowLicenseModal(true);
           }
           StorageService.setCurrentStoreCode(effectiveStoreCode);
           setCurrentStoreCode(effectiveStoreCode);
           setStoreSessionReady(true);
         }}
+      />
+    );
+  }
+
+  const isBackOfficeCentral = (() => {
+    try {
+      return localStorage.getItem('ui.backOfficeCentral') === '1';
+    } catch {
+      return false;
+    }
+  })();
+
+  // Le code du jour/licence reste obligatoire pour les postes caisse, mais pas pour le profil Back office.
+  if ((!isLicenseValid || isLocked) && !isBackOfficeCentral) {
+    return (
+      <LicenseModal 
+        open={showLicenseModal} 
+        onLicenseValid={handleLicenseValid}
+        isLocked={isLocked}
       />
     );
   }
