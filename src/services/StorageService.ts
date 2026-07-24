@@ -200,7 +200,7 @@ export class StorageService {
 
     const copy = (legacyKey: string, suffix: string) => {
       const v = localStorage.getItem(legacyKey);
-      if (v) localStorage.setItem(this.getStoreKey(storeCode, suffix), v);
+      if (v) this.setItemWithQuotaRecovery(this.getStoreKey(storeCode, suffix), v);
     };
 
     copy('klick_caisse_transactions_by_day', 'transactions_by_day');
@@ -229,7 +229,7 @@ export class StorageService {
     copy(this.CASHIERS_KEY, 'cashiers');
 
     if (productCatalogMigrationOk) {
-      localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+      this.setItemWithQuotaRecovery(this.STORE_MIGRATION_FLAG, '1');
     } else {
       console.warn('Migration legacy incomplète: le catalogue produits/catégories sera reproposé au prochain démarrage.');
     }
@@ -261,7 +261,7 @@ export class StorageService {
         /* ignore */
       }
     }
-    localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+    this.setItemWithQuotaRecovery(this.STORE_MIGRATION_FLAG, '1');
   }
 
   static getTransactionsByDayRaw(): string | null {
@@ -318,7 +318,7 @@ export class StorageService {
 
   static saveCustomers(customers: Customer[]): void {
     try {
-      localStorage.setItem(this.activeStoreKey('customers'), JSON.stringify(customers));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('customers'), JSON.stringify(customers));
     } catch {}
   }
 
@@ -449,7 +449,7 @@ export class StorageService {
   // Sauvegarder les paramètres
   static saveSettings(settings: any): void {
     try {
-      localStorage.setItem(this.activeStoreKey('settings'), JSON.stringify(settings));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('settings'), JSON.stringify(settings));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des paramètres:', error);
     }
@@ -544,7 +544,7 @@ export class StorageService {
           return alnum.length >= 2; // ignorer \u0000S, 'c', 'b', etc.
         })))
         .sort();
-      localStorage.setItem(this.activeStoreKey('subcategories'), JSON.stringify(unique));
+      this.setItemWithQuotaRecovery(this.activeStoreKey('subcategories'), JSON.stringify(unique));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des sous-catégories:', error);
     }
@@ -996,7 +996,7 @@ export class StorageService {
     const code = storeCode ?? this.getCurrentStoreCode();
     const key = this.getStoreKey(code, 'cashiers');
     try {
-      localStorage.setItem(key, JSON.stringify(cashiers));
+      this.setItemWithQuotaRecovery(key, JSON.stringify(cashiers));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des caissiers:', error);
     }
@@ -1146,12 +1146,12 @@ export class StorageService {
       // Accepte deux notations pour transactions et zCounter
       const transactionsByDay = (data as any).transactionsByDay ?? (data as any).transactions_by_day ?? (data as any).klick_caisse_transactions_by_day;
       if (transactionsByDay && typeof transactionsByDay === 'object') {
-        localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(transactionsByDay));
+        this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(transactionsByDay));
       }
       const closures = (data as any).closures ?? (data as any).klick_caisse_closures;
       if (Array.isArray(closures)) this.saveAllClosures(closures);
       const zCounter = (data as any).zCounter ?? (data as any).z_counter ?? (data as any).klick_caisse_z_counter;
-      if (Number.isFinite(Number(zCounter))) localStorage.setItem(this.activeStoreKey('z_counter'), String(Number(zCounter)));
+      if (Number.isFinite(Number(zCounter))) this.setItemWithQuotaRecovery(this.activeStoreKey('z_counter'), String(Number(zCounter)));
       const cashiers = (data as any).cashiers;
       if (Array.isArray(cashiers)) this.saveCashiers(cashiers);
       const customers = (data as any).customers;
@@ -1274,7 +1274,7 @@ export class StorageService {
       if (Number.isFinite(last) && now - last < this.AUTO_BACKUP_DOWNLOAD_THROTTLE_MS) {
         return false;
       }
-      localStorage.setItem(key, String(now));
+      this.setItemWithQuotaRecovery(key, String(now));
       return true;
     } catch {
       return true;
@@ -1381,7 +1381,7 @@ export class StorageService {
   static saveTransactions(transactions: Transaction[], storeCode?: string): void {
     const code = storeCode ?? this.getCurrentStoreCode();
     const key = this.getStoreKey(code, 'transactions');
-    localStorage.setItem(key, JSON.stringify(transactions));
+    this.setItemWithQuotaRecovery(key, JSON.stringify(transactions));
   }
 
   static loadTransactions(storeCode?: string): Transaction[] {
@@ -1403,7 +1403,7 @@ export class StorageService {
   }
 
   static setCurrentStoreCode(storeCode: string): void {
-    localStorage.setItem('klick_caisse_current_store', storeCode);
+    this.setItemWithQuotaRecovery('klick_caisse_current_store', storeCode);
   }
 
   static getAllStoreData(storeCode: string): {
