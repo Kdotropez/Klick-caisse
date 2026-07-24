@@ -1548,7 +1548,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     const paymentHeight = Math.min(applyScale(178), Math.max(applyScale(132), usableHeight * 0.2));
     const bottomHeight = collapseBottomMenus
       ? 0
-      : Math.min(applyScale(168), Math.max(applyScale(118), usableHeight * 0.18));
+      : Math.min(applyScale(230), Math.max(applyScale(170), usableHeight * 0.24));
 
     const xLeft = margin;
     const xRight = margin + leftWidth + gap;
@@ -1562,16 +1562,17 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         : yBottom - yProducts - gap
     );
     const cartHeight = Math.max(applyScale(320), usableHeight - paymentHeight - gap);
-    const bottomPanelWidth = (leftWidth - gap * 2) / 3;
+    const settingsWidth = Math.floor((leftWidth - gap) * 0.64);
+    const statsWidth = leftWidth - settingsWidth - gap;
 
     return [
       { id: 'products', title: 'Grille Produits', type: 'products', x: xLeft, y: yProducts, width: leftWidth, height: productsHeight, isMinimized: false, isMaximized: false, zIndex: 1 },
       { id: 'cart', title: 'Panier & Ticket', type: 'cart', x: xRight, y: yTop, width: rightWidth, height: cartHeight, isMinimized: false, isMaximized: false, zIndex: 2 },
       { id: 'categories', title: 'Catégories', type: 'categories', x: xLeft, y: yTop, width: leftWidth, height: categoriesHeight, isMinimized: false, isMaximized: false, zIndex: 3 },
       { id: 'search', title: 'Modes de Règlement', type: 'search', x: xRight, y: yTop + cartHeight + gap, width: rightWidth, height: paymentHeight, isMinimized: false, isMaximized: false, zIndex: 4 },
-      { id: 'window5', title: 'Fonction', type: 'settings', x: xLeft, y: yBottom, width: bottomPanelWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 5 },
-      { id: 'window6', title: 'Fenêtre Libre 2', type: 'free', x: xLeft + bottomPanelWidth + gap, y: yBottom, width: bottomPanelWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 6 },
-      { id: 'window7', title: 'Fonction Stat', type: 'stats', x: xLeft + (bottomPanelWidth + gap) * 2, y: yBottom, width: bottomPanelWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 7 },
+      { id: 'window5', title: 'Fonction', type: 'settings', x: xLeft, y: yBottom, width: settingsWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 5 },
+      { id: 'window6', title: 'Fenêtre Libre 2', type: 'free', x: xLeft, y: yBottom, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 6 },
+      { id: 'window7', title: 'Fonction Stat', type: 'stats', x: xLeft + settingsWidth + gap, y: yBottom, width: statsWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 7 },
     ];
   }, [applyScale, layoutBounds.height, layoutBounds.width]);
 
@@ -3604,7 +3605,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       )}
 
                            {windows
-          .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window6', 'window7'].includes(window.id)) // Afficher les fenêtres utiles
+          .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window7'].includes(window.id)) // Afficher les fenêtres utiles
           .filter(window => !bottomMenusCollapsed || !['window5', 'window6', 'window7'].includes(window.id))
           .map((window) => (
                            <Paper

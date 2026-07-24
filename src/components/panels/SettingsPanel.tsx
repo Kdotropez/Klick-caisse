@@ -336,11 +336,11 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Checkbox checked={compactMode} onChange={(e) => setCompactMode(e.target.checked)} />
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Mode compact</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Compact petits écrans</Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Checkbox checked={autoFit} onChange={(e) => setAutoFit(e.target.checked)} />
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Auto-fit</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Ajustement auto écran</Typography>
         </Box>
         {isAdmin && (
           <Box sx={{ ml: 'auto', pl: 1 }}>
