@@ -157,7 +157,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Fonction helper pour appliquer le facteur d'échelle
   // Garder des décimales pour éviter de tomber à 0rem
-  const applyScale = (value: number) => Number((value * GLOBAL_SCALE_FACTOR).toFixed(2));
+  const applyScale = useCallback((value: number) => Number((value * GLOBAL_SCALE_FACTOR).toFixed(2)), []);
 
   // Fonction helper pour calculer la taille de police adaptée
   const getScaledFontSize = (baseSize: string) => {
@@ -1520,93 +1520,66 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
 
 
-  const [windows, setWindows] = useState<Window[]>([
-                   {
-        id: 'products',
-        title: 'Grille Produits',
-        type: 'products',
-        x: applyScale(20), // Même x que la fenêtre catégories
-        y: applyScale(241), // Position pour toucher les fenêtres 5 et 6 avec gap de 1px
-        width: 722, // Largeur exacte observée par l'utilisateur
-        height: 466, // Hauteur exacte observée par l'utilisateur
-        isMinimized: false,
-        isMaximized: false,
-        zIndex: 1,
-      },
-                          {
-         id: 'cart',
-         title: 'Panier & Ticket',
-         type: 'cart',
-         x: applyScale(832.33), // Position avec espacement de 10px (20 + 802.33 + 10)
-         y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
-         width: applyScale(540), // Élargi d'un tiers (405 * 1.33 = 540)
-         height: applyScale(600), // Hauteur exacte mesurée
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 2,
-       },
-                                                                                                                                                                       {
-          id: 'categories',
-          title: 'Catégories',
-          type: 'categories',
-          x: applyScale(20), // Position personnalisée - coin haut gauche de l'espace fenêtre
-          y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
-          width: applyScale(802.33), // Largeur exacte mesurée
-          height: applyScale(220), // Hauteur ajustée pour éviter tout recouvrement avec la grille
-          isMinimized: false,
-          isMaximized: false,
-          zIndex: 3,
-        },
-                          {
-         id: 'search',
-         title: 'Modes de Règlement',
-         type: 'search',
-         x: applyScale(832.33), // Même x que la fenêtre ticket
-         y: applyScale(620), // Collée à la fenêtre 2 (20 + 600 = 620)
-         width: applyScale(540), // Même largeur que le ticket élargi
-         height: applyScale(217.33), // Étirée pour se rapprocher de la fenêtre 7
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 4,
-       },
-                  {
-         id: 'window5',
-         title: 'Fonction',
-         type: 'settings',
-         x: applyScale(20), // À gauche
-         y: applyScale(760), // Remonté de 60px (820 - 60 = 760)
-         width: applyScale(401.3), // Largeur exacte mesurée
-         height: applyScale(189.33), // Hauteur exacte mesurée
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 5,
-       },
-             {
-         id: 'window6',
-         title: 'Fenêtre Libre 2',
-         type: 'free',
-         x: applyScale(431.3), // À côté de la première avec espacement (20 + 401.3 + 10)
-         y: applyScale(760), // Remonté de 60px (820 - 60 = 760)
-         width: applyScale(388.63), // Largeur ajustée par l'utilisateur
-         height: applyScale(190.66), // Hauteur ajustée par l'utilisateur
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 6,
-       },
-               {
-          id: 'window7',
-          title: 'Fonction Stat',
-          type: 'stats',
-          x: applyScale(832.33), // Même x que la fenêtre Modes de Règlement
-          y: applyScale(837.33), // Remonté de 60px (897.33 - 60 = 837.33)
-          width: applyScale(540), // Même largeur que les fenêtres au-dessus
-          height: applyScale(113), // Hauteur ajustée par l'utilisateur
-          isMinimized: false,
-          isMaximized: false,
-          zIndex: 7,
-        },
-    
-  ]);
+  const [bottomMenusCollapsed, setBottomMenusCollapsedState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ui.bottomMenusCollapsed') !== '0';
+    } catch {
+      return true;
+    }
+  });
+
+  const setBottomMenusCollapsed = (value: boolean) => {
+    setBottomMenusCollapsedState(value);
+    try {
+      localStorage.setItem('ui.bottomMenusCollapsed', value ? '1' : '0');
+    } catch {
+      // Ignore storage failures.
+    }
+  };
+
+  const buildOptimizedWindows = useCallback((collapseBottomMenus: boolean): Window[] => {
+    const margin = applyScale(8);
+    const gap = applyScale(8);
+    const usableWidth = Math.max(900, layoutBounds.width - margin * 2);
+    const usableHeight = Math.max(620, layoutBounds.height - margin * 2);
+    const rightWidth = Math.min(Math.max(usableWidth * 0.36, applyScale(430)), applyScale(600));
+    const leftWidth = Math.max(applyScale(420), usableWidth - rightWidth - gap);
+    const categoriesHeight = Math.min(applyScale(170), Math.max(applyScale(118), usableHeight * 0.2));
+    const paymentHeight = Math.min(applyScale(178), Math.max(applyScale(132), usableHeight * 0.2));
+    const bottomHeight = collapseBottomMenus
+      ? 0
+      : Math.min(applyScale(168), Math.max(applyScale(118), usableHeight * 0.18));
+
+    const xLeft = margin;
+    const xRight = margin + leftWidth + gap;
+    const yTop = margin;
+    const yProducts = yTop + categoriesHeight + gap;
+    const yBottom = margin + usableHeight - bottomHeight;
+    const productsHeight = Math.max(
+      applyScale(260),
+      collapseBottomMenus
+        ? usableHeight - categoriesHeight - gap
+        : yBottom - yProducts - gap
+    );
+    const cartHeight = Math.max(applyScale(320), usableHeight - paymentHeight - gap);
+    const bottomPanelWidth = (leftWidth - gap * 2) / 3;
+
+    return [
+      { id: 'products', title: 'Grille Produits', type: 'products', x: xLeft, y: yProducts, width: leftWidth, height: productsHeight, isMinimized: false, isMaximized: false, zIndex: 1 },
+      { id: 'cart', title: 'Panier & Ticket', type: 'cart', x: xRight, y: yTop, width: rightWidth, height: cartHeight, isMinimized: false, isMaximized: false, zIndex: 2 },
+      { id: 'categories', title: 'Catégories', type: 'categories', x: xLeft, y: yTop, width: leftWidth, height: categoriesHeight, isMinimized: false, isMaximized: false, zIndex: 3 },
+      { id: 'search', title: 'Modes de Règlement', type: 'search', x: xRight, y: yTop + cartHeight + gap, width: rightWidth, height: paymentHeight, isMinimized: false, isMaximized: false, zIndex: 4 },
+      { id: 'window5', title: 'Fonction', type: 'settings', x: xLeft, y: yBottom, width: bottomPanelWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 5 },
+      { id: 'window6', title: 'Fenêtre Libre 2', type: 'free', x: xLeft + bottomPanelWidth + gap, y: yBottom, width: bottomPanelWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 6 },
+      { id: 'window7', title: 'Fonction Stat', type: 'stats', x: xLeft + (bottomPanelWidth + gap) * 2, y: yBottom, width: bottomPanelWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 7 },
+    ];
+  }, [applyScale, layoutBounds.height, layoutBounds.width]);
+
+  const [windows, setWindows] = useState<Window[]>(() => buildOptimizedWindows(bottomMenusCollapsed));
+
+  useEffect(() => {
+    setWindows(buildOptimizedWindows(bottomMenusCollapsed));
+  }, [bottomMenusCollapsed, buildOptimizedWindows]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -3604,8 +3577,33 @@ const WindowManager: React.FC<WindowManagerProps> = ({
         </Box>
       )}
 
+      <Button
+        variant="contained"
+        size="small"
+        onClick={() => setBottomMenusCollapsed(!bottomMenusCollapsed)}
+        sx={{
+          position: 'absolute',
+          left: applyScale(12),
+          bottom: applyScale(10),
+          zIndex: 9000,
+          minWidth: applyScale(170),
+          py: 0.5,
+          borderRadius: 999,
+          fontWeight: 800,
+          textTransform: 'none',
+          boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+          backgroundColor: bottomMenusCollapsed ? '#455a64' : '#7b1fa2',
+          '&:hover': {
+            backgroundColor: bottomMenusCollapsed ? '#37474f' : '#6a1b9a',
+          },
+        }}
+      >
+        {bottomMenusCollapsed ? 'Afficher menus bas' : 'Masquer menus bas'}
+      </Button>
+
                            {windows
           .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window6', 'window7'].includes(window.id)) // Afficher les fenêtres utiles
+          .filter(window => !bottomMenusCollapsed || !['window5', 'window6', 'window7'].includes(window.id))
           .map((window) => (
                            <Paper
             key={window.id}
