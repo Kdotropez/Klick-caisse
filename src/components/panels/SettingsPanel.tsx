@@ -781,6 +781,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   hasTransactions: !!data.transactionsByDay
                 });
                 
+                let catalogPersisted = true;
+
                 // Restaurer les données (boutique courante)
                 if (data.products && data.categories) {
                   try {
@@ -793,9 +795,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     );
                     if (!ok) throw restoreError;
                     StorageService.prepareActiveStoreForFullRestore();
-                    StorageService.saveProductionData(data.products, data.categories, undefined, { skipAutoBackup: true });
+                    try {
+                      StorageService.saveProductionData(data.products, data.categories, undefined, { skipAutoBackup: true });
+                    } catch (retryError) {
+                      catalogPersisted = false;
+                      console.warn('Catalogue non sauvegardé localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
+                    }
                   }
-                  console.log('✅ Produits + catégories restaurés:', data.products.length, data.categories.length);
+                  console.log(catalogPersisted ? '✅ Produits + catégories restaurés:' : '⚠️ Catalogue chargé depuis base intégrée/non persisté:', data.products.length, data.categories.length);
                 } else {
                   if (data.products) {
                     try {
@@ -806,12 +813,22 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                       );
                       if (!ok) throw restoreError;
                       StorageService.prepareActiveStoreForFullRestore();
-                      StorageService.saveProducts(data.products);
+                      try {
+                        StorageService.saveProducts(data.products);
+                      } catch (retryError) {
+                        catalogPersisted = false;
+                        console.warn('Produits non sauvegardés localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
+                      }
                     }
                     console.log('✅ Produits restaurés:', data.products.length);
                   }
                   if (data.categories) {
-                    StorageService.saveCategories(data.categories);
+                    try {
+                      StorageService.saveCategories(data.categories);
+                    } catch (retryError) {
+                      catalogPersisted = false;
+                      console.warn('Catégories non sauvegardées localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
+                    }
                     console.log('✅ Catégories restaurées:', data.categories.length);
                   }
                 }
@@ -879,7 +896,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                                `📂 ${data.categories?.length || 0} catégories\n` +
                                `🔒 ${finalClosures.length} clôtures (fusion intelligente)\n` +
                                `📈 Séquence Z: ${finalZNumbers.join(' → ')}\n` +
-                               `💰 Z${data.zCounter || 0}\n\n` +
+                               `💰 Z${data.zCounter || 0}\n` +
+                               `${catalogPersisted ? '' : '\n⚠️ Catalogue non stocké localement faute de place; la base intégrée restera utilisée.'}\n\n` +
                                `Rechargez la page pour voir les changements.`;
                 
                 alert(message);
