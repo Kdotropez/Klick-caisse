@@ -49,6 +49,24 @@ const extractSubcategoriesFromProducts = (list: Product[]): string[] => {
   return Array.from(set).sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
 };
 
+const tryPersistEmbeddedBase = (storeCode: string): void => {
+  try {
+    StorageService.saveProductionData(products, categories, storeCode, { skipAutoBackup: true });
+  } catch (error) {
+    console.warn(
+      'Base intégrée chargée en mémoire, mais non sauvegardée localement (quota navigateur atteint).',
+      error
+    );
+  }
+
+  try {
+    const extracted = extractSubcategoriesFromProducts(products);
+    StorageService.saveSubcategories(extracted);
+  } catch (error) {
+    console.warn('Sous-catégories intégrées non sauvegardées localement (quota navigateur atteint).', error);
+  }
+};
+
 
 
 
@@ -75,9 +93,7 @@ export const loadProductionData = async (storeCode: string): Promise<{
     // alors que produits + catégories sont déjà dans le blob — sinon on écrase tout par la base intégrée.
     if (savedProducts.length === 0 && savedCategories.length > 0) {
       console.warn('Base locale incomplète détectée (catégories sans produits), rechargement de la base intégrée.');
-      StorageService.saveProductionData(products, categories, storeCode);
-      const extracted = extractSubcategoriesFromProducts(products);
-      StorageService.saveSubcategories(extracted);
+      tryPersistEmbeddedBase(storeCode);
       return { products, categories };
     }
 
@@ -122,9 +138,7 @@ export const loadProductionData = async (storeCode: string): Promise<{
     }
     
     // Si pas de données complètes, utiliser les données intégrées pour cette boutique
-    StorageService.saveProductionData(products, categories, storeCode);
-    const extracted = extractSubcategoriesFromProducts(products);
-    StorageService.saveSubcategories(extracted);
+    tryPersistEmbeddedBase(storeCode);
     return { products, categories };
   } catch (error) {
     console.error('❌ Erreur lors du chargement des données:', error);
