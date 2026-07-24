@@ -177,6 +177,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [showProReceipt, setShowProReceipt] = useState(false);
   const [showProManager, setShowProManager] = useState(false);
   const [showHelpManual, setShowHelpManual] = useState(false);
+  const [isBackOfficeCentral, setIsBackOfficeCentral] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ui.backOfficeCentral') === '1';
+    } catch {
+      return false;
+    }
+  });
 
   const [adminTapCount, setAdminTapCount] = useState(0);
   const lastAdminTapRef = React.useRef<number>(0);
@@ -200,6 +207,16 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         // eslint-disable-next-line no-alert
         window.alert('Mode administrateur activé.');
       }
+    }
+  };
+
+  const toggleBackOfficeCentral = () => {
+    const next = !isBackOfficeCentral;
+    setIsBackOfficeCentral(next);
+    try {
+      localStorage.setItem('ui.backOfficeCentral', next ? '1' : '0');
+    } catch {
+      /* ignore */
     }
   };
 
@@ -344,7 +361,15 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Ajustement auto écran</Typography>
         </Box>
         {isAdmin && (
-          <Box sx={{ ml: 'auto', pl: 1 }}>
+          <Box sx={{ ml: 'auto', pl: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Button
+              size="small"
+              variant={isBackOfficeCentral ? 'contained' : 'outlined'}
+              onClick={(e) => { e.stopPropagation(); toggleBackOfficeCentral(); }}
+              sx={{ fontSize: '0.65rem', minWidth: 0, whiteSpace: 'nowrap' }}
+            >
+              Back office {isBackOfficeCentral ? 'ON' : 'OFF'}
+            </Button>
             <Button size="small" variant="text" onClick={(e) => { e.stopPropagation(); lock(); }} sx={{ fontSize: '0.7rem', minWidth: 0 }}>
               Admin
             </Button>
@@ -740,6 +765,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         💾 Sauvegarde
       </Button>
 
+      {isBackOfficeCentral && (
       <Button
         variant="contained"
         sx={{
@@ -917,6 +943,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       >
         🔄 Restaurer
       </Button>
+      )}
 
       {/* Importer un seul Z depuis un backup JSON */}
       <Button
