@@ -102,7 +102,15 @@ export class StorageService {
     } catch (error) {
       if (!this.isQuotaExceeded(error)) throw error;
       this.purgeOversizedLocalBackups();
-      localStorage.setItem(key, value);
+      try {
+        localStorage.setItem(key, value);
+      } catch (retryError) {
+        if (!this.isQuotaExceeded(retryError)) throw retryError;
+        // Dernier recours: la nouvelle valeur est peut-être plus grosse que l'ancienne.
+        // Une archive locale a déjà été créée par purgeOversizedLocalBackups().
+        localStorage.removeItem(key);
+        localStorage.setItem(key, value);
+      }
     }
   }
 
