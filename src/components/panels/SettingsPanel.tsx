@@ -298,7 +298,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const totalPaddingHeight = 8;
   const availableWidth = width - totalGapsWidth - totalPaddingWidth;
   const availableHeight = height - totalGapsHeight - totalPaddingHeight;
-  const buttonWidth = Math.floor(availableWidth / 3);
+  const columns = width >= 900 ? 5 : width >= 700 ? 4 : 3;
+  const buttonWidth = Math.floor(availableWidth / columns);
   const buttonHeight = Math.floor(availableHeight / 4);
 
   
@@ -308,7 +309,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       sx={{
         height: '100%',
         display: 'grid',
-        gridTemplateColumns: `repeat(3, ${buttonWidth}px)`,
+        gridTemplateColumns: `repeat(${columns}, ${buttonWidth}px)`,
         gridAutoRows: `${buttonHeight}px`,
         gap: `${gap}px`,
         p: 0.5,
