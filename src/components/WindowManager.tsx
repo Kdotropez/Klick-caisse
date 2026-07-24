@@ -3516,17 +3516,43 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           zIndex: 10001,
           py: 0.75,
           px: 2,
-          textAlign: 'center',
           backgroundColor: '#0d47a1',
           color: '#fff',
           fontWeight: 800,
           fontSize: '1rem',
           letterSpacing: '0.04em',
           boxShadow: 2,
-          pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'auto',
         }}
       >
-        Boutique : {getStoreByCode(activeStoreCode)?.name ?? 'Boutique'}
+        <Box sx={{ flex: 1 }} />
+        <Box sx={{ flex: 2, textAlign: 'center' }}>
+          Boutique : {getStoreByCode(activeStoreCode)?.name ?? 'Boutique'}
+        </Box>
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setBottomMenusCollapsed(!bottomMenusCollapsed)}
+            sx={{
+              py: 0.25,
+              px: 1.5,
+              borderRadius: 999,
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              textTransform: 'none',
+              backgroundColor: bottomMenusCollapsed ? '#455a64' : '#7b1fa2',
+              '&:hover': {
+                backgroundColor: bottomMenusCollapsed ? '#37474f' : '#6a1b9a',
+              },
+            }}
+          >
+            {bottomMenusCollapsed ? 'Afficher menus' : 'Masquer menus'}
+          </Button>
+        </Box>
       </Box>
       {/* Indicateur de mode drag and drop */}
       {isDragging && (
@@ -3576,30 +3602,6 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           ✅ Règlement {paymentMethod} réussi !
         </Box>
       )}
-
-      <Button
-        variant="contained"
-        size="small"
-        onClick={() => setBottomMenusCollapsed(!bottomMenusCollapsed)}
-        sx={{
-          position: 'absolute',
-          left: applyScale(12),
-          bottom: applyScale(10),
-          zIndex: 9000,
-          minWidth: applyScale(170),
-          py: 0.5,
-          borderRadius: 999,
-          fontWeight: 800,
-          textTransform: 'none',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-          backgroundColor: bottomMenusCollapsed ? '#455a64' : '#7b1fa2',
-          '&:hover': {
-            backgroundColor: bottomMenusCollapsed ? '#37474f' : '#6a1b9a',
-          },
-        }}
-      >
-        {bottomMenusCollapsed ? 'Afficher menus bas' : 'Masquer menus bas'}
-      </Button>
 
                            {windows
           .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window6', 'window7'].includes(window.id)) // Afficher les fenêtres utiles

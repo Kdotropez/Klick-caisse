@@ -37,6 +37,18 @@ export class StorageService {
 
   private static purgeOversizedLocalBackups(): void {
     try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        const normalized = key.toLowerCase();
+        if (
+          normalized.includes('auto_backups') ||
+          normalized.includes('emergency_backup') ||
+          normalized.includes('emergency_recovery')
+        ) {
+          localStorage.removeItem(key);
+        }
+      }
       localStorage.removeItem(this.activeStoreKey('auto_backups'));
       localStorage.removeItem('klick_caisse_auto_backups');
       localStorage.removeItem('klick_emergency_backup');
