@@ -3,13 +3,15 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListIte
 import CustomersListModal from './CustomersListModal';
 import { StorageService } from '../../services/StorageService';
 
+type PaymentFilter = 'all' | 'cash' | 'card' | 'sumup' | 'check';
+
 interface GlobalTicketsModalProps {
   open: boolean;
   onClose: () => void;
   onlyToday: boolean;
   setOnlyToday: (v: boolean) => void;
-  filterPayment: 'all' | 'cash' | 'card' | 'sumup';
-  setFilterPayment: (v: 'all' | 'cash' | 'card' | 'sumup') => void;
+  filterPayment: PaymentFilter;
+  setFilterPayment: (v: PaymentFilter) => void;
   amountMin: string;
   setAmountMin: (v: string) => void;
   amountMax: string;
@@ -171,6 +173,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
       if (filterPayment === 'cash' && !(m === 'cash' || m.includes('esp'))) return false;
       if (filterPayment === 'card' && !(m === 'card' || m.includes('carte'))) return false;
       if (filterPayment === 'sumup' && m !== 'sumup') return false;
+      if (filterPayment === 'check' && !(m === 'check' || m.includes('chèq') || m.includes('cheq'))) return false;
 
       // Filtre par client si demandé
       if (filterCustomerId && String(t.customerId || '') !== String(filterCustomerId)) return false;
@@ -270,7 +273,7 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
       <DialogTitle>Tickets globaux</DialogTitle>
       <DialogContent>
         {/* Boutons de filtres */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 1, mb: 2 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1, mb: 2 }}>
           <Button 
             size="small" 
             variant={filterPayment==='all'?'contained':'outlined'} 
@@ -298,6 +301,13 @@ const GlobalTicketsModal: React.FC<GlobalTicketsModalProps> = ({
             onClick={() => setFilterPayment('sumup')}
           >
             SumUp
+          </Button>
+          <Button 
+            size="small" 
+            variant={filterPayment==='check'?'contained':'outlined'} 
+            onClick={() => setFilterPayment('check')}
+          >
+            Chèque
           </Button>
           <Button 
             size="small" 

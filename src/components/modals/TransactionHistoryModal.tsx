@@ -4,12 +4,14 @@ import { Transaction } from '../../types/Product';
 import { StorageService } from '../../services/StorageService';
 import { List } from 'react-window';
 
+type PaymentFilter = 'all' | 'cash' | 'card' | 'sumup' | 'check';
+
 interface TransactionHistoryModalProps {
   open: boolean;
   onClose: () => void;
   transactions: Transaction[];
-  filterPayment: 'all' | 'cash' | 'card' | 'sumup';
-  setFilterPayment: (v: 'all' | 'cash' | 'card' | 'sumup') => void;
+  filterPayment: PaymentFilter;
+  setFilterPayment: (v: PaymentFilter) => void;
   filterAmountMin: string;
   setFilterAmountMin: (v: string) => void;
   filterAmountMax: string;
@@ -57,6 +59,7 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
       if (filterPayment === 'cash' && !(m === 'cash' || m.includes('esp'))) return false;
       if (filterPayment === 'card' && !(m === 'card' || m.includes('carte'))) return false;
       if (filterPayment === 'sumup' && m !== 'sumup') return false;
+      if (filterPayment === 'check' && !(m === 'check' || m.includes('chèq') || m.includes('cheq'))) return false;
 
       const amount = t.total || 0;
       if (!Number.isNaN(exact) && Math.abs(amount - exact) > 0.009) return false;
@@ -135,11 +138,12 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Tickets de la journée</DialogTitle>
       <DialogContent>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.5, mb: 1 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 0.5, mb: 1 }}>
           <Button size="small" variant={filterPayment==='all'?'contained':'outlined'} onClick={() => setFilterPayment('all')}>Tous</Button>
           <Button size="small" variant={filterPayment==='cash'?'contained':'outlined'} onClick={() => setFilterPayment('cash')}>Espèces</Button>
           <Button size="small" variant={filterPayment==='card'?'contained':'outlined'} onClick={() => setFilterPayment('card')}>Carte</Button>
           <Button size="small" variant={filterPayment==='sumup'?'contained':'outlined'} onClick={() => setFilterPayment('sumup')}>SumUp</Button>
+          <Button size="small" variant={filterPayment==='check'?'contained':'outlined'} onClick={() => setFilterPayment('check')}>Chèque</Button>
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, mb: 1 }}>
           <TextField size="small" label="Montant min" value={filterAmountMin} onChange={(e) => setFilterAmountMin(e.target.value)} inputProps={{ inputMode: 'decimal' }} />

@@ -549,14 +549,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
   const [filterCustomerForTickets, setFilterCustomerForTickets] = useState<string | null>(null);
-  const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
+  const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'check' | 'all'>('cash');
   const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
   const [showEndOfDay, setShowEndOfDay] = useState(false);
   const [showClosures, setShowClosures] = useState(false);
   const [closures, setClosures] = useState<any[]>([]);
   const [selectedClosureIdx, setSelectedClosureIdx] = useState<number | null>(null);
   // Filtres pour la modale tickets jour
-  const [filterPayment, setFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup'>('all');
+  const [filterPayment, setFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup' | 'check'>('all');
   const [filterAmountMin, setFilterAmountMin] = useState<string>('');
   const [filterAmountMax, setFilterAmountMax] = useState<string>('');
   const [filterAmountExact, setFilterAmountExact] = useState<string>('');
@@ -564,7 +564,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Tickets globaux (toutes sauvegardes)
   const [showGlobalTickets, setShowGlobalTickets] = useState(false);
   const [showProReceiptQuick, setShowProReceiptQuick] = useState(false);
-  const [globalFilterPayment, setGlobalFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup'>('all');
+  const [globalFilterPayment, setGlobalFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup' | 'check'>('all');
   const [globalAmountMin, setGlobalAmountMin] = useState<string>('');
   const [globalAmountMax, setGlobalAmountMax] = useState<string>('');
   const [globalAmountExact, setGlobalAmountExact] = useState<string>('');
