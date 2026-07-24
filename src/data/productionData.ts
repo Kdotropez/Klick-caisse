@@ -73,7 +73,15 @@ export const loadProductionData = async (storeCode: string): Promise<{
     
     // Ne pas exiger les sous-catégories : après migration legacy elles peuvent être vides
     // alors que produits + catégories sont déjà dans le blob — sinon on écrase tout par la base intégrée.
-    if (savedProducts.length > 0 || savedCategories.length > 0) {
+    if (savedProducts.length === 0 && savedCategories.length > 0) {
+      console.warn('Base locale incomplète détectée (catégories sans produits), rechargement de la base intégrée.');
+      StorageService.saveProductionData(products, categories, storeCode);
+      const extracted = extractSubcategoriesFromProducts(products);
+      StorageService.saveSubcategories(extracted);
+      return { products, categories };
+    }
+
+    if (savedProducts.length > 0) {
       // Migration automatique: réinjecter les sous-catégories manquantes depuis la base intégrée
       try {
         const refById = new Map<string, { categorie?: string; sousCategorie?: string }>();
