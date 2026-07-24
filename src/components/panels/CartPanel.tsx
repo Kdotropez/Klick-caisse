@@ -14,7 +14,6 @@ import {
 import { Add, Remove, Edit } from '@mui/icons-material';
 import { CartItem } from '../../types/Product';
 import { APP_VERSION } from '../../version';
-import { StorageService } from '../../services/StorageService';
 import {
   computeTicketTotalBreakdown,
   isLineExcludedFromGlobalDiscount,
@@ -80,28 +79,20 @@ const CartPanel: React.FC<CartPanelProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [editingPrice, setEditingPrice] = useState<{ key: string; value: string } | null>(null);
 
-  const settings = useMemo(() => {
-    try {
-      return StorageService.loadSettings() || ({} as any);
-    } catch {
-      return {} as any;
-    }
-  }, []);
+  const exclusionSettings = useMemo(() => loadDiscountExclusionSettings(), []);
 
   // Protection contre les états incohérents avec stabilisation
   const safeCartItems = useMemo(() => {
     if (!Array.isArray(cartItems)) return [];
-    
-    return cartItems.filter(item => 
-      item && 
-      item.product && 
+
+    return cartItems.filter(item =>
+      item &&
+      item.product &&
       typeof item.product.id === 'string' &&
       typeof item.quantity === 'number' &&
       item.quantity > 0
     );
   }, [cartItems]);
-
-  const exclusionSettings = useMemo(() => loadDiscountExclusionSettings(), [settings]);
 
   const totalsBreakdown = useMemo(() => {
     return computeTicketTotalBreakdown(

@@ -5,7 +5,6 @@ import { StorageService } from '../../services/StorageService';
 import CustomersListModal from './CustomersListModal';
 import {
   computeTicketTotal,
-  getLineFinalUnitPrice,
   loadDiscountExclusionSettings,
 } from '../../utils/ticketTotal';
 
