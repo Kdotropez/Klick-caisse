@@ -399,6 +399,19 @@ const mergeTransactionsByDay = (
   return result;
 };
 
+const transactionsByDayFromClosures = (closures: any[]): Record<string, any[]> => {
+  const map: Record<string, any[]> = {};
+  for (const closure of closures) {
+    const txs = Array.isArray(closure?.transactions) ? closure.transactions : [];
+    for (const tx of txs) {
+      const day = getTxDayKey(tx);
+      if (!map[day]) map[day] = [];
+      map[day].push(tx);
+    }
+  }
+  return map;
+};
+
 const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
   const closures = StorageService.loadClosures(storeCode);
   const txs = collectStoreTransactions(storeCode, closures);
@@ -672,9 +685,11 @@ const BackOfficeDashboard: React.FC = () => {
         mergedClosures = mergeClosuresByDay(existingClosures, importedDailyClosures);
         StorageService.saveAllClosures(mergedClosures, targetStoreCode);
       }
-      if (data.transactionsByDay) {
+      const txFromClosures = importedDailyClosures.length > 0 ? transactionsByDayFromClosures(importedDailyClosures) : {};
+      const incomingTransactionsByDay = mergeTransactionsByDay(txFromClosures, data.transactionsByDay || {});
+      if (Object.keys(incomingTransactionsByDay).length > 0) {
         const existingMap = parseMap(localStorage.getItem(StorageService.getStoreKey(targetStoreCode, 'transactions_by_day')));
-        StorageService.saveTransactionsByDayMap(mergeTransactionsByDay(existingMap, data.transactionsByDay), targetStoreCode);
+        StorageService.saveTransactionsByDayMap(mergeTransactionsByDay(existingMap, incomingTransactionsByDay), targetStoreCode);
       }
       if (Number.isFinite(Number(data.zCounter))) {
         const maxZ = (mergedClosures || StorageService.loadClosures(targetStoreCode))
