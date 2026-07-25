@@ -128,6 +128,18 @@ const downloadHtml = (filename: string, title: string, body: string): void => {
   URL.revokeObjectURL(url);
 };
 
+const downloadJson = (filename: string, data: unknown): void => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 const buildStoreHtmlReport = (store: StoreStats): string => {
   const paymentRows = Object.entries(store.paymentTotals).map(([label, amount]) => [label, formatEuro(Number(amount) || 0)]);
   return `
@@ -174,6 +186,42 @@ const buildGlobalHtmlReport = (stores: StoreStats[]): string => `
     ]))}</tbody>
   </table>
 `;
+
+const buildPortableHtmlReport = (stores: StoreStats[]): string => `
+  ${buildGlobalHtmlReport(stores)}
+  ${stores.map((store) => `<div style="break-before: page; page-break-before: always;">${buildStoreHtmlReport(store)}</div>`).join('')}
+`;
+
+const exportBackOfficeBackup = (stores: Array<{ code: string; name: string }>): void => {
+  const backup = {
+    schemaVersion: 1,
+    type: 'klick-back-office-backup',
+    exportedAt: new Date().toISOString(),
+    stores: stores.map((store) => {
+      const productionData = StorageService.loadProductionData(store.code);
+      const transactionsByDay = parseMap(localStorage.getItem(StorageService.getStoreKey(store.code, 'transactions_by_day')));
+      return {
+        code: store.code,
+        name: store.name,
+        productionData,
+        settings: (() => {
+          try { return JSON.parse(localStorage.getItem(StorageService.getStoreKey(store.code, 'settings')) || '{}'); } catch { return {}; }
+        })(),
+        subcategories: (() => {
+          try { return JSON.parse(localStorage.getItem(StorageService.getStoreKey(store.code, 'subcategories')) || '[]'); } catch { return []; }
+        })(),
+        transactionsByDay,
+        closures: StorageService.loadClosures(store.code),
+        zCounter: Number(localStorage.getItem(StorageService.getStoreKey(store.code, 'z_counter')) || '0'),
+        cashiers: StorageService.loadCashiers(store.code),
+        customers: (() => {
+          try { return JSON.parse(localStorage.getItem(StorageService.getStoreKey(store.code, 'customers')) || '[]'); } catch { return []; }
+        })(),
+      };
+    }),
+  };
+  downloadJson(`klick-back-office-backup-${new Date().toISOString().slice(0, 10)}.json`, backup);
+};
 
 const parseMap = (raw: string | null): Record<string, any[]> => {
   try {
@@ -577,6 +625,20 @@ const BackOfficeDashboard: React.FC = () => {
           onClick={() => downloadHtml('rapport-global-boutiques.html', 'Rapport global multi-boutiques', buildGlobalHtmlReport(statsByStore))}
         >
           Export HTML global
+        </Button>
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={() => downloadHtml('rapport-back-office-complet.html', 'Rapport Back office complet', buildPortableHtmlReport(statsByStore))}
+        >
+          HTML portable complet
+        </Button>
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={() => exportBackOfficeBackup(stores)}
+        >
+          Sauvegarde Back office
         </Button>
       </Box>
 
