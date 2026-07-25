@@ -1,7 +1,8 @@
 import { Product, Category, Transaction, Cashier } from '../types';
 import { Customer } from '../types/Customer';
-import { getStoreByCode } from '../types/Store';
+import { BACK_OFFICE_PROFILE_CODE, getStoreByCode } from '../types/Store';
 import { defaultSubcategoriesRegistry } from '../data/subcategoriesRegistry';
+import { computeTicketTotal } from '../utils/ticketTotal';
 
 export class StorageService {
   private static readonly PRODUCTS_KEY = 'klick_caisse_products';
@@ -36,6 +37,9 @@ export class StorageService {
 
   private static purgeOversizedLocalBackups(): void {
     try {
+      this.downloadLocalStorageArchiveBeforePurge();
+      // Ne jamais purger automatiquement les traces de sauvegarde des autres boutiques.
+      // On limite la récupération de quota à la boutique active et aux anciennes clés globales.
       localStorage.removeItem(this.activeStoreKey('auto_backups'));
       localStorage.removeItem('klick_caisse_auto_backups');
       localStorage.removeItem('klick_emergency_backup');
@@ -45,13 +49,68 @@ export class StorageService {
     }
   }
 
+  private static downloadLocalStorageArchiveBeforePurge(): void {
+    try {
+      if (typeof document === 'undefined') return;
+      const storeCode = this.getCurrentStoreCode();
+      const sessionKey = `klick_quota_archive_downloaded_${storeCode}`;
+      try {
+        if (sessionStorage.getItem(sessionKey) === '1') return;
+      } catch {
+        /* ignore */
+      }
+
+      const snapshot: Record<string, string> = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        snapshot[key] = localStorage.getItem(key) || '';
+      }
+
+      const archive = {
+        schemaVersion: 1,
+        type: 'localStorage-archive-before-quota-cleanup',
+        exportedAt: new Date().toISOString(),
+        storeCode,
+        localStorage: snapshot,
+      };
+      const blob = new Blob([JSON.stringify(archive, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const filename = `${this.backupFilePrefix(storeCode)}-archive-avant-nettoyage-quota-${this.datedStamp(new Date())}.json`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      try {
+        sessionStorage.setItem(sessionKey, '1');
+      } catch {
+        /* ignore */
+      }
+      console.warn(`Archive locale créée avant nettoyage quota: ${filename}`);
+    } catch (error) {
+      console.warn('Impossible de créer l’archive locale avant nettoyage quota:', error);
+    }
+  }
+
   private static setItemWithQuotaRecovery(key: string, value: string): void {
     try {
       localStorage.setItem(key, value);
     } catch (error) {
       if (!this.isQuotaExceeded(error)) throw error;
       this.purgeOversizedLocalBackups();
-      localStorage.setItem(key, value);
+      try {
+        localStorage.setItem(key, value);
+      } catch (retryError) {
+        if (!this.isQuotaExceeded(retryError)) throw retryError;
+        // Dernier recours: la nouvelle valeur est peut-être plus grosse que l'ancienne.
+        // Une archive locale a déjà été créée par purgeOversizedLocalBackups().
+        localStorage.removeItem(key);
+        localStorage.setItem(key, value);
+      }
     }
   }
 
@@ -100,6 +159,9 @@ export class StorageService {
 
   /** Le mot de passe d’ouverture est le nom de la boutique (voir STORES). */
   static verifyStoreAccessPin(storeCode: string, input: string): boolean {
+    if (storeCode === BACK_OFFICE_PROFILE_CODE) {
+      return this.normalizeStoreNameForAccess(input) === this.normalizeStoreNameForAccess('hermitan');
+    }
     const expected = this.getStoreAccessExpectedLabel(storeCode);
     if (!expected) return false;
     return this.normalizeStoreNameForAccess(input) === this.normalizeStoreNameForAccess(expected);
@@ -149,7 +211,7 @@ export class StorageService {
 
     const copy = (legacyKey: string, suffix: string) => {
       const v = localStorage.getItem(legacyKey);
-      if (v) localStorage.setItem(this.getStoreKey(storeCode, suffix), v);
+      if (v) this.setItemWithQuotaRecovery(this.getStoreKey(storeCode, suffix), v);
     };
 
     copy('klick_caisse_transactions_by_day', 'transactions_by_day');
@@ -165,17 +227,23 @@ export class StorageService {
     const c = localStorage.getItem(this.CATEGORIES_KEY);
     const legacyProducts = this.parseLegacyProductsRaw(p);
     const legacyCategories = this.parseLegacyCategoriesRaw(c);
+    let productCatalogMigrationOk = true;
     if (legacyProducts.length > 0 || legacyCategories.length > 0) {
       try {
         /** Éviter export auto + téléchargement JSON pendant la migration (gros volume → UI bloquée). */
         this.saveProductionData(legacyProducts, legacyCategories, storeCode, { skipAutoBackup: true });
       } catch (e) {
+        productCatalogMigrationOk = false;
         console.error('Migration legacy produits/catégories:', e);
       }
     }
     copy(this.CASHIERS_KEY, 'cashiers');
 
-    localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+    if (productCatalogMigrationOk) {
+      this.setItemWithQuotaRecovery(this.STORE_MIGRATION_FLAG, '1');
+    } else {
+      console.warn('Migration legacy incomplète: le catalogue produits/catégories sera reproposé au prochain démarrage.');
+    }
   }
 
   /**
@@ -204,7 +272,7 @@ export class StorageService {
         /* ignore */
       }
     }
-    localStorage.setItem(this.STORE_MIGRATION_FLAG, '1');
+    this.setItemWithQuotaRecovery(this.STORE_MIGRATION_FLAG, '1');
   }
 
   static getTransactionsByDayRaw(): string | null {
@@ -226,12 +294,14 @@ export class StorageService {
     }
   }
 
-  static saveTransactionsByDayMap(map: Record<string, any[]>): void {
-    this.setTransactionsByDayRaw(JSON.stringify(map));
+  static saveTransactionsByDayMap(map: Record<string, any[]>, storeCode?: string): void {
+    const key = storeCode ? this.getStoreKey(storeCode, 'transactions_by_day') : this.activeStoreKey('transactions_by_day');
+    this.setItemWithQuotaRecovery(key, JSON.stringify(map));
   }
 
-  static setZCounterValue(n: number): void {
-    this.setItemWithQuotaRecovery(this.activeStoreKey('z_counter'), String(n));
+  static setZCounterValue(n: number, storeCode?: string): void {
+    const key = storeCode ? this.getStoreKey(storeCode, 'z_counter') : this.activeStoreKey('z_counter');
+    this.setItemWithQuotaRecovery(key, String(n));
   }
 
   // Sauvegarder les produits
@@ -242,7 +312,7 @@ export class StorageService {
       const categories =
         pd && Array.isArray(pd.categories) && pd.categories.length > 0
           ? pd.categories
-          : this.loadCategories();
+          : this.loadCategories(code);
       this.saveProductionData(products, categories, code);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des produits:', error);
@@ -259,9 +329,10 @@ export class StorageService {
     } catch { return []; }
   }
 
-  static saveCustomers(customers: Customer[]): void {
+  static saveCustomers(customers: Customer[], storeCode?: string): void {
     try {
-      localStorage.setItem(this.activeStoreKey('customers'), JSON.stringify(customers));
+      const key = storeCode ? this.getStoreKey(storeCode, 'customers') : this.activeStoreKey('customers');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(customers));
     } catch {}
   }
 
@@ -289,13 +360,15 @@ export class StorageService {
   }
 
   // Charger les produits
-  static loadProducts(): Product[] {
+  static loadProducts(storeCode?: string, opts?: { skipLegacy?: boolean }): Product[] {
     try {
-      const code = this.getCurrentStoreCode();
+      const code = storeCode ?? this.getCurrentStoreCode();
       const pd = this.loadProductionData(code);
       if (pd && Array.isArray(pd.products) && pd.products.length > 0) {
         return pd.products;
       }
+      const canUseLegacyFallback = !opts?.skipLegacy && !localStorage.getItem(this.STORE_MIGRATION_FLAG);
+      if (!canUseLegacyFallback) return [];
       const data = localStorage.getItem(this.PRODUCTS_KEY);
       if (!data) return [];
       
@@ -337,7 +410,7 @@ export class StorageService {
       const products =
         pd && Array.isArray(pd.products) && pd.products.length > 0
           ? pd.products
-          : this.loadProducts();
+          : this.loadProducts(code);
       this.saveProductionData(products, categories, code);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des catégories:', error);
@@ -345,13 +418,15 @@ export class StorageService {
   }
 
   // Charger les catégories
-  static loadCategories(): Category[] {
+  static loadCategories(storeCode?: string, opts?: { skipLegacy?: boolean }): Category[] {
     try {
-      const code = this.getCurrentStoreCode();
+      const code = storeCode ?? this.getCurrentStoreCode();
       const pd = this.loadProductionData(code);
       if (pd && Array.isArray(pd.categories) && pd.categories.length > 0) {
         return pd.categories;
       }
+      const canUseLegacyFallback = !opts?.skipLegacy && !localStorage.getItem(this.STORE_MIGRATION_FLAG);
+      if (!canUseLegacyFallback) return [];
       const data = localStorage.getItem(this.CATEGORIES_KEY);
       if (!data) return [];
       
@@ -386,9 +461,10 @@ export class StorageService {
   }
 
   // Sauvegarder les paramètres
-  static saveSettings(settings: any): void {
+  static saveSettings(settings: any, storeCode?: string): void {
     try {
-      localStorage.setItem(this.activeStoreKey('settings'), JSON.stringify(settings));
+      const key = storeCode ? this.getStoreKey(storeCode, 'settings') : this.activeStoreKey('settings');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(settings));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des paramètres:', error);
     }
@@ -470,7 +546,7 @@ export class StorageService {
     }
   }
 
-  static saveSubcategories(subcategories: string[]): void {
+  static saveSubcategories(subcategories: string[], storeCode?: string): void {
     try {
       const unique = Array.from(new Set(subcategories
         // eslint-disable-next-line no-control-regex
@@ -483,7 +559,8 @@ export class StorageService {
           return alnum.length >= 2; // ignorer \u0000S, 'c', 'b', etc.
         })))
         .sort();
-      localStorage.setItem(this.activeStoreKey('subcategories'), JSON.stringify(unique));
+      const key = storeCode ? this.getStoreKey(storeCode, 'subcategories') : this.activeStoreKey('subcategories');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(unique));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des sous-catégories:', error);
     }
@@ -514,11 +591,6 @@ export class StorageService {
           return alnum.length >= 2;
         })
       )).sort();
-      
-      // Sauvegarder automatiquement les sous-catégories synchronisées
-      if (productSubcategories.length > 0) {
-        this.saveSubcategories(merged);
-      }
       
       return merged;
     } catch (error) {
@@ -599,10 +671,23 @@ export class StorageService {
 
   private static computeTransactionTotalFromItems(t: any): number {
     try {
-      return (Array.isArray(t.items) ? t.items : []).reduce((sum: number, item: any) => {
-        const unit = item?.selectedVariation?.finalPrice ?? item?.product?.finalPrice ?? 0;
-        return sum + this.coerceAmount(unit) * (Number(item?.quantity) || 0);
-      }, 0);
+      const settings = this.loadSettings() || {};
+      return computeTicketTotal(
+        Array.isArray(t.items) ? t.items : [],
+        t.itemDiscounts || {},
+        t.globalDiscount ?? null,
+        {
+          excludedDiscountCategories: Array.isArray(settings.excludedDiscountCategories)
+            ? settings.excludedDiscountCategories
+            : [],
+          excludedDiscountSubcategories: Array.isArray((settings as any).excludedDiscountSubcategories)
+            ? (settings as any).excludedDiscountSubcategories
+            : [],
+          excludedDiscountProductIds: Array.isArray((settings as any).excludedDiscountProductIds)
+            ? (settings as any).excludedDiscountProductIds
+            : [],
+        }
+      );
     } catch {
       return 0;
     }
@@ -677,7 +762,7 @@ export class StorageService {
   }
 
   // ---------- Clôture (archives) ----------
-  static loadClosures(): any[] {
+  static loadClosures(storeCode?: string): any[] {
     const parseArray = (raw: string | null): any[] | null => {
       if (raw == null || raw === '') return null;
       try {
@@ -688,8 +773,10 @@ export class StorageService {
       }
     };
     try {
-      const fromStore = parseArray(localStorage.getItem(this.activeStoreKey('closures')));
+      const key = storeCode ? this.getStoreKey(storeCode, 'closures') : this.activeStoreKey('closures');
+      const fromStore = parseArray(localStorage.getItem(key));
       if (fromStore && fromStore.length > 0) return fromStore;
+      if (storeCode) return [];
       const fromLegacy = parseArray(localStorage.getItem(this.LEGACY_CLOSURES_KEY));
       if (fromLegacy && fromLegacy.length > 0) return fromLegacy;
       return [];
@@ -709,9 +796,10 @@ export class StorageService {
     }
   }
 
-  static saveAllClosures(closures: any[]): void {
+  static saveAllClosures(closures: any[], storeCode?: string): void {
     try {
-      this.setItemWithQuotaRecovery(this.activeStoreKey('closures'), JSON.stringify(closures || []));
+      const key = storeCode ? this.getStoreKey(storeCode, 'closures') : this.activeStoreKey('closures');
+      this.setItemWithQuotaRecovery(key, JSON.stringify(closures || []));
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement des clôtures:', error);
     }
@@ -927,7 +1015,7 @@ export class StorageService {
     const code = storeCode ?? this.getCurrentStoreCode();
     const key = this.getStoreKey(code, 'cashiers');
     try {
-      localStorage.setItem(key, JSON.stringify(cashiers));
+      this.setItemWithQuotaRecovery(key, JSON.stringify(cashiers));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des caissiers:', error);
     }
@@ -1077,12 +1165,12 @@ export class StorageService {
       // Accepte deux notations pour transactions et zCounter
       const transactionsByDay = (data as any).transactionsByDay ?? (data as any).transactions_by_day ?? (data as any).klick_caisse_transactions_by_day;
       if (transactionsByDay && typeof transactionsByDay === 'object') {
-        localStorage.setItem(this.activeStoreKey('transactions_by_day'), JSON.stringify(transactionsByDay));
+        this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(transactionsByDay));
       }
       const closures = (data as any).closures ?? (data as any).klick_caisse_closures;
       if (Array.isArray(closures)) this.saveAllClosures(closures);
       const zCounter = (data as any).zCounter ?? (data as any).z_counter ?? (data as any).klick_caisse_z_counter;
-      if (Number.isFinite(Number(zCounter))) localStorage.setItem(this.activeStoreKey('z_counter'), String(Number(zCounter)));
+      if (Number.isFinite(Number(zCounter))) this.setItemWithQuotaRecovery(this.activeStoreKey('z_counter'), String(Number(zCounter)));
       const cashiers = (data as any).cashiers;
       if (Array.isArray(cashiers)) this.saveCashiers(cashiers);
       const customers = (data as any).customers;
@@ -1205,7 +1293,7 @@ export class StorageService {
       if (Number.isFinite(last) && now - last < this.AUTO_BACKUP_DOWNLOAD_THROTTLE_MS) {
         return false;
       }
-      localStorage.setItem(key, String(now));
+      this.setItemWithQuotaRecovery(key, String(now));
       return true;
     } catch {
       return true;
@@ -1312,7 +1400,7 @@ export class StorageService {
   static saveTransactions(transactions: Transaction[], storeCode?: string): void {
     const code = storeCode ?? this.getCurrentStoreCode();
     const key = this.getStoreKey(code, 'transactions');
-    localStorage.setItem(key, JSON.stringify(transactions));
+    this.setItemWithQuotaRecovery(key, JSON.stringify(transactions));
   }
 
   static loadTransactions(storeCode?: string): Transaction[] {
@@ -1334,7 +1422,43 @@ export class StorageService {
   }
 
   static setCurrentStoreCode(storeCode: string): void {
-    localStorage.setItem('klick_caisse_current_store', storeCode);
+    this.setItemWithQuotaRecovery('klick_caisse_current_store', storeCode);
+  }
+
+  static prepareActiveStoreForFullRestore(storeCode?: string): void {
+    this.downloadLocalStorageArchiveBeforePurge();
+    const keyFor = (suffix: string) => storeCode ? this.getStoreKey(storeCode, suffix) : this.activeStoreKey(suffix);
+    const keys = [
+      'productionData',
+      'transactions_by_day',
+      'transactions',
+      'closures',
+      'z_counter',
+      'settings',
+      'subcategories',
+      'customers',
+      'cashiers',
+      'pro_receipts',
+      'auto_backups',
+    ];
+    for (const suffix of keys) {
+      try {
+        localStorage.removeItem(keyFor(suffix));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  static clearStoreCatalogForRestore(storeCode?: string): void {
+    this.downloadLocalStorageArchiveBeforePurge();
+    const code = storeCode ?? this.getCurrentStoreCode();
+    try {
+      localStorage.removeItem(this.getStoreKey(code, 'productionData'));
+      localStorage.removeItem(this.getStoreKey(code, 'auto_backups'));
+    } catch {
+      /* ignore */
+    }
   }
 
   static getAllStoreData(storeCode: string): {

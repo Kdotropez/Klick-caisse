@@ -38,7 +38,11 @@ const StoreSelectModal: React.FC<StoreSelectModalProps> = ({ initialCode, onConf
 
   const handleOpenCaisse = () => {
     if (!StorageService.verifyStoreAccessPin(selected, pin)) {
-      setPinError(`Saisissez le nom de la boutique : ${selectedStore?.name ?? ''}.`);
+      setPinError(
+        selectedStore?.isBackOfficeProfile
+          ? 'Mot de passe back office incorrect.'
+          : `Saisissez le nom de la boutique : ${selectedStore?.name ?? ''}.`
+      );
       return;
     }
     setPinError(null);
@@ -107,14 +111,23 @@ const StoreSelectModal: React.FC<StoreSelectModalProps> = ({ initialCode, onConf
           </DialogTitle>
           <DialogContent>
             <Alert severity="info" sx={{ mb: 2 }}>
-              Saisissez le <strong>nom de la boutique</strong> exactement comme affiché :{' '}
-              <strong>{selectedStore?.name}</strong>. La casse et les accents sont tolérés (ex. « saint tropez » pour
-              Saint Tropez).
+              {selectedStore?.isBackOfficeProfile ? (
+                <>
+                  Saisissez le <strong>mot de passe back office</strong>.
+                </>
+              ) : (
+                <>
+                  Saisissez le <strong>nom de la boutique</strong> exactement comme affiché :{' '}
+                  <strong>{selectedStore?.name}</strong>. La casse et les accents sont tolérés (ex. « saint tropez » pour
+                  Saint Tropez).
+                </>
+              )}
             </Alert>
             <TextField
               fullWidth
               autoCapitalize="words"
-              label="Nom de la boutique"
+              label={selectedStore?.isBackOfficeProfile ? 'Mot de passe back office' : 'Nom de la boutique'}
+              type={selectedStore?.isBackOfficeProfile ? 'password' : 'text'}
               value={pin}
               onChange={(e) => {
                 setPin(e.target.value);

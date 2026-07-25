@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box } from '@mui/material';
 import WindowManager from './components/WindowManager';
+import BackOfficeDashboard from './components/BackOfficeDashboard';
 import LicenseModal from './components/LicenseModal';
 import StoreSelectModal from './components/StoreSelectModal';
 import LegacyMigrationModal from './components/LegacyMigrationModal';
 
 import { Product, Category, CartItem, ProductVariation } from './types';
-import { STORES } from './types/Store';
+import { BACK_OFFICE_DEFAULT_STORE_CODE, BACK_OFFICE_PROFILE_CODE, STORES } from './types/Store';
 import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
 // import { UpdateService } from './services/UpdateService';
-// import { APP_VERSION } from './version';
+import { APP_VERSION } from './version';
 import { useUISettings } from './context/UISettingsContext';
 
 const MIN_ROOT_WIDTH = 800;
@@ -139,16 +140,17 @@ const App: React.FC = () => {
 
   const handleProductClick = (product: Product) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
+      const existingItem = prevItems.find(
+        (item) => item.product.id === product.id && !item.selectedVariation
+      );
       if (existingItem) {
-        return prevItems.map(item =>
-          item.product.id === product.id
+        return prevItems.map((item) =>
+          item.product.id === product.id && !item.selectedVariation
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
-      } else {
-        return [...prevItems, { product, quantity: 1 }];
       }
+      return [...prevItems, { product, quantity: 1 }];
     });
   };
 
@@ -358,6 +360,27 @@ const App: React.FC = () => {
     }
   }, [isLicenseValid, lastValidatedDate, lastActivity, isLocked, checkLicenseValidity, checkAutoLock]);
 
+  useEffect(() => {
+    if (!storeSessionReady || !isLicenseValid || isLocked) return;
+    try {
+      if (localStorage.getItem('ui.backOfficeCentral') === '1') return;
+      const key = StorageService.getStoreKey(currentStoreCode, `safety_backup_before_version_${APP_VERSION}`);
+      if (localStorage.getItem(key) === '1') return;
+      const timer = window.setTimeout(() => {
+        try {
+          StorageService.downloadFullBackup();
+          localStorage.setItem(key, '1');
+          console.log(`Sauvegarde sécurité version ${APP_VERSION} créée pour boutique ${currentStoreCode}`);
+        } catch (error) {
+          console.error('Erreur sauvegarde sécurité avant nouvelle version:', error);
+        }
+      }, 700);
+      return () => window.clearTimeout(timer);
+    } catch {
+      return;
+    }
+  }, [currentStoreCode, isLicenseValid, isLocked, storeSessionReady]);
+
   const rootWidthPx = parseInt(rootSize.width);
   const rootHeightPx = parseInt(rootSize.height);
   const baseScale = compactMode ? 0.9 : 1;
@@ -528,17 +551,6 @@ const App: React.FC = () => {
     document.addEventListener('touchcancel', onUp);
   };
 
-  // Si la licence n'est pas valide ou si l'application est verrouillée, afficher la modale de licence
-  if (!isLicenseValid || isLocked) {
-    return (
-      <LicenseModal 
-        open={showLicenseModal} 
-        onLicenseValid={handleLicenseValid}
-        isLocked={isLocked}
-      />
-    );
-  }
-
   if (!legacyMigrationDone) {
     return (
       <LegacyMigrationModal
@@ -583,10 +595,45 @@ const App: React.FC = () => {
           } catch {
             /* ignore */
           }
-          StorageService.setCurrentStoreCode(code);
-          setCurrentStoreCode(code);
+          const effectiveStoreCode = code === BACK_OFFICE_PROFILE_CODE ? BACK_OFFICE_DEFAULT_STORE_CODE : code;
+          const isBackOfficeLogin = code === BACK_OFFICE_PROFILE_CODE;
+          try {
+            localStorage.setItem('ui.backOfficeCentral', isBackOfficeLogin ? '1' : '0');
+          } catch {
+            /* ignore */
+          }
+          if (isBackOfficeLogin) {
+            setIsLicenseValid(true);
+            setShowLicenseModal(false);
+            setIsLocked(false);
+            setLastValidatedDate(new Date().toLocaleDateString('fr-FR'));
+          } else {
+            setIsLicenseValid(false);
+            setShowLicenseModal(true);
+          }
+          StorageService.setCurrentStoreCode(effectiveStoreCode);
+          setCurrentStoreCode(effectiveStoreCode);
           setStoreSessionReady(true);
         }}
+      />
+    );
+  }
+
+  const isBackOfficeCentral = (() => {
+    try {
+      return localStorage.getItem('ui.backOfficeCentral') === '1';
+    } catch {
+      return false;
+    }
+  })();
+
+  // Le code du jour/licence reste obligatoire pour les postes caisse, mais pas pour le profil Back office.
+  if ((!isLicenseValid || isLocked) && !isBackOfficeCentral) {
+    return (
+      <LicenseModal 
+        open={showLicenseModal} 
+        onLicenseValid={handleLicenseValid}
+        isLocked={isLocked}
       />
     );
   }
@@ -595,6 +642,14 @@ const App: React.FC = () => {
     width: parseInt(rootSize.width, 10) || MIN_ROOT_WIDTH,
     height: parseInt(rootSize.height, 10) || MIN_ROOT_HEIGHT,
   };
+
+  if (isBackOfficeCentral) {
+    return (
+      <Box sx={{ height: rootSize.height, width: rootSize.width, backgroundColor: '#f4f6f8', overflow: 'hidden' }}>
+        <BackOfficeDashboard />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{

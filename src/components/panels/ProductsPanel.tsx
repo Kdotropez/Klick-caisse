@@ -110,7 +110,7 @@ const ProductCard = memo<ProductCardProps>(function ProductCard({
       onDrop={onDrop}
       onDragEnd={(e) => { if (!isEditMode) onDragEnd(e); }}
     >
-      <Box sx={{ position: 'relative', flexGrow: 1 }}>
+      <Box sx={{ position: 'relative', flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0 }}>
         {isEditMode && (
           <Box
             sx={{
@@ -166,18 +166,22 @@ const ProductCard = memo<ProductCardProps>(function ProductCard({
         <Typography
           variant="body2"
           sx={{
-            fontWeight: '600',
-            fontSize: `${Math.max(0.75, 0.85 * cardScaleFactor)}rem`,
-            lineHeight: 1.1,
+            fontWeight: '900',
+            fontSize: `${Math.max(0.95, 1.16 * cardScaleFactor)}rem`,
+            lineHeight: 1.08,
             flexGrow: 1,
-            color: '#2c3e50',
+            color: '#102027',
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textAlign: 'center',
-            justifyContent: 'center',
-            alignItems: 'center'
+            px: 0.5,
+            py: 0.35,
+            borderRadius: 1,
+            backgroundColor: 'rgba(255,255,255,0.55)',
+            textShadow: '0 1px 0 rgba(255,255,255,0.7)',
+            letterSpacing: '-0.01em',
           }}
         >
           {product.name}
@@ -286,9 +290,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   onProductClick,
   onEditProduct,
 }) => {
-  const headerHeight = 82;
   const { cols, rows, cardWidth, cardHeight, prevCellIndex, nextCellIndex, totalCells } = gridLayout;
-  const totalHeightToSubtract = 2 * rows + 1;
   const cellIndices = useMemo(() => Array.from({ length: totalCells }, (_, index) => index), [totalCells]);
   const cardScaleFactor = useMemo(() => Math.min(cardWidth / 150, cardHeight / 120), [cardWidth, cardHeight]);
 
@@ -302,12 +304,13 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           gridTemplateRows: `repeat(${rows}, ${cardHeight}px)`,
           gap: '1px',
           p: '1px',
-          overflow: 'hidden',
+          overflow: 'auto',
           minHeight: 0,
           width: '100%',
-          height: `${headerHeight + totalHeightToSubtract + cardHeight * rows}px`,
+          height: '100%',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignContent: 'start',
+          alignItems: 'start',
           boxSizing: 'border-box',
         }}
       >

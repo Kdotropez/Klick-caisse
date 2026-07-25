@@ -177,6 +177,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [showProReceipt, setShowProReceipt] = useState(false);
   const [showProManager, setShowProManager] = useState(false);
   const [showHelpManual, setShowHelpManual] = useState(false);
+  const [isBackOfficeCentral, setIsBackOfficeCentral] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ui.backOfficeCentral') === '1';
+    } catch {
+      return false;
+    }
+  });
 
   const [adminTapCount, setAdminTapCount] = useState(0);
   const lastAdminTapRef = React.useRef<number>(0);
@@ -200,6 +207,16 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         // eslint-disable-next-line no-alert
         window.alert('Mode administrateur activé.');
       }
+    }
+  };
+
+  const toggleBackOfficeCentral = () => {
+    const next = !isBackOfficeCentral;
+    setIsBackOfficeCentral(next);
+    try {
+      localStorage.setItem('ui.backOfficeCentral', next ? '1' : '0');
+    } catch {
+      /* ignore */
     }
   };
 
@@ -298,7 +315,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const totalPaddingHeight = 8;
   const availableWidth = width - totalGapsWidth - totalPaddingWidth;
   const availableHeight = height - totalGapsHeight - totalPaddingHeight;
-  const buttonWidth = Math.floor(availableWidth / 3);
+  const columns = width >= 900 ? 5 : width >= 700 ? 4 : 3;
+  const buttonWidth = Math.floor(availableWidth / columns);
   const buttonHeight = Math.floor(availableHeight / 4);
 
   
@@ -308,7 +326,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       sx={{
         height: '100%',
         display: 'grid',
-        gridTemplateColumns: `repeat(3, ${buttonWidth}px)`,
+        gridTemplateColumns: `repeat(${columns}, ${buttonWidth}px)`,
         gridAutoRows: `${buttonHeight}px`,
         gap: `${gap}px`,
         p: 0.5,
@@ -336,14 +354,22 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Checkbox checked={compactMode} onChange={(e) => setCompactMode(e.target.checked)} />
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Mode compact</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Compact petits écrans</Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Checkbox checked={autoFit} onChange={(e) => setAutoFit(e.target.checked)} />
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Auto-fit</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Ajustement auto écran</Typography>
         </Box>
         {isAdmin && (
-          <Box sx={{ ml: 'auto', pl: 1 }}>
+          <Box sx={{ ml: 'auto', pl: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Button
+              size="small"
+              variant={isBackOfficeCentral ? 'contained' : 'outlined'}
+              onClick={(e) => { e.stopPropagation(); toggleBackOfficeCentral(); }}
+              sx={{ fontSize: '0.65rem', minWidth: 0, whiteSpace: 'nowrap' }}
+            >
+              Back office {isBackOfficeCentral ? 'ON' : 'OFF'}
+            </Button>
             <Button size="small" variant="text" onClick={(e) => { e.stopPropagation(); lock(); }} sx={{ fontSize: '0.7rem', minWidth: 0 }}>
               Admin
             </Button>
@@ -447,8 +473,24 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             const products = StorageService.loadProducts() as any[];
             const categories = StorageService.loadCategories() as any[];
             const subcats = StorageService.loadSubcategories();
+            const code = StorageService.getCurrentStoreCode();
+            const prodKey = StorageService.getStoreKey(code, 'productionData');
+            const prodBlob = localStorage.getItem(prodKey) || '';
+            const totalBytes = Object.keys(localStorage).reduce((sum, key) => {
+              const value = localStorage.getItem(key) || '';
+              return sum + key.length + value.length;
+            }, 0);
             const sample = products.slice(0, 5).map(p => ({ id: p.id, cat: p.category, sub: p.associatedCategories }));
-            alert(`Produits: ${products.length}\nCatégories: ${categories.length}\nSous-catégories (registre): ${subcats.length}\nExemples:\n${JSON.stringify(sample, null, 2)}`);
+            alert(
+              `Boutique: ${code}\n` +
+              `Produits: ${products.length}\n` +
+              `Catégories: ${categories.length}\n` +
+              `Sous-catégories (registre): ${subcats.length}\n` +
+              `Blob productionData: ${(prodBlob.length / 1024).toFixed(1)} Ko\n` +
+              `Stockage local total: ${(totalBytes / 1024).toFixed(1)} Ko\n` +
+              `Migration legacy: ${localStorage.getItem(StorageService.STORE_MIGRATION_FLAG) ? 'faite' : 'non faite'}\n\n` +
+              `Exemples:\n${JSON.stringify(sample, null, 2)}`
+            );
           } catch (e) { alert('Erreur diagnostics'); }
         }}
       >
@@ -723,6 +765,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         💾 Sauvegarde
       </Button>
 
+      {isBackOfficeCentral && (
       <Button
         variant="contained"
         sx={{
@@ -763,35 +806,88 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   hasSubcategories: !!data.subcategories,
                   hasTransactions: !!data.transactionsByDay
                 });
+
+                const targetStoreCode = isBackOfficeCentral && data.storeCode
+                  ? String(data.storeCode)
+                  : StorageService.getCurrentStoreCode();
+                const targetStoreName = data.storeName || `Boutique ${targetStoreCode}`;
+                if (isBackOfficeCentral && data.storeCode) {
+                  const okTarget = window.confirm(
+                    `Restaurer cette sauvegarde dans la boutique du fichier ?\n\n` +
+                    `Boutique: ${targetStoreName}\nCode: ${targetStoreCode}\n\n` +
+                    `Le PC central peut ensuite ouvrir cette boutique pour consulter les Z, ventes et statistiques.`
+                  );
+                  if (!okTarget) return;
+                }
                 
+                let catalogPersisted = true;
+
                 // Restaurer les données (boutique courante)
                 if (data.products && data.categories) {
-                  StorageService.saveProductionData(data.products, data.categories);
-                  console.log('✅ Produits + catégories restaurés:', data.products.length, data.categories.length);
+                  try {
+                    StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
+                  } catch (restoreError) {
+                    const ok = window.confirm(
+                      'Le stockage navigateur est plein.\n\n' +
+                      'Une archive de sécurité va être téléchargée, puis les données de la boutique courante seront vidées avant de relancer la restauration.\n\n' +
+                      'Continuer ?'
+                    );
+                    if (!ok) throw restoreError;
+                    StorageService.clearStoreCatalogForRestore(targetStoreCode);
+                    try {
+                      StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
+                    } catch (retryError) {
+                      catalogPersisted = false;
+                      console.warn('Catalogue non sauvegardé localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
+                    }
+                  }
+                  console.log(catalogPersisted ? '✅ Produits + catégories restaurés:' : '⚠️ Catalogue chargé depuis base intégrée/non persisté:', data.products.length, data.categories.length);
                 } else {
                   if (data.products) {
-                    StorageService.saveProducts(data.products);
+                    try {
+                      const categoriesForTarget = Array.isArray(data.categories) ? data.categories : [];
+                      StorageService.saveProductionData(data.products, categoriesForTarget, targetStoreCode, { skipAutoBackup: true });
+                    } catch (restoreError) {
+                      const ok = window.confirm(
+                        'Le stockage navigateur est plein.\n\nCréer une archive, vider la boutique courante puis relancer la restauration ?'
+                      );
+                      if (!ok) throw restoreError;
+                      StorageService.clearStoreCatalogForRestore(targetStoreCode);
+                      try {
+                        const categoriesForTarget = Array.isArray(data.categories) ? data.categories : [];
+                        StorageService.saveProductionData(data.products, categoriesForTarget, targetStoreCode, { skipAutoBackup: true });
+                      } catch (retryError) {
+                        catalogPersisted = false;
+                        console.warn('Produits non sauvegardés localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
+                      }
+                    }
                     console.log('✅ Produits restaurés:', data.products.length);
                   }
                   if (data.categories) {
-                    StorageService.saveCategories(data.categories);
+                    try {
+                      const productsForTarget = Array.isArray(data.products) ? data.products : [];
+                      StorageService.saveProductionData(productsForTarget, data.categories, targetStoreCode, { skipAutoBackup: true });
+                    } catch (retryError) {
+                      catalogPersisted = false;
+                      console.warn('Catégories non sauvegardées localement après nettoyage quota. La restauration continue sans bloquer.', retryError);
+                    }
                     console.log('✅ Catégories restaurées:', data.categories.length);
                   }
                 }
 
                 if (data.settings) {
-                  StorageService.saveSettings(data.settings);
+                  StorageService.saveSettings(data.settings, targetStoreCode);
                   console.log('✅ Paramètres restaurés');
                 }
 
                 if (data.subcategories) {
-                  StorageService.saveSubcategories(data.subcategories);
+                  StorageService.saveSubcategories(data.subcategories, targetStoreCode);
                   console.log('✅ Sous-catégories restaurées:', data.subcategories.length);
                 }
                 
                 if (data.closures) {
                   // Fusionner intelligemment les clôtures au lieu de les remplacer
-                  const currentClosures = StorageService.loadClosures();
+                  const currentClosures = StorageService.loadClosures(targetStoreCode);
                   const newClosures = data.closures;
                   
                   // Créer un Set des numéros Z existants pour éviter les doublons
@@ -814,35 +910,41 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   // Trier par numéro Z
                   mergedClosures.sort((a: any, b: any) => a.zNumber - b.zNumber);
                   
-                  StorageService.saveAllClosures(mergedClosures);
+                  StorageService.saveAllClosures(mergedClosures, targetStoreCode);
                   console.log(`✅ Clôtures fusionnées: ${addedCount} nouvelles + ${currentClosures.length} existantes = ${mergedClosures.length} total`);
                 }
 
                 if (data.zCounter !== undefined) {
-                  StorageService.setZCounterValue(Number(data.zCounter));
+                  StorageService.setZCounterValue(Number(data.zCounter), targetStoreCode);
                   console.log('✅ Compteur Z restauré:', data.zCounter);
                 }
 
                 if (data.transactionsByDay) {
-                  StorageService.saveTransactionsByDayMap(data.transactionsByDay as Record<string, any[]>);
+                  StorageService.saveTransactionsByDayMap(data.transactionsByDay as Record<string, any[]>, targetStoreCode);
                   console.log('✅ Transactions restaurées');
                 }
 
                 if (data.cashiers) {
-                  StorageService.saveCashiers(data.cashiers);
+                  StorageService.saveCashiers(data.cashiers, targetStoreCode);
                   console.log('✅ Caissiers restaurés:', data.cashiers.length);
+                }
+                if (data.customers) {
+                  StorageService.saveCustomers(data.customers, targetStoreCode);
+                  console.log('✅ Clients restaurés:', data.customers.length);
                 }
                 
                 // Calculer le nombre total de clôtures après fusion
-                const finalClosures = StorageService.loadClosures();
+                const finalClosures = StorageService.loadClosures(targetStoreCode);
                 const finalZNumbers = finalClosures.map((c: any) => c.zNumber).sort((a: number, b: number) => a - b);
                 
                 const message = `✅ Restauration terminée avec succès !\n\n` +
                                `📦 ${data.products?.length || 0} produits\n` +
                                `📂 ${data.categories?.length || 0} catégories\n` +
+                               `🏪 Boutique cible: ${targetStoreName} (${targetStoreCode})\n` +
                                `🔒 ${finalClosures.length} clôtures (fusion intelligente)\n` +
                                `📈 Séquence Z: ${finalZNumbers.join(' → ')}\n` +
-                               `💰 Z${data.zCounter || 0}\n\n` +
+                               `💰 Z${data.zCounter || 0}\n` +
+                               `${catalogPersisted ? '' : '\n⚠️ Catalogue non stocké localement faute de place; la base intégrée restera utilisée.'}\n\n` +
                                `Rechargez la page pour voir les changements.`;
                 
                 alert(message);
@@ -862,6 +964,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
       >
         🔄 Restaurer
       </Button>
+      )}
 
       {/* Importer un seul Z depuis un backup JSON */}
       <Button

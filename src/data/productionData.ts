@@ -68,12 +68,17 @@ export const loadProductionData = async (storeCode: string): Promise<{
 }> => {
   try {
     // 1) Données déjà isolées par boutique (blob productionData + clés dérivées via getCurrentStoreCode)
-    const savedProducts = StorageService.loadProducts();
-    const savedCategories = StorageService.loadCategories();
+    const savedProducts = StorageService.loadProducts(storeCode, { skipLegacy: true });
+    const savedCategories = StorageService.loadCategories(storeCode, { skipLegacy: true });
     
     // Ne pas exiger les sous-catégories : après migration legacy elles peuvent être vides
     // alors que produits + catégories sont déjà dans le blob — sinon on écrase tout par la base intégrée.
-    if (savedProducts.length > 0 || savedCategories.length > 0) {
+    if (savedProducts.length === 0 && savedCategories.length > 0) {
+      console.warn('Base locale incomplète détectée (catégories sans produits), utilisation de la base intégrée sans écriture locale.');
+      return { products, categories };
+    }
+
+    if (savedProducts.length > 0) {
       // Migration automatique: réinjecter les sous-catégories manquantes depuis la base intégrée
       try {
         const refById = new Map<string, { categorie?: string; sousCategorie?: string }>();
@@ -113,14 +118,12 @@ export const loadProductionData = async (storeCode: string): Promise<{
       return { products: savedProducts, categories: savedCategories };
     }
     
-    // Si pas de données complètes, utiliser les données intégrées pour cette boutique
-    StorageService.saveProductionData(products, categories, storeCode);
-    const extracted = extractSubcategoriesFromProducts(products);
-    StorageService.saveSubcategories(extracted);
+    // Si pas de données complètes, utiliser les données intégrées sans recopier tout le catalogue en localStorage.
+    // Les modifications utilisateur seront persistées lors des prochains enregistrements explicites.
     return { products, categories };
   } catch (error) {
     console.error('❌ Erreur lors du chargement des données:', error);
-    return { products: [], categories: [] };
+    return { products, categories };
   }
 };
 

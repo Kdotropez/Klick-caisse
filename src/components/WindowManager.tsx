@@ -40,6 +40,15 @@ import { getStoreByCode } from '../types/Store';
 import ProductsPanel from './panels/ProductsPanel';
 import { getProductGridLayout } from '../utils/productGridLayout';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import {
+  computeTicketTotal,
+  computePaymentTotalsFromTransactionList,
+  getLineFinalUnitPrice,
+  getLinePayableAmount,
+  allocateGlobalDiscountByLineKey,
+  loadDiscountExclusionSettings,
+  type ItemDiscount,
+} from '../utils/ticketTotal';
 
 const GlobalTicketsModal = React.lazy(() => import('./modals/GlobalTicketsModal'));
 const GlobalTicketEditorModal = React.lazy(() => import('./modals/GlobalTicketEditorModal'));
@@ -127,6 +136,13 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const APP_BAR_HEIGHT = 64;
 
   const activeStoreCode = currentStoreCode ?? StorageService.getCurrentStoreCode();
+  const isBackOfficeCentral = (() => {
+    try {
+      return localStorage.getItem('ui.backOfficeCentral') === '1';
+    } catch {
+      return false;
+    }
+  })();
 
   /** 1 = taille nominale ; éviter une double réduction avec le scale du conteneur App. */
   const GLOBAL_SCALE_FACTOR = 1;
@@ -148,7 +164,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   // Fonction helper pour appliquer le facteur d'échelle
   // Garder des décimales pour éviter de tomber à 0rem
-  const applyScale = (value: number) => Number((value * GLOBAL_SCALE_FACTOR).toFixed(2));
+  const applyScale = useCallback((value: number) => Number((value * GLOBAL_SCALE_FACTOR).toFixed(2)), []);
 
   // Fonction helper pour calculer la taille de police adaptée
   const getScaledFontSize = (baseSize: string) => {
@@ -540,14 +556,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
   const [filterCustomerForTickets, setFilterCustomerForTickets] = useState<string | null>(null);
-  const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'all'>('cash');
+  const [paymentRecapMethod, setPaymentRecapMethod] = useState<'cash' | 'card' | 'sumup' | 'check' | 'all'>('cash');
   const [paymentRecapSort, setPaymentRecapSort] = useState<'amount' | 'name' | 'qty' | 'category' | 'subcategory'>('amount');
   const [showEndOfDay, setShowEndOfDay] = useState(false);
   const [showClosures, setShowClosures] = useState(false);
   const [closures, setClosures] = useState<any[]>([]);
   const [selectedClosureIdx, setSelectedClosureIdx] = useState<number | null>(null);
   // Filtres pour la modale tickets jour
-  const [filterPayment, setFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup'>('all');
+  const [filterPayment, setFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup' | 'check'>('all');
   const [filterAmountMin, setFilterAmountMin] = useState<string>('');
   const [filterAmountMax, setFilterAmountMax] = useState<string>('');
   const [filterAmountExact, setFilterAmountExact] = useState<string>('');
@@ -555,7 +571,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   // Tickets globaux (toutes sauvegardes)
   const [showGlobalTickets, setShowGlobalTickets] = useState(false);
   const [showProReceiptQuick, setShowProReceiptQuick] = useState(false);
-  const [globalFilterPayment, setGlobalFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup'>('all');
+  const [globalFilterPayment, setGlobalFilterPayment] = useState<'all' | 'cash' | 'card' | 'sumup' | 'check'>('all');
   const [globalAmountMin, setGlobalAmountMin] = useState<string>('');
   const [globalAmountMax, setGlobalAmountMax] = useState<string>('');
   const [globalAmountExact, setGlobalAmountExact] = useState<string>('');
@@ -618,23 +634,18 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const computeDailyProductSales = (transactions: Transaction[]) => {
     const byProduct: Record<string, { product: Product; totalQty: number; totalAmount: number }> = {};
     for (const tx of transactions) {
-      const itemDiscounts = (tx as any)?.itemDiscounts || {};
+      const txItemDiscounts = (tx as any)?.itemDiscounts || {};
+      const globalDisc = (tx as any)?.globalDiscount ?? null;
+      const settings = loadDiscountExclusionSettings();
+      const globalShare = allocateGlobalDiscountByLineKey(tx.items, txItemDiscounts, globalDisc, settings);
+
       for (const item of tx.items) {
         const key = item.product.id;
-        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-        const originalUnit = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-        let unit = originalUnit;
-        const d = itemDiscounts[discountKey];
-        if (d) {
-          if (d.type === 'euro') unit = Math.max(0, originalUnit - d.value);
-          else if (d.type === 'percent') unit = originalUnit * (1 - d.value / 100);
-          else if (d.type === 'price') unit = d.value;
-        }
-        const lineAmount = unit * (item.quantity || 0);
+        const lineAmount = getLinePayableAmount(item, txItemDiscounts, globalShare);
         if (!byProduct[key]) {
           byProduct[key] = { product: item.product, totalQty: 0, totalAmount: 0 };
         }
-        byProduct[key].totalQty += (item.quantity || 0);
+        byProduct[key].totalQty += item.quantity || 0;
         byProduct[key].totalAmount += lineAmount;
       }
     }
@@ -642,22 +653,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
   
   const computePaymentTotalsFromTransactions = useCallback((transactions: Transaction[]) => {
-    let cash = 0, card = 0, sumup = 0;
-    for (const tx of transactions) {
-      const method = String((tx as any).paymentMethod || '').toLowerCase();
-      const total = Number(tx.total) || 0;
-      if (method === 'cash' || method.includes('esp')) cash += total;
-      else if (method === 'card' || method.includes('carte')) card += total;
-      else if (method === 'sumup') sumup += total;
-    }
-    return { 'Espèces': cash, 'SumUp': sumup, 'Carte': card } as typeof paymentTotals;
+    return computePaymentTotalsFromTransactionList(transactions);
   }, []);
   
   // États pour les totaux par méthode de paiement
   const [paymentTotals, setPaymentTotals] = useState({
     'Espèces': 0,
     'SumUp': 0,
-    'Carte': 0
+    'Carte': 0,
+    'Chèque': 0,
+    'Autres': 0,
   });
   const totalDailyDiscounts = useMemo(() => {
     try {
@@ -1522,93 +1527,70 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
 
 
-  const [windows, setWindows] = useState<Window[]>([
-                   {
-        id: 'products',
-        title: 'Grille Produits',
-        type: 'products',
-        x: applyScale(20), // Même x que la fenêtre catégories
-        y: applyScale(241), // Position pour toucher les fenêtres 5 et 6 avec gap de 1px
-        width: 722, // Largeur exacte observée par l'utilisateur
-        height: 466, // Hauteur exacte observée par l'utilisateur
-        isMinimized: false,
-        isMaximized: false,
-        zIndex: 1,
-      },
-                          {
-         id: 'cart',
-         title: 'Panier & Ticket',
-         type: 'cart',
-         x: applyScale(832.33), // Position avec espacement de 10px (20 + 802.33 + 10)
-         y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
-         width: applyScale(540), // Élargi d'un tiers (405 * 1.33 = 540)
-         height: applyScale(600), // Hauteur exacte mesurée
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 2,
-       },
-                                                                                                                                                                       {
-          id: 'categories',
-          title: 'Catégories',
-          type: 'categories',
-          x: applyScale(20), // Position personnalisée - coin haut gauche de l'espace fenêtre
-          y: applyScale(20), // Remonté de 60px (80 - 60 = 20)
-          width: applyScale(802.33), // Largeur exacte mesurée
-          height: applyScale(220), // Hauteur ajustée pour éviter tout recouvrement avec la grille
-          isMinimized: false,
-          isMaximized: false,
-          zIndex: 3,
-        },
-                          {
-         id: 'search',
-         title: 'Modes de Règlement',
-         type: 'search',
-         x: applyScale(832.33), // Même x que la fenêtre ticket
-         y: applyScale(620), // Collée à la fenêtre 2 (20 + 600 = 620)
-         width: applyScale(540), // Même largeur que le ticket élargi
-         height: applyScale(217.33), // Étirée pour se rapprocher de la fenêtre 7
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 4,
-       },
-                  {
-         id: 'window5',
-         title: 'Fonction',
-         type: 'settings',
-         x: applyScale(20), // À gauche
-         y: applyScale(760), // Remonté de 60px (820 - 60 = 760)
-         width: applyScale(401.3), // Largeur exacte mesurée
-         height: applyScale(189.33), // Hauteur exacte mesurée
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 5,
-       },
-             {
-         id: 'window6',
-         title: 'Fenêtre Libre 2',
-         type: 'free',
-         x: applyScale(431.3), // À côté de la première avec espacement (20 + 401.3 + 10)
-         y: applyScale(760), // Remonté de 60px (820 - 60 = 760)
-         width: applyScale(388.63), // Largeur ajustée par l'utilisateur
-         height: applyScale(190.66), // Hauteur ajustée par l'utilisateur
-         isMinimized: false,
-         isMaximized: false,
-         zIndex: 6,
-       },
-               {
-          id: 'window7',
-          title: 'Fonction Stat',
-          type: 'stats',
-          x: applyScale(832.33), // Même x que la fenêtre Modes de Règlement
-          y: applyScale(837.33), // Remonté de 60px (897.33 - 60 = 837.33)
-          width: applyScale(540), // Même largeur que les fenêtres au-dessus
-          height: applyScale(113), // Hauteur ajustée par l'utilisateur
-          isMinimized: false,
-          isMaximized: false,
-          zIndex: 7,
-        },
-    
-  ]);
+  const [bottomMenusCollapsed, setBottomMenusCollapsed] = useState<boolean>(true);
+
+  const buildOptimizedWindows = useCallback((collapseBottomMenus: boolean): Window[] => {
+    const margin = applyScale(8);
+    const gap = applyScale(8);
+    const usableWidth = Math.max(900, layoutBounds.width - margin * 2);
+    const usableHeight = Math.max(620, layoutBounds.height - APP_BAR_HEIGHT - margin * 2);
+    const rightWidth = Math.min(Math.max(usableWidth * 0.36, applyScale(430)), applyScale(600));
+    const leftWidth = Math.max(applyScale(420), usableWidth - rightWidth - gap);
+    const categoriesHeight = Math.min(applyScale(235), Math.max(applyScale(190), usableHeight * 0.24));
+    const paymentHeight = Math.min(applyScale(178), Math.max(applyScale(132), usableHeight * 0.2));
+    const bottomHeight = collapseBottomMenus
+      ? 0
+      : Math.min(applyScale(230), Math.max(applyScale(170), usableHeight * 0.24));
+
+    const xLeft = margin;
+    const xRight = margin + leftWidth + gap;
+    const yTop = margin + APP_BAR_HEIGHT;
+    const yProducts = yTop + categoriesHeight + gap;
+    const yBottom = yTop + usableHeight - bottomHeight;
+    if (isBackOfficeCentral) {
+      const backOfficeRightWidth = Math.min(Math.max(usableWidth * 0.34, applyScale(390)), applyScale(560));
+      const backOfficeLeftWidth = Math.max(applyScale(520), usableWidth - backOfficeRightWidth - gap);
+      const backOfficeSettingsHeight = collapseBottomMenus ? 0 : Math.min(applyScale(230), Math.max(applyScale(170), usableHeight * 0.24));
+      const backOfficeProductsHeight = Math.max(
+        applyScale(320),
+        usableHeight - categoriesHeight - gap - (collapseBottomMenus ? 0 : backOfficeSettingsHeight + gap)
+      );
+      return [
+        { id: 'products', title: 'Grille Produits', type: 'products', x: xLeft, y: yProducts, width: backOfficeLeftWidth, height: backOfficeProductsHeight, isMinimized: false, isMaximized: false, zIndex: 1 },
+        { id: 'cart', title: 'Panier & Ticket', type: 'cart', x: xRight, y: yTop, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 2 },
+        { id: 'categories', title: 'Catégories', type: 'categories', x: xLeft, y: yTop, width: backOfficeLeftWidth, height: categoriesHeight, isMinimized: false, isMaximized: false, zIndex: 3 },
+        { id: 'search', title: 'Modes de Règlement', type: 'search', x: xRight, y: yTop, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 4 },
+        { id: 'window5', title: 'Fonction', type: 'settings', x: xLeft, y: yTop + categoriesHeight + gap + backOfficeProductsHeight + gap, width: backOfficeLeftWidth, height: backOfficeSettingsHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 5 },
+        { id: 'window6', title: 'Fenêtre Libre 2', type: 'free', x: xLeft, y: yBottom, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 6 },
+        { id: 'window7', title: 'Back office Stats', type: 'stats', x: xLeft + backOfficeLeftWidth + gap, y: yTop, width: backOfficeRightWidth, height: usableHeight, isMinimized: false, isMaximized: false, zIndex: 7 },
+      ];
+    }
+    const productsHeight = Math.max(
+      applyScale(260),
+      collapseBottomMenus
+        ? usableHeight - categoriesHeight - gap
+        : yBottom - yProducts - gap
+    );
+    const cartHeight = Math.max(applyScale(320), usableHeight - paymentHeight - gap);
+    const settingsWidth = Math.floor((leftWidth - gap) * 0.64);
+    const statsWidth = leftWidth - settingsWidth - gap;
+
+    return [
+      { id: 'products', title: 'Grille Produits', type: 'products', x: xLeft, y: yProducts, width: leftWidth, height: productsHeight, isMinimized: false, isMaximized: false, zIndex: 1 },
+      { id: 'cart', title: 'Panier & Ticket', type: 'cart', x: xRight, y: yTop, width: rightWidth, height: cartHeight, isMinimized: false, isMaximized: false, zIndex: 2 },
+      { id: 'categories', title: 'Catégories', type: 'categories', x: xLeft, y: yTop, width: leftWidth, height: categoriesHeight, isMinimized: false, isMaximized: false, zIndex: 3 },
+      { id: 'search', title: 'Modes de Règlement', type: 'search', x: xRight, y: yTop + cartHeight + gap, width: rightWidth, height: paymentHeight, isMinimized: false, isMaximized: false, zIndex: 4 },
+      { id: 'window5', title: 'Fonction', type: 'settings', x: xLeft, y: yBottom, width: settingsWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 5 },
+      { id: 'window6', title: 'Fenêtre Libre 2', type: 'free', x: xLeft, y: yBottom, width: 0, height: 0, isMinimized: true, isMaximized: false, zIndex: 6 },
+      { id: 'window7', title: 'Fonction Stat', type: 'stats', x: xLeft + settingsWidth + gap, y: yBottom, width: statsWidth, height: bottomHeight, isMinimized: collapseBottomMenus, isMaximized: false, zIndex: 7 },
+    ];
+  }, [applyScale, isBackOfficeCentral, layoutBounds.height, layoutBounds.width]);
+
+  const [windows, setWindows] = useState<Window[]>(() => buildOptimizedWindows(bottomMenusCollapsed));
+
+  useEffect(() => {
+    setWindows(buildOptimizedWindows(bottomMenusCollapsed));
+  }, [bottomMenusCollapsed, buildOptimizedWindows]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -1737,6 +1719,10 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     // Calculer le total avec toutes remises (individuelles + globale)
     const total = getTotalWithGlobalDiscount();
+    if (!Number.isFinite(total) || total < 0) {
+      alert('Total du panier invalide. Vérifiez les prix des articles avant de valider le règlement.');
+      return;
+    }
 
     const methodLabel = method === 'cash' ? 'Espèces' : method === 'card' ? 'Carte' : method === 'sumup' ? 'SumUp' : 'Chèque';
 
@@ -1894,7 +1880,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
   const productGridLayout = useMemo(() => {
     const pw = windows.find((w) => w.type === 'products' && !w.isMinimized);
-    return getProductGridLayout(pw?.width ?? 802);
+    return getProductGridLayout(pw?.width ?? 802, pw?.height ?? 520);
   }, [windows]);
 
   const CARDS_PER_PAGE = productGridLayout.cardsPerPage;
@@ -2943,84 +2929,16 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const getItemFinalPrice = (item: CartItem) => {
-    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-    const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-    const discount = itemDiscounts[discountKey];
-
-    if (!discount) return originalPrice;
-
-    switch (discount.type) {
-      case 'euro':
-        return Math.max(0, originalPrice - discount.value);
-      case 'percent':
-        return originalPrice * (1 - discount.value / 100);
-      case 'price':
-        return discount.value;
-      default:
-        return originalPrice;
-    }
+    return getLineFinalUnitPrice(item, itemDiscounts as Record<string, ItemDiscount>);
   };
 
   const getTotalWithGlobalDiscount = () => {
-    // Calculer le sous-total (prix originaux)
-    const settings = StorageService.loadSettings() || {};
-    const excludedCatsRaw: string[] = Array.isArray(settings.excludedDiscountCategories) ? settings.excludedDiscountCategories : [];
-    const excludedSubRaw: string[] = Array.isArray((settings as any).excludedDiscountSubcategories) ? (settings as any).excludedDiscountSubcategories : [];
-    const excludedProd: string[] = Array.isArray((settings as any).excludedDiscountProductIds) ? (settings as any).excludedDiscountProductIds : [];
-    const norm = (s: string) => StorageService.normalizeLabel(String(s||''));
-    const excludedCats = new Set(excludedCatsRaw.map(norm));
-    const excludedSub = new Set(excludedSubRaw.map(norm));
-    const isExcluded = (item: CartItem) => {
-      if (excludedProd.includes(item.product.id)) return true;
-      const cat = item.product?.category || '';
-      if (excludedCats.has(norm(cat))) return true;
-      // Vérifier sous-catégories associées
-      const subs: string[] = Array.isArray((item.product as any)?.associatedCategories) ? (item.product as any).associatedCategories : [];
-      return subs.some(s => excludedSub.has(norm(s)));
-    };
-
-    const subtotal = cartItems.reduce((sum, item) => {
-      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      return sum + (originalPrice * item.quantity);
-    }, 0);
-
-    // Calculer les remises individuelles
-    const individualDiscounts = cartItems.reduce((sum, item) => {
-      const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-      const originalTotal = originalPrice * item.quantity;
-      const finalPrice = getItemFinalPrice(item);
-      const finalTotal = finalPrice * item.quantity;
-      
-      return sum + (originalTotal - finalTotal);
-    }, 0);
-
-    // Calculer la remise globale
-    let globalDiscountAmount = 0;
-    if (globalDiscount) {
-      // Total des produits sans remise individuelle
-      const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
-        const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-        const hasIndividualDiscount = itemDiscounts[discountKey];
-        // Exclure aussi les catégories marquées exclues
-        if (!hasIndividualDiscount && !isExcluded(item)) {
-          const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-          return sum + (originalPrice * item.quantity);
-        }
-        return sum;
-      }, 0);
-
-      // Appliquer la remise globale sur le total
-      if (globalDiscount.type === 'euro') {
-        globalDiscountAmount = Math.min(totalWithoutIndividualDiscount, globalDiscount.value);
-      } else {
-        globalDiscountAmount = totalWithoutIndividualDiscount * (globalDiscount.value / 100);
-      }
-    }
-
-    const totalDiscounts = individualDiscounts + globalDiscountAmount;
-    
-    // Total final = Sous-total - Total des remises
-    return subtotal - totalDiscounts;
+    return computeTicketTotal(
+      cartItems,
+      itemDiscounts as Record<string, ItemDiscount>,
+      globalDiscount,
+      loadDiscountExclusionSettings()
+    );
   };
 
 
@@ -3058,7 +2976,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onDragEnd={handleDragEnd}
-            onProductClick={handleProductClick}
+            onProductClick={isBackOfficeCentral ? () => undefined : handleProductClick}
             onEditProduct={(p) => { setSelectedProductForEdit(p); setShowProductEditModal(true); }}
           />
         );
@@ -3609,17 +3527,43 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           zIndex: 10001,
           py: 0.75,
           px: 2,
-          textAlign: 'center',
           backgroundColor: '#0d47a1',
           color: '#fff',
           fontWeight: 800,
           fontSize: '1rem',
           letterSpacing: '0.04em',
           boxShadow: 2,
-          pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'auto',
         }}
       >
-        Boutique : {getStoreByCode(activeStoreCode)?.name ?? 'Boutique'}
+        <Box sx={{ flex: 1 }} />
+        <Box sx={{ flex: 2, textAlign: 'center' }}>
+          Boutique : {getStoreByCode(activeStoreCode)?.name ?? 'Boutique'}
+        </Box>
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setBottomMenusCollapsed(!bottomMenusCollapsed)}
+            sx={{
+              py: 0.25,
+              px: 1.5,
+              borderRadius: 999,
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              textTransform: 'none',
+              backgroundColor: bottomMenusCollapsed ? '#455a64' : '#7b1fa2',
+              '&:hover': {
+                backgroundColor: bottomMenusCollapsed ? '#37474f' : '#6a1b9a',
+              },
+            }}
+          >
+            {bottomMenusCollapsed ? 'Afficher menus' : 'Masquer menus'}
+          </Button>
+        </Box>
       </Box>
       {/* Indicateur de mode drag and drop */}
       {isDragging && (
@@ -3671,7 +3615,14 @@ const WindowManager: React.FC<WindowManagerProps> = ({
       )}
 
                            {windows
-          .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window6', 'window7'].includes(window.id)) // Afficher les fenêtres utiles
+          .filter(window => ['categories', 'products', 'cart', 'search', 'window5', 'window7'].includes(window.id)) // Afficher les fenêtres utiles
+          .filter(window => !isBackOfficeCentral || !['cart', 'search'].includes(window.id))
+          .filter(window => {
+            if (!bottomMenusCollapsed) return true;
+            if (['window5', 'window6'].includes(window.id)) return false;
+            if (window.id === 'window7') return isBackOfficeCentral;
+            return true;
+          })
           .map((window) => (
                            <Paper
             key={window.id}

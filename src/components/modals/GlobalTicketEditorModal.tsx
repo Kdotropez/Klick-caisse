@@ -3,6 +3,10 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconBut
 import { Add, Remove, Edit } from '@mui/icons-material';
 import { StorageService } from '../../services/StorageService';
 import CustomersListModal from './CustomersListModal';
+import {
+  computeTicketTotal,
+  loadDiscountExclusionSettings,
+} from '../../utils/ticketTotal';
 
 interface GlobalTicketEditorModalProps {
   open: boolean;
@@ -18,12 +22,19 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
   const [editingPrice, setEditingPrice] = useState<{ itemIndex: number; newPrice: string } | null>(null);
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
   
+  const recalcDraftTotal = (draftItems: any[], draftState: any) => {
+    const settings = loadDiscountExclusionSettings();
+    return computeTicketTotal(
+      draftItems || [],
+      draftState?.itemDiscounts || {},
+      draftState?.globalDiscount ?? null,
+      settings
+    );
+  };
+
   const recalcAndSave = () => {
     if (!draft) return;
-    const total = (draft.items || []).reduce((s:number, it:any) => {
-      const up = getDisplayPrice(it); // Utiliser le prix personnalisé s'il existe
-      return s + (up * (it.quantity||0));
-    }, 0);
+    const total = recalcDraftTotal(draft.items, draft);
     const updated = { ...draft, total };
     if (isToday) {
       StorageService.updateDailyTransaction(updated);
@@ -85,12 +96,7 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
       
       updatedItems[editingPrice.itemIndex] = updatedItem;
       // Recalcul immédiat du total pour retour visuel
-      const newTotal = (updatedItems || []).reduce((s:number, it:any) => {
-        const unit = it.customPrice !== undefined
-          ? it.customPrice
-          : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
-        return s + (unit * (it.quantity || 0));
-      }, 0);
+      const newTotal = recalcDraftTotal(updatedItems, { ...prev, items: updatedItems });
       return { ...prev, items: updatedItems, total: newTotal };
     });
     

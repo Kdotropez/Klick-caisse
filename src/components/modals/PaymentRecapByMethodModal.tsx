@@ -3,7 +3,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, List, L
 import { Transaction, Product } from '../../types';
 
 export type PaymentRecapSort = 'qty' | 'amount' | 'name' | 'category' | 'subcategory';
-export type PaymentMethodKey = 'cash' | 'card' | 'sumup';
+export type PaymentMethodKey = 'cash' | 'card' | 'sumup' | 'check';
 
 interface PaymentRecapByMethodModalProps {
   open: boolean;
@@ -20,6 +20,7 @@ const PaymentRecapByMethodModal: React.FC<PaymentRecapByMethodModalProps> = ({ o
     if (method === 'cash') return m === 'cash' || m.includes('esp');
     if (method === 'card') return m === 'card' || m.includes('carte');
     if (method === 'sumup') return m === 'sumup';
+    if (method === 'check') return m === 'check' || m.includes('chèq') || m.includes('cheq');
     return true;
   });
 
@@ -48,7 +49,14 @@ const PaymentRecapByMethodModal: React.FC<PaymentRecapByMethodModalProps> = ({ o
 
   const totalAmount = filtered.reduce((s, t) => s + (t.total || 0), 0);
 
-  const title = method === 'cash' ? 'Tickets Espèces' : method === 'card' ? 'Tickets Carte' : 'Tickets SumUp';
+  const title =
+    method === 'cash'
+      ? 'Tickets Espèces'
+      : method === 'card'
+        ? 'Tickets Carte'
+        : method === 'check'
+          ? 'Tickets Chèque'
+          : 'Tickets SumUp';
 
   // État local pour expansion par ticket
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());

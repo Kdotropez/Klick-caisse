@@ -21,9 +21,14 @@ import {
   Download,
 } from '@mui/icons-material';
 import { CartItem } from '../types/Product';
-
-type ItemDiscount = { type: 'euro' | 'percent' | 'price'; value: number };
-type GlobalDiscount = { type: 'euro' | 'percent'; value: number } | null;
+import {
+  computeTicketTotalBreakdown,
+  getLineFinalUnitPrice,
+  getLineOriginalUnitPrice,
+  loadDiscountExclusionSettings,
+  type GlobalDiscount,
+  type ItemDiscount,
+} from '../utils/ticketTotal';
 
 interface RecapModalProps {
   open: boolean;
@@ -35,36 +40,20 @@ interface RecapModalProps {
 }
 
 const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems, itemDiscounts = {}, globalDiscount = null, getItemFinalPrice }) => {
-  const subtotalOriginal = cartItems.reduce((sum, item) => {
-    const price = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-    return sum + (price * item.quantity);
-  }, 0);
+  const exclusionSettings = loadDiscountExclusionSettings();
+  const breakdown = computeTicketTotalBreakdown(
+    cartItems,
+    itemDiscounts as Record<string, ItemDiscount>,
+    globalDiscount as GlobalDiscount,
+    exclusionSettings
+  );
+  const subtotalOriginal = breakdown.subtotal;
+  const individualDiscounts = breakdown.individualDiscounts;
+  const globalDiscountAmount = breakdown.globalDiscountAmount;
+  const grandTotal = breakdown.total;
 
-  const individualDiscounts = cartItems.reduce((sum, item) => {
-    const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-    const originalTotal = originalPrice * item.quantity;
-    const finalPrice = getItemFinalPrice ? getItemFinalPrice(item) : originalPrice;
-    const finalTotal = finalPrice * item.quantity;
-    return sum + Math.max(0, (originalTotal - finalTotal));
-  }, 0);
-
-  let globalDiscountAmount = 0;
-  if (globalDiscount) {
-    const totalWithoutIndividualDiscount = cartItems.reduce((sum, item) => {
-      const discountKey = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-      const hasIndividualDiscount = (itemDiscounts as any)[discountKey];
-      if (!hasIndividualDiscount) {
-        const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-        return sum + (originalPrice * item.quantity);
-      }
-      return sum;
-    }, 0);
-    globalDiscountAmount = globalDiscount.type === 'euro'
-      ? Math.min(totalWithoutIndividualDiscount, globalDiscount.value)
-      : totalWithoutIndividualDiscount * (globalDiscount.value / 100);
-  }
-
-  const grandTotal = subtotalOriginal - (individualDiscounts + globalDiscountAmount);
+  const resolveFinalUnit = (item: CartItem) =>
+    getItemFinalPrice ? getItemFinalPrice(item) : getLineFinalUnitPrice(item, itemDiscounts as Record<string, ItemDiscount>);
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -141,8 +130,8 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems, itemD
           
           <List sx={{ backgroundColor: 'white', borderRadius: 1, border: '1px solid #e0e0e0' }}>
             {cartItems.map((item, index) => {
-              const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-              const finalPrice = getItemFinalPrice ? getItemFinalPrice(item) : originalPrice;
+              const originalPrice = getLineOriginalUnitPrice(item);
+              const finalPrice = resolveFinalUnit(item);
               const originalTotal = originalPrice * item.quantity;
               const finalTotal = finalPrice * item.quantity;
               const discountAmount = Math.max(0, originalTotal - finalTotal);

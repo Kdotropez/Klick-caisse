@@ -16,6 +16,12 @@ import { IconButton } from '@mui/material';
 import { CartItem } from '../types/Product';
 import { APP_VERSION } from '../version';
 import { StorageService } from '../services/StorageService';
+import {
+  allocateGlobalDiscountByLineKey,
+  computeTicketTotalBreakdown,
+  getLinePayableAmount,
+  loadDiscountExclusionSettings,
+} from '../utils/ticketTotal';
 
 interface DailyReportModalProps {
   open: boolean;
@@ -58,6 +64,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
   // Tri des articles (détail produits)
   const [productSortKey, setProductSortKey] = useState<'name'|'category'|'totalQty'|'transactions'|'totalAmount'|'percentage'>('totalAmount');
   const [productSortDir, setProductSortDir] = useState<'asc'|'desc'>('desc');
+
+  const discountExclusionSettings = React.useMemo(() => loadDiscountExclusionSettings(), []);
 
   // Les données seront lues à la volée dans les mémos pour éviter les dépendances instables
 
@@ -137,7 +145,15 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
 
   // Calculer les statistiques de la date sélectionnée (aligne avec la liste affichée)
   useEffect(() => {
-    const txs = Array.isArray(selectedDateTransactions) ? selectedDateTransactions : [];
+    const rawTxs = Array.isArray(selectedDateTransactions) ? selectedDateTransactions : [];
+    const seenTxIds = new Set<string>();
+    const txs = rawTxs.filter((t: any) => {
+      const id = String(t?.id || '');
+      if (!id) return true;
+      if (seenTxIds.has(id)) return false;
+      seenTxIds.add(id);
+      return true;
+    });
     if (txs.length > 0) {
       let totalSales = 0;
       let totalItems = 0;
@@ -146,39 +162,17 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
 
       txs.forEach((transaction: any) => {
         totalSales += Number(transaction.total) || 0;
-        if (transaction.items && Array.isArray(transaction.items)) {
-          transaction.items.forEach((item: any) => {
-            const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
-            const originalTotal = originalPrice * (item.quantity || 0);
-            let finalTotal = originalTotal;
-            const key = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
-            const discount = transaction.itemDiscounts?.[key];
-            if (discount) {
-              if (discount.type === 'euro') {
-                finalTotal = Math.max(0, originalTotal - (discount.value * (item.quantity || 0)));
-              } else if (discount.type === 'percent') {
-                finalTotal = originalTotal * (1 - discount.value / 100);
-              } else if (discount.type === 'price') {
-                finalTotal = (discount.value || 0) * (item.quantity || 0);
-              }
-            }
-            totalOriginalAmount += originalTotal;
-            totalItems += (item.quantity || 0);
-            totalDiscounts += (originalTotal - finalTotal);
-          });
-        }
+        const items = Array.isArray(transaction.items) ? transaction.items : [];
+        const breakdown = computeTicketTotalBreakdown(
+          items,
+          transaction.itemDiscounts || {},
+          transaction.globalDiscount ?? null,
+          discountExclusionSettings
+        );
+        totalOriginalAmount += breakdown.subtotal;
+        totalDiscounts += Math.max(0, breakdown.subtotal - (Number(transaction.total) || breakdown.total));
+        totalItems += items.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0), 0);
       });
-      // Éviter les doubles comptages si des tickets identiques proviennent de sources différentes
-      try {
-        const uniqueIds = new Set<string>();
-        const uniqueTxs: any[] = [];
-        for (const t of txs) {
-          const id = String(t?.id);
-          if (!uniqueIds.has(id)) { uniqueIds.add(id); uniqueTxs.push(t); }
-        }
-        // Recalculer totalSales sur base des tickets uniques uniquement
-        totalSales = uniqueTxs.reduce((s, t) => s + (Number(t?.total) || 0), 0);
-      } catch {}
       const totalTransactions = txs.length;
       const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
       setDailyStats({ totalSales, totalItems, totalTransactions, averageTransactionValue, totalDiscounts, totalOriginalAmount });
@@ -194,7 +188,7 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
     const totalTransactions = cartItems.length > 0 ? 1 : 0;
     const averageTransactionValue = totalTransactions > 0 ? totalSales / totalTransactions : 0;
     setDailyStats({ totalSales, totalItems, totalTransactions, averageTransactionValue, totalDiscounts: 0, totalOriginalAmount: totalSales });
-  }, [selectedDateTransactions, cartItems]);
+  }, [selectedDateTransactions, cartItems, discountExclusionSettings]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
@@ -965,6 +959,13 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                     const articleStats = new Map<string, any>();
                     (Array.isArray(selectedDateTransactions) ? selectedDateTransactions : []).forEach((transaction:any) => {
                       if (Array.isArray(transaction.items)) {
+                        const txDiscounts = transaction.itemDiscounts || {};
+                        const globalShare = allocateGlobalDiscountByLineKey(
+                          transaction.items,
+                          txDiscounts,
+                          transaction.globalDiscount ?? null,
+                          discountExclusionSettings
+                        );
                         transaction.items.forEach((item:any) => {
                           const product = item.product || {};
                           const variation = item.selectedVariation || null;
@@ -985,9 +986,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                             totalAmount: 0,
                             transactions: 0,
                           };
-                          const unitPrice = variation ? variation.finalPrice : product.finalPrice;
                           const qty = Number(item.quantity) || 0;
-                          const itemTotal = (Number(unitPrice) || 0) * qty;
+                          const itemTotal = getLinePayableAmount(item, txDiscounts, globalShare);
                           existing.totalQty += qty;
                           existing.totalAmount += itemTotal;
                           existing.transactions += 1;
@@ -1095,6 +1095,13 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
               
               selectedDateTransactions.forEach(transaction => {
                 if (transaction.items && Array.isArray(transaction.items)) {
+                  const txDiscounts = transaction.itemDiscounts || {};
+                  const globalShare = allocateGlobalDiscountByLineKey(
+                    transaction.items,
+                    txDiscounts,
+                    transaction.globalDiscount ?? null,
+                    discountExclusionSettings
+                  );
                   transaction.items.forEach((item: any) => {
                     const product = item.product || {};
                     const variation = item.selectedVariation || null;
@@ -1119,9 +1126,8 @@ const DailyReportModal: React.FC<DailyReportModalProps> = ({
                       percentage: 0
                     };
 
-                    const unitPrice = variation ? variation.finalPrice : product.finalPrice;
                     const qty = Number(item.quantity) || 0;
-                    const itemTotal = (Number(unitPrice) || 0) * qty;
+                    const itemTotal = getLinePayableAmount(item, txDiscounts, globalShare);
 
                     existing.totalQty += qty;
                     existing.totalAmount += itemTotal;
