@@ -584,17 +584,11 @@ const BackOfficeDashboard: React.FC = () => {
     if (!ok) return;
 
     try {
-      if (Array.isArray(data.products) && Array.isArray(data.categories)) {
-        try {
-          StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
-        } catch {
-          StorageService.clearStoreCatalogForRestore(targetStoreCode);
-          try {
-            StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
-          } catch (quotaError) {
-            console.warn('Catalogue non persisté faute de quota, restauration des ventes maintenue.', quotaError);
-          }
-        }
+      if (Array.isArray(data.products) || Array.isArray(data.categories)) {
+        // En Back office, les statistiques viennent des tickets/clôtures importés.
+        // Ne pas persister le gros catalogue évite de saturer localStorage et laisse la place aux Z.
+        StorageService.clearStoreCatalogForRestore(targetStoreCode);
+        console.info('Catalogue du backup ignoré en stockage Back office pour préserver le quota. Les articles vendus restent disponibles via les tickets.');
       }
       if (data.settings) StorageService.saveSettings(data.settings, targetStoreCode);
       if (Array.isArray(data.subcategories)) StorageService.saveSubcategories(data.subcategories, targetStoreCode);
