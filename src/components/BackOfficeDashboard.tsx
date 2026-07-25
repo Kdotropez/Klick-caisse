@@ -165,6 +165,18 @@ const buildStoreHtmlReport = (store: StoreStats): string => {
     <table><thead><tr><th>Jour</th><th>CA</th><th>Tickets</th><th>Articles</th></tr></thead><tbody>${htmlRows(store.dailyRows.map((row) => [row.key, formatEuro(row.ca), row.tickets, row.qty]))}</tbody></table>
     <h2>Ventes par mois</h2>
     <table><thead><tr><th>Mois</th><th>CA</th><th>Tickets</th><th>Articles</th></tr></thead><tbody>${htmlRows(store.monthlyRows.map((row) => [row.key, formatEuro(row.ca), row.tickets, row.qty]))}</tbody></table>
+    <h2>Clôtures / Z</h2>
+    <table><thead><tr><th>Z Back office</th><th>Z original</th><th>Date</th><th>Tickets</th><th>CA</th></tr></thead><tbody>${htmlRows(store.closures.map((closure) => {
+      const txs = Array.isArray(closure?.transactions) ? closure.transactions : [];
+      const total = txs.reduce((sum: number, tx: any) => sum + (Number(tx?.total) || 0), 0);
+      return [
+        `Z${closure?.zNumber || '-'}`,
+        closure?.originalZNumber ? `Z${closure.originalZNumber}` : '',
+        closure?.closedAt ? new Date(closure.closedAt).toLocaleDateString('fr-FR') : '',
+        txs.length,
+        formatEuro(total),
+      ];
+    }))}</tbody></table>
     <h2>Top articles par CA</h2>
     <table><thead><tr><th>#</th><th>Article</th><th>Quantité</th><th>CA</th></tr></thead><tbody>${htmlRows(store.topProducts.map((product, index) => [index + 1, product.name, product.qty, formatEuro(product.amount)]))}</tbody></table>
   `;
@@ -874,6 +886,45 @@ const BackOfficeDashboard: React.FC = () => {
                     </ListItem>
                   ))}
                 </List>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ gridColumn: '1 / -1' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" fontWeight={900} sx={{ flex: 1 }}>Clôtures / Z</Typography>
+                  <Button size="small" variant="outlined" onClick={() => downloadCsv(
+                    `${selected.name}-clotures-z.csv`,
+                    ['Z Back office', 'Z original', 'Date', 'Tickets', 'CA'],
+                    selected.closures.map((closure) => {
+                      const txs = Array.isArray(closure?.transactions) ? closure.transactions : [];
+                      const total = txs.reduce((sum: number, tx: any) => sum + (Number(tx?.total) || 0), 0);
+                      return [
+                        `Z${closure?.zNumber || '-'}`,
+                        closure?.originalZNumber ? `Z${closure.originalZNumber}` : '',
+                        closure?.closedAt ? new Date(closure.closedAt).toLocaleDateString('fr-FR') : '',
+                        txs.length,
+                        total.toFixed(2),
+                      ];
+                    })
+                  )}>CSV</Button>
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.5fr 1fr 1fr', gap: 1, fontWeight: 900, borderBottom: '1px solid #ddd', pb: 0.5 }}>
+                  <Typography>Z Back office</Typography><Typography>Z original</Typography><Typography>Date</Typography><Typography>Tickets</Typography><Typography>CA</Typography>
+                </Box>
+                {selected.closures.map((closure) => {
+                  const txs = Array.isArray(closure?.transactions) ? closure.transactions : [];
+                  const total = txs.reduce((sum: number, tx: any) => sum + (Number(tx?.total) || 0), 0);
+                  return (
+                    <Box key={`${closure?.zNumber}-${closure?.closedAt}`} sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.5fr 1fr 1fr', gap: 1, py: 0.5, borderBottom: '1px solid #f0f0f0' }}>
+                      <Typography fontWeight={800}>Z{closure?.zNumber || '-'}</Typography>
+                      <Typography>{closure?.originalZNumber ? `Z${closure.originalZNumber}` : '-'}</Typography>
+                      <Typography>{closure?.closedAt ? new Date(closure.closedAt).toLocaleDateString('fr-FR') : '-'}</Typography>
+                      <Typography>{txs.length}</Typography>
+                      <Typography fontFamily="monospace">{formatEuro(total)}</Typography>
+                    </Box>
+                  );
+                })}
               </CardContent>
             </Card>
 
