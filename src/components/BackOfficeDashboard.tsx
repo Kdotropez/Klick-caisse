@@ -35,7 +35,45 @@ type StoreStats = {
   lastDate?: Date;
   paymentTotals: Record<string, number>;
   topProducts: Array<{ name: string; qty: number; amount: number }>;
+  dailyRows: Array<{ key: string; ca: number; tickets: number; qty: number }>;
+  monthlyRows: Array<{ key: string; ca: number; tickets: number; qty: number }>;
+  marginAmount: number;
+  paymentTotal: number;
+  closureTotal: number;
   anomalies: string[];
+};
+
+const formatDayKey = (date: Date): string => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const formatMonthKey = (date: Date): string => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  return `${yyyy}-${mm}`;
+};
+
+const toCsvValue = (value: unknown): string => {
+  const text = String(value ?? '');
+  return `"${text.replace(/"/g, '""')}"`;
+};
+
+const downloadCsv = (filename: string, headers: string[], rows: Array<Array<string | number>>): void => {
+  const content = [headers, ...rows]
+    .map((row) => row.map(toCsvValue).join(';'))
+    .join('\n');
+  const blob = new Blob([`\uFEFF${content}`], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 const parseMap = (raw: string | null): Record<string, any[]> => {
@@ -122,13 +160,33 @@ const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
     .filter((d) => Number.isFinite(d.getTime()))
     .sort((a, b) => a.getTime() - b.getTime());
   const paymentTotals = computePaymentTotalsFromTransactionList(txs);
+  const paymentTotal = Object.values(paymentTotals).reduce((sum, amount) => sum + (Number(amount) || 0), 0);
   const productMap = new Map<string, { name: string; qty: number; amount: number }>();
+  const dailyMap = new Map<string, { key: string; ca: number; tickets: number; qty: number }>();
+  const monthlyMap = new Map<string, { key: string; ca: number; tickets: number; qty: number }>();
   const settings = loadDiscountExclusionSettings();
+  let marginAmount = 0;
 
   for (const tx of txs) {
     const items = Array.isArray(tx?.items) ? tx.items : [];
     const discounts = tx?.itemDiscounts || {};
     const globalShare = allocateGlobalDiscountByLineKey(items, discounts, tx?.globalDiscount ?? null, settings);
+    const txDate = new Date(tx?.timestamp);
+    const dayKey = Number.isFinite(txDate.getTime()) ? formatDayKey(txDate) : 'Date inconnue';
+    const monthKey = Number.isFinite(txDate.getTime()) ? formatMonthKey(txDate) : 'Mois inconnu';
+    const txQty = items.reduce((sum: number, item: any) => sum + (Number(item?.quantity) || 0), 0);
+    const txTotal = Number(tx?.total) || 0;
+    const day = dailyMap.get(dayKey) || { key: dayKey, ca: 0, tickets: 0, qty: 0 };
+    day.ca += txTotal;
+    day.tickets += 1;
+    day.qty += txQty;
+    dailyMap.set(dayKey, day);
+    const month = monthlyMap.get(monthKey) || { key: monthKey, ca: 0, tickets: 0, qty: 0 };
+    month.ca += txTotal;
+    month.tickets += 1;
+    month.qty += txQty;
+    monthlyMap.set(monthKey, month);
+
     for (const item of items) {
       const product = item?.product || {};
       const key = `${String(product.id || product.name || 'inconnu')}__${String(item?.selectedVariation?.id || 'main')}`;
@@ -137,7 +195,10 @@ const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
         : product.name || 'Article';
       const current = productMap.get(key) || { name, qty: 0, amount: 0 };
       current.qty += Number(item?.quantity) || 0;
-      current.amount += getLinePayableAmount(item, discounts, globalShare);
+      const lineAmount = getLinePayableAmount(item, discounts, globalShare);
+      current.amount += lineAmount;
+      const cost = Number(product.wholesalePrice) || 0;
+      if (cost > 0) marginAmount += lineAmount - cost * (Number(item?.quantity) || 0);
       productMap.set(key, current);
     }
   }
@@ -153,6 +214,13 @@ const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
   if (txs.some((tx) => !Array.isArray(tx?.items) || tx.items.length === 0)) {
     anomalies.push('Tickets sans articles détectés');
   }
+  if (Math.abs(paymentTotal - totalCA) > 0.01) {
+    anomalies.push(`Écart paiements / CA: ${formatEuro(paymentTotal)} vs ${formatEuro(totalCA)}`);
+  }
+  const closureTotal = closures.reduce((sum, closure) => sum + (Number(closure?.totalCA) || 0), 0);
+  if (closureTotal > 0 && Math.abs(closureTotal - totalCA) > 0.01) {
+    anomalies.push(`Écart clôtures / tickets: ${formatEuro(closureTotal)} vs ${formatEuro(totalCA)}`);
+  }
 
   return {
     code: storeCode,
@@ -166,7 +234,12 @@ const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
     firstDate: dates[0],
     lastDate: dates[dates.length - 1],
     paymentTotals,
+    paymentTotal,
+    closureTotal,
     topProducts: Array.from(productMap.values()).sort((a, b) => b.amount - a.amount).slice(0, 12),
+    dailyRows: Array.from(dailyMap.values()).sort((a, b) => b.key.localeCompare(a.key)),
+    monthlyRows: Array.from(monthlyMap.values()).sort((a, b) => b.key.localeCompare(a.key)),
+    marginAmount,
     anomalies,
   };
 };
@@ -278,6 +351,45 @@ const BackOfficeDashboard: React.FC = () => {
         <Card><CardContent><Typography variant="caption">Clôtures Z</Typography><Typography variant="h5" fontWeight={900}>{globalZ}</Typography></CardContent></Card>
       </Box>
 
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Typography variant="h6" fontWeight={900} sx={{ flex: 1 }}>Comparaison boutiques</Typography>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => downloadCsv(
+                'comparaison-boutiques.csv',
+                ['Boutique', 'CA', 'Tickets', 'Panier moyen', 'Z', 'Marge estimee'],
+                statsByStore.map((store) => [
+                  store.name,
+                  store.totalCA.toFixed(2),
+                  store.ticketCount,
+                  (store.ticketCount ? store.totalCA / store.ticketCount : 0).toFixed(2),
+                  store.zCount,
+                  store.marginAmount.toFixed(2),
+                ])
+              )}
+            >
+              Export CSV
+            </Button>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', gap: 1, fontWeight: 900, borderBottom: '1px solid #ddd', pb: 0.5 }}>
+            <Typography>Boutique</Typography><Typography>CA</Typography><Typography>Tickets</Typography><Typography>Panier</Typography><Typography>Z</Typography><Typography>Marge</Typography>
+          </Box>
+          {statsByStore.map((store) => (
+            <Box key={store.code} sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', gap: 1, py: 0.5, borderBottom: '1px solid #f0f0f0' }}>
+              <Typography>{store.name}</Typography>
+              <Typography fontFamily="monospace">{formatEuro(store.totalCA)}</Typography>
+              <Typography>{store.ticketCount}</Typography>
+              <Typography fontFamily="monospace">{formatEuro(store.ticketCount ? store.totalCA / store.ticketCount : 0)}</Typography>
+              <Typography>{store.zCount}</Typography>
+              <Typography fontFamily="monospace">{formatEuro(store.marginAmount)}</Typography>
+            </Box>
+          ))}
+        </CardContent>
+      </Card>
+
       <Box sx={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {statsByStore.map((store) => (
@@ -311,11 +423,12 @@ const BackOfficeDashboard: React.FC = () => {
                   Période: {selected.firstDate ? selected.firstDate.toLocaleDateString('fr-FR') : '-'} - {selected.lastDate ? selected.lastDate.toLocaleDateString('fr-FR') : '-'}
                 </Typography>
                 <Divider sx={{ my: 2 }} />
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 2 }}>
                   <Box><Typography variant="caption">CA</Typography><Typography variant="h6" fontWeight={900}>{formatEuro(selected.totalCA)}</Typography></Box>
                   <Box><Typography variant="caption">Tickets</Typography><Typography variant="h6" fontWeight={900}>{selected.ticketCount}</Typography></Box>
                   <Box><Typography variant="caption">Panier moyen</Typography><Typography variant="h6" fontWeight={900}>{formatEuro(selected.ticketCount ? selected.totalCA / selected.ticketCount : 0)}</Typography></Box>
                   <Box><Typography variant="caption">Dernier Z</Typography><Typography variant="h6" fontWeight={900}>Z{selected.lastZ || '-'}</Typography></Box>
+                  <Box><Typography variant="caption">Marge estimée</Typography><Typography variant="h6" fontWeight={900}>{formatEuro(selected.marginAmount)}</Typography></Box>
                 </Box>
               </CardContent>
             </Card>
@@ -336,7 +449,12 @@ const BackOfficeDashboard: React.FC = () => {
 
             <Card>
               <CardContent>
-                <Typography variant="h6" fontWeight={900}>Contrôles</Typography>
+                <Typography variant="h6" fontWeight={900}>Rapprochement</Typography>
+                <List dense>
+                  <ListItem sx={{ py: 0.25 }}><ListItemText primary="CA tickets" /><Typography fontFamily="monospace">{formatEuro(selected.totalCA)}</Typography></ListItem>
+                  <ListItem sx={{ py: 0.25 }}><ListItemText primary="Total paiements" /><Typography fontFamily="monospace">{formatEuro(selected.paymentTotal)}</Typography></ListItem>
+                  <ListItem sx={{ py: 0.25 }}><ListItemText primary="Total clôtures" /><Typography fontFamily="monospace">{formatEuro(selected.closureTotal || selected.totalCA)}</Typography></ListItem>
+                </List>
                 {selected.anomalies.length === 0 ? (
                   <Chip label="Aucune anomalie détectée" color="success" />
                 ) : (
@@ -347,9 +465,58 @@ const BackOfficeDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
+            <Card>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" fontWeight={900} sx={{ flex: 1 }}>Ventes par jour</Typography>
+                  <Button size="small" variant="outlined" onClick={() => downloadCsv(
+                    `${selected.name}-ventes-jour.csv`,
+                    ['Jour', 'CA', 'Tickets', 'Articles'],
+                    selected.dailyRows.map((row) => [row.key, row.ca.toFixed(2), row.tickets, row.qty])
+                  )}>CSV</Button>
+                </Box>
+                <List dense>
+                  {selected.dailyRows.slice(0, 10).map((row) => (
+                    <ListItem key={row.key} sx={{ py: 0.25 }}>
+                      <ListItemText primary={row.key} secondary={`${row.tickets} ticket(s) - ${row.qty} article(s)`} />
+                      <Typography fontFamily="monospace" fontWeight={900}>{formatEuro(row.ca)}</Typography>
+                    </ListItem>
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" fontWeight={900} sx={{ flex: 1 }}>Ventes par mois</Typography>
+                  <Button size="small" variant="outlined" onClick={() => downloadCsv(
+                    `${selected.name}-ventes-mois.csv`,
+                    ['Mois', 'CA', 'Tickets', 'Articles'],
+                    selected.monthlyRows.map((row) => [row.key, row.ca.toFixed(2), row.tickets, row.qty])
+                  )}>CSV</Button>
+                </Box>
+                <List dense>
+                  {selected.monthlyRows.map((row) => (
+                    <ListItem key={row.key} sx={{ py: 0.25 }}>
+                      <ListItemText primary={row.key} secondary={`${row.tickets} ticket(s) - ${row.qty} article(s)`} />
+                      <Typography fontFamily="monospace" fontWeight={900}>{formatEuro(row.ca)}</Typography>
+                    </ListItem>
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+
             <Card sx={{ gridColumn: '1 / -1' }}>
               <CardContent>
-                <Typography variant="h6" fontWeight={900}>Top articles par CA</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" fontWeight={900} sx={{ flex: 1 }}>Top articles par CA</Typography>
+                  <Button size="small" variant="outlined" onClick={() => downloadCsv(
+                    `${selected.name}-top-articles.csv`,
+                    ['Rang', 'Article', 'Quantite', 'CA'],
+                    selected.topProducts.map((product, index) => [index + 1, product.name, product.qty, product.amount.toFixed(2)])
+                  )}>CSV</Button>
+                </Box>
                 <List dense>
                   {selected.topProducts.map((product, index) => (
                     <ListItem key={`${product.name}-${index}`} sx={{ py: 0.25 }}>
