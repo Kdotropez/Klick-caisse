@@ -761,6 +761,23 @@ const BackOfficeDashboard: React.FC = () => {
                   >
                     Export HTML boutique
                   </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => {
+                      const ok = window.confirm(
+                        `Remettre à zéro les imports de ${selected.name} ?\n\n` +
+                        `Une archive de sécurité sera téléchargée avant suppression.\n` +
+                        `Cette action supprime les données importées de cette boutique dans le Back office.`
+                      );
+                      if (!ok) return;
+                      StorageService.prepareActiveStoreForFullRestore(selected.code);
+                      setRefreshKey((value) => value + 1);
+                      window.alert(`Imports remis à zéro pour ${selected.name}.`);
+                    }}
+                  >
+                    RAZ imports boutique
+                  </Button>
                 </Box>
                 <Typography color="text.secondary">
                   Période: {selected.firstDate ? selected.firstDate.toLocaleDateString('fr-FR') : '-'} - {selected.lastDate ? selected.lastDate.toLocaleDateString('fr-FR') : '-'}
