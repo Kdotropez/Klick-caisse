@@ -9,6 +9,16 @@ type BackOfficeStoreData = {
   subcategories?: string[];
   cashiers?: any[];
   customers?: any[];
+  imports?: Array<{
+    id: string;
+    fileName: string;
+    exportedAt?: string;
+    storeCode: string;
+    storeName?: string;
+    closures: any[];
+    transactionsByDay: Record<string, any[]>;
+    zCounter?: number;
+  }>;
 };
 
 const DB_NAME = 'klick_back_office';

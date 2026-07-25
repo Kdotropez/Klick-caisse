@@ -233,6 +233,7 @@ const exportBackOfficeBackup = (stores: Array<{ code: string; name: string }>, d
         customers: storeData?.customers || (() => {
           try { return JSON.parse(localStorage.getItem(StorageService.getStoreKey(store.code, 'customers')) || '[]'); } catch { return []; }
         })(),
+        imports: storeData?.imports || [],
       };
     }),
   };
@@ -415,8 +416,21 @@ const transactionsByDayFromClosures = (closures: any[]): Record<string, any[]> =
 };
 
 const buildStoreStats = (storeCode: string, storeName: string, backOfficeData?: BackOfficeStoreData | null): StoreStats => {
-  const closures = backOfficeData?.closures || StorageService.loadClosures(storeCode);
-  const txs = collectStoreTransactions(storeCode, closures, backOfficeData?.transactionsByDay);
+  let closures = backOfficeData?.closures || StorageService.loadClosures(storeCode);
+  let transactionsByDay = backOfficeData?.transactionsByDay;
+  if (backOfficeData?.imports && backOfficeData.imports.length > 0) {
+    closures = [];
+    transactionsByDay = {};
+    for (const imported of backOfficeData.imports) {
+      const dailyClosures = buildDailyClosuresFromBackup(imported);
+      closures = mergeClosuresByDay(closures, dailyClosures);
+      transactionsByDay = mergeTransactionsByDay(
+        transactionsByDay,
+        mergeTransactionsByDay(transactionsByDayFromClosures(dailyClosures), imported.transactionsByDay || {})
+      );
+    }
+  }
+  const txs = collectStoreTransactions(storeCode, closures, transactionsByDay);
   const totalCA = txs.reduce((sum, tx) => sum + (Number(tx?.total) || 0), 0);
   const dates = txs
     .map((tx) => new Date(tx?.timestamp))
@@ -696,6 +710,18 @@ const BackOfficeDashboard: React.FC = () => {
       let mergedClosures: any[] | null = null;
       const importedDailyClosures = buildDailyClosuresFromBackup(data);
       const existingBackOffice = await BackOfficeStorage.loadStore(targetStoreCode);
+      const backupId = [
+        file.name,
+        data.exportedAt || '',
+        targetStoreCode,
+        String(data.zCounter || ''),
+        String(Array.isArray(data.closures) ? data.closures.length : 0),
+      ].join('|');
+      const existingImports = existingBackOffice?.imports || [];
+      if (existingImports.some((item) => item.id === backupId)) {
+        window.alert('Ce fichier a déjà été importé pour cette boutique. Aucun doublon ajouté.');
+        return;
+      }
       if (importedDailyClosures.length > 0) {
         const existingClosures = existingBackOffice?.closures || [];
         mergedClosures = mergeClosuresByDay(existingClosures, importedDailyClosures);
@@ -716,6 +742,19 @@ const BackOfficeDashboard: React.FC = () => {
         subcategories: Array.isArray(data.subcategories) ? data.subcategories : existingBackOffice?.subcategories,
         cashiers: Array.isArray(data.cashiers) ? data.cashiers : existingBackOffice?.cashiers,
         customers: Array.isArray(data.customers) ? data.customers : existingBackOffice?.customers,
+        imports: [
+          ...existingImports,
+          {
+            id: backupId,
+            fileName: file.name,
+            exportedAt: data.exportedAt,
+            storeCode: targetStoreCode,
+            storeName: targetStore.name,
+            closures: Array.isArray(data.closures) ? data.closures : [],
+            transactionsByDay: data.transactionsByDay || {},
+            zCounter: Number(data.zCounter) || undefined,
+          },
+        ],
       });
       setSelectedStoreCode(targetStoreCode);
       setRefreshKey((value) => value + 1);
