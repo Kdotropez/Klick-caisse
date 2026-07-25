@@ -91,10 +91,12 @@ const downloadHtml = (filename: string, title: string, body: string): void => {
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>${htmlEscape(title)}</title>
   <style>
+    @page { size: A4 landscape; margin: 12mm; }
     body { font-family: Arial, Helvetica, sans-serif; color: #1f2933; margin: 32px; background: #f7f9fc; }
-    .page { background: white; border: 1px solid #d9e2ec; border-radius: 12px; padding: 28px; max-width: 1180px; margin: 0 auto; }
+    .page { background: white; border: 1px solid #d9e2ec; border-radius: 12px; padding: 28px; max-width: 1280px; min-width: 980px; margin: 0 auto; }
     h1 { margin: 0 0 4px; color: #0d47a1; font-size: 28px; }
     h2 { margin: 28px 0 10px; color: #123c69; border-bottom: 2px solid #d9e2ec; padding-bottom: 6px; }
     .meta { color: #52606d; margin-bottom: 20px; }
@@ -109,7 +111,8 @@ const downloadHtml = (filename: string, title: string, body: string): void => {
     .ok { color: #1b5e20; font-weight: 700; }
     .warn { color: #b26a00; font-weight: 700; }
     .footer { margin-top: 28px; color: #829ab1; font-size: 12px; }
-    @media print { body { background: white; margin: 0; } .page { border: none; } }
+    @media print { body { background: white; margin: 0; } .page { border: none; min-width: auto; } }
+    @media screen and (max-width: 900px) { body { margin: 8px; } .page { transform-origin: top left; } }
   </style>
 </head>
 <body><div class="page">${body}<div class="footer">Rapport généré par Klick Caisse Back office - ${new Date().toLocaleString('fr-FR')}</div></div></body>
@@ -340,10 +343,95 @@ const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
   };
 };
 
+const buildFilteredStats = (base: StoreStats, filteredTxs: any[], filteredClosures: any[]): StoreStats => {
+  const originalStore = STORES.find((store) => store.code === base.code);
+  const stats = buildStoreStats(base.code, originalStore?.name || base.name);
+  return buildStoreStatsFromTransactions({ ...stats, txs: filteredTxs, closures: filteredClosures });
+};
+
+const buildStoreStatsFromTransactions = (base: StoreStats): StoreStats => {
+  const txs = base.txs;
+  const closures = base.closures;
+  const totalCA = txs.reduce((sum, tx) => sum + (Number(tx?.total) || 0), 0);
+  const dates = txs
+    .map((tx) => new Date(tx?.timestamp))
+    .filter((d) => Number.isFinite(d.getTime()))
+    .sort((a, b) => a.getTime() - b.getTime());
+  const paymentTotals = computePaymentTotalsFromTransactionList(txs);
+  const paymentTotal = Object.values(paymentTotals).reduce((sum, amount) => sum + (Number(amount) || 0), 0);
+  const productMap = new Map<string, { name: string; qty: number; amount: number }>();
+  const dailyMap = new Map<string, { key: string; ca: number; tickets: number; qty: number }>();
+  const monthlyMap = new Map<string, { key: string; ca: number; tickets: number; qty: number }>();
+  const settings = loadDiscountExclusionSettings();
+  let marginAmount = 0;
+
+  for (const tx of txs) {
+    const items = Array.isArray(tx?.items) ? tx.items : [];
+    const discounts = tx?.itemDiscounts || {};
+    const globalShare = allocateGlobalDiscountByLineKey(items, discounts, tx?.globalDiscount ?? null, settings);
+    const txDate = new Date(tx?.timestamp);
+    const dayKey = Number.isFinite(txDate.getTime()) ? formatDayKey(txDate) : 'Date inconnue';
+    const monthKey = Number.isFinite(txDate.getTime()) ? formatMonthKey(txDate) : 'Mois inconnu';
+    const txQty = items.reduce((sum: number, item: any) => sum + (Number(item?.quantity) || 0), 0);
+    const txTotal = Number(tx?.total) || 0;
+    const day = dailyMap.get(dayKey) || { key: dayKey, ca: 0, tickets: 0, qty: 0 };
+    day.ca += txTotal; day.tickets += 1; day.qty += txQty; dailyMap.set(dayKey, day);
+    const month = monthlyMap.get(monthKey) || { key: monthKey, ca: 0, tickets: 0, qty: 0 };
+    month.ca += txTotal; month.tickets += 1; month.qty += txQty; monthlyMap.set(monthKey, month);
+
+    for (const item of items) {
+      const product = item?.product || {};
+      const key = `${String(product.id || product.name || 'inconnu')}__${String(item?.selectedVariation?.id || 'main')}`;
+      const name = item?.selectedVariation?.attributes ? `${product.name || 'Article'} (${item.selectedVariation.attributes})` : product.name || 'Article';
+      const current = productMap.get(key) || { name, qty: 0, amount: 0 };
+      const lineAmount = getLinePayableAmount(item, discounts, globalShare);
+      current.qty += Number(item?.quantity) || 0;
+      current.amount += lineAmount;
+      const cost = Number(product.wholesalePrice) || 0;
+      if (cost > 0) marginAmount += lineAmount - cost * (Number(item?.quantity) || 0);
+      productMap.set(key, current);
+    }
+  }
+
+  const zNumbers = closures.map((c) => Number(c?.zNumber)).filter((n) => Number.isFinite(n)).sort((a, b) => a - b);
+  const anomalies: string[] = [];
+  for (let i = 1; i < zNumbers.length; i++) {
+    if (zNumbers[i] === zNumbers[i - 1]) anomalies.push(`Z${zNumbers[i]} en doublon`);
+    if (zNumbers[i] > zNumbers[i - 1] + 1) anomalies.push(`Z manquant entre Z${zNumbers[i - 1]} et Z${zNumbers[i]}`);
+  }
+  if (txs.some((tx) => !Array.isArray(tx?.items) || tx.items.length === 0)) anomalies.push('Tickets sans articles détectés');
+  if (Math.abs(paymentTotal - totalCA) > 0.01) anomalies.push(`Écart paiements / CA: ${formatEuro(paymentTotal)} vs ${formatEuro(totalCA)}`);
+  const closureTotal = closures.reduce((sum, closure) => sum + (Number(closure?.totalCA) || 0), 0);
+  if (closureTotal > 0 && Math.abs(closureTotal - totalCA) > 0.01) anomalies.push(`Écart clôtures / tickets: ${formatEuro(closureTotal)} vs ${formatEuro(totalCA)}`);
+
+  return {
+    ...base,
+    txs,
+    closures,
+    totalCA,
+    ticketCount: txs.length,
+    zCount: closures.length,
+    lastZ: zNumbers[zNumbers.length - 1] || 0,
+    firstDate: dates[0],
+    lastDate: dates[dates.length - 1],
+    paymentTotals,
+    paymentTotal,
+    closureTotal,
+    topProducts: Array.from(productMap.values()).sort((a, b) => b.amount - a.amount),
+    dailyRows: Array.from(dailyMap.values()).sort((a, b) => b.key.localeCompare(a.key)),
+    monthlyRows: Array.from(monthlyMap.values()).sort((a, b) => b.key.localeCompare(a.key)),
+    marginAmount,
+    anomalies,
+  };
+};
+
 const BackOfficeDashboard: React.FC = () => {
   const stores = useMemo(() => STORES.filter((store) => !store.isBackOfficeProfile), []);
   const [selectedStoreCode, setSelectedStoreCode] = useState<string>('3');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedDay, setSelectedDay] = useState<string>('all');
+  const [articleSort, setArticleSort] = useState<'amount' | 'qty' | 'name'>('amount');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const statsByStore = useMemo(() => {
@@ -351,7 +439,51 @@ const BackOfficeDashboard: React.FC = () => {
     return stores.map((store) => buildStoreStats(store.code, store.name));
   }, [refreshKey, stores]);
 
-  const selected = statsByStore.find((store) => store.code === selectedStoreCode) || statsByStore[0];
+  const selectedBase = statsByStore.find((store) => store.code === selectedStoreCode) || statsByStore[0];
+  const availableMonths = useMemo(() => {
+    const months = new Set<string>();
+    selectedBase?.txs.forEach((tx) => {
+      const date = new Date(tx?.timestamp);
+      if (Number.isFinite(date.getTime())) months.add(formatMonthKey(date));
+    });
+    return Array.from(months).sort().reverse();
+  }, [selectedBase]);
+  const availableDays = useMemo(() => {
+    const days = new Set<string>();
+    selectedBase?.txs.forEach((tx) => {
+      const date = new Date(tx?.timestamp);
+      if (!Number.isFinite(date.getTime())) return;
+      const month = formatMonthKey(date);
+      if (selectedMonth !== 'all' && month !== selectedMonth) return;
+      days.add(formatDayKey(date));
+    });
+    return Array.from(days).sort().reverse();
+  }, [selectedBase, selectedMonth]);
+  const selected = useMemo(() => {
+    if (!selectedBase) return selectedBase;
+    if (selectedMonth === 'all' && selectedDay === 'all') return selectedBase;
+    const txs = selectedBase.txs.filter((tx) => {
+      const date = new Date(tx?.timestamp);
+      if (!Number.isFinite(date.getTime())) return false;
+      if (selectedMonth !== 'all' && formatMonthKey(date) !== selectedMonth) return false;
+      if (selectedDay !== 'all' && formatDayKey(date) !== selectedDay) return false;
+      return true;
+    });
+    const closures = selectedBase.closures.filter((closure) => {
+      const date = new Date(closure?.closedAt);
+      if (!Number.isFinite(date.getTime())) return false;
+      if (selectedMonth !== 'all' && formatMonthKey(date) !== selectedMonth) return false;
+      if (selectedDay !== 'all' && formatDayKey(date) !== selectedDay) return false;
+      return true;
+    });
+    return buildFilteredStats(selectedBase, txs, closures);
+  }, [selectedBase, selectedDay, selectedMonth]);
+  const sortedTopProducts = useMemo(() => {
+    const list = selected?.topProducts ? [...selected.topProducts] : [];
+    if (articleSort === 'qty') return list.sort((a, b) => b.qty - a.qty);
+    if (articleSort === 'name') return list.sort((a, b) => a.name.localeCompare(b.name));
+    return list.sort((a, b) => b.amount - a.amount);
+  }, [articleSort, selected]);
   const globalCA = statsByStore.reduce((sum, store) => sum + store.totalCA, 0);
   const globalTickets = statsByStore.reduce((sum, store) => sum + store.ticketCount, 0);
   const globalZ = statsByStore.reduce((sum, store) => sum + store.zCount, 0);
@@ -528,7 +660,7 @@ const BackOfficeDashboard: React.FC = () => {
                     onClick={() => downloadHtml(
                       `rapport-${selected.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.html`,
                       `Rapport boutique - ${selected.name}`,
-                      buildStoreHtmlReport(selected)
+                      buildStoreHtmlReport({ ...selected, topProducts: sortedTopProducts })
                     )}
                   >
                     Export HTML boutique
@@ -537,6 +669,45 @@ const BackOfficeDashboard: React.FC = () => {
                 <Typography color="text.secondary">
                   Période: {selected.firstDate ? selected.firstDate.toLocaleDateString('fr-FR') : '-'} - {selected.lastDate ? selected.lastDate.toLocaleDateString('fr-FR') : '-'}
                 </Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, mt: 2 }}>
+                  <Box>
+                    <Typography variant="caption" fontWeight={800}>Mois</Typography>
+                    <select
+                      value={selectedMonth}
+                      onChange={(event) => {
+                        setSelectedMonth(event.target.value);
+                        setSelectedDay('all');
+                      }}
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #cbd5e1' }}
+                    >
+                      <option value="all">Tous les mois</option>
+                      {availableMonths.map((month) => <option key={month} value={month}>{month}</option>)}
+                    </select>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" fontWeight={800}>Jour</Typography>
+                    <select
+                      value={selectedDay}
+                      onChange={(event) => setSelectedDay(event.target.value)}
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #cbd5e1' }}
+                    >
+                      <option value="all">Tous les jours</option>
+                      {availableDays.map((day) => <option key={day} value={day}>{day}</option>)}
+                    </select>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" fontWeight={800}>Tri articles</Typography>
+                    <select
+                      value={articleSort}
+                      onChange={(event) => setArticleSort(event.target.value as 'amount' | 'qty' | 'name')}
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #cbd5e1' }}
+                    >
+                      <option value="amount">CA décroissant</option>
+                      <option value="qty">Quantité décroissante</option>
+                      <option value="name">Nom A-Z</option>
+                    </select>
+                  </Box>
+                </Box>
                 <Divider sx={{ my: 2 }} />
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 2 }}>
                   <Box><Typography variant="caption">CA</Typography><Typography variant="h6" fontWeight={900}>{formatEuro(selected.totalCA)}</Typography></Box>
@@ -629,11 +800,11 @@ const BackOfficeDashboard: React.FC = () => {
                   <Button size="small" variant="outlined" onClick={() => downloadCsv(
                     `${selected.name}-top-articles.csv`,
                     ['Rang', 'Article', 'Quantite', 'CA'],
-                    selected.topProducts.map((product, index) => [index + 1, product.name, product.qty, product.amount.toFixed(2)])
+                    sortedTopProducts.map((product, index) => [index + 1, product.name, product.qty, product.amount.toFixed(2)])
                   )}>CSV</Button>
                 </Box>
                 <List dense>
-                  {selected.topProducts.map((product, index) => (
+                  {sortedTopProducts.map((product, index) => (
                     <ListItem key={`${product.name}-${index}`} sx={{ py: 0.25 }}>
                       <Typography sx={{ width: 36, fontWeight: 900 }}>{index + 1}</Typography>
                       <ListItemText primary={product.name} secondary={`${product.qty} unité(s)`} />
