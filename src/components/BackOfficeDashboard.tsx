@@ -259,14 +259,30 @@ const collectStoreTransactions = (storeCode: string, closures: any[]): any[] => 
 
 const mergeClosuresByZ = (existing: any[], incoming: any[]): any[] => {
   const byZ = new Map<number, any>();
+  const used = new Set<number>();
   for (const closure of existing) {
     const z = Number(closure?.zNumber);
-    if (Number.isFinite(z)) byZ.set(z, closure);
+    if (Number.isFinite(z)) {
+      byZ.set(z, closure);
+      used.add(z);
+    }
   }
+  let nextZ = used.size > 0 ? Math.max(...Array.from(used)) + 1 : 1;
   for (const closure of incoming) {
-    const z = Number(closure?.zNumber);
+    let z = Number(closure?.zNumber);
     if (!Number.isFinite(z)) continue;
-    if (!byZ.has(z)) byZ.set(z, closure);
+    let closureToStore = closure;
+    if (used.has(z)) {
+      while (used.has(nextZ)) nextZ += 1;
+      closureToStore = {
+        ...closure,
+        originalZNumber: closure.originalZNumber ?? z,
+        zNumber: nextZ,
+      };
+      z = nextZ;
+    }
+    used.add(z);
+    byZ.set(z, closureToStore);
   }
   return Array.from(byZ.values()).sort((a, b) => (Number(a?.zNumber) || 0) - (Number(b?.zNumber) || 0));
 };
@@ -570,15 +586,21 @@ const BackOfficeDashboard: React.FC = () => {
       }
       if (data.settings) StorageService.saveSettings(data.settings, targetStoreCode);
       if (Array.isArray(data.subcategories)) StorageService.saveSubcategories(data.subcategories, targetStoreCode);
+      let mergedClosures: any[] | null = null;
       if (Array.isArray(data.closures)) {
         const existingClosures = StorageService.loadClosures(targetStoreCode);
-        StorageService.saveAllClosures(mergeClosuresByZ(existingClosures, data.closures), targetStoreCode);
+        mergedClosures = mergeClosuresByZ(existingClosures, data.closures);
+        StorageService.saveAllClosures(mergedClosures, targetStoreCode);
       }
       if (data.transactionsByDay) {
         const existingMap = parseMap(localStorage.getItem(StorageService.getStoreKey(targetStoreCode, 'transactions_by_day')));
         StorageService.saveTransactionsByDayMap(mergeTransactionsByDay(existingMap, data.transactionsByDay), targetStoreCode);
       }
-      if (Number.isFinite(Number(data.zCounter))) StorageService.setZCounterValue(Number(data.zCounter), targetStoreCode);
+      if (Number.isFinite(Number(data.zCounter))) {
+        const maxZ = (mergedClosures || StorageService.loadClosures(targetStoreCode))
+          .reduce((max, closure) => Math.max(max, Number(closure?.zNumber) || 0), 0);
+        StorageService.setZCounterValue(Math.max(Number(data.zCounter) || 0, maxZ), targetStoreCode);
+      }
       if (Array.isArray(data.cashiers)) StorageService.saveCashiers(data.cashiers, targetStoreCode);
       if (Array.isArray(data.customers)) StorageService.saveCustomers(data.customers, targetStoreCode);
       setSelectedStoreCode(targetStoreCode);
