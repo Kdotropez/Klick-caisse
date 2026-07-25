@@ -576,7 +576,7 @@ const BackOfficeDashboard: React.FC = () => {
         try {
           StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
         } catch {
-          StorageService.prepareActiveStoreForFullRestore(targetStoreCode);
+          StorageService.clearStoreCatalogForRestore(targetStoreCode);
           try {
             StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
           } catch (quotaError) {

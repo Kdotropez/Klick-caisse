@@ -1450,6 +1450,17 @@ export class StorageService {
     }
   }
 
+  static clearStoreCatalogForRestore(storeCode?: string): void {
+    this.downloadLocalStorageArchiveBeforePurge();
+    const code = storeCode ?? this.getCurrentStoreCode();
+    try {
+      localStorage.removeItem(this.getStoreKey(code, 'productionData'));
+      localStorage.removeItem(this.getStoreKey(code, 'auto_backups'));
+    } catch {
+      /* ignore */
+    }
+  }
+
   static getAllStoreData(storeCode: string): {
     products: Product[];
     categories: Category[];

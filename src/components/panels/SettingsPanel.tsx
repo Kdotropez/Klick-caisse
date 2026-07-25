@@ -833,7 +833,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                       'Continuer ?'
                     );
                     if (!ok) throw restoreError;
-                    StorageService.prepareActiveStoreForFullRestore(targetStoreCode);
+                    StorageService.clearStoreCatalogForRestore(targetStoreCode);
                     try {
                       StorageService.saveProductionData(data.products, data.categories, targetStoreCode, { skipAutoBackup: true });
                     } catch (retryError) {
@@ -852,7 +852,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         'Le stockage navigateur est plein.\n\nCréer une archive, vider la boutique courante puis relancer la restauration ?'
                       );
                       if (!ok) throw restoreError;
-                      StorageService.prepareActiveStoreForFullRestore(targetStoreCode);
+                      StorageService.clearStoreCatalogForRestore(targetStoreCode);
                       try {
                         const categoriesForTarget = Array.isArray(data.categories) ? data.categories : [];
                         StorageService.saveProductionData(data.products, categoriesForTarget, targetStoreCode, { skipAutoBackup: true });
