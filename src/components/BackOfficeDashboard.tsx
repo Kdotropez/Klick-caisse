@@ -171,7 +171,9 @@ const buildStoreHtmlReport = (store: StoreStats): string => {
       const total = txs.reduce((sum: number, tx: any) => sum + (Number(tx?.total) || 0), 0);
       return [
         `Z${closure?.zNumber || '-'}`,
-        closure?.originalZNumber ? `Z${closure.originalZNumber}` : '',
+        Array.isArray(closure?.originalZNumbers)
+          ? closure.originalZNumbers.map((z: number) => `Z${z}`).join(', ')
+          : closure?.originalZNumber ? `Z${closure.originalZNumber}` : '',
         closure?.closedAt ? new Date(closure.closedAt).toLocaleDateString('fr-FR') : '',
         txs.length,
         formatEuro(total),
@@ -269,34 +271,105 @@ const collectStoreTransactions = (storeCode: string, closures: any[]): any[] => 
   return out;
 };
 
-const mergeClosuresByZ = (existing: any[], incoming: any[]): any[] => {
-  const byZ = new Map<number, any>();
-  const used = new Set<number>();
+const getTxDayKey = (tx: any): string => {
+  const date = new Date(tx?.timestamp);
+  return Number.isFinite(date.getTime()) ? formatDayKey(date) : 'date-inconnue';
+};
+
+const txUniqueKey = (tx: any): string => {
+  const id = String(tx?.id || '');
+  const ts = new Date(tx?.timestamp || 0).getTime();
+  return `${id}@${ts}`;
+};
+
+const buildDailyClosuresFromBackup = (data: any): any[] => {
+  const byDay = new Map<string, { txs: any[]; txKeys: Set<string>; originalZNumbers: Set<number> }>();
+  const addTx = (tx: any, originalZ?: number) => {
+    const day = getTxDayKey(tx);
+    const current = byDay.get(day) || { txs: [], txKeys: new Set<string>(), originalZNumbers: new Set<number>() };
+    const key = txUniqueKey(tx);
+    if (!current.txKeys.has(key)) {
+      current.txKeys.add(key);
+      current.txs.push(tx);
+    }
+    if (Number.isFinite(Number(originalZ))) current.originalZNumbers.add(Number(originalZ));
+    byDay.set(day, current);
+  };
+
+  if (Array.isArray(data?.closures)) {
+    for (const closure of data.closures) {
+      const originalZ = Number(closure?.zNumber);
+      const txs = Array.isArray(closure?.transactions) ? closure.transactions : [];
+      txs.forEach((tx: any) => addTx(tx, originalZ));
+    }
+  }
+
+  const txMap = data?.transactionsByDay && typeof data.transactionsByDay === 'object' ? data.transactionsByDay : {};
+  for (const list of Object.values(txMap)) {
+    if (Array.isArray(list)) list.forEach((tx: any) => addTx(tx));
+  }
+
+  return Array.from(byDay.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([day, value]) => ({
+      zNumber: 0,
+      originalZNumbers: Array.from(value.originalZNumbers).sort((a, b) => a - b),
+      closedAt: `${day}T23:59:59.999Z`,
+      transactions: value.txs.sort((a, b) => new Date(a?.timestamp || 0).getTime() - new Date(b?.timestamp || 0).getTime()),
+      totalCA: value.txs.reduce((sum, tx) => sum + (Number(tx?.total) || 0), 0),
+      reconstructedFromTickets: true,
+      sourceExportedAt: data?.exportedAt,
+    }));
+};
+
+const mergeClosuresByDay = (existing: any[], incoming: any[]): any[] => {
+  const byDay = new Map<string, any>();
+  const usedZ = new Set<number>();
+
   for (const closure of existing) {
+    const day = String(closure?.closedAt || '').slice(0, 10);
     const z = Number(closure?.zNumber);
-    if (Number.isFinite(z)) {
-      byZ.set(z, closure);
-      used.add(z);
-    }
+    if (Number.isFinite(z)) usedZ.add(z);
+    if (day) byDay.set(day, closure);
   }
-  let nextZ = used.size > 0 ? Math.max(...Array.from(used)) + 1 : 1;
+
+  let nextZ = usedZ.size > 0 ? Math.max(...Array.from(usedZ)) + 1 : 1;
   for (const closure of incoming) {
-    let z = Number(closure?.zNumber);
-    if (!Number.isFinite(z)) continue;
-    let closureToStore = closure;
-    if (used.has(z)) {
-      while (used.has(nextZ)) nextZ += 1;
-      closureToStore = {
-        ...closure,
-        originalZNumber: closure.originalZNumber ?? z,
-        zNumber: nextZ,
-      };
-      z = nextZ;
+    const day = String(closure?.closedAt || '').slice(0, 10);
+    if (!day) continue;
+    const existingClosure = byDay.get(day);
+    if (existingClosure) {
+      const existingTxs = Array.isArray(existingClosure.transactions) ? existingClosure.transactions : [];
+      const seen = new Set(existingTxs.map(txUniqueKey));
+      const incomingTxs = Array.isArray(closure.transactions) ? closure.transactions : [];
+      const mergedTxs = [...existingTxs];
+      for (const tx of incomingTxs) {
+        const key = txUniqueKey(tx);
+        if (!seen.has(key)) {
+          seen.add(key);
+          mergedTxs.push(tx);
+        }
+      }
+      const originalZNumbers = Array.from(new Set([
+        ...((Array.isArray(existingClosure.originalZNumbers) ? existingClosure.originalZNumbers : []) as number[]),
+        ...((Array.isArray(closure.originalZNumbers) ? closure.originalZNumbers : []) as number[]),
+      ])).sort((a, b) => Number(a) - Number(b));
+      byDay.set(day, {
+        ...existingClosure,
+        originalZNumbers,
+        transactions: mergedTxs,
+        totalCA: mergedTxs.reduce((sum, tx) => sum + (Number(tx?.total) || 0), 0),
+        reconstructedFromTickets: true,
+      });
+      continue;
     }
-    used.add(z);
-    byZ.set(z, closureToStore);
+
+    while (usedZ.has(nextZ)) nextZ += 1;
+    usedZ.add(nextZ);
+    byDay.set(day, { ...closure, zNumber: nextZ });
   }
-  return Array.from(byZ.values()).sort((a, b) => (Number(a?.zNumber) || 0) - (Number(b?.zNumber) || 0));
+
+  return Array.from(byDay.values()).sort((a, b) => new Date(a?.closedAt || 0).getTime() - new Date(b?.closedAt || 0).getTime());
 };
 
 const mergeTransactionsByDay = (
@@ -593,9 +666,10 @@ const BackOfficeDashboard: React.FC = () => {
       if (data.settings) StorageService.saveSettings(data.settings, targetStoreCode);
       if (Array.isArray(data.subcategories)) StorageService.saveSubcategories(data.subcategories, targetStoreCode);
       let mergedClosures: any[] | null = null;
-      if (Array.isArray(data.closures)) {
+      const importedDailyClosures = buildDailyClosuresFromBackup(data);
+      if (importedDailyClosures.length > 0) {
         const existingClosures = StorageService.loadClosures(targetStoreCode);
-        mergedClosures = mergeClosuresByZ(existingClosures, data.closures);
+        mergedClosures = mergeClosuresByDay(existingClosures, importedDailyClosures);
         StorageService.saveAllClosures(mergedClosures, targetStoreCode);
       }
       if (data.transactionsByDay) {
@@ -912,7 +986,9 @@ const BackOfficeDashboard: React.FC = () => {
                       const total = txs.reduce((sum: number, tx: any) => sum + (Number(tx?.total) || 0), 0);
                       return [
                         `Z${closure?.zNumber || '-'}`,
-                        closure?.originalZNumber ? `Z${closure.originalZNumber}` : '',
+                        Array.isArray(closure?.originalZNumbers)
+                          ? closure.originalZNumbers.map((z: number) => `Z${z}`).join(', ')
+                          : closure?.originalZNumber ? `Z${closure.originalZNumber}` : '',
                         closure?.closedAt ? new Date(closure.closedAt).toLocaleDateString('fr-FR') : '',
                         txs.length,
                         total.toFixed(2),
@@ -929,7 +1005,11 @@ const BackOfficeDashboard: React.FC = () => {
                   return (
                     <Box key={`${closure?.zNumber}-${closure?.closedAt}`} sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.5fr 1fr 1fr', gap: 1, py: 0.5, borderBottom: '1px solid #f0f0f0' }}>
                       <Typography fontWeight={800}>Z{closure?.zNumber || '-'}</Typography>
-                      <Typography>{closure?.originalZNumber ? `Z${closure.originalZNumber}` : '-'}</Typography>
+                      <Typography>
+                        {Array.isArray(closure?.originalZNumbers)
+                          ? closure.originalZNumbers.map((z: number) => `Z${z}`).join(', ')
+                          : closure?.originalZNumber ? `Z${closure.originalZNumber}` : '-'}
+                      </Typography>
                       <Typography>{closure?.closedAt ? new Date(closure.closedAt).toLocaleDateString('fr-FR') : '-'}</Typography>
                       <Typography>{txs.length}</Typography>
                       <Typography fontFamily="monospace">{formatEuro(total)}</Typography>
