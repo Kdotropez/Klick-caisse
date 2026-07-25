@@ -12,7 +12,7 @@ import { Cashier } from './types/Cashier';
 import { loadProductionData, saveProductionData } from './data/productionData';
 import { StorageService } from './services/StorageService';
 // import { UpdateService } from './services/UpdateService';
-// import { APP_VERSION } from './version';
+import { APP_VERSION } from './version';
 import { useUISettings } from './context/UISettingsContext';
 
 const MIN_ROOT_WIDTH = 800;
@@ -359,6 +359,27 @@ const App: React.FC = () => {
       };
     }
   }, [isLicenseValid, lastValidatedDate, lastActivity, isLocked, checkLicenseValidity, checkAutoLock]);
+
+  useEffect(() => {
+    if (!storeSessionReady || !isLicenseValid || isLocked) return;
+    try {
+      if (localStorage.getItem('ui.backOfficeCentral') === '1') return;
+      const key = StorageService.getStoreKey(currentStoreCode, `safety_backup_before_version_${APP_VERSION}`);
+      if (localStorage.getItem(key) === '1') return;
+      const timer = window.setTimeout(() => {
+        try {
+          StorageService.downloadFullBackup();
+          localStorage.setItem(key, '1');
+          console.log(`Sauvegarde sécurité version ${APP_VERSION} créée pour boutique ${currentStoreCode}`);
+        } catch (error) {
+          console.error('Erreur sauvegarde sécurité avant nouvelle version:', error);
+        }
+      }, 700);
+      return () => window.clearTimeout(timer);
+    } catch {
+      return;
+    }
+  }, [currentStoreCode, isLicenseValid, isLocked, storeSessionReady]);
 
   const rootWidthPx = parseInt(rootSize.width);
   const rootHeightPx = parseInt(rootSize.height);
