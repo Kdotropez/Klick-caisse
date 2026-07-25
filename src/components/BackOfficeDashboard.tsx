@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { STORES } from '../types/Store';
 import { StorageService } from '../services/StorageService';
+import { BackOfficeStorage, BackOfficeStoreData } from '../services/BackOfficeStorage';
 import { formatEuro } from '../utils/currency';
 import {
   allocateGlobalDiscountByLineKey,
@@ -206,29 +207,30 @@ const buildPortableHtmlReport = (stores: StoreStats[]): string => `
   ${stores.map((store) => `<div style="break-before: page; page-break-before: always;">${buildStoreHtmlReport(store)}</div>`).join('')}
 `;
 
-const exportBackOfficeBackup = (stores: Array<{ code: string; name: string }>): void => {
+const exportBackOfficeBackup = (stores: Array<{ code: string; name: string }>, dataByStore: Record<string, BackOfficeStoreData | null>): void => {
   const backup = {
     schemaVersion: 1,
     type: 'klick-back-office-backup',
     exportedAt: new Date().toISOString(),
     stores: stores.map((store) => {
+      const storeData = dataByStore[store.code];
       const productionData = StorageService.loadProductionData(store.code);
-      const transactionsByDay = parseMap(localStorage.getItem(StorageService.getStoreKey(store.code, 'transactions_by_day')));
+      const transactionsByDay = storeData?.transactionsByDay || parseMap(localStorage.getItem(StorageService.getStoreKey(store.code, 'transactions_by_day')));
       return {
         code: store.code,
         name: store.name,
         productionData,
-        settings: (() => {
+        settings: storeData?.settings || (() => {
           try { return JSON.parse(localStorage.getItem(StorageService.getStoreKey(store.code, 'settings')) || '{}'); } catch { return {}; }
         })(),
-        subcategories: (() => {
+        subcategories: storeData?.subcategories || (() => {
           try { return JSON.parse(localStorage.getItem(StorageService.getStoreKey(store.code, 'subcategories')) || '[]'); } catch { return []; }
         })(),
         transactionsByDay,
-        closures: StorageService.loadClosures(store.code),
-        zCounter: Number(localStorage.getItem(StorageService.getStoreKey(store.code, 'z_counter')) || '0'),
-        cashiers: StorageService.loadCashiers(store.code),
-        customers: (() => {
+        closures: storeData?.closures || StorageService.loadClosures(store.code),
+        zCounter: storeData?.zCounter ?? Number(localStorage.getItem(StorageService.getStoreKey(store.code, 'z_counter')) || '0'),
+        cashiers: storeData?.cashiers || StorageService.loadCashiers(store.code),
+        customers: storeData?.customers || (() => {
           try { return JSON.parse(localStorage.getItem(StorageService.getStoreKey(store.code, 'customers')) || '[]'); } catch { return []; }
         })(),
       };
@@ -246,7 +248,7 @@ const parseMap = (raw: string | null): Record<string, any[]> => {
   }
 };
 
-const collectStoreTransactions = (storeCode: string, closures: any[]): any[] => {
+const collectStoreTransactions = (storeCode: string, closures: any[], transactionsByDayOverride?: Record<string, any[]>): any[] => {
   const seen = new Set<string>();
   const out: any[] = [];
   const add = (tx: any) => {
@@ -263,7 +265,7 @@ const collectStoreTransactions = (storeCode: string, closures: any[]): any[] => 
     txs.forEach(add);
   }
 
-  const map = parseMap(localStorage.getItem(StorageService.getStoreKey(storeCode, 'transactions_by_day')));
+  const map = transactionsByDayOverride || parseMap(localStorage.getItem(StorageService.getStoreKey(storeCode, 'transactions_by_day')));
   Object.values(map).forEach((list) => {
     if (Array.isArray(list)) list.forEach(add);
   });
@@ -412,9 +414,9 @@ const transactionsByDayFromClosures = (closures: any[]): Record<string, any[]> =
   return map;
 };
 
-const buildStoreStats = (storeCode: string, storeName: string): StoreStats => {
-  const closures = StorageService.loadClosures(storeCode);
-  const txs = collectStoreTransactions(storeCode, closures);
+const buildStoreStats = (storeCode: string, storeName: string, backOfficeData?: BackOfficeStoreData | null): StoreStats => {
+  const closures = backOfficeData?.closures || StorageService.loadClosures(storeCode);
+  const txs = collectStoreTransactions(storeCode, closures, backOfficeData?.transactionsByDay);
   const totalCA = txs.reduce((sum, tx) => sum + (Number(tx?.total) || 0), 0);
   const dates = txs
     .map((tx) => new Date(tx?.timestamp))
@@ -594,12 +596,25 @@ const BackOfficeDashboard: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedDay, setSelectedDay] = useState<string>('all');
   const [articleSort, setArticleSort] = useState<'amount' | 'qty' | 'name'>('amount');
+  const [backOfficeData, setBackOfficeData] = useState<Record<string, BackOfficeStoreData | null>>({});
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    BackOfficeStorage.loadAll(stores.map((store) => store.code))
+      .then((data) => {
+        if (!cancelled) setBackOfficeData(data);
+      })
+      .catch((error) => console.error('Erreur chargement Back office IndexedDB:', error));
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshKey, stores]);
 
   const statsByStore = useMemo(() => {
     void refreshKey;
-    return stores.map((store) => buildStoreStats(store.code, store.name));
-  }, [refreshKey, stores]);
+    return stores.map((store) => buildStoreStats(store.code, store.name, backOfficeData[store.code]));
+  }, [backOfficeData, refreshKey, stores]);
 
   const selectedBase = statsByStore.find((store) => store.code === selectedStoreCode) || statsByStore[0];
   const availableMonths = useMemo(() => {
@@ -680,24 +695,28 @@ const BackOfficeDashboard: React.FC = () => {
       if (Array.isArray(data.subcategories)) StorageService.saveSubcategories(data.subcategories, targetStoreCode);
       let mergedClosures: any[] | null = null;
       const importedDailyClosures = buildDailyClosuresFromBackup(data);
+      const existingBackOffice = await BackOfficeStorage.loadStore(targetStoreCode);
       if (importedDailyClosures.length > 0) {
-        const existingClosures = StorageService.loadClosures(targetStoreCode);
+        const existingClosures = existingBackOffice?.closures || [];
         mergedClosures = mergeClosuresByDay(existingClosures, importedDailyClosures);
-        StorageService.saveAllClosures(mergedClosures, targetStoreCode);
       }
       const txFromClosures = importedDailyClosures.length > 0 ? transactionsByDayFromClosures(importedDailyClosures) : {};
       const incomingTransactionsByDay = mergeTransactionsByDay(txFromClosures, data.transactionsByDay || {});
-      if (Object.keys(incomingTransactionsByDay).length > 0) {
-        const existingMap = parseMap(localStorage.getItem(StorageService.getStoreKey(targetStoreCode, 'transactions_by_day')));
-        StorageService.saveTransactionsByDayMap(mergeTransactionsByDay(existingMap, incomingTransactionsByDay), targetStoreCode);
-      }
-      if (Number.isFinite(Number(data.zCounter))) {
-        const maxZ = (mergedClosures || StorageService.loadClosures(targetStoreCode))
-          .reduce((max, closure) => Math.max(max, Number(closure?.zNumber) || 0), 0);
-        StorageService.setZCounterValue(Math.max(Number(data.zCounter) || 0, maxZ), targetStoreCode);
-      }
-      if (Array.isArray(data.cashiers)) StorageService.saveCashiers(data.cashiers, targetStoreCode);
-      if (Array.isArray(data.customers)) StorageService.saveCustomers(data.customers, targetStoreCode);
+      const mergedTransactionsByDay = mergeTransactionsByDay(existingBackOffice?.transactionsByDay || {}, incomingTransactionsByDay);
+      const maxZ = (mergedClosures || existingBackOffice?.closures || [])
+        .reduce((max, closure) => Math.max(max, Number(closure?.zNumber) || 0), 0);
+      await BackOfficeStorage.saveStore({
+        storeCode: targetStoreCode,
+        storeName: targetStore.name,
+        updatedAt: new Date().toISOString(),
+        closures: mergedClosures || existingBackOffice?.closures || [],
+        transactionsByDay: mergedTransactionsByDay,
+        zCounter: Math.max(Number(data.zCounter) || 0, maxZ, existingBackOffice?.zCounter || 0),
+        settings: data.settings || existingBackOffice?.settings,
+        subcategories: Array.isArray(data.subcategories) ? data.subcategories : existingBackOffice?.subcategories,
+        cashiers: Array.isArray(data.cashiers) ? data.cashiers : existingBackOffice?.cashiers,
+        customers: Array.isArray(data.customers) ? data.customers : existingBackOffice?.customers,
+      });
       setSelectedStoreCode(targetStoreCode);
       setRefreshKey((value) => value + 1);
       window.alert(`Sauvegarde restaurée dans ${targetStore.name}.`);
@@ -753,7 +772,7 @@ const BackOfficeDashboard: React.FC = () => {
         <Button
           variant="outlined"
           size="large"
-          onClick={() => exportBackOfficeBackup(stores)}
+          onClick={() => exportBackOfficeBackup(stores, backOfficeData)}
         >
           Sauvegarde Back office
         </Button>
@@ -855,8 +874,12 @@ const BackOfficeDashboard: React.FC = () => {
                       );
                       if (!ok) return;
                       StorageService.prepareActiveStoreForFullRestore(selected.code);
-                      setRefreshKey((value) => value + 1);
-                      window.alert(`Imports remis à zéro pour ${selected.name}.`);
+                      BackOfficeStorage.clearStore(selected.code)
+                        .then(() => {
+                          setRefreshKey((value) => value + 1);
+                          window.alert(`Imports remis à zéro pour ${selected.name}.`);
+                        })
+                        .catch((error) => window.alert(`Erreur remise à zéro: ${(error as Error).message}`));
                     }}
                   >
                     RAZ imports boutique
