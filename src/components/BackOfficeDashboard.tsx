@@ -76,6 +76,102 @@ const downloadCsv = (filename: string, headers: string[], rows: Array<Array<stri
   URL.revokeObjectURL(url);
 };
 
+const htmlEscape = (value: unknown): string =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+const htmlRows = (rows: Array<Array<string | number>>): string =>
+  rows.map((row) => `<tr>${row.map((cell) => `<td>${htmlEscape(cell)}</td>`).join('')}</tr>`).join('');
+
+const downloadHtml = (filename: string, title: string, body: string): void => {
+  const html = `<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>${htmlEscape(title)}</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; color: #1f2933; margin: 32px; background: #f7f9fc; }
+    .page { background: white; border: 1px solid #d9e2ec; border-radius: 12px; padding: 28px; max-width: 1180px; margin: 0 auto; }
+    h1 { margin: 0 0 4px; color: #0d47a1; font-size: 28px; }
+    h2 { margin: 28px 0 10px; color: #123c69; border-bottom: 2px solid #d9e2ec; padding-bottom: 6px; }
+    .meta { color: #52606d; margin-bottom: 20px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }
+    .kpi { border: 1px solid #d9e2ec; border-radius: 10px; padding: 14px; background: #f8fbff; }
+    .label { color: #627d98; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .value { font-size: 22px; font-weight: 800; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th { background: #0d47a1; color: white; text-align: left; padding: 9px; font-size: 13px; }
+    td { border-bottom: 1px solid #e6edf5; padding: 8px; font-size: 13px; }
+    tr:nth-child(even) td { background: #fafcff; }
+    .ok { color: #1b5e20; font-weight: 700; }
+    .warn { color: #b26a00; font-weight: 700; }
+    .footer { margin-top: 28px; color: #829ab1; font-size: 12px; }
+    @media print { body { background: white; margin: 0; } .page { border: none; } }
+  </style>
+</head>
+<body><div class="page">${body}<div class="footer">Rapport généré par Klick Caisse Back office - ${new Date().toLocaleString('fr-FR')}</div></div></body>
+</html>`;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+const buildStoreHtmlReport = (store: StoreStats): string => {
+  const paymentRows = Object.entries(store.paymentTotals).map(([label, amount]) => [label, formatEuro(Number(amount) || 0)]);
+  return `
+    <h1>Rapport boutique - ${htmlEscape(store.name)}</h1>
+    <div class="meta">Période: ${store.firstDate ? store.firstDate.toLocaleDateString('fr-FR') : '-'} - ${store.lastDate ? store.lastDate.toLocaleDateString('fr-FR') : '-'}</div>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Chiffre d'affaires</div><div class="value">${formatEuro(store.totalCA)}</div></div>
+      <div class="kpi"><div class="label">Tickets</div><div class="value">${store.ticketCount}</div></div>
+      <div class="kpi"><div class="label">Panier moyen</div><div class="value">${formatEuro(store.ticketCount ? store.totalCA / store.ticketCount : 0)}</div></div>
+      <div class="kpi"><div class="label">Marge estimée</div><div class="value">${formatEuro(store.marginAmount)}</div></div>
+    </div>
+    <h2>Rapprochement</h2>
+    <table><thead><tr><th>Contrôle</th><th>Montant</th></tr></thead><tbody>${htmlRows([
+      ['CA tickets', formatEuro(store.totalCA)],
+      ['Total paiements', formatEuro(store.paymentTotal)],
+      ['Total clôtures', formatEuro(store.closureTotal || store.totalCA)],
+      ['Dernier Z', `Z${store.lastZ || '-'}`],
+    ])}</tbody></table>
+    <p class="${store.anomalies.length ? 'warn' : 'ok'}">${store.anomalies.length ? store.anomalies.map(htmlEscape).join('<br/>') : 'Aucune anomalie détectée'}</p>
+    <h2>Paiements</h2>
+    <table><thead><tr><th>Mode</th><th>Total</th></tr></thead><tbody>${htmlRows(paymentRows)}</tbody></table>
+    <h2>Ventes par jour</h2>
+    <table><thead><tr><th>Jour</th><th>CA</th><th>Tickets</th><th>Articles</th></tr></thead><tbody>${htmlRows(store.dailyRows.map((row) => [row.key, formatEuro(row.ca), row.tickets, row.qty]))}</tbody></table>
+    <h2>Ventes par mois</h2>
+    <table><thead><tr><th>Mois</th><th>CA</th><th>Tickets</th><th>Articles</th></tr></thead><tbody>${htmlRows(store.monthlyRows.map((row) => [row.key, formatEuro(row.ca), row.tickets, row.qty]))}</tbody></table>
+    <h2>Top articles par CA</h2>
+    <table><thead><tr><th>#</th><th>Article</th><th>Quantité</th><th>CA</th></tr></thead><tbody>${htmlRows(store.topProducts.map((product, index) => [index + 1, product.name, product.qty, formatEuro(product.amount)]))}</tbody></table>
+  `;
+};
+
+const buildGlobalHtmlReport = (stores: StoreStats[]): string => `
+  <h1>Rapport global multi-boutiques</h1>
+  <div class="meta">Comparaison des boutiques importées dans le Back office central.</div>
+  <table>
+    <thead><tr><th>Boutique</th><th>CA</th><th>Tickets</th><th>Panier moyen</th><th>Z</th><th>Marge estimée</th><th>Alertes</th></tr></thead>
+    <tbody>${htmlRows(stores.map((store) => [
+      store.name,
+      formatEuro(store.totalCA),
+      store.ticketCount,
+      formatEuro(store.ticketCount ? store.totalCA / store.ticketCount : 0),
+      store.zCount,
+      formatEuro(store.marginAmount),
+      store.anomalies.length ? store.anomalies.join(' | ') : 'OK',
+    ]))}</tbody>
+  </table>
+`;
+
 const parseMap = (raw: string | null): Record<string, any[]> => {
   try {
     const parsed = raw ? JSON.parse(raw) : {};
@@ -343,6 +439,13 @@ const BackOfficeDashboard: React.FC = () => {
         <Button variant="outlined" size="large" onClick={() => setRefreshKey((value) => value + 1)}>
           Rafraîchir
         </Button>
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={() => downloadHtml('rapport-global-boutiques.html', 'Rapport global multi-boutiques', buildGlobalHtmlReport(statsByStore))}
+        >
+          Export HTML global
+        </Button>
       </Box>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 2 }}>
@@ -418,7 +521,19 @@ const BackOfficeDashboard: React.FC = () => {
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
             <Card sx={{ gridColumn: '1 / -1' }}>
               <CardContent>
-                <Typography variant="h5" fontWeight={900}>{selected.name}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h5" fontWeight={900} sx={{ flex: 1 }}>{selected.name}</Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => downloadHtml(
+                      `rapport-${selected.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.html`,
+                      `Rapport boutique - ${selected.name}`,
+                      buildStoreHtmlReport(selected)
+                    )}
+                  >
+                    Export HTML boutique
+                  </Button>
+                </Box>
                 <Typography color="text.secondary">
                   Période: {selected.firstDate ? selected.firstDate.toLocaleDateString('fr-FR') : '-'} - {selected.lastDate ? selected.lastDate.toLocaleDateString('fr-FR') : '-'}
                 </Typography>
