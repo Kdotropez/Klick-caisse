@@ -612,6 +612,7 @@ const BackOfficeDashboard: React.FC = () => {
   const [articleSort, setArticleSort] = useState<'amount' | 'qty' | 'name'>('amount');
   const [backOfficeData, setBackOfficeData] = useState<Record<string, BackOfficeStoreData | null>>({});
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const backOfficeBackupInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -765,6 +766,42 @@ const BackOfficeDashboard: React.FC = () => {
     }
   };
 
+  const restoreBackOfficeBackup = async (file: File) => {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (data?.type !== 'klick-back-office-backup' || !Array.isArray(data.stores)) {
+      window.alert('Ce fichier n’est pas une sauvegarde Back office globale.');
+      return;
+    }
+    const ok = window.confirm(
+      `Importer la sauvegarde Back office globale ?\n\n` +
+      `${data.stores.length} boutique(s)\n` +
+      `Export: ${data.exportedAt || '-'}\n\n` +
+      `Les données Back office du téléphone seront remplacées pour les boutiques présentes dans le fichier.`
+    );
+    if (!ok) return;
+
+    for (const store of data.stores) {
+      const storeCode = String(store.code || '');
+      if (!storeCode) continue;
+      await BackOfficeStorage.saveStore({
+        storeCode,
+        storeName: store.name,
+        updatedAt: new Date().toISOString(),
+        closures: Array.isArray(store.closures) ? store.closures : [],
+        transactionsByDay: store.transactionsByDay || {},
+        zCounter: Number(store.zCounter) || undefined,
+        settings: store.settings,
+        subcategories: Array.isArray(store.subcategories) ? store.subcategories : [],
+        cashiers: Array.isArray(store.cashiers) ? store.cashiers : [],
+        customers: Array.isArray(store.customers) ? store.customers : [],
+        imports: Array.isArray(store.imports) ? store.imports : [],
+      });
+    }
+    setRefreshKey((value) => value + 1);
+    window.alert('Sauvegarde Back office globale importée.');
+  };
+
   return (
     <Box sx={{ height: '100%', width: '100%', overflow: 'auto', backgroundColor: '#f4f6f8', p: 2, boxSizing: 'border-box' }}>
       <input
@@ -776,6 +813,17 @@ const BackOfficeDashboard: React.FC = () => {
           const file = event.target.files?.[0];
           event.target.value = '';
           if (file) void restoreBackup(file);
+        }}
+      />
+      <input
+        ref={backOfficeBackupInputRef}
+        type="file"
+        accept=".json,application/json"
+        hidden
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          event.target.value = '';
+          if (file) void restoreBackOfficeBackup(file);
         }}
       />
 
@@ -814,6 +862,13 @@ const BackOfficeDashboard: React.FC = () => {
           onClick={() => exportBackOfficeBackup(stores, backOfficeData)}
         >
           Sauvegarde Back office
+        </Button>
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={() => backOfficeBackupInputRef.current?.click()}
+        >
+          Import global Back office
         </Button>
       </Box>
 
