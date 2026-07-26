@@ -130,7 +130,9 @@ const RecapModal: React.FC<RecapModalProps> = ({ open, onClose, cartItems, itemD
           
           <List sx={{ backgroundColor: 'white', borderRadius: 1, border: '1px solid #e0e0e0' }}>
             {cartItems.map((item, index) => {
-              const originalPrice = getLineOriginalUnitPrice(item);
+              const originalPrice = (item as any).customPrice !== undefined
+                ? Number((item as any).customPrice) || 0
+                : getLineOriginalUnitPrice(item);
               const finalPrice = resolveFinalUnit(item);
               const originalTotal = originalPrice * item.quantity;
               const finalTotal = finalPrice * item.quantity;

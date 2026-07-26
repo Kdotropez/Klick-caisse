@@ -33,6 +33,11 @@ function coerceUnit(value: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function getLineBaseUnitPrice(item: TicketLineItem): number {
+  if (item.customPrice !== undefined) return coerceUnit(item.customPrice);
+  return getLineOriginalUnitPrice(item);
+}
+
 export function getLineFinalUnitPrice(
   item: TicketLineItem,
   itemDiscounts: Record<string, ItemDiscount> = {}
@@ -101,12 +106,13 @@ export function computeTicketTotalBreakdown(
   const list = Array.isArray(items) ? items : [];
 
   const subtotal = list.reduce((sum, item) => {
-    const originalPrice = getLineOriginalUnitPrice(item);
+    const originalPrice = getLineBaseUnitPrice(item);
     const qty = Number(item.quantity) || 0;
     return sum + originalPrice * qty;
   }, 0);
 
   const individualDiscounts = list.reduce((sum, item) => {
+    if (item.customPrice !== undefined) return sum;
     const originalPrice = getLineOriginalUnitPrice(item);
     const qty = Number(item.quantity) || 0;
     const originalTotal = originalPrice * qty;
@@ -121,7 +127,7 @@ export function computeTicketTotalBreakdown(
       const discountKey = getLineDiscountKey(item);
       const hasIndividualDiscount = itemDiscounts[discountKey];
       if (!hasIndividualDiscount && !isLineExcludedFromGlobalDiscount(item, settings)) {
-        const originalPrice = getLineOriginalUnitPrice(item);
+        const originalPrice = getLineBaseUnitPrice(item);
         const qty = Number(item.quantity) || 0;
         return sum + originalPrice * qty;
       }
@@ -214,7 +220,7 @@ export function allocateGlobalDiscountByLineKey(
   for (const item of items) {
     const key = getLineDiscountKey(item);
     if (itemDiscounts[key] || isLineExcludedFromGlobalDiscount(item, settings)) continue;
-    const weight = getLineOriginalUnitPrice(item) * (Number(item.quantity) || 0);
+    const weight = getLineBaseUnitPrice(item) * (Number(item.quantity) || 0);
     if (weight > 0) eligible.push({ key, weight });
   }
 

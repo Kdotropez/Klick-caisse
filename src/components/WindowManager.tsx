@@ -203,6 +203,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   const [showGlobalDiscountModal, setShowGlobalDiscountModal] = useState(false);
   const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null);
   const [itemDiscounts, setItemDiscounts] = useState<{[key: string]: {type: 'euro' | 'percent' | 'price', value: number}}>({});
+  const [itemPriceOverrides, setItemPriceOverrides] = useState<Record<string, number>>({});
   const [globalDiscount, setGlobalDiscount] = useState<{type: 'euro' | 'percent', value: number} | null>(null);
   const [autoGlassDiscountEnabled, setAutoGlassDiscountEnabled] = useState<boolean>(() => {
     try {
@@ -1739,7 +1740,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     // Construire la transaction et persister
     const tx = {
       id: Date.now().toString(),
-      items: cartItems.map(i => ({ ...i })),
+      items: getCartItemsWithPriceOverrides().map(i => ({ ...i })),
       total,
       paymentMethod: method,
       cashierName: 'Caissier',
@@ -1760,6 +1761,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
 
     // Réinitialiser toutes les remises pour la vente suivante
     setItemDiscounts({});
+    setItemPriceOverrides({});
     setGlobalDiscount(null);
 
     debugLog(`Règlement ${method} réussi - Total: ${total.toFixed(2)}€ - Compteurs de ventes mis à jour`);
@@ -1770,6 +1772,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
     onClearCart: () => {
       if (cartItems.length === 0) return;
       setItemDiscounts({});
+      setItemPriceOverrides({});
       setGlobalDiscount(null);
       onClearCart?.();
     },
@@ -2929,12 +2932,32 @@ const WindowManager: React.FC<WindowManagerProps> = ({
   };
 
   const getItemFinalPrice = (item: CartItem) => {
-    return getLineFinalUnitPrice(item, itemDiscounts as Record<string, ItemDiscount>);
+    const key = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+    const override = itemPriceOverrides[key];
+    const itemWithOverride = override !== undefined
+      ? {
+          ...item,
+          customPrice: override,
+          originalPrice: item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice,
+        }
+      : item;
+    return getLineFinalUnitPrice(itemWithOverride, itemDiscounts as Record<string, ItemDiscount>);
   };
+
+  const getCartItemsWithPriceOverrides = () => cartItems.map((item) => {
+    const key = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+    const override = itemPriceOverrides[key];
+    if (override === undefined) return item;
+    return {
+      ...item,
+      customPrice: override,
+      originalPrice: item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice,
+    } as any;
+  });
 
   const getTotalWithGlobalDiscount = () => {
     return computeTicketTotal(
-      cartItems,
+      getCartItemsWithPriceOverrides(),
       itemDiscounts as Record<string, ItemDiscount>,
       globalDiscount,
       loadDiscountExclusionSettings()
@@ -2986,6 +3009,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
           <CartPanel
             cartItems={cartItems}
             itemDiscounts={itemDiscounts as any}
+            itemPriceOverrides={itemPriceOverrides}
             globalDiscount={globalDiscount as any}
             getItemFinalPrice={getItemFinalPrice}
             getTotalWithGlobalDiscount={getTotalWithGlobalDiscount}
@@ -2997,11 +3021,26 @@ const WindowManager: React.FC<WindowManagerProps> = ({
             // Ouvre le tableau des remises via le bouton Récap s'il faut un accès rapide
             onResetCartAndDiscounts={() => { 
   setItemDiscounts({}); 
+  setItemPriceOverrides({});
   setGlobalDiscount(null); 
   setLockedCompensations({ seau: {}, vasque: {} });
   cartItems.forEach(item => onRemoveItem(item.product.id, item.selectedVariation?.id || null)); 
 }}
             onRemoveItemDiscount={(key) => { const next = { ...itemDiscounts } as any; delete next[key]; setItemDiscounts(next); }}
+            onSetItemPriceOverride={(itemId, variationId, value) => {
+              const key = `${itemId}-${variationId || 'main'}`;
+              setItemPriceOverrides((prev) => ({ ...prev, [key]: value }));
+              setItemDiscounts((prev) => {
+                const next = { ...prev } as any;
+                if (next[key]?.type === 'price') delete next[key];
+                return next;
+              });
+            }}
+            onRemoveItemPriceOverride={(key) => {
+              const next = { ...itemPriceOverrides };
+              delete next[key];
+              setItemPriceOverrides(next);
+            }}
             onClearGlobalDiscount={() => setGlobalDiscount(null)}
             promoBanner={null}
             autoGlassDiscountEnabled={autoGlassDiscountEnabled}
@@ -3715,7 +3754,7 @@ const WindowManager: React.FC<WindowManagerProps> = ({
            <RecapModal
              open={showRecapModal}
              onClose={() => setShowRecapModal(false)}
-             cartItems={cartItems}
+             cartItems={getCartItemsWithPriceOverrides() as any}
              itemDiscounts={itemDiscounts as any}
              globalDiscount={globalDiscount as any}
              getItemFinalPrice={getItemFinalPrice}

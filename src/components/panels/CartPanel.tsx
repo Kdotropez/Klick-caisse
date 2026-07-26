@@ -26,6 +26,7 @@ export type { ItemDiscount };
 interface CartPanelProps {
   cartItems: CartItem[];
   itemDiscounts: Record<string, ItemDiscount>;
+  itemPriceOverrides?: Record<string, number>;
   globalDiscount: { type: 'euro' | 'percent'; value: number } | null;
   getItemFinalPrice: (item: CartItem) => number;
   getTotalWithGlobalDiscount: () => number;
@@ -37,6 +38,8 @@ interface CartPanelProps {
   
   onResetCartAndDiscounts: () => void;
   onRemoveItemDiscount: (discountKey: string) => void;
+  onSetItemPriceOverride?: (itemId: string, variationId: string | null, value: number) => void;
+  onRemoveItemPriceOverride?: (discountKey: string) => void;
   onClearGlobalDiscount: () => void;
   promoBanner?: React.ReactNode;
   autoGlassDiscountEnabled?: boolean;
@@ -53,6 +56,7 @@ interface CartPanelProps {
 const CartPanel: React.FC<CartPanelProps> = ({
   cartItems,
   itemDiscounts,
+  itemPriceOverrides = {},
   globalDiscount,
   getItemFinalPrice,
   getTotalWithGlobalDiscount,
@@ -63,6 +67,8 @@ const CartPanel: React.FC<CartPanelProps> = ({
   onOpenGlobalDiscount,
   onResetCartAndDiscounts,
   onRemoveItemDiscount,
+  onSetItemPriceOverride,
+  onRemoveItemPriceOverride,
   onClearGlobalDiscount,
   promoBanner,
   autoGlassDiscountEnabled = true,
@@ -80,6 +86,18 @@ const CartPanel: React.FC<CartPanelProps> = ({
   const [editingPrice, setEditingPrice] = useState<{ key: string; value: string } | null>(null);
 
   const exclusionSettings = useMemo(() => loadDiscountExclusionSettings(), []);
+  const cartItemsForTotals = useMemo(() => {
+    return (Array.isArray(cartItems) ? cartItems : []).map((item) => {
+      const key = `${item.product.id}-${item.selectedVariation?.id || 'main'}`;
+      const override = itemPriceOverrides[key];
+      if (override === undefined) return item;
+      return {
+        ...item,
+        customPrice: override,
+        originalPrice: item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice,
+      } as any;
+    });
+  }, [cartItems, itemPriceOverrides]);
 
   // Protection contre les états incohérents avec stabilisation
   const safeCartItems = useMemo(() => {
@@ -96,12 +114,12 @@ const CartPanel: React.FC<CartPanelProps> = ({
 
   const totalsBreakdown = useMemo(() => {
     return computeTicketTotalBreakdown(
-      Array.isArray(cartItems) ? cartItems : [],
+      cartItemsForTotals,
       itemDiscounts as Record<string, ItemDiscount>,
       globalDiscount,
       exclusionSettings
     );
-  }, [cartItems, exclusionSettings, globalDiscount, itemDiscounts]);
+  }, [cartItemsForTotals, exclusionSettings, globalDiscount, itemDiscounts]);
 
   // Auto-scroll vers le bas quand de nouveaux articles sont ajoutés
   useEffect(() => {
@@ -154,11 +172,13 @@ const CartPanel: React.FC<CartPanelProps> = ({
               const variationId = item.selectedVariation?.id || null;
               const discountKey = `${item.product.id}-${variationId || 'main'}`;
               const discount = itemDiscounts[discountKey];
+              const priceOverride = itemPriceOverrides[discountKey];
+              const visibleDiscount = discount && discount.type !== 'price' ? discount : undefined;
               const originalPrice = item.selectedVariation ? item.selectedVariation.finalPrice : item.product.finalPrice;
               const finalPrice = getItemFinalPrice(item);
               const originalTotal = originalPrice * item.quantity;
               const finalTotal = finalPrice * item.quantity;
-              const discountAmountPerUnit = originalPrice - finalPrice;
+              const discountAmountPerUnit = visibleDiscount ? originalPrice - finalPrice : 0;
               const discountAmountTotal = discountAmountPerUnit * item.quantity;
               const discountPercent = originalPrice > 0 ? (discountAmountPerUnit / originalPrice) * 100 : 0;
 
@@ -218,7 +238,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
                                   const normalized = editingPrice.value.replace(',', '.');
                                   const val = parseFloat(normalized);
                                   if (Number.isFinite(val) && val >= 0) {
-                                    onApplyItemDiscount(item.product.id, variationId, 'price', val);
+                                    onSetItemPriceOverride?.(item.product.id, variationId, val);
                                     setEditingPrice(null);
                                   } else {
                                     alert('Prix invalide');
@@ -234,7 +254,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
                                 const normalized = editingPrice.value.replace(',', '.');
                                 const val = parseFloat(normalized);
                                 if (Number.isFinite(val) && val >= 0) {
-                                  onApplyItemDiscount(item.product.id, variationId, 'price', val);
+                                  onSetItemPriceOverride?.(item.product.id, variationId, val);
                                   setEditingPrice(null);
                                 } else {
                                   alert('Prix invalide');
@@ -250,14 +270,14 @@ const CartPanel: React.FC<CartPanelProps> = ({
                             <Typography
                               variant="body2"
                               noWrap
-                              sx={{ width: 62, textAlign: 'right', fontWeight: 'bold', color: discount?.type==='price' ? '#ef6c00' : '#666', textDecoration: discount?.type==='price' ? 'underline' : 'none' }}
+                              sx={{ width: 62, textAlign: 'right', fontWeight: 'bold', color: priceOverride !== undefined ? '#ef6c00' : '#666', textDecoration: priceOverride !== undefined ? 'underline' : 'none' }}
                               onClick={() => {
                                 const currentUnit = finalPrice;
                                 setEditingPrice({ key: discountKey, value: currentUnit.toFixed(2).replace('.', ',') });
                               }}
-                              title={discount?.type==='price' ? 'Prix modifié - cliquer pour changer' : 'Cliquer pour modifier le prix'}
+                              title={priceOverride !== undefined ? 'Prix modifié - cliquer pour changer' : 'Cliquer pour modifier le prix'}
                             >
-                              {(discount?.type==='price' ? finalPrice : originalPrice).toFixed(2)} €
+                              {(priceOverride !== undefined ? finalPrice : originalPrice).toFixed(2)} €
                             </Typography>
                             <IconButton
                               size="small"
@@ -273,7 +293,7 @@ const CartPanel: React.FC<CartPanelProps> = ({
                         )}
                       </Box>
 
-                      {discount && (
+                      {visibleDiscount && (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} onClick={(e) => e.stopPropagation()}>
                           <Typography variant="caption" noWrap sx={{ color: '#ef6c00', fontWeight: 'bold', maxWidth: 92 }}>
                             -{discountAmountTotal.toFixed(2)}€ ({discountPercent.toFixed(0)}%)
@@ -282,6 +302,17 @@ const CartPanel: React.FC<CartPanelProps> = ({
                             {originalTotal.toFixed(2)}€
                           </Typography>
                           <IconButton size="small" onClick={() => onRemoveItemDiscount(discountKey)} sx={{ color: '#ff0000', p: 0.25 }}>
+                            ✕
+                          </IconButton>
+                        </Box>
+                      )}
+
+                      {priceOverride !== undefined && !visibleDiscount && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} onClick={(e) => e.stopPropagation()}>
+                          <Typography variant="caption" noWrap sx={{ color: '#ef6c00', fontWeight: 'bold', maxWidth: 110 }}>
+                            Prix modifié
+                          </Typography>
+                          <IconButton size="small" onClick={() => onRemoveItemPriceOverride?.(discountKey)} sx={{ color: '#ff0000', p: 0.25 }}>
                             ✕
                           </IconButton>
                         </Box>
