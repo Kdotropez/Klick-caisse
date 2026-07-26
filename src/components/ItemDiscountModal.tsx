@@ -14,6 +14,7 @@ import {
   MenuItem,
   Paper,
   Divider,
+  Alert,
 } from '@mui/material';
 import { CartItem } from '../types/Product';
 
@@ -169,10 +170,13 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
         textAlign: 'center',
         fontWeight: 'bold'
       }}>
-        💰 Remise sur {item.product.name}
+        🏷️ Remise article — {item.product.name}
       </DialogTitle>
 
       <DialogContent sx={{ pt: 3 }}>
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Cette fenêtre sert aux remises. Pour changer le prix réel d’un article, utilisez le crayon à côté du prix dans le panier.
+        </Alert>
         {/* Mode d'application */}
         <Box sx={{ display: 'flex', gap: 1, mb: 2, justifyContent: 'center' }}>
           <Button variant={mode==='unit'?'contained':'outlined'} onClick={() => setMode('unit')}>Par unité</Button>
@@ -252,17 +256,24 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
 
         {/* Type de remise */}
         <FormControl fullWidth sx={{ mb: 3 }}>
-          <InputLabel>Type de modification</InputLabel>
+          <InputLabel>Type de remise</InputLabel>
           <Select
             value={discountType}
-            onChange={(e) => setDiscountType(e.target.value as 'euro' | 'percent' | 'price')}
-            label="Type de modification"
+            onChange={(e) => setDiscountType(e.target.value as 'euro' | 'percent')}
+            label="Type de remise"
           >
             <MenuItem value="percent">Remise en pourcentage (%)</MenuItem>
             <MenuItem value="euro">Remise en euros {mode==='unit' ? '(par unité)' : '(sur total)'} </MenuItem>
-            <MenuItem value="price">{mode==='unit' ? 'Nouveau prix unitaire' : 'Nouveau total'}</MenuItem>
           </Select>
         </FormControl>
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, mb: 2 }}>
+          {(discountType === 'percent' ? [5, 10, 15, 20] : [1, 2, 5, 10]).map((value) => (
+            <Button key={value} variant="outlined" onClick={() => setDiscountValue(value)}>
+              {discountType === 'percent' ? `-${value}%` : `-${value}€`}
+            </Button>
+          ))}
+        </Box>
 
         {/* Valeur de la remise */}
         {discountType === 'percent' && (
@@ -318,10 +329,10 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
         )}
 
         {/* Résumé de la modification */}
-        {(discountValue > 0 || (discountType === 'price' && ((mode==='unit' && newUnitPrice > 0) || (mode==='total' && newTotal > 0)))) && (
+        {discountValue > 0 && (
           <Paper sx={{ p: 2, backgroundColor: '#e8f5e8', mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'center' }}>
-              Résumé de la modification
+              Résumé de la remise
             </Typography>
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -381,7 +392,7 @@ const ItemDiscountModal: React.FC<ItemDiscountModalProps> = ({
             '&:hover': { backgroundColor: '#f57c00' }
           }}
         >
-          Appliquer la modification
+          Appliquer la remise
         </Button>
       </DialogActions>
     </Dialog>
