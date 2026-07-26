@@ -169,7 +169,9 @@ const CartPanel: React.FC<CartPanelProps> = ({
           <List dense>
             {safeCartItems.map((item, index) => {
               const isExcludedForDiscount = isLineExcludedFromGlobalDiscount(item, exclusionSettings);
-              const variationId = item.selectedVariation?.id || null;
+              const variationId = item.selectedVariation
+                ? (item.selectedVariation.id || item.selectedVariation.ean13 || item.selectedVariation.reference || item.selectedVariation.attributes || null)
+                : null;
               const discountKey = `${item.product.id}-${variationId || 'main'}`;
               const discount = itemDiscounts[discountKey];
               const priceOverride = itemPriceOverrides[discountKey];

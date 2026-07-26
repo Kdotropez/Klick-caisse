@@ -31,6 +31,11 @@ function getDefaultRootSize(): { width: string; height: string } {
   };
 }
 
+const getVariationKey = (variation?: ProductVariation): string => {
+  if (!variation) return '';
+  return String(variation.id || variation.ean13 || variation.reference || variation.attributes || '');
+};
+
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -158,12 +163,12 @@ const App: React.FC = () => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => 
         item.product.id === product.id && 
-        item.selectedVariation?.id === variation.id
+        getVariationKey(item.selectedVariation) === getVariationKey(variation)
       );
       
       if (existingItem) {
         return prevItems.map(item =>
-          item.product.id === product.id && item.selectedVariation?.id === variation.id
+          item.product.id === product.id && getVariationKey(item.selectedVariation) === getVariationKey(variation)
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -177,7 +182,7 @@ const App: React.FC = () => {
     setCartItems(prevItems => {
       const itemIndex = prevItems.findIndex(item => 
         item.product.id === productId && 
-        (variationId ? item.selectedVariation?.id === variationId : !item.selectedVariation)
+        (variationId ? getVariationKey(item.selectedVariation) === variationId : !item.selectedVariation)
       );
       
       if (itemIndex === -1) return prevItems;
@@ -196,7 +201,7 @@ const App: React.FC = () => {
     setCartItems(prevItems => 
       prevItems.filter(item => 
         !(item.product.id === productId && 
-          (variationId ? item.selectedVariation?.id === variationId : !item.selectedVariation))
+          (variationId ? getVariationKey(item.selectedVariation) === variationId : !item.selectedVariation))
       )
     );
   };

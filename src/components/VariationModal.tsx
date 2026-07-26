@@ -29,8 +29,18 @@ const VariationModal: React.FC<VariationModalProps> = ({
 }) => {
   if (!product) return null;
 
-  const handleVariationSelect = (variation: ProductVariation) => {
-    onSelectVariation(variation);
+  const getVariationSafeId = (variation: ProductVariation, index: number) => {
+    return String(
+      variation.id ||
+      variation.ean13 ||
+      variation.reference ||
+      variation.attributes ||
+      `variation-${index}`
+    );
+  };
+
+  const handleVariationSelect = (variation: ProductVariation, index: number) => {
+    onSelectVariation({ ...variation, id: getVariationSafeId(variation, index) });
     onClose();
   };
 
@@ -90,8 +100,8 @@ const VariationModal: React.FC<VariationModalProps> = ({
           gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
           gap: 2 
         }}>
-          {product.variations.map((variation) => (
-            <Box key={variation.id}>
+          {product.variations.map((variation, index) => (
+            <Box key={`${getVariationSafeId(variation, index)}-${index}`}>
               <Card 
                 sx={{ 
                   cursor: 'pointer',
@@ -101,7 +111,7 @@ const VariationModal: React.FC<VariationModalProps> = ({
                     boxShadow: 3
                   }
                 }}
-                onClick={() => handleVariationSelect(variation)}
+                onClick={() => handleVariationSelect(variation, index)}
               >
                 <CardContent sx={{ textAlign: 'center', p: 2 }}>
                   {/* Attributs (taille, couleur, etc.) */}
