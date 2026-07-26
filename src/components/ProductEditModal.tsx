@@ -283,7 +283,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              label="Prix de vente HT"
+              label="Prix de vente TTC"
               type="number"
               value={editedProduct.finalPrice}
               onChange={(e) => handleInputChange('finalPrice', parseFloat(e.target.value) || 0)}
