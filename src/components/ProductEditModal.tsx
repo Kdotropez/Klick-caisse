@@ -49,6 +49,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [showVariationForm, setShowVariationForm] = useState(false);
   const [error, setError] = useState('');
   const [newSubcategory, setNewSubcategory] = useState<string>('');
+  const [bulkVariationPrice, setBulkVariationPrice] = useState<number>(0);
 
   useEffect(() => {
     if (product) {
@@ -123,6 +124,34 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
             }
           : v
       )
+    });
+  };
+
+  const handleVariationFinalPriceChange = (variationId: string, finalPrice: number) => {
+    if (!editedProduct) return;
+    setEditedProduct({
+      ...editedProduct,
+      variations: editedProduct.variations.map((variation) =>
+        variation.id === variationId
+          ? {
+              ...variation,
+              finalPrice,
+              priceImpact: finalPrice - editedProduct.finalPrice,
+            }
+          : variation
+      ),
+    });
+  };
+
+  const applyBulkVariationPrice = () => {
+    if (!editedProduct || bulkVariationPrice <= 0) return;
+    setEditedProduct({
+      ...editedProduct,
+      variations: editedProduct.variations.map((variation) => ({
+        ...variation,
+        finalPrice: bulkVariationPrice,
+        priceImpact: bulkVariationPrice - editedProduct.finalPrice,
+      })),
     });
   };
 
@@ -354,6 +383,23 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
             {editedProduct.variations.length > 0 && (
               <Box sx={{ mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 2, p: 1.5, backgroundColor: '#fff8e1', borderRadius: 1 }}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    label="Prix final pour toutes"
+                    value={bulkVariationPrice}
+                    onChange={(e) => setBulkVariationPrice(parseFloat(e.target.value) || 0)}
+                    inputProps={{ step: 0.01, min: 0 }}
+                    sx={{ width: 190 }}
+                  />
+                  <Button variant="contained" onClick={applyBulkVariationPrice} disabled={bulkVariationPrice <= 0}>
+                    Appliquer à toutes les déclinaisons
+                  </Button>
+                  <Typography variant="caption" color="text.secondary">
+                    Définit le même prix final pour toutes les déclinaisons.
+                  </Typography>
+                </Box>
                 {editedProduct.variations.map((variation, index) => (
                   <Box
                     key={variation.id}
@@ -378,8 +424,8 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
                       </IconButton>
                     </Box>
                     
-                                         <Grid container spacing={1}>
-                       <Grid item xs={12} md={3}>
+                     <Grid container spacing={1}>
+                       <Grid item xs={12} md={2}>
                          <TextField
                            fullWidth
                            size="small"
@@ -388,7 +434,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
                            onChange={(e) => handleVariationChange(variation.id, 'attributes', e.target.value)}
                          />
                        </Grid>
-                       <Grid item xs={12} md={3}>
+                       <Grid item xs={12} md={2}>
                          <TextField
                            fullWidth
                            size="small"
@@ -399,7 +445,18 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
                            inputProps={{ step: 0.01 }}
                          />
                        </Grid>
-                       <Grid item xs={12} md={3}>
+                       <Grid item xs={12} md={2}>
+                         <TextField
+                           fullWidth
+                           size="small"
+                           label="Prix final"
+                           type="number"
+                           value={variation.finalPrice}
+                           onChange={(e) => handleVariationFinalPriceChange(variation.id, parseFloat(e.target.value) || 0)}
+                           inputProps={{ step: 0.01, min: 0 }}
+                         />
+                       </Grid>
+                       <Grid item xs={12} md={2}>
                          <TextField
                            fullWidth
                            size="small"
@@ -408,7 +465,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
                            onChange={(e) => handleVariationChange(variation.id, 'ean13', e.target.value)}
                          />
                        </Grid>
-                       <Grid item xs={12} md={3}>
+                       <Grid item xs={12} md={2}>
                          <TextField
                            fullWidth
                            size="small"
