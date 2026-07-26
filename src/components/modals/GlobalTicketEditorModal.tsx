@@ -185,34 +185,21 @@ const GlobalTicketEditorModal: React.FC<GlobalTicketEditorModalProps> = ({ open,
                     secondaryAction={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <IconButton size="small" onClick={() => setDraft((prev: any) => {
-                          const newItems = prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: Math.max(0, (x.quantity||0)-1) } : x);
-                          const newTotal = (newItems || []).reduce((s:number, it:any) => {
-                            const unit = it.customPrice !== undefined
-                              ? it.customPrice
-                              : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
-                            return s + (unit * (it.quantity || 0));
-                          }, 0);
+                          const newItems = prev.items
+                            .map((x:any,i:number)=> i===idx ? { ...x, quantity: Math.max(0, (x.quantity||0)-1) } : x)
+                            .filter((x:any) => (Number(x.quantity) || 0) > 0);
+                          const newTotal = recalcDraftTotal(newItems, { ...prev, items: newItems });
                           return { ...prev, items: newItems, total: newTotal };
                         })}><Remove fontSize="small" /></IconButton>
                         <Typography variant="caption" sx={{ fontFamily: 'monospace', minWidth: 20, textAlign: 'center' }}>{it.quantity}</Typography>
                         <IconButton size="small" onClick={() => setDraft((prev: any) => {
                           const newItems = prev.items.map((x:any,i:number)=> i===idx ? { ...x, quantity: (x.quantity||0)+1 } : x);
-                          const newTotal = (newItems || []).reduce((s:number, it:any) => {
-                            const unit = it.customPrice !== undefined
-                              ? it.customPrice
-                              : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
-                            return s + (unit * (it.quantity || 0));
-                          }, 0);
+                          const newTotal = recalcDraftTotal(newItems, { ...prev, items: newItems });
                           return { ...prev, items: newItems, total: newTotal };
                         })}><Add fontSize="small" /></IconButton>
                         <IconButton size="small" color="error" onClick={() => setDraft((prev:any) => {
                           const newItems = prev.items.filter((_:any,i:number)=> i!==idx);
-                          const newTotal = (newItems || []).reduce((s:number, it:any) => {
-                            const unit = it.customPrice !== undefined
-                              ? it.customPrice
-                              : (it.selectedVariation ? it.selectedVariation.finalPrice : it.product.finalPrice);
-                            return s + (unit * (it.quantity || 0));
-                          }, 0);
+                          const newTotal = recalcDraftTotal(newItems, { ...prev, items: newItems });
                           return { ...prev, items: newItems, total: newTotal };
                         })}>✕</IconButton>
                       </Box>
