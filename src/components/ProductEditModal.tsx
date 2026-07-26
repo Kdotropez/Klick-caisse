@@ -59,6 +59,19 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   const handleInputChange = (field: keyof Product, value: any) => {
     if (!editedProduct) return;
+
+    if (field === 'finalPrice') {
+      const nextBasePrice = Number(value) || 0;
+      setEditedProduct({
+        ...editedProduct,
+        finalPrice: nextBasePrice,
+        variations: editedProduct.variations.map((variation) => ({
+          ...variation,
+          finalPrice: nextBasePrice + (Number(variation.priceImpact) || 0),
+        })),
+      });
+      return;
+    }
     
     setEditedProduct({
       ...editedProduct,
@@ -100,7 +113,15 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     setEditedProduct({
       ...editedProduct,
       variations: editedProduct.variations.map(v => 
-        v.id === variationId ? { ...v, [field]: value } : v
+        v.id === variationId
+          ? {
+              ...v,
+              [field]: value,
+              ...(field === 'priceImpact'
+                ? { finalPrice: editedProduct.finalPrice + (Number(value) || 0) }
+                : {}),
+            }
+          : v
       )
     });
   };
