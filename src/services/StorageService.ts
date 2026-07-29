@@ -748,6 +748,19 @@ export class StorageService {
     }
   }
 
+  static loadTransactionsForDay(dayKey: string): Transaction[] {
+    try {
+      const map = this.getTransactionsByDayMap();
+      const list = Array.isArray(map[dayKey]) ? map[dayKey] : [];
+      return list
+        .map((t: any) => this.normalizeTransactionRecord(t))
+        .filter((t): t is Transaction => t !== null);
+    } catch (error) {
+      console.error(`Erreur lors du chargement des transactions du ${dayKey}:`, error);
+      return [];
+    }
+  }
+
   static clearTodayTransactions(): void {
     try {
       const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
@@ -758,6 +771,18 @@ export class StorageService {
       this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
     } catch (error) {
       console.error('Erreur lors de l\'effacement des transactions du jour:', error);
+    }
+  }
+
+  static clearTransactionsForDay(dayKey: string): void {
+    try {
+      const raw = localStorage.getItem(this.activeStoreKey('transactions_by_day'));
+      if (!raw) return;
+      const map: Record<string, any[]> = JSON.parse(raw);
+      delete map[dayKey];
+      this.setItemWithQuotaRecovery(this.activeStoreKey('transactions_by_day'), JSON.stringify(map));
+    } catch (error) {
+      console.error(`Erreur lors de l'effacement des transactions du ${dayKey}:`, error);
     }
   }
 
