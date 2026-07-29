@@ -24,7 +24,7 @@ const EndOfDayModal: React.FC<EndOfDayModalProps> = ({ open, onClose, transactio
     return Object.keys(map)
       .filter((day) => Array.isArray(map[day]) && map[day].length > 0)
       .sort((a, b) => b.localeCompare(a));
-  }, [open]);
+  }, []);
 
   const todayKey = getLocalDateKey();
   const [selectedDate, setSelectedDate] = useState(() => availableDays[0] || todayKey);
